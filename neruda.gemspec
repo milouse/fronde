@@ -5,7 +5,7 @@ Gem::Specification.new do |s|
   s.name        = 'neruda'
   s.version     = '0.0.1'
   s.date        = '2017-06-12'
-  s.summary     = 'A simplistic way to publish book online.'
+  s.summary     = 'A simplistic way to publish a book online.'
   s.description = 'Write your org files, we take care of the rest.'
   s.authors     = ['Étienne Deparis']
   s.email       = 'etienne@depar.is'
