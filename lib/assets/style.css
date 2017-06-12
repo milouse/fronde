@@ -1,0 +1,199 @@
+body {
+    font-family: serif;
+    font-size: 20pt;
+}
+
+a:hover {
+    text-decoration: none;
+}
+
+dt {
+    font-weight: bold;
+}
+dt:after {
+    font-weight: bold;
+    content: ":";
+}
+
+figure {
+    text-align: center;
+}
+
+kbd {
+    border-width: .3em;
+    border-style: solid;
+}
+
+#content,
+#footer,
+.status {
+    width: 968px;
+    margin: 1em auto;
+}
+
+#content img {
+    max-width: 100%;
+}
+
+
+/**
+ * Content
+ */
+
+#content {
+    padding: 1em;
+    line-height: 1.5em;
+}
+
+#content h1.chapter-title {
+    margin: 0;
+    line-height: 1.5em;
+}
+
+.chapter-meta {
+    font-size: smaller;
+    padding: 0 .4em;
+    border-left-style: solid;
+    border-left-width: .4em;
+    border-radius: .4em;
+}
+.chapter-meta p {
+    margin: .3em 0;
+}
+
+.src {
+    font-family: Inconsolata, monospace;
+    font-size: 1em;
+    display:block;
+    padding-left:.4em;
+    margin:1em 1.5em;
+    line-height:1.5em;
+    border-left-width: .4em;
+    border-left-style: solid;
+    border-radius: .4em;
+    overflow-x: auto;
+}
+
+blockquote  {
+    display: block;
+    padding: 0 1.5em;
+    font-style: italic;
+    margin: 1em 0;
+}
+blockquote::after {
+    display: table;
+    content: "";
+    clear: both;
+}
+blockquote>*:first-child::before {
+    content: "« ";
+    font-size: 3em;
+}
+blockquote>*:last-child::after {
+    content: " »";
+    font-size: 2em;
+}
+
+div.footnotes,
+.footdef {
+    font-size: smaller;
+}
+div.footnotes::before,
+.footdef::before {
+    content: "---";
+    display: block;
+}
+div.footnotes,
+.footdef sup {
+    font-size: smaller;
+}
+
+#content .chapter::after {
+    content: "❦";
+    font-size: xx-large;
+    display: block;
+    text-align: center;
+}
+
+/**
+ * Footer
+ */
+#gotop {
+    position: fixed;
+    bottom: 0em;
+    right: 1em;
+    font-size: smaller;
+}
+
+#footer {
+    clear: both;
+    padding-top: 0;
+    font-size: smaller;
+    margin-bottom: .5em;
+}
+
+/**
+ * Responsive...
+ */
+@media screen and (max-width: 968px) {
+    #content, .status {
+        width: 90%;
+    }
+}
+
+
+/**
+ * Colors
+ * We used the Dracula color theme
+ * https://draculatheme.com/
+ */
+
+body {
+    background: #282a36;
+    color: #f8f8f2;
+}
+
+h1 {
+    color: #ffb86c;
+}
+
+h2 {
+    color: #bd93f9;
+}
+
+a:link, a:visited {
+    color: #ff79c6;
+}
+
+kbd {
+    border-color: #f8f8f2;
+}
+
+code {
+    background: #373844;
+    color: #e2e2dc;
+}
+
+mark {
+    background: #f1fa8c;
+}
+
+.chapter-meta {
+    border-left-color: #373844;
+    background-color: #464752;
+}
+
+.src {
+    border-left-color: #bd93f9;
+}
+
+blockquote>*:first-child::before {
+    color: #50fa7b;
+}
+blockquote>*:last-child::after {
+    color: #50fa7b;
+}
+
+.comment-content {
+    border-left-color: #bd93f9;
+}

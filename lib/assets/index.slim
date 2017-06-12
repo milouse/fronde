@@ -1,0 +1,13 @@
+h1 = title
+
+== text
+
+p
+  a href=proxy_url('/epub/all') Télécharger la version complète
+
+h2 Chapitres
+
+ul
+  - @chapters.each do |c|
+    li
+      a href=proxy_url("/chapter/#{c[:slug]}") = c[:title]

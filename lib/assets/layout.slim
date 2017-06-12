@@ -1,0 +1,17 @@
+doctype html
+html
+  head
+    title #{title}
+    meta name='author' content=author
+    link rel='stylesheet' href=proxy_url('/style.css') type='text/css'
+
+  body
+    #content
+      == yield
+
+    footer#footer.status
+      p © #{author}
+      p#gotop
+        a href=proxy_url('/') Accueil
+        '  ·
+        a href='#top' Aller en haut

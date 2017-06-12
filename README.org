@@ -1,0 +1,57 @@
+#+title: Neruda
+
+**Neruda** is a little [[http://sinatrarb.com][Sinatra]] app template, which aims to offer a quick
+access for writers to web publication. It is named in memory of Pablo
+Neruda.
+
+* Install
+
+These installation instructions use [[https://rvm.io][rvm]] as ruby provider. If you want to
+use rbenv or your system ruby, please refer to their specific
+documentation to know how to install ruby 2.4 and [[https://bundler.io/][bundler]].
+
+First we need to upgrade rvm (always do that from time to time):
+
+#+begin_src shell
+$ rvm get latest
+$ rvm install ruby-2.4.1
+#+end_src
+
+Then the installation itself:
+
+#+begin_src shell
+$ mkdir mysite
+$ rvm use ruby-2.4.1
+$ rvm gemset create neruda
+$ rvm gemset use neruda
+$ gem install neruda
+#+end_src
+
+Finally, you need to configure it to your needs.
+
+#+begin_src shell
+$ pablo init
+#+end_src
+
+* Running it
+
+For testing it, you should just run:
+
+#+begin_src shell
+$ pablo start
+#+end_src
+
+For production use, just pass the right environnement variable:
+
+#+begin_src shell
+$ APP_ENV=production pablo start
+#+end_src
+
+To stop it, just enter =ctrl+C= if you are in development mode or enter
+=pablo stop= in production mode.
+
+You can now start your first chapter: =pablo new=
+
+* Known issues
+
+See [[TODO.org][TODO.org]]

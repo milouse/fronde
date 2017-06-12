@@ -1,0 +1,157 @@
+#!/usr/bin/env ruby
+
+require 'yaml'
+require 'fileutils'
+
+def help
+  unless File.exist?(File.join(__dir__, 'config/config.yml'))
+    STDERR.puts 'Please init your website: pablo init'
+    exit 1
+  end
+
+  options = ['start', 'stop', 'new']
+  if File.exist? 'Capfile'
+    options << 'push'
+  else
+    options << 'capify'
+  end
+
+  STDERR.puts "pablo [ #{options.join(' | ')} ]"
+  exit 1
+end
+
+def capify
+  if File.exist? 'Capfile'
+    STDERR.puts 'Capfile already exists. Aborting'
+    exit 1
+  end
+
+  FileUtils.copy File.join(__dir__, '../docs/Capfile.example'), 'Capfile'
+end
+
+def _init_path
+  FileUtils.mkdir_p 'config'
+  FileUtils.mkdir_p 'public'
+  FileUtils.mkdir_p 'tmp/pids'
+  FileUtils.mkdir_p 'private/orgs'
+  FileUtils.mkdir_p 'private/epubs'
+end
+
+def _init_config
+  config = {}
+  print 'Name of your website: '
+  config['title'] = STDIN.gets.strip
+  print 'Your author name: '
+  config['author'] = STDIN.gets.strip
+  print 'Main language of your website [en_US]: '
+  lang = STDIN.gets.strip
+  lang = 'en_US' if lang == ''
+  config['lang'] = lang
+
+  main_title = config['title'].tr(' ', '_').downcase.gsub(/[^a-z0-9_]/, '')
+  print "Filename of the main generated epub [#{main_title}]: "
+  epub = STDIN.gets.strip
+  if epub == ''
+    epub = main_title
+  else
+    epub = File.basename(epub, '.epub')
+  end
+  config['book_filename'] = epub
+  config['chapters'] = []
+
+  IO.write 'config/config.yml', config.to_yaml
+end
+
+def _init_assets
+  unless Dir.exist? 'views'
+    FileUtils.cp_r File.join(__dir__, '../lib/assets'), 'views'
+  end
+
+  return if File.exist? 'public/style.css'
+  FileUtils.mv 'views/style.css', 'public/style.css'
+end
+
+def _init_rackup
+  unless File.exist? 'Rakefile'
+    FileUtils.copy File.join(__dir__, '../docs/Rakefile.example'), 'Rakefile'
+  end
+
+  return if File.exist? 'config.ru'
+  rackup_conf = <<EOF
+# frozen_string_literal: true
+
+require 'neruda'
+run Neruda::App
+EOF
+  IO.write('config.ru', rackup_conf)
+end
+
+def init
+  _init_path
+  _init_config
+  _init_assets
+  _init_rackup
+end
+
+def create_new(title)
+  if title == ''
+    filename = 'new'
+  else
+    filename = title.tr(' ', '_').downcase.gsub(/[^a-z0-9_]/, '')
+  end
+
+  filename = "private/orgs/#{filename}.org"
+
+  if Dir.exist? 'private/orgs'
+    config = YAML.load_file('config/config.yml')
+    IO.write filename, <<EOF
+#+title: #{title}
+#+date: <#{Date.today.strftime('%Y-%m-%d %a.')}>
+#+author: #{config['author']}
+
+
+EOF
+  end
+
+  editor = ENV['EDITOR'] || 'emacs'
+  exec editor, filename
+end
+
+if ARGV[0] == 'init'
+  init
+
+elsif ARGV[0] == 'capify'
+  capify
+
+elsif ['start', 'run'].include?(ARGV[0])
+  loc_env = ENV['APP_ENV'] || 'development'
+  cmd = ['rackup', "-E #{loc_env}", '-P', 'tmp/pids/neruda.pid']
+  cmd << '-D' if loc_env == 'production'
+  exec cmd.join(' ')
+
+elsif ARGV[0] == 'stop'
+  unless File.exist? 'tmp/pids/neruda.pid'
+    STDERR.puts 'No pid file found'
+    exit 1
+  end
+  pid = IO.read('tmp/pids/neruda.pid').strip.to_i
+  Process.kill('TERM', pid)
+  File.unlink 'tmp/pids/neruda.pid'
+
+elsif ARGV[0] == 'new'
+  if ARGV[1].nil?
+    print 'Title: '
+    title = STDIN.gets.strip
+  else
+    title = ARGV[1]
+  end
+
+  create_new title
+
+elsif ARGV[0].nil?
+  help
+
+else
+  exec 'rake', ARGV[0]
+
+end

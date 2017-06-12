@@ -1,0 +1,17 @@
+---
+
+title: My Awesome Title
+author: Me Myself
+# license: © Me
+# lang: en_US
+
+book_filename: my_awesome_title
+
+## If we are behind a subfolder reverse proxy
+# base_path: /subfolder
+
+chapters:
+  - in_the
+  - order
+  - we_wish
+  - they_appear
