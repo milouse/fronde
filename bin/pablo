@@ -25,6 +25,7 @@ def capify
   capfile = File.new('Capfile', 'a')
   capfile.write <<EOF
 neruda_spec = Gem::Specification.find_by_name 'neruda'
+Dir.glob("\#{neruda_spec.gem_dir}/lib/tasks/*.rake").each { |r| import r }
 Dir.glob("\#{neruda_spec.gem_dir}/lib/tasks/capistrano/*.rake").each { |r| import r }
 EOF
 end
