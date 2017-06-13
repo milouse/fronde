@@ -10,23 +10,24 @@ def help
   end
 
   options = ['start', 'stop', 'new']
-  if File.exist? 'Capfile'
-    options << 'push'
-  else
-    options << 'capify'
-  end
+  options << 'capify' if File.exist? 'Capfile'
 
   STDERR.puts "pablo [ #{options.join(' | ')} ]"
   exit 1
 end
 
 def capify
-  if File.exist? 'Capfile'
-    STDERR.puts 'Capfile already exists. Aborting'
+  unless File.exist? 'Capfile'
+    STDERR.puts 'Capfile does not exist. Aborting'
     exit 1
   end
 
-  FileUtils.copy File.join(__dir__, '../docs/Capfile.example'), 'Capfile'
+  capfile = File.new('Capfile', 'a')
+  capfile.write <<EOF
+neruda_spec = Gem::Specification.find_by_name 'neruda'
+puts neruda_spec.gem_dir
+Dir.glob("\#{neruda_spec.gem_dir}/lib/tasks/capistrano/*.rake").each { |r| import r }
+EOF
 end
 
 def _init_path
