@@ -124,19 +124,16 @@ elsif ARGV[0] == 'capify'
   capify
 
 elsif ['start', 'run'].include?(ARGV[0])
-  loc_env = ENV['APP_ENV'] || 'development'
-  cmd = ['rackup', "-E #{loc_env}", '-P', 'tmp/pids/neruda.pid']
-  cmd << '-D' if loc_env == 'production'
-  exec cmd.join(' ')
+  puts 'You can also start neruda with the following command:'
+  puts 'rake sinatra:start'
+
+  exec 'rake', 'sinatra:start'
 
 elsif ARGV[0] == 'stop'
-  unless File.exist? 'tmp/pids/neruda.pid'
-    STDERR.puts 'No pid file found'
-    exit 1
-  end
-  pid = IO.read('tmp/pids/neruda.pid').strip.to_i
-  Process.kill('TERM', pid)
-  File.unlink 'tmp/pids/neruda.pid'
+  puts 'You can also stop neruda with the following command:'
+  puts 'rake sinatra:stop'
+
+  exec 'rake', 'sinatra:stop'
 
 elsif ARGV[0] == 'new'
   if ARGV[1].nil?

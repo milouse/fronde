@@ -1,6 +1,6 @@
 namespace :sinatra do
-  desc 'Restart the underlaying sinatra application'
-  task :restart_server do
+  desc 'Restart the remote neruda application'
+  task :restart_remote_server do
     on roles(:app) do
       within release_path do
         if test("[ -e '#{release_path}/tmp/pids/sinatra.pid' ]")
