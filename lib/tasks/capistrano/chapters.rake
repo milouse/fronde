@@ -23,22 +23,24 @@ namespace :chapters do
   end
 
   desc 'Upload the complete book'
-  task upload_book: ['chapters:prepare_book', 'chapters:upload_epubs']
+  task upload_book: ['chapters:make_book', 'chapters:upload_epubs']
 
-  desc 'Remove remote orphaned epub files'
-  task :purge do
-    neruda_config = YAML.load_file('config/config.yml')
-    final_org = neruda_config['book_filename'] || 'all'
-    on roles(:app) do
-      within release_path do
-        epub_files = capture :ls, '-1', 'private/epubs/*.epub'
-        epub_files.each_line do |filename|
-          filename.delete!("\n")
-          file_radix = File.basename(filename, '.epub')
-          next if file_radix == final_org
-          org_file = "private/orgs/#{file_radix}.org"
-          unless test("[ -e '#{release_path}/#{org_file}' ]")
-            execute :rm, filename
+  namespace :purge do
+    desc 'Remove remote orphaned epub files'
+    task :remote do
+      neruda_config = YAML.load_file('config/config.yml')
+      final_org = neruda_config['book_filename'] || 'all'
+      on roles(:app) do
+        within release_path do
+          epub_files = capture :ls, '-1', 'private/epubs/*.epub'
+          epub_files.each_line do |filename|
+            filename.delete!("\n")
+            file_radix = File.basename(filename, '.epub')
+            next if file_radix == final_org
+            org_file = "private/orgs/#{file_radix}.org"
+            unless test("[ -e '#{release_path}/#{org_file}' ]")
+              execute :rm, filename
+            end
           end
         end
       end

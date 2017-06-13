@@ -17,4 +17,7 @@ namespace :sinatra do
     cmd << '-D' if loc_env == 'production'
     exec cmd.join(' ')
   end
+
+  desc 'Restart local sinatra server'
+  task restart: ['sinatra:stop', 'sinatra:start']
 end
