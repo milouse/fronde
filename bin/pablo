@@ -4,7 +4,7 @@ require 'yaml'
 require 'fileutils'
 
 def help
-  unless File.exist?(File.join(__dir__, 'config/config.yml'))
+  unless File.exist? 'config/config.yml'
     STDERR.puts 'Please init your website: pablo init'
     exit 1
   end
@@ -148,10 +148,6 @@ elsif ARGV[0] == 'new'
 
   create_new title
 
-elsif ARGV[0].nil?
-  help
-
 else
-  exec 'rake', ARGV[0]
-
+  help
 end
