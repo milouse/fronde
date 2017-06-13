@@ -9,13 +9,25 @@ Gem::Specification.new do |s|
   s.description = 'Write your org files, we take care of the rest.'
   s.authors     = ['Étienne Deparis']
   s.email       = 'etienne@depar.is'
-  s.files       = ['lib/neruda.rb', 'lib/neruda/chapter.rb',
-                   'lib/neruda/url.rb', 'lib/tasks/chapters.rake',
-                   'lib/tasks/sinatra.rake', 'lib/assets/chapter.slim',
-                   'lib/assets/layout.slim', 'lib/assets/index.slim',
-                   'lib/assets/style.css', 'docs/Capfile.example',
-                   'docs/Rakefile.example', 'docs/config.yml.example',
-                   'README.org', 'TODO.org', 'LICENSE']
+  s.files       = ['lib/neruda.rb',
+                   'lib/neruda/chapter.rb',
+                   'lib/neruda/url.rb',
+                   # Rake tasks
+                   'lib/tasks/chapters.rake',
+                   'lib/tasks/sinatra.rake',
+                   'lib/tasks/capistrano/chapters.rake',
+                   'lib/tasks/capistrano/sinatra.rake',
+                   # Various template examples
+                   'lib/assets/chapter.slim',
+                   'lib/assets/layout.slim',
+                   'lib/assets/index.slim',
+                   'lib/assets/style.css',
+                   # Bootstrap config files
+                   'docs/Rakefile.example',
+                   'docs/config.yml.example',
+                   'README.org',
+                   'TODO.org',
+                   'LICENSE']
   s.executables = ['pablo']
   s.homepage    = 'https://git.deparis.io/neruda/'
   s.license     = 'WTFPL'
