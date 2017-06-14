@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 namespace :sinatra do
   desc 'Stop the underlaying sinatra application'
   task :stop do

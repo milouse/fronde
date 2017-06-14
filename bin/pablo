@@ -1,4 +1,6 @@
 #!/usr/bin/env ruby
+# coding: utf-8
+# frozen_string_literal: true
 
 require 'yaml'
 require 'fileutils'
@@ -23,11 +25,11 @@ def capify
   end
 
   capfile = File.new('Capfile', 'a')
-  capfile.write <<EOF
-neruda_spec = Gem::Specification.find_by_name 'neruda'
-Dir.glob("\#{neruda_spec.gem_dir}/lib/tasks/*.rake").each { |r| import r }
-Dir.glob("\#{neruda_spec.gem_dir}/lib/tasks/capistrano/*.rake").each { |r| import r }
-EOF
+  capfile.write <<~EOF
+    neruda_spec = Gem::Specification.find_by_name 'neruda'
+    Dir.glob("\#{neruda_spec.gem_dir}/lib/tasks/*.rake").each { |r| import r }
+    Dir.glob("\#{neruda_spec.gem_dir}/lib/tasks/capistrano/*.rake").each { |r| import r }
+  EOF
 end
 
 def _init_path
@@ -78,12 +80,12 @@ def _init_rackup
   end
 
   return if File.exist? 'config.ru'
-  rackup_conf = <<EOF
-# frozen_string_literal: true
+  rackup_conf = <<~EOF
+    # frozen_string_literal: true
 
-require 'neruda'
-run Neruda::App
-EOF
+    require 'neruda'
+    run Neruda::App
+  EOF
   IO.write('config.ru', rackup_conf)
 end
 
@@ -103,16 +105,15 @@ def create_new(title)
 
   filename = "private/orgs/#{filename}.org"
 
-  if Dir.exist? 'private/orgs'
-    config = YAML.load_file('config/config.yml')
-    IO.write filename, <<EOF
-#+title: #{title}
-#+date: <#{Date.today.strftime('%Y-%m-%d %a.')}>
-#+author: #{config['author']}
+  FileUtils.mkdir_p 'private/orgs' unless Dir.exist? 'private/orgs'
+  config = YAML.load_file('config/config.yml')
+  IO.write filename, <<~EOF
+    #+title: #{title}
+    #+date: <#{Date.today.strftime('%Y-%m-%d %a.')}>
+    #+author: #{config['author']}
 
 
-EOF
-  end
+  EOF
 
   editor = ENV['EDITOR'] || 'emacs'
   exec editor, filename
