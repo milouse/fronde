@@ -156,7 +156,7 @@ def create_new(title)
 
   EOF
 
-  editor = ENV['EDITOR'] || 'emacs'
+  editor = ENV['EDITOR'] || ENV['VISUAL'] || 'emacs'
   exec editor, filename
 end
 
