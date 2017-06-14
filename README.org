@@ -3,11 +3,14 @@
 *Neruda* is a little [[http://sinatrarb.com][Sinatra]] app, which aims to offer a quick access for
 writers to web publication. It is named in memory of Pablo Neruda.
 
+Source code is available on my [[https://git.deparis.io/neruda][cgit instance]], while issues should be
+followed on my [[https://projects.deparis.io/projects/neruda][redmine instance]].
+
 * Install
 
 These installation instructions use [[https://rvm.io][rvm]] as ruby provider. If you want to
 use rbenv or your system ruby, please refer to their specific
-documentation to know how to install ruby 2.4 and [[https://bundler.io/][bundler]].
+documentation to know how to install ruby 2.4.
 
 First we need to upgrade rvm (always do that from time to time):
 
@@ -20,9 +23,7 @@ Then the installation itself:
 
 #+begin_src shell
 $ mkdir mysite
-$ rvm use ruby-2.4.1
-$ rvm gemset create neruda
-$ rvm gemset use neruda
+$ rvm use ruby-2.4.1@neruda --create
 $ gem install neruda
 #+end_src
 
@@ -30,6 +31,7 @@ Finally, you need to configure it to your needs.
 
 #+begin_src shell
 $ pablo init
+$ bundle install
 #+end_src
 
 * Running it
@@ -49,7 +51,56 @@ $ APP_ENV=production pablo start
 To stop it, just enter =ctrl+C= if you are in development mode or enter
 =pablo stop= in production mode.
 
-You can now start your first chapter: =pablo new=
+* Pablo command
+
+In order to manage you Neruda installation, this gem provides a little
+helper called =pablo=. You already used it to =init=, =start= and =stop=
+your local installation. It can do a little more.
+
+** New
+
+=pablo new [article title]= will open your favorite text editor to let
+you write a new chapter to your book.
+
+If you don't provide a title to the command, =pablo= will ask you for
+one before launching your editor.
+
+If you don't have configured the =EDITOR= or =VISUAL= environnement
+variable, =pablo= will default to Gnu Emacs.
+
+** Compile
+
+=pablo compile= will first convert your orphaned org files (the ones
+without a corresponding epub file), then producing the global epub book,
+made with all your chapters.
+
+** Capify
+
+=pablo capify= will add the correct references to Neruda rake tasks in
+your =Capfile=, what will allow you to call them as part of your
+deployment workflow.
+
+You can add the =chapters:sync= task:
+
+#+begin_src ruby
+after 'deploy:finishing', 'chapters:sync'
+#+end_src
+
+This task depends on all the following. Or you can just select a bunch
+of them:
+
+#+begin_src ruby
+after 'deploy:finishing', 'chapters:build_epubs'
+after 'deploy:finishing', 'chapters:upload_epubs'
+after 'deploy:finishing', 'chapters:upload_book'
+after 'deploy:finishing', 'chapters:purge:remote'
+#+end_src
+
+Don't forget to restart the remote sinatra server:
+
+#+begin_src ruby
+after 'deploy:finished', 'sinatra:restart:remote'
+#+end_src
 
 * Known issues
 
