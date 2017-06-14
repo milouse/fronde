@@ -3,24 +3,25 @@
 # frozen_string_literal: true
 
 require 'yaml'
+require 'rainbow'
 require 'fileutils'
 
 def help
   unless File.exist? 'config/config.yml'
-    STDERR.puts 'Please init your website: pablo init'
+    STDERR.puts 'Please init your website: ' +
+                Rainbow('pablo init').yellow
     exit 1
   end
 
   options = ['start', 'stop', 'new']
   options << 'capify' if File.exist? 'Capfile'
 
-  STDERR.puts "pablo [ #{options.join(' | ')} ]"
-  exit 1
+  STDERR.puts 'Usage: ' + Rainbow("pablo [ #{options.join(' | ')} ]").yellow
 end
 
 def capify
   unless File.exist? 'Capfile'
-    STDERR.puts 'Capfile does not exist. Aborting'
+    STDERR.puts Rainbow('ERROR: Capfile does not exist.').red
     exit 1
   end
 
@@ -90,10 +91,15 @@ def _init_rackup
 end
 
 def init
+  puts Rainbow('Creating main folders…').green
   _init_path
+  puts Rainbow('Populating config file…').green
   _init_config
+  puts Rainbow('Copying template files…').green
   _init_assets
+  puts Rainbow('Installing rake and bundler files…').green
   _init_rackup
+  puts Rainbow('Neruda has been successfully installed.').green
 end
 
 def create_new(title)
