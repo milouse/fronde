@@ -14,4 +14,5 @@ rvm --force gemset delete nerudatest
 rvm gemset create nerudatest
 rvm gemset use nerudatest
 gem install $neruda_gem
+echo 'ruby-2.4.1@nerudatest' > .ruby-version
 pwd
