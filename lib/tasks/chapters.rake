@@ -45,7 +45,7 @@ namespace :chapters do
       next if file_radix == 'index'
       epub_file = "private/epubs/#{file_radix}.epub"
       epub_to_upload << epub_file
-      execute :pandoc, '-S', "-o #{epub_file}", filename
+      system 'pandoc', '-S', "-o #{epub_file}", filename
     end
     next if epub_to_upload.empty?
     IO.write('tmp/epub_to_upload.yml', epub_to_upload.to_yaml)

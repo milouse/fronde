@@ -17,7 +17,7 @@ namespace :sinatra do
     loc_env = ENV['APP_ENV'] || 'development'
     cmd = ['rackup', "-E #{loc_env}", '-P', 'tmp/pids/neruda.pid']
     cmd << '-D' if loc_env == 'production'
-    exec cmd.join(' ')
+    system cmd.join(' ')
   end
 
   desc 'Restart local sinatra server'
