@@ -1,7 +1,6 @@
 require 'yaml'
 
 namespace :chapters do
-
   desc 'Upload epub files listed in tmp/epub_to_upload.yml'
   task :upload_epubs do
     next unless File.exist?('tmp/epub_to_upload.yml')
@@ -32,7 +31,12 @@ namespace :chapters do
       final_org = neruda_config['book_filename'] || 'all'
       on roles(:app) do
         within release_path do
-          epub_files = capture :ls, '-1', 'private/epubs/*.epub'
+          begin
+            epub_files = capture :ls, '-1', 'private/epubs/*.epub'
+          rescue SSHKit::Command::Failed
+            warn 'No epub files found. Aborting.'
+            next
+          end
           epub_files.each_line do |filename|
             filename.delete!("\n")
             file_radix = File.basename(filename, '.epub')
