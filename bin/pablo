@@ -90,6 +90,37 @@ def _init_rackup
   IO.write('config.ru', rackup_conf)
 end
 
+def _init_bundler
+  # print 'Do you want to use [o]rg files, [m]arkdown files or [b]oth' \
+  #       ' (default is org): '
+  # markup = STDIN.gets.strip.downcase
+  # if markup == 'm'
+  #   markup_gem = 'gem \'kramdown\''
+  # elsif markup == 'b'
+  #   markup_gem = "gem 'kramdown'\ngem 'org-ruby'"
+  # else
+  #   markup_gem = 'gem \'org-ruby\''
+  # end
+  markup_gem = 'gem \'org-ruby\''
+
+  gemfile = <<~EOF
+    # frozen_string_literal: true
+
+    source 'https://rubygems.org'
+
+    gem 'neruda'
+    #{markup_gem}
+
+    group :development do
+      gem 'capistrano'
+      gem 'capistrano-bundler'
+      gem 'capistrano-rvm'
+      gem 'rubocop'
+    end
+  EOF
+  IO.write('Gemfile', gemfile)
+end
+
 def init
   puts Rainbow('Creating main folders…').green
   _init_path
@@ -99,7 +130,11 @@ def init
   _init_assets
   puts Rainbow('Installing rake and bundler files…').green
   _init_rackup
+  _init_bundler
   puts Rainbow('Neruda has been successfully installed.').green
+  puts ''
+  puts 'To complete this installation, you must now run: ' +
+       Rainbow('bundle install').yellow
 end
 
 def create_new(title)
@@ -132,16 +167,12 @@ elsif ARGV[0] == 'capify'
   capify
 
 elsif ['start', 'run'].include?(ARGV[0])
-  puts 'You can also start neruda with the following command:'
-  puts 'rake sinatra:start'
-
-  exec 'rake', 'sinatra:start'
+  puts Rainbow('bundle exec rake sinatra:start').green
+  system 'bundle', 'exec', 'rake', 'sinatra:start'
 
 elsif ARGV[0] == 'stop'
-  puts 'You can also stop neruda with the following command:'
-  puts 'rake sinatra:stop'
-
-  exec 'rake', 'sinatra:stop'
+  puts Rainbow('bundle exec rake sinatra:stop').green
+  system 'bundle', 'exec', 'rake', 'sinatra:stop'
 
 elsif ARGV[0] == 'new'
   if ARGV[1].nil?
