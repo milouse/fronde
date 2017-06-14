@@ -13,7 +13,7 @@ def help
     exit 1
   end
 
-  options = ['start', 'stop', 'new']
+  options = ['start', 'stop', 'new', 'compile']
   options << 'capify' if File.exist? 'Capfile'
 
   STDERR.puts 'Usage: ' + Rainbow("pablo [ #{options.join(' | ')} ]").yellow
@@ -173,6 +173,12 @@ elsif ['start', 'run'].include?(ARGV[0])
 elsif ARGV[0] == 'stop'
   puts Rainbow('bundle exec rake sinatra:stop').green
   system 'bundle', 'exec', 'rake', 'sinatra:stop'
+
+elsif ARGV[0] == 'compile'
+  puts Rainbow('bundle exec rake chapters:build_epubs').green
+  system 'bundle', 'exec', 'rake', 'chapters:build_epubs'
+  puts Rainbow('bundle exec rake chapters:make_book').green
+  system 'bundle', 'exec', 'rake', 'chapters:make_book'
 
 elsif ARGV[0] == 'new'
   if ARGV[1].nil?
