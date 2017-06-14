@@ -52,4 +52,9 @@ namespace :chapters do
       end
     end
   end
+
+  desc 'Execute in one call the following: :build_epubs,' \
+       ':upload_epubs, :upload_book, :purge:remote'
+  task sync: ['chapters:build_epubs', 'chapters:upload_epubs',
+              'chapters:upload_book', 'chapters:purge:remote']
 end
