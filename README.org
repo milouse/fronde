@@ -31,7 +31,6 @@ Finally, you need to configure it to your needs.
 
 #+begin_src sh
 $ pablo init
-$ bundle install
 #+end_src
 
 * Running it

@@ -38,7 +38,6 @@ Gem::Specification.new do |s|
 
   s.required_ruby_version = '>= 2.4'
 
-  s.add_runtime_dependency('bundler', '~> 1')
   s.add_runtime_dependency('rainbow', '~> 2.2')
   s.add_runtime_dependency('org-ruby', '~> 0.9')
   s.add_runtime_dependency('slim', '~> 3.0')

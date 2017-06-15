@@ -19,6 +19,13 @@ def help
   STDERR.puts 'Usage: ' + Rainbow("pablo [ #{options.join(' | ')} ]").yellow
 end
 
+def bundler_is_present?
+  ENV['PATH'].split(':').each do |folder|
+    return true if File.exist? File.join(folder, 'bundle')
+  end
+  false
+end
+
 def capify
   unless File.exist? 'Capfile'
     STDERR.puts Rainbow('ERROR: Capfile does not exist.').red
@@ -91,6 +98,10 @@ def _init_rackup
 end
 
 def _init_bundler
+  return if File.exist? 'Gemfile'
+  puts ''
+  puts 'Bundler has been detected in your path.'
+  # puts ''
   # print 'Do you want to use [o]rg files, [m]arkdown files or [b]oth' \
   #       ' (default is org): '
   # markup = STDIN.gets.strip.downcase
@@ -119,6 +130,9 @@ def _init_bundler
     end
   EOF
   IO.write('Gemfile', gemfile)
+  puts ''
+  puts 'To complete this installation, you must now run: ' +
+       Rainbow('bundle install').yellow
 end
 
 def init
@@ -128,13 +142,11 @@ def init
   _init_config
   puts Rainbow('Copying template files…').green
   _init_assets
-  puts Rainbow('Installing rake and bundler files…').green
+  puts Rainbow('Installing rake files…').green
   _init_rackup
-  _init_bundler
-  puts Rainbow('Neruda has been successfully installed.').green
   puts ''
-  puts 'To complete this installation, you must now run: ' +
-       Rainbow('bundle install').yellow
+  puts Rainbow('Neruda has been successfully installed.').green
+  _init_bundler if bundler_is_present?
 end
 
 def create_new(title)
@@ -167,18 +179,35 @@ elsif ARGV[0] == 'capify'
   capify
 
 elsif ['start', 'run'].include?(ARGV[0])
-  puts Rainbow('bundle exec rake sinatra:start').green
-  system 'bundle', 'exec', 'rake', 'sinatra:start'
+  if bundler_is_present?
+    puts Rainbow('bundle exec rake sinatra:start').green
+    exec 'bundle', 'exec', 'rake', 'sinatra:start'
+  else
+    puts Rainbow('rake sinatra:start').green
+    exec 'rake', 'sinatra:start'
+  end
 
 elsif ARGV[0] == 'stop'
-  puts Rainbow('bundle exec rake sinatra:stop').green
-  system 'bundle', 'exec', 'rake', 'sinatra:stop'
+  if bundler_is_present?
+    puts Rainbow('bundle exec rake sinatra:stop').green
+    exec 'bundle', 'exec', 'rake', 'sinatra:stop'
+  else
+    puts Rainbow('rake sinatra:stop').green
+    exec 'rake', 'sinatra:stop'
+  end
 
 elsif ARGV[0] == 'compile'
-  puts Rainbow('bundle exec rake chapters:build_epubs').green
-  system 'bundle', 'exec', 'rake', 'chapters:build_epubs'
-  puts Rainbow('bundle exec rake chapters:make_book').green
-  system 'bundle', 'exec', 'rake', 'chapters:make_book'
+  if bundler_is_present?
+    puts Rainbow('bundle exec rake chapters:build_epubs').green
+    exec 'bundle', 'exec', 'rake', 'chapters:build_epubs'
+    puts Rainbow('bundle exec rake chapters:make_book').green
+    exec 'bundle', 'exec', 'rake', 'chapters:make_book'
+  else
+    puts Rainbow('rake chapters:build_epubs').green
+    exec 'rake', 'chapters:build_epubs'
+    puts Rainbow('rake chapters:make_book').green
+    exec 'rake', 'chapters:make_book'
+  end
 
 elsif ARGV[0] == 'new'
   if ARGV[1].nil?
