@@ -14,14 +14,14 @@ documentation to know how to install ruby 2.4.
 
 First we need to upgrade rvm (always do that from time to time):
 
-#+begin_src shell
+#+begin_src sh
 $ rvm get latest
 $ rvm install ruby-2.4.1
 #+end_src
 
 Then the installation itself:
 
-#+begin_src shell
+#+begin_src sh
 $ mkdir mysite
 $ rvm use ruby-2.4.1@neruda --create
 $ gem install neruda
@@ -29,7 +29,7 @@ $ gem install neruda
 
 Finally, you need to configure it to your needs.
 
-#+begin_src shell
+#+begin_src sh
 $ pablo init
 $ bundle install
 #+end_src
@@ -38,13 +38,13 @@ $ bundle install
 
 For testing it, you should just run:
 
-#+begin_src shell
+#+begin_src sh
 $ pablo start
 #+end_src
 
 For production use, just pass the right environnement variable:
 
-#+begin_src shell
+#+begin_src sh
 $ APP_ENV=production pablo start
 #+end_src
 
