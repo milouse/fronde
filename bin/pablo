@@ -179,6 +179,13 @@ elsif ARGV[0] == 'capify'
   capify
 
 elsif ['start', 'run'].include?(ARGV[0])
+  loc_env = ENV['APP_ENV'] || 'development'
+  if loc_env != 'production'
+    puts Rainbow("Neruda is run in #{loc_env} environment").green
+  else
+    puts Rainbow('>> Neruda is run in production environment <<').yellow
+  end
+  puts ''
   if bundler_is_present?
     puts Rainbow('bundle exec rake sinatra:start').blue
     exec 'bundle', 'exec', 'rake', 'sinatra:start'
