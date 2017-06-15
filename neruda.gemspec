@@ -28,12 +28,13 @@ Gem::Specification.new do |s|
                    # Bootstrap config files
                    'docs/Rakefile.example',
                    'docs/config.yml.example',
-                   'README.org',
-                   'TODO.org',
+                   'README.md',
                    'LICENSE']
   s.executables = ['pablo']
   s.homepage    = 'https://git.deparis.io/neruda/about/'
   s.license     = 'WTFPL'
+
+  s.extra_rdoc_files = ['README.md', 'LICENSE']
 
   s.required_ruby_version = '>= 2.4'
 
