@@ -104,4 +104,4 @@ after 'deploy:finished', 'sinatra:restart:remote'
 
 * Known issues
 
-See [[TODO.org][TODO.org]]
+See [[https://projects.deparis.io/projects/neruda/issues][issues on redmine]].
