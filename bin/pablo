@@ -136,13 +136,13 @@ def _init_bundler
 end
 
 def init
-  puts Rainbow('Creating main folders…').green
+  puts Rainbow('Creating main folders…').blue
   _init_path
-  puts Rainbow('Populating config file…').green
+  puts Rainbow('Populating config file…').blue
   _init_config
-  puts Rainbow('Copying template files…').green
+  puts Rainbow('Copying template files…').blue
   _init_assets
-  puts Rainbow('Installing rake files…').green
+  puts Rainbow('Installing rake files…').blue
   _init_rackup
   puts ''
   puts Rainbow('Neruda has been successfully installed.').green
@@ -180,32 +180,32 @@ elsif ARGV[0] == 'capify'
 
 elsif ['start', 'run'].include?(ARGV[0])
   if bundler_is_present?
-    puts Rainbow('bundle exec rake sinatra:start').green
+    puts Rainbow('bundle exec rake sinatra:start').blue
     exec 'bundle', 'exec', 'rake', 'sinatra:start'
   else
-    puts Rainbow('rake sinatra:start').green
+    puts Rainbow('rake sinatra:start').blue
     exec 'rake', 'sinatra:start'
   end
 
 elsif ARGV[0] == 'stop'
   if bundler_is_present?
-    puts Rainbow('bundle exec rake sinatra:stop').green
+    puts Rainbow('bundle exec rake sinatra:stop').blue
     exec 'bundle', 'exec', 'rake', 'sinatra:stop'
   else
-    puts Rainbow('rake sinatra:stop').green
+    puts Rainbow('rake sinatra:stop').blue
     exec 'rake', 'sinatra:stop'
   end
 
 elsif ARGV[0] == 'compile'
   if bundler_is_present?
-    puts Rainbow('bundle exec rake chapters:build_epubs').green
+    puts Rainbow('bundle exec rake chapters:build_epubs').blue
     exec 'bundle', 'exec', 'rake', 'chapters:build_epubs'
-    puts Rainbow('bundle exec rake chapters:make_book').green
+    puts Rainbow('bundle exec rake chapters:make_book').blue
     exec 'bundle', 'exec', 'rake', 'chapters:make_book'
   else
-    puts Rainbow('rake chapters:build_epubs').green
+    puts Rainbow('rake chapters:build_epubs').blue
     exec 'rake', 'chapters:build_epubs'
-    puts Rainbow('rake chapters:make_book').green
+    puts Rainbow('rake chapters:make_book').blue
     exec 'rake', 'chapters:make_book'
   end
 
