@@ -187,7 +187,6 @@ elsif ARGV[0] == 'new'
   else
     title = ARGV[1]
   end
-
   create_new title
 
 else

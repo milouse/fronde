@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 namespace :sinatra do
   namespace :restart do
     desc 'Restart the remote neruda application'

@@ -5,6 +5,7 @@ AllCops:
 Metrics/BlockLength:
   Exclude:
     - 'lib/**/*.rake'
+    - neruda.gemspec
 
 Metrics/MethodLength:
   Enabled: false
