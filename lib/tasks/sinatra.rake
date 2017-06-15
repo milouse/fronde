@@ -21,7 +21,7 @@ namespace :sinatra do
     cmd = ['rackup', "-E #{loc_env}", '-P', 'tmp/pids/neruda.pid']
     cmd << '-D' if loc_env == 'production'
     begin
-      system cmd.join(' ')
+      sh cmd.join(' ')
     rescue Interrupt
       puts Rainbow(' Kthxbye').blue
     end
