@@ -26,6 +26,12 @@ def bundler_is_present?
   false
 end
 
+def rake_or_bundle_run(cmd)
+  cmd = ['bundle', 'exec'] + cmd if bundler_is_present?
+  puts Rainbow(cmd.join(' ')).blue
+  exec(*cmd)
+end
+
 def capify
   unless File.exist? 'Capfile'
     STDERR.puts Rainbow('ERROR: Capfile does not exist.').red
@@ -186,35 +192,14 @@ elsif ['start', 'run'].include?(ARGV[0])
     puts Rainbow('>> Neruda is run in production environment <<').yellow
   end
   puts ''
-  if bundler_is_present?
-    puts Rainbow('bundle exec rake sinatra:start').blue
-    exec 'bundle', 'exec', 'rake', 'sinatra:start'
-  else
-    puts Rainbow('rake sinatra:start').blue
-    exec 'rake', 'sinatra:start'
-  end
+  rake_or_bundle_run ['rake', 'sinatra:start']
 
 elsif ARGV[0] == 'stop'
-  if bundler_is_present?
-    puts Rainbow('bundle exec rake sinatra:stop').blue
-    exec 'bundle', 'exec', 'rake', 'sinatra:stop'
-  else
-    puts Rainbow('rake sinatra:stop').blue
-    exec 'rake', 'sinatra:stop'
-  end
+  rake_or_bundle_run ['rake', 'sinatra:stop']
 
 elsif ARGV[0] == 'compile'
-  if bundler_is_present?
-    puts Rainbow('bundle exec rake chapters:build_epubs').blue
-    exec 'bundle', 'exec', 'rake', 'chapters:build_epubs'
-    puts Rainbow('bundle exec rake chapters:make_book').blue
-    exec 'bundle', 'exec', 'rake', 'chapters:make_book'
-  else
-    puts Rainbow('rake chapters:build_epubs').blue
-    exec 'rake', 'chapters:build_epubs'
-    puts Rainbow('rake chapters:make_book').blue
-    exec 'rake', 'chapters:make_book'
-  end
+  rake_or_bundle_run ['rake', 'chapters:build_epubs']
+  # rake_or_bundle_run ['rake', 'chapters:make_book']
 
 elsif ARGV[0] == 'new'
   if ARGV[1].nil?
