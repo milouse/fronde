@@ -158,28 +158,6 @@ def init
   _init_bundler if bundler_is_present?
 end
 
-def create_new(title)
-  if title == ''
-    filename = 'new'
-  else
-    filename = title.tr(' ', '_').downcase.gsub(/[^a-z0-9_]/, '')
-  end
-
-  filename = "private/chapters/#{filename}.org"
-
-  config = YAML.load_file('config/config.yml')
-  IO.write filename, <<~EOF
-    #+title: #{title}
-    #+date: <#{Date.today.strftime('%Y-%m-%d %a.')}>
-    #+author: #{config['author']}
-
-
-  EOF
-
-  editor = ENV['EDITOR'] || ENV['VISUAL'] || 'emacs'
-  exec editor, filename
-end
-
 if ARGV[0] == 'init'
   init
 
@@ -210,7 +188,7 @@ elsif ARGV[0] == 'new'
   else
     title = ARGV[1]
   end
-  create_new title
+  rake_or_bundle_run ['rake', "chapters:new[#{title}]"]
 
 else
   help

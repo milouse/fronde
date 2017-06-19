@@ -96,6 +96,35 @@ namespace :chapters do
     IO.write('config/chapters.yml', chapters.to_yaml)
   end
 
+  desc 'Open an editor to create a new chapter'
+  task :new, :title do |_, args|
+    if args[:title] == ''
+      filename = 'new'
+    else
+      filename = args[:title].tr(' ', '_').downcase.gsub(/[^a-z0-9_]/, '')
+    end
+
+    filename = "private/chapters/#{filename}.org"
+
+    unless File.exist? filename
+      config = YAML.load_file('config/config.yml')
+      IO.write filename, <<~EOF
+        #+title: #{args[:title]}
+        #+date: <#{Date.today.strftime('%Y-%m-%d %a.')}>
+        #+author: #{config['author']}
+
+
+      EOF
+    end
+
+    editor = ENV['EDITOR'] || ENV['VISUAL'] || 'emacs'
+    if editor.match?(/^emacs/)
+      sh editor, '+5', filename
+    else
+      sh editor, filename
+    end
+  end
+
   desc 'Create the org file of the complete book'
   task prepare_book: 'chapters:index' do
     chapters = YAML.load_file('config/chapters.yml')
