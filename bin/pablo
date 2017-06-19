@@ -50,7 +50,10 @@ def _init_path
   FileUtils.mkdir_p 'config'
   FileUtils.mkdir_p 'public'
   FileUtils.mkdir_p 'tmp/pids'
-  FileUtils.mkdir_p 'private/orgs'
+  FileUtils.mkdir_p 'private/characters'
+  FileUtils.mkdir_p 'private/sceneries'
+  FileUtils.mkdir_p 'private/chapters'
+  FileUtils.mkdir_p 'private/notes'
   FileUtils.mkdir_p 'private/epubs'
 end
 
@@ -162,9 +165,8 @@ def create_new(title)
     filename = title.tr(' ', '_').downcase.gsub(/[^a-z0-9_]/, '')
   end
 
-  filename = "private/orgs/#{filename}.org"
+  filename = "private/chapters/#{filename}.org"
 
-  FileUtils.mkdir_p 'private/orgs' unless Dir.exist? 'private/orgs'
   config = YAML.load_file('config/config.yml')
   IO.write filename, <<~EOF
     #+title: #{title}

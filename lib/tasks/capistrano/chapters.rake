@@ -43,7 +43,7 @@ namespace :chapters do
             filename.delete!("\n")
             file_radix = File.basename(filename, '.epub')
             next if file_radix == final_org
-            org_file = "private/orgs/#{file_radix}.org"
+            org_file = "private/chapters/#{file_radix}.org"
             unless test("[ -e '#{release_path}/#{org_file}' ]")
               execute :rm, filename
             end

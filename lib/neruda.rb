@@ -72,7 +72,7 @@ class Neruda::App < Sinatra::Base
   get '/' do
     @slug = 'index'
     text_content = ''
-    if File.exist? File.join('private', 'orgs', 'index.org')
+    if File.exist? File.join('private', 'index.org')
       find_chapter
       @content = Orgmode::Parser.load @org_file
       text_content = @content.to_html

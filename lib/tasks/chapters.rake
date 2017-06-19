@@ -11,8 +11,7 @@ namespace :chapters do
     chapters = neruda_config['chapters']
     next unless chapters.any?
     chapters.each do |file_radix|
-      next if file_radix == 'index'
-      filename = "private/orgs/#{file_radix}.org"
+      filename = "private/chapters/#{file_radix}.org"
       org_to_convert << filename
     end
     next if org_to_convert.empty?
@@ -44,7 +43,6 @@ namespace :chapters do
     epub_to_upload = []
     org_to_convert.each do |filename|
       file_radix = File.basename(filename, '.org')
-      next if file_radix == 'index'
       epub_file = "private/epubs/#{file_radix}.epub"
       epub_to_upload << epub_file
       sh 'pandoc', '-S', "-o #{epub_file}", filename
@@ -66,7 +64,7 @@ namespace :chapters do
     neruda_config = YAML.load_file('config/config.yml')
     final_org = neruda_config['book_filename'] || 'all'
     chapters = neruda_config['chapters']
-    Dir.glob('private/orgs/*.org') do |filename|
+    Dir.glob('private/chapters/*.org') do |filename|
       file_radix = File.basename(filename, '.org')
       unless chapters.include? file_radix
         STDERR.puts "WARNING: #{filename} exists but #{file_radix} " \
@@ -77,7 +75,7 @@ namespace :chapters do
     Dir.glob('private/epubs/*.epub') do |filename|
       file_radix = File.basename(filename, '.epub')
       next if file_radix == final_org
-      org_file = "private/orgs/#{file_radix}.org"
+      org_file = "private/chapters/#{file_radix}.org"
       File.unlink filename unless File.exist? org_file
     end
   end
@@ -89,7 +87,7 @@ namespace :chapters do
     next if neruda_config['chapters'].nil?
     chapters = []
     neruda_config['chapters'].each do |file_radix|
-      filename = "private/orgs/#{file_radix}.org"
+      filename = "private/chapters/#{file_radix}.org"
       next unless File.exist? filename
       f = Orgmode::Parser.load filename
       title = f.in_buffer_settings['TITLE']
@@ -118,7 +116,7 @@ namespace :chapters do
 
     chapters.each do |c|
       file_radix = c[:slug]
-      filename = "private/orgs/#{file_radix}.org"
+      filename = "private/chapters/#{file_radix}.org"
       next unless File.exist? filename
       file_content = IO.read(filename)
       file_content.gsub!(/^#\+date:.*$/mi, '')
