@@ -18,6 +18,7 @@ Gem::Specification.new do |s|
                    # Rake tasks
                    'lib/tasks/chapters.rake',
                    'lib/tasks/sinatra.rake',
+                   'lib/tasks/book.rake',
                    'lib/tasks/capistrano/chapters.rake',
                    'lib/tasks/capistrano/sinatra.rake',
                    # Various template examples

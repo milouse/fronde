@@ -4,126 +4,107 @@
 
 require 'yaml'
 require 'rainbow'
+require 'optparse'
 require 'fileutils'
 
-def help
-  unless File.exist? 'config/config.yml'
-    STDERR.puts 'Please init your website: ' +
-                Rainbow('pablo init').yellow
-    exit 1
+# Methods used to play with bundler
+module BundlerHelper
+  def bundler_is_present?
+    return false unless File.exist?('Gemfile')
+    ENV['PATH'].split(':').each do |folder|
+      return true if File.exist? File.join(folder, 'bundle')
+    end
+    false
   end
 
-  options = ['start', 'stop', 'new', 'compile']
-  options << 'capify' if File.exist? 'Capfile'
-
-  STDERR.puts 'Usage: ' + Rainbow("pablo [ #{options.join(' | ')} ]").yellow
-end
-
-def bundler_is_present?
-  ENV['PATH'].split(':').each do |folder|
-    return true if File.exist? File.join(folder, 'bundle')
+  def rake_or_bundle_run(cmd)
+    cmd.insert(1, '-s') unless @options[:verbose]
+    cmd = ['bundle', 'exec'] + cmd if bundler_is_present?
+    puts Rainbow(cmd.join(' ')).blue if @options[:verbose]
+    exec(*cmd)
   end
-  false
 end
 
-def rake_or_bundle_run(cmd)
-  cmd = ['bundle', 'exec'] + cmd if bundler_is_present?
-  puts Rainbow(cmd.join(' ')).blue
-  exec(*cmd)
-end
-
-def capify
-  unless File.exist? 'Capfile'
-    STDERR.puts Rainbow('ERROR: Capfile does not exist.').red
-    exit 1
+# Methods used with pablo init method
+module PabloInit
+  def init_path
+    FileUtils.mkdir_p 'config'
+    FileUtils.mkdir_p 'public'
+    FileUtils.mkdir_p 'tmp/pids'
+    FileUtils.mkdir_p 'private/characters'
+    FileUtils.mkdir_p 'private/sceneries'
+    FileUtils.mkdir_p 'private/chapters'
+    FileUtils.mkdir_p 'private/notes'
+    FileUtils.mkdir_p 'private/epubs'
   end
 
-  capfile = File.new('Capfile', 'a')
-  capfile.write <<~EOF
-    neruda_spec = Gem::Specification.find_by_name 'neruda'
-    Dir.glob("\#{neruda_spec.gem_dir}/lib/tasks/*.rake").each { |r| import r }
-    Dir.glob("\#{neruda_spec.gem_dir}/lib/tasks/capistrano/*.rake").each { |r| import r }
-  EOF
-end
+  def init_config
+    config = {}
+    print 'Name of your website: '
+    config['title'] = STDIN.gets.strip
+    print 'Your author name: '
+    config['author'] = STDIN.gets.strip
+    print 'Main language of your website [en_US]: '
+    lang = STDIN.gets.strip
+    lang = 'en_US' if lang == ''
+    config['lang'] = lang
 
-def _init_path
-  FileUtils.mkdir_p 'config'
-  FileUtils.mkdir_p 'public'
-  FileUtils.mkdir_p 'tmp/pids'
-  FileUtils.mkdir_p 'private/characters'
-  FileUtils.mkdir_p 'private/sceneries'
-  FileUtils.mkdir_p 'private/chapters'
-  FileUtils.mkdir_p 'private/notes'
-  FileUtils.mkdir_p 'private/epubs'
-end
+    main_title = config['title'].tr(' ', '_').downcase.gsub(/[^a-z0-9_]/, '')
+    print "Filename of the main generated epub [#{main_title}]: "
+    epub = STDIN.gets.strip
+    if epub == ''
+      epub = main_title
+    else
+      epub = File.basename(epub, '.epub')
+    end
+    config['book_filename'] = epub
+    config['chapters'] = []
 
-def _init_config
-  config = {}
-  print 'Name of your website: '
-  config['title'] = STDIN.gets.strip
-  print 'Your author name: '
-  config['author'] = STDIN.gets.strip
-  print 'Main language of your website [en_US]: '
-  lang = STDIN.gets.strip
-  lang = 'en_US' if lang == ''
-  config['lang'] = lang
-
-  main_title = config['title'].tr(' ', '_').downcase.gsub(/[^a-z0-9_]/, '')
-  print "Filename of the main generated epub [#{main_title}]: "
-  epub = STDIN.gets.strip
-  if epub == ''
-    epub = main_title
-  else
-    epub = File.basename(epub, '.epub')
-  end
-  config['book_filename'] = epub
-  config['chapters'] = []
-
-  IO.write 'config/config.yml', config.to_yaml
-end
-
-def _init_assets
-  unless Dir.exist? 'views'
-    FileUtils.cp_r File.join(__dir__, '../lib/assets'), 'views'
+    IO.write 'config/config.yml', config.to_yaml
   end
 
-  return if File.exist? 'public/style.css'
-  FileUtils.mv 'views/style.css', 'public/style.css'
-end
+  def init_assets
+    unless Dir.exist? 'views'
+      FileUtils.cp_r File.join(__dir__, '../lib/assets'), 'views'
+    end
 
-def _init_rackup
-  unless File.exist? 'Rakefile'
-    FileUtils.copy File.join(__dir__, '../docs/Rakefile.example'), 'Rakefile'
+    return if File.exist? 'public/style.css'
+    FileUtils.mv 'views/style.css', 'public/style.css'
   end
 
-  return if File.exist? 'config.ru'
-  rackup_conf = <<~EOF
+  def init_rackup
+    unless File.exist? 'Rakefile'
+      FileUtils.copy File.join(__dir__, '../docs/Rakefile.example'), 'Rakefile'
+    end
+
+    return if File.exist? 'config.ru'
+    rackup_conf = <<~EOF
     # frozen_string_literal: true
 
     require 'neruda'
     run Neruda::App
   EOF
-  IO.write('config.ru', rackup_conf)
-end
+    IO.write('config.ru', rackup_conf)
+  end
 
-def _init_bundler
-  return if File.exist? 'Gemfile'
-  puts ''
-  puts 'Bundler has been detected in your path.'
-  # puts ''
-  # print 'Do you want to use [o]rg files, [m]arkdown files or [b]oth' \
-  #       ' (default is org): '
-  # markup = STDIN.gets.strip.downcase
-  # if markup == 'm'
-  #   markup_gem = 'gem \'kramdown\''
-  # elsif markup == 'b'
-  #   markup_gem = "gem 'kramdown'\ngem 'org-ruby'"
-  # else
-  #   markup_gem = 'gem \'org-ruby\''
-  # end
-  markup_gem = 'gem \'org-ruby\''
+  def init_bundler
+    return if File.exist? 'Gemfile'
+    puts ''
+    puts 'Bundler has been detected in your path.'
+    # puts ''
+    # print 'Do you want to use [o]rg files, [m]arkdown files or [b]oth' \
+    #       ' (default is org): '
+    # markup = STDIN.gets.strip.downcase
+    # if markup == 'm'
+    #   markup_gem = 'gem \'kramdown\''
+    # elsif markup == 'b'
+    #   markup_gem = "gem 'kramdown'\ngem 'org-ruby'"
+    # else
+    #   markup_gem = 'gem \'org-ruby\''
+    # end
+    markup_gem = 'gem \'org-ruby\''
 
-  gemfile = <<~EOF
+    gemfile = <<~EOF
     # frozen_string_literal: true
 
     source 'https://rubygems.org'
@@ -138,58 +119,152 @@ def _init_bundler
       gem 'rubocop'
     end
   EOF
-  IO.write('Gemfile', gemfile)
-  puts ''
-  puts 'To complete this installation, you must now run: ' +
-       Rainbow('bundle install').yellow
-end
-
-def init
-  puts Rainbow('Creating main folders…').blue
-  _init_path
-  puts Rainbow('Populating config file…').blue
-  _init_config
-  puts Rainbow('Copying template files…').blue
-  _init_assets
-  puts Rainbow('Installing rake files…').blue
-  _init_rackup
-  puts ''
-  puts Rainbow('Neruda has been successfully installed.').green
-  _init_bundler if bundler_is_present?
-end
-
-if ARGV[0] == 'init'
-  init
-
-elsif ARGV[0] == 'capify'
-  capify
-
-elsif ['start', 'run'].include?(ARGV[0])
-  loc_env = ENV['APP_ENV'] || 'development'
-  if loc_env != 'production'
-    puts Rainbow("Neruda is run in #{loc_env} environment").green
-  else
-    puts Rainbow('>> Neruda is run in production environment <<').yellow
+    IO.write('Gemfile', gemfile)
+    puts ''
+    puts 'To complete this installation, you must now run: ' +
+         Rainbow('bundle install').yellow
   end
-  puts ''
-  rake_or_bundle_run ['rake', 'sinatra:start']
-
-elsif ARGV[0] == 'stop'
-  rake_or_bundle_run ['rake', 'sinatra:stop']
-
-elsif ARGV[0] == 'compile'
-  rake_or_bundle_run ['rake', 'chapters:build_epubs']
-  # rake_or_bundle_run ['rake', 'chapters:make_book']
-
-elsif ARGV[0] == 'new'
-  if ARGV[1].nil?
-    print 'Title: '
-    title = STDIN.gets.strip
-  else
-    title = ARGV[1]
-  end
-  rake_or_bundle_run ['rake', "chapters:new[#{title}]"]
-
-else
-  help
 end
+
+# Main pablo class
+class Pablo
+  def initialize
+    @options = {
+      verbose: false
+    }
+
+    parse_options
+
+    if ARGV[0] == 'init'
+      pablo_init
+
+    elsif ARGV[0] == 'capify'
+      capify
+
+    elsif ['start', 'run'].include?(ARGV[0])
+      start
+
+    elsif ARGV[0] == 'stop'
+      rake_or_bundle_run ['rake', 'sinatra:stop']
+
+    elsif ARGV[0] == 'compile'
+      rake_or_bundle_run ['rake', 'chapters:build_epubs']
+    # rake_or_bundle_run ['rake', 'book:make']
+
+    elsif ARGV[0] == 'new'
+      new_chapter
+
+    elsif ARGV[0] == 'list'
+      list
+    end
+  end
+
+  private
+
+  def parse_options
+    optparse = OptionParser.new do |opts|
+      opts.banner = <<~EOF
+        Usage:
+            pablo init
+            pablo [options] #{pablo_banner} [params]
+
+      EOF
+      opts.on('-v', '--verbose', 'Output more information') do
+        @options[:verbose] = true
+      end
+      opts.on('-h', '--help', 'Display this screen') do
+        STDERR.puts opts
+        STDERR.puts <<~EOF
+
+          Commands:
+              init   : Initialize your Neruda instance
+              start  : Start the rack web server (default is thin)
+              stop   : Stop the web server
+              compile: Generate the epubs files
+              list   : List various book elements
+
+          Chapters related commands:
+              new [title] : Create a new chapter
+
+        EOF
+        exit
+      end
+    end
+
+    optparse.parse!
+
+    return if ARGV[0]
+    STDERR.puts Rainbow('ERROR: no command given. Run pablo -h for ' \
+                        'options and available commands').red
+    exit 1
+  end
+
+  include BundlerHelper
+  include PabloInit
+
+  def pablo_banner
+    options = ['start', 'stop', 'new', 'compile', 'list']
+    options << 'capify' if File.exist? 'Capfile'
+
+    "[ #{options.join(' | ')} ]"
+  end
+
+  def pablo_init
+    puts Rainbow('Creating main folders…').blue
+    init_path
+    puts Rainbow('Populating config file…').blue
+    init_config
+    puts Rainbow('Copying template files…').blue
+    init_assets
+    puts Rainbow('Installing rake files…').blue
+    init_rackup
+    puts ''
+    puts Rainbow('Neruda has been successfully installed.').green
+    init_bundler if bundler_is_present?
+  end
+
+  def capify
+    unless File.exist? 'Capfile'
+      STDERR.puts Rainbow('ERROR: Capfile does not exist.').red
+      exit 1
+    end
+
+    capfile = File.new('Capfile', 'a')
+    capfile.write <<~EOF
+    neruda_spec = Gem::Specification.find_by_name 'neruda'
+    Dir.glob("\#{neruda_spec.gem_dir}/lib/tasks/*.rake").each { |r| import r }
+    Dir.glob("\#{neruda_spec.gem_dir}/lib/tasks/capistrano/*.rake").each { |r| import r }
+  EOF
+  end
+
+  def start
+    loc_env = ENV['APP_ENV'] || 'development'
+    if loc_env != 'production'
+      puts Rainbow("Neruda is run in #{loc_env} environment").green
+    else
+      puts Rainbow('>> Neruda is run in production environment <<').yellow
+    end
+    puts ''
+    rake_or_bundle_run ['rake', 'sinatra:start']
+  end
+
+  def new_chapter
+    if ARGV[1].nil?
+      print 'Title: '
+      title = STDIN.gets.strip
+    else
+      title = ARGV[1]
+    end
+    rake_or_bundle_run ['rake', "chapters:new[#{title}]"]
+  end
+
+  def list
+    if ARGV[1].nil?
+      STDERR.puts Rainbow('ERROR: No list type given.').red
+      exit 1
+    end
+    rake_or_bundle_run ['rake', "book:list[#{ARGV[1]}]"]
+  end
+end
+
+Pablo.new

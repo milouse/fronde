@@ -24,7 +24,7 @@ namespace :chapters do
   end
 
   desc 'Upload the complete book'
-  task upload_book: ['chapters:make_book', 'chapters:upload_epubs']
+  task upload_book: ['book:make', 'chapters:upload_epubs']
 
   namespace :purge do
     desc 'Remove remote orphaned epub files'
