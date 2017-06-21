@@ -156,6 +156,13 @@ class Pablo
 
     elsif ARGV[0] == 'list'
       list
+
+    elsif ARGV[0] == 'board'
+      tiddly_file = 'private/notes/tiddly.html'
+      unless File.exist? tiddly_file
+        FileUtils.copy File.join(__dir__, '../lib/tiddly.html'), tiddly_file
+      end
+      exec 'gio', 'open', tiddly_file
     end
   end
 
