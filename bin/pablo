@@ -188,7 +188,7 @@ class Pablo
               start  : Start the rack web server (default is thin)
               stop   : Stop the web server
               compile: Generate the epubs files
-              list   : List various book elements
+              list   : List various book elements (chapters, characters, sceneries)
 
           Chapters related commands:
               new [title] : Create a new chapter
@@ -268,6 +268,7 @@ class Pablo
   def list
     if ARGV[1].nil?
       STDERR.puts Rainbow('ERROR: No list type given.').red
+      STDERR.puts 'Enter one of [chapters, characters, sceneries].'
       exit 1
     end
     rake_or_bundle_run ['rake', "book:list[#{ARGV[1]}]"]
