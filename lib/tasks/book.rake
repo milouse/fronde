@@ -40,10 +40,10 @@ namespace :book do
       filename = "private/chapters/#{file_radix}.org"
       next unless File.exist? filename
       file_content = IO.read(filename)
-      file_content.gsub!(/^#\+date:.*$/mi, '')
-      file_content.gsub!(/^#\+author:.*$/mi, '')
-      file_content.gsub!(/^(\*+)\s+(.*)$/mi, '*\1 \2')
-      file_content.gsub!(/^#\+title:\s?(.*)$/mi, '* \1')
+      file_content.gsub!(/^#\+date:.*$/i, '')
+      file_content.gsub!(/^#\+author:.*$/i, '')
+      file_content.gsub!(/^(\*+)\s+(.*)$/i, '*\1 \2')
+      file_content.gsub!(/^#\+title:\s?(.*)$/i, '* \1')
 
       org_file.write(file_content + "\n")
     end
