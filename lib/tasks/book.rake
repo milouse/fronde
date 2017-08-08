@@ -5,7 +5,7 @@ require 'rainbow'
 
 namespace :book do
   desc 'List various book elements'
-  task :list, :list_type do |t, args|
+  task :list, :list_type do |_, args|
     list_type = args[:list_type]
     next unless ['chapters', 'characters',
                  'notes', 'sceneries'].include?(list_type)
