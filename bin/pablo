@@ -17,10 +17,11 @@ module BundlerHelper
     false
   end
 
-  def rake_or_bundle_run(cmd)
+  def rake_or_bundle_run(cmd, use_system = false)
     cmd.insert(1, '-s') unless @options[:verbose]
     cmd = ['bundle', 'exec'] + cmd if bundler_is_present?
     puts Rainbow(cmd.join(' ')).blue if @options[:verbose]
+    return cmd.join(' ') if use_system
     exec(*cmd)
   end
 end
@@ -148,8 +149,8 @@ class Pablo
       rake_or_bundle_run ['rake', 'sinatra:stop']
 
     elsif ARGV[0] == 'compile'
-      rake_or_bundle_run ['rake', 'chapters:build_epubs']
-    # rake_or_bundle_run ['rake', 'book:make']
+      rake_or_bundle_run ['rake', 'chapters:build_epubs'], true
+      rake_or_bundle_run ['rake', 'book:make']
 
     elsif ARGV[0] == 'new'
       new_chapter
