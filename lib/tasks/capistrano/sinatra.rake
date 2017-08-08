@@ -9,7 +9,7 @@ namespace :sinatra do
           if test("[ -e '#{release_path}/tmp/pids/sinatra.pid' ]")
             execute :pkill, '-F', 'tmp/pids/sinatra.pid'
           end
-          execute :rackup, '-E', fetch(:app_env),
+          execute :bundle, :exec, :rackup, '-E', fetch(:app_env),
                   '-P', 'tmp/pids/sinatra.pid', '-D'
         end
       end
