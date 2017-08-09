@@ -24,6 +24,20 @@ module BundlerHelper
     return cmd.join(' ') if use_system
     exec(*cmd)
   end
+
+  def capify
+    unless File.exist? 'Capfile'
+      STDERR.puts Rainbow('ERROR: Capfile does not exist.').red
+      exit 1
+    end
+
+    capfile = File.new('Capfile', 'a')
+    capfile.write <<~EOF
+    neruda_spec = Gem::Specification.find_by_name 'neruda'
+    Dir.glob("\#{neruda_spec.gem_dir}/lib/tasks/*.rake").each { |r| import r }
+    Dir.glob("\#{neruda_spec.gem_dir}/lib/tasks/capistrano/*.rake").each { |r| import r }
+    EOF
+  end
 end
 
 # Methods used with pablo init method
@@ -125,6 +139,20 @@ module PabloInit
     puts 'To complete this installation, you must now run: ' +
          Rainbow('bundle install').yellow
   end
+
+  def pablo_init
+    puts Rainbow('Creating main folders…').blue
+    init_path
+    puts Rainbow('Populating config file…').blue
+    init_config
+    puts Rainbow('Copying template files…').blue
+    init_assets
+    puts Rainbow('Installing rake files…').blue
+    init_rackup
+    puts ''
+    puts Rainbow('Neruda has been successfully installed.').green
+    init_bundler if bundler_is_present?
+  end
 end
 
 # Main pablo class
@@ -135,35 +163,35 @@ class Pablo
     }
 
     parse_options
+    route_command
+  end
 
-    if ARGV[0] == 'init'
+  def route_command
+    case ARGV[0]
+    when 'init'
       pablo_init
 
-    elsif ARGV[0] == 'capify'
+    when 'capify'
       capify
 
-    elsif ['start', 'run'].include?(ARGV[0])
+    when 'start', 'run'
       start
 
-    elsif ARGV[0] == 'stop'
+    when 'stop'
       rake_or_bundle_run ['rake', 'sinatra:stop']
 
-    elsif ARGV[0] == 'compile'
+    when 'compile'
       rake_or_bundle_run ['rake', 'chapters:build_epubs'], true
       rake_or_bundle_run ['rake', 'book:make']
 
-    elsif ARGV[0] == 'new'
+    when 'new'
       new_chapter
 
-    elsif ARGV[0] == 'list'
+    when 'list'
       list
 
-    elsif ARGV[0] == 'board'
-      tiddly_file = 'private/notes/tiddly.html'
-      unless File.exist? tiddly_file
-        FileUtils.copy File.join(__dir__, '../lib/tiddly.html'), tiddly_file
-      end
-      exec 'gio', 'open', tiddly_file
+    when 'board'
+      board
     end
   end
 
@@ -217,34 +245,6 @@ class Pablo
     exit
   end
 
-  def pablo_init
-    puts Rainbow('Creating main folders…').blue
-    init_path
-    puts Rainbow('Populating config file…').blue
-    init_config
-    puts Rainbow('Copying template files…').blue
-    init_assets
-    puts Rainbow('Installing rake files…').blue
-    init_rackup
-    puts ''
-    puts Rainbow('Neruda has been successfully installed.').green
-    init_bundler if bundler_is_present?
-  end
-
-  def capify
-    unless File.exist? 'Capfile'
-      STDERR.puts Rainbow('ERROR: Capfile does not exist.').red
-      exit 1
-    end
-
-    capfile = File.new('Capfile', 'a')
-    capfile.write <<~EOF
-    neruda_spec = Gem::Specification.find_by_name 'neruda'
-    Dir.glob("\#{neruda_spec.gem_dir}/lib/tasks/*.rake").each { |r| import r }
-    Dir.glob("\#{neruda_spec.gem_dir}/lib/tasks/capistrano/*.rake").each { |r| import r }
-  EOF
-  end
-
   def start
     loc_env = ENV['APP_ENV'] || 'development'
     if loc_env != 'production'
@@ -269,6 +269,14 @@ class Pablo
   def list
     list_type = ARGV[1] || 'chapters'
     rake_or_bundle_run ['rake', "book:list[#{list_type}]"]
+  end
+
+  def board
+    tiddly_file = 'private/notes/tiddly.html'
+    unless File.exist? tiddly_file
+      FileUtils.copy File.join(__dir__, '../lib/tiddly.html'), tiddly_file
+    end
+    exec 'gio', 'open', tiddly_file
   end
 end
 
