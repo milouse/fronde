@@ -173,8 +173,8 @@ class Pablo
     optparse = OptionParser.new do |opts|
       opts.banner = <<~EOF
         Usage:
-            pablo init
-            pablo [options] #{pablo_banner} [params]
+            pablo -h
+            pablo [ -v ] command
 
       EOF
       opts.on('-v', '--verbose', 'Output more information') do
@@ -182,21 +182,7 @@ class Pablo
       end
       opts.on('-h', '--help', 'Display this screen') do
         STDERR.puts opts
-        STDERR.puts <<~EOF
-
-          Commands:
-              init   : Initialize your Neruda instance
-              start  : Start the rack web server (default is thin)
-              stop   : Stop the web server
-              compile: Generate the epubs files
-              list   : List various book elements (chapters, characters, notes, sceneries)
-              board  : Open your TiddlyWiki file located at ./private/notes/tiddly.html
-
-          Chapters related commands:
-              new [title] : Create a new chapter
-
-        EOF
-        exit
+        pablo_help
       end
     end
 
@@ -211,11 +197,24 @@ class Pablo
   include BundlerHelper
   include PabloInit
 
-  def pablo_banner
-    options = ['start', 'stop', 'new', 'compile', 'list']
-    options << 'capify' if File.exist? 'Capfile'
+  def pablo_help
+    STDERR.puts <<~EOF
 
-    "[ #{options.join(' | ')} ]"
+      Book Commands:
+          new [title]     Begin to write a new chapter
+          compile         Generate the epubs files
+          list [elements] List various book elements
+                          (chapters, characters, notes, sceneries)
+          board           Open your TiddlyWiki file located
+                          at ./private/notes/tiddly.html
+
+      System Commands
+          init            Initialize your Neruda instance
+                          (you just need to do it once).
+          start           Start a test web server
+          stop            Stop the web server
+    EOF
+    exit
   end
 
   def pablo_init
