@@ -268,12 +268,8 @@ class Pablo
   end
 
   def list
-    if ARGV[1].nil?
-      STDERR.puts Rainbow('ERROR: No list type given.').red
-      STDERR.puts 'Enter one of [chapters, characters, notes, sceneries].'
-      exit 1
-    end
-    rake_or_bundle_run ['rake', "book:list[#{ARGV[1]}]"]
+    list_type = ARGV[1] || 'chapters'
+    rake_or_bundle_run ['rake', "book:list[#{list_type}]"]
   end
 end
 

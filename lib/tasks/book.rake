@@ -7,8 +7,12 @@ namespace :book do
   desc 'List various book elements'
   task :list, :list_type do |_, args|
     list_type = args[:list_type]
-    next unless ['chapters', 'characters',
-                 'notes', 'sceneries'].include?(list_type)
+    unless ['chapters', 'characters',
+            'notes', 'sceneries'].include?(list_type)
+      STDERR.puts Rainbow("ERROR: #{list_type} is not a valid list type.").red
+      STDERR.puts 'Enter one of [chapters, characters, notes, sceneries].'
+      next
+    end
     Dir.glob("private/#{list_type}/*.org") do |filename|
       file_radix = File.basename(filename, '.org')
       title = file_radix.split('_').map(&:capitalize).join(' ')
