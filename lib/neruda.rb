@@ -33,13 +33,15 @@ class Neruda::App < Sinatra::Base
   end
 
   def find_file(kind = 'org')
-    f = File.join('private', "#{kind}s", "#{@slug}.#{kind}")
+    if kind == 'epub'
+      f = File.join('private', 'epubs', "#{@slug}.epub")
+    elsif kind == 'chapters'
+      f = File.join('private', 'chapters', "#{@slug}.org")
+    else
+      f = File.join('private', "#{@slug}.#{kind}")
+    end
     halt 404 unless File.exist? f
     f
-  end
-
-  def find_chapter
-    @org_file = find_file
   end
 
   get '/epub/:chapter' do
@@ -55,7 +57,7 @@ class Neruda::App < Sinatra::Base
 
   get '/chapter/:chapter' do
     find_slug
-    find_chapter
+    @org_file = find_file('chapters')
     @content = Orgmode::Parser.load @org_file
     title # Force the early removal of the title
     slim :chapter
@@ -73,7 +75,7 @@ class Neruda::App < Sinatra::Base
     @slug = 'index'
     text_content = ''
     if File.exist? File.join('private', 'index.org')
-      find_chapter
+      @org_file = find_file
       @content = Orgmode::Parser.load @org_file
       text_content = @content.to_html
     end
