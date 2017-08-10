@@ -27,6 +27,10 @@ class Neruda::App < Sinatra::Base
   include Neruda::Url
   include Neruda::Chapter
 
+  def chdir
+    Dir.chdir settings.root if ENV['APP_ENV'] == 'production'
+  end
+
   def find_slug
     @slug = params[:chapter]
     halt 404 if @slug.nil?
@@ -45,6 +49,7 @@ class Neruda::App < Sinatra::Base
   end
 
   get '/epub/:chapter' do
+    chdir
     find_slug
     if @slug == 'all' && !Neruda::CONFIG['book_filename'].nil?
       @slug = Neruda::CONFIG['book_filename']
@@ -56,6 +61,7 @@ class Neruda::App < Sinatra::Base
   end
 
   get '/chapter/:chapter' do
+    chdir
     find_slug
     @org_file = find_file('chapters')
     @content = Orgmode::Parser.load @org_file
@@ -72,6 +78,7 @@ class Neruda::App < Sinatra::Base
   end
 
   get '/' do
+    chdir
     @slug = 'index'
     text_content = ''
     if File.exist? File.join('private', 'index.org')
