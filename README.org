@@ -1,5 +1,7 @@
 #+title: Neruda
 
+[[https://badge.fury.io/rb/neruda.svg]]
+
 *Neruda* is a little [[http://sinatrarb.com][Sinatra]] app, which aims to offer a quick access for
 writers to web publication. It is named in memory of Pablo Neruda.
 
