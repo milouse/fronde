@@ -84,6 +84,7 @@ class Neruda::App < Sinatra::Base
     if File.exist? File.join('private', 'index.org')
       @org_file = find_file
       @content = Orgmode::Parser.load @org_file
+      title
       text_content = @content.to_html
     end
 
