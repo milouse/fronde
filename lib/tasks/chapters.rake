@@ -119,9 +119,9 @@ namespace :chapters do
 
     editor = ENV['EDITOR'] || ENV['VISUAL'] || 'emacs'
     if editor.match?(/^emacs/)
-      sh editor, '+5', filename
+      sh [editor, '+5', filename].join(' ')
     else
-      sh editor, filename
+      sh [editor, filename].join(' ')
     end
   end
 end
