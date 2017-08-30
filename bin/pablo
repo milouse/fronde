@@ -169,6 +169,7 @@ class Pablo
   def route_command
     case @arg
     when 'capify', 'list', 'start', 'edit', 'setup'
+      ARGV.shift
       send @arg
 
     when 'stop'
@@ -253,17 +254,17 @@ class Pablo
   end
 
   def edit
-    if ARGV[1].nil?
+    if ARGV[0].nil?
       print 'Title: '
       title = STDIN.gets.strip
     else
-      title = ARGV[1]
+      title = ARGV.join(' ')
     end
     rake_or_bundle_run ['rake', "chapters:create_or_edit[#{title}]"]
   end
 
   def list
-    list_type = ARGV[1] || 'chapters'
+    list_type = ARGV[0] || 'chapters'
     rake_or_bundle_run ['rake', "book:list[#{list_type}]"]
   end
 end
