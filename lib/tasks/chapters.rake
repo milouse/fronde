@@ -16,7 +16,7 @@ namespace :chapters do
     end
     next if org_to_convert.empty?
     Dir.mkdir 'tmp' unless Dir.exist? 'tmp'
-    IO.write('tmp/org_to_convert.yml', org_to_convert.to_yaml)
+    IO.write 'tmp/org_to_convert.yml', org_to_convert.to_yaml
   end
 
   desc 'Identify orphan (without epubs) org files'
@@ -31,7 +31,7 @@ namespace :chapters do
       org_to_convert << filename unless File.exist? epub_file
     end
     next if org_to_convert.empty?
-    IO.write('tmp/org_to_convert.yml', org_to_convert.to_yaml)
+    IO.write 'tmp/org_to_convert.yml', org_to_convert.to_yaml
   end
 
   desc 'Convert org files from tmp/org_to_convert.yml to epubs'
@@ -48,7 +48,7 @@ namespace :chapters do
       sh 'pandoc', '-S', "--output=#{epub_file}", filename
     end
     next if epub_to_upload.empty?
-    IO.write('tmp/epub_to_upload.yml', epub_to_upload.to_yaml)
+    IO.write 'tmp/epub_to_upload.yml', epub_to_upload.to_yaml
   end
 
   desc 'Build missing epubs'
@@ -93,7 +93,7 @@ namespace :chapters do
       title = f.in_buffer_settings['TITLE']
       chapters << { slug: file_radix, title: title } unless title.nil?
     end
-    IO.write('config/chapters.yml', chapters.to_yaml)
+    IO.write 'config/chapters.yml', chapters.to_yaml
   end
 
   desc 'Open an editor to create a new chapter'
@@ -108,13 +108,13 @@ namespace :chapters do
 
     unless File.exist? filename
       config = YAML.load_file('config/config.yml')
-      IO.write filename, <<~EOF
+      filecontent = <<~ORG
         #+title: #{args[:title]}
         #+date: <#{Date.today.strftime('%Y-%m-%d %a.')}>
         #+author: #{config['author']}
 
-
-      EOF
+      ORG
+      IO.write filename, filecontent
     end
 
     editor = ENV['EDITOR'] || ENV['VISUAL'] || 'emacs'

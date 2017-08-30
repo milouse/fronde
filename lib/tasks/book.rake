@@ -53,7 +53,7 @@ namespace :book do
     end
     org_file.close
 
-    IO.write('tmp/org_to_convert.yml', [final_org].to_yaml)
+    IO.write 'tmp/org_to_convert.yml', [final_org].to_yaml
   end
 
   task make: ['book:prepare', 'chapters:convert_org']
