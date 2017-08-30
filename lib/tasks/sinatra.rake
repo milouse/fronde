@@ -6,7 +6,7 @@ namespace :sinatra do
   desc 'Stop the underlaying sinatra application'
   task :stop do
     unless File.exist? 'tmp/pids/neruda.pid'
-      STDERR.puts 'No pid file found'
+      STDERR.puts Rainbow('No pid file found').red
       exit 1
     end
     pid = IO.read('tmp/pids/neruda.pid').strip.to_i
@@ -27,7 +27,7 @@ namespace :sinatra do
         sh(*cmd)
       end
     rescue Interrupt
-      puts Rainbow(' Kthxbye').blue
+      puts Rainbow('Kthxbye').blue
     end
   end
 
