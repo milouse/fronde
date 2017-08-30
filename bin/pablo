@@ -161,23 +161,17 @@ class Pablo
     @options = {
       verbose: false
     }
+    @available_commands = ['capify', 'list', 'start', 'new_chapter',
+                           'setup', 'stop', 'compile']
 
     parse_options
     route_command
   end
 
   def route_command
-    arg = ARGV[0]
-
-    if arg == 'new'
-      arg = 'new_chapter'
-    elsif arg == 'run'
-      arg = 'start'
-    end
-
-    case arg
+    case @arg
     when 'capify', 'list', 'start', 'new_chapter', 'setup'
-      send arg
+      send @arg
 
     when 'stop'
       rake_or_bundle_run ['rake', 'sinatra:stop']
@@ -209,9 +203,17 @@ class Pablo
 
     optparse.parse!
 
-    return if ARGV[0]
-    STDERR.puts Rainbow('ERROR: no command given. Run pablo -h for ' \
-                        'options and available commands').red
+    @arg = ARGV[0]
+    if @arg == 'new'
+      @arg = 'new_chapter'
+    elsif @arg == 'run'
+      @arg = 'start'
+    end
+
+    return if @available_commands.include?(@arg)
+    STDERR.puts Rainbow('ERROR: no or unknown command given.').red
+    STDERR.puts Rainbow('Run pablo -h for options and available ' \
+                        'commands').red
     exit 1
   end
 
