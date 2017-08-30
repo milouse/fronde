@@ -189,9 +189,6 @@ class Pablo
 
     when 'list'
       list
-
-    when 'board'
-      board
     end
   end
 
@@ -233,8 +230,6 @@ class Pablo
           compile         Generate the epubs files
           list [elements] List various book elements
                           (chapters, characters, notes, sceneries)
-          board           Open your TiddlyWiki file located
-                          at ./private/notes/tiddly.html
 
       System Commands
           init            Initialize your Neruda instance
@@ -269,14 +264,6 @@ class Pablo
   def list
     list_type = ARGV[1] || 'chapters'
     rake_or_bundle_run ['rake', "book:list[#{list_type}]"]
-  end
-
-  def board
-    tiddly_file = 'private/notes/tiddly.html'
-    unless File.exist? tiddly_file
-      FileUtils.copy File.join(__dir__, '../lib/tiddly.html'), tiddly_file
-    end
-    exec 'gio', 'open', tiddly_file
   end
 end
 

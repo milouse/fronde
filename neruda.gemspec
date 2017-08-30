@@ -13,7 +13,6 @@ Gem::Specification.new do |s|
   s.author      = 'Étienne Deparis'
   s.email       = 'etienne@depar.is'
   s.files       = ['lib/neruda.rb',
-                   'lib/tiddly.html',
                    'lib/neruda/chapter.rb',
                    'lib/neruda/url.rb',
                    # Rake tasks
