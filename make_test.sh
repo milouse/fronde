@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+[ "z$1" = z ] && echo 'Please give me the path to the neruda gem to test' \
+  && exit 1
+
 export PATH="$PATH:$HOME/.rvm/bin"
 source "$HOME/.rvm/scripts/rvm"
 
