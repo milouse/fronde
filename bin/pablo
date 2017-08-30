@@ -209,6 +209,10 @@ class Pablo
       @arg = 'start'
     end
 
+    if !File.exist?('config/config.yml') && @arg != 'setup'
+      STDERR.puts Rainbow('ERROR: please run pablo setup before all').red
+      exit 1
+    end
     return if @available_commands.include?(@arg)
     STDERR.puts Rainbow('ERROR: no or unknown command given.').red
     STDERR.puts Rainbow('Run pablo -h for options and available ' \
