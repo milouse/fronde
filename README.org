@@ -2,16 +2,16 @@
 
 [[https://badge.fury.io/rb/neruda.svg]]
 
-*Neruda* is a little [[http://sinatrarb.com][Sinatra]] app, which aims to offer a quick access for
-writers to web publication. It is named in memory of Pablo Neruda.
+*Neruda* is a little [[http://sinatrarb.com][Sinatra]] app, which aims to offer a quick access
+for writers to web publication. It is named in memory of Pablo Neruda.
 
 Source code is available on my [[https://git.deparis.io/neruda][cgit instance]], while issues should be
 followed on my [[https://projects.deparis.io/projects/neruda][redmine instance]].
 
 * Install
 
-These installation instructions use [[https://rvm.io][rvm]] as ruby provider. If you want to
-use rbenv or your system ruby, please refer to their specific
+These installation instructions use [[https://rvm.io][rvm]] as ruby provider. If you want
+to use rbenv or your system ruby, please refer to their specific
 documentation to know how to install ruby 2.4.
 
 First we need to upgrade rvm (always do that from time to time):
@@ -32,7 +32,7 @@ $ gem install neruda
 Finally, you need to configure it to your needs.
 
 #+begin_src sh
-$ pablo init
+$ pablo setup
 #+end_src
 
 * Running it
@@ -55,8 +55,8 @@ To stop it, just enter =ctrl+C= if you are in development mode or enter
 * Pablo command
 
 In order to manage you Neruda installation, this gem provides a little
-helper called =pablo=. You already used it to =init=, =start= and =stop=
-your local installation. It can do a little more.
+helper called =pablo=. You already used it to =setup=, =start= and
+=stop= your local installation. It can do a little more.
 
 ** New
 
