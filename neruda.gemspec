@@ -3,7 +3,7 @@
 
 Gem::Specification.new do |s|
   s.name        = 'neruda'
-  s.version     = '0.0.7'
+  s.version     = '0.0.8'
   s.date        = '2017-08-30'
   s.summary     = 'A simplistic way to publish a book online.'
   s.description = <<~EOF
