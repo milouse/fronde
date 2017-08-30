@@ -140,7 +140,7 @@ module PabloInit
          Rainbow('bundle install').yellow
   end
 
-  def pablo_init
+  def setup
     puts Rainbow('Creating main folders…').blue
     init_path
     puts Rainbow('Populating config file…').blue
@@ -167,15 +167,17 @@ class Pablo
   end
 
   def route_command
-    case ARGV[0]
-    when 'init'
-      pablo_init
+    arg = ARGV[0]
 
-    when 'capify'
-      capify
+    if arg == 'new'
+      arg = 'new_chapter'
+    elsif arg == 'run'
+      arg = 'start'
+    end
 
-    when 'start', 'run'
-      start
+    case arg
+    when 'capify', 'list', 'start', 'new_chapter', 'setup'
+      send arg
 
     when 'stop'
       rake_or_bundle_run ['rake', 'sinatra:stop']
@@ -183,12 +185,6 @@ class Pablo
     when 'compile'
       rake_or_bundle_run ['rake', 'chapters:build_epubs'], true
       rake_or_bundle_run ['rake', 'book:make']
-
-    when 'new'
-      new_chapter
-
-    when 'list'
-      list
     end
   end
 
@@ -232,7 +228,7 @@ class Pablo
                           (chapters, characters, notes, sceneries)
 
       System Commands
-          init            Initialize your Neruda instance
+          setup           Initialize your Neruda instance
                           (you just need to do it once).
           start           Start a test web server
           stop            Stop the web server
