@@ -159,7 +159,7 @@ class Pablo
     @options = {
       verbose: false
     }
-    @available_commands = ['capify', 'list', 'start', 'new_chapter',
+    @available_commands = ['capify', 'list', 'start', 'edit',
                            'setup', 'stop', 'compile']
 
     parse_options
@@ -168,7 +168,7 @@ class Pablo
 
   def route_command
     case @arg
-    when 'capify', 'list', 'start', 'new_chapter', 'setup'
+    when 'capify', 'list', 'start', 'edit', 'setup'
       send @arg
 
     when 'stop'
@@ -204,7 +204,7 @@ class Pablo
 
     @arg = ARGV[0]
     if @arg == 'new'
-      @arg = 'new_chapter'
+      @arg = 'edit'
     elsif @arg == 'run'
       @arg = 'start'
     end
@@ -226,7 +226,8 @@ class Pablo
   def pablo_help
     STDERR.puts <<~HELP
       Book Commands:
-          new [title]     Begin to write a new chapter
+          new  [title]    Begin to write a new chapter
+          edit [title]    Continue the writing of a chapter
           compile         Generate the epubs files
           list [elements] List various book elements
                           (chapters, characters, notes, sceneries)
@@ -251,14 +252,14 @@ class Pablo
     rake_or_bundle_run ['rake', 'sinatra:start']
   end
 
-  def new_chapter
+  def edit
     if ARGV[1].nil?
       print 'Title: '
       title = STDIN.gets.strip
     else
       title = ARGV[1]
     end
-    rake_or_bundle_run ['rake', "chapters:new[#{title}]"]
+    rake_or_bundle_run ['rake', "chapters:create_or_edit[#{title}]"]
   end
 
   def list

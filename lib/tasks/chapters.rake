@@ -97,7 +97,7 @@ namespace :chapters do
   end
 
   desc 'Open an editor to create a new chapter'
-  task :new, :title do |_, args|
+  task :create_or_edit, :title do |_, args|
     if args[:title] == ''
       filename = 'new'
     else
@@ -118,6 +118,10 @@ namespace :chapters do
     end
 
     editor = ENV['EDITOR'] || ENV['VISUAL'] || 'emacs'
+
+    puts Rainbow(args[:title]).blue
+    puts "Opening #{filename} with #{editor}"
+
     if editor.match?(/^emacs/)
       sh [editor, '+5', filename].join(' ')
     else
