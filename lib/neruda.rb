@@ -19,8 +19,7 @@ class Neruda::App < Sinatra::Base
   configure :production, :development do
     # When used as a Gem, we lose the correct path.
     set :root, Dir.pwd
-    enable :logging
-    disable :method_override, :sessions
+    disable :logging, :method_override, :sessions
     mime_type :epub, 'application/epub+zip'
   end
 
@@ -28,7 +27,13 @@ class Neruda::App < Sinatra::Base
   include Neruda::Chapter
 
   def chdir
-    Dir.chdir settings.root if ENV['APP_ENV'] == 'production'
+    loc_env = 'development'
+    if ENV.key? 'APP_ENV'
+      loc_env = ENV['APP_ENV']
+    elsif ENV.key? 'RACK_ENV'
+      loc_env = ENV['RACK_ENV']
+    end
+    Dir.chdir settings.root if loc_env == 'production'
   end
 
   def find_slug
