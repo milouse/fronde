@@ -45,6 +45,7 @@ namespace :chapters do
       file_radix = File.basename(filename, '.org')
       epub_file = "private/epubs/#{file_radix}.epub"
       epub_to_upload << epub_file
+      puts "Converting #{filename} to #{epub_file}"
       sh 'pandoc', '-S', "--output=#{epub_file}", filename
     end
     next if epub_to_upload.empty?
