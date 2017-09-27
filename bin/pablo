@@ -164,6 +164,8 @@ class Pablo
                            'setup', 'stop', 'compile']
 
     parse_options
+    # Be sure required directories are always there
+    init_path unless @arg == 'setup'
     route_command
   end
 
