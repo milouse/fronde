@@ -86,8 +86,9 @@ class Neruda::App < Sinatra::Base
     chdir
     @slug = 'index'
     text_content = ''
-    if File.exist? File.join('private', 'index.org')
-      @org_file = find_file
+    index_file = File.join('private', 'index.org')
+    if File.exist? index_file
+      @org_file = index_file
       @content = Orgmode::Parser.load @org_file
       title
       text_content = @content.to_html
