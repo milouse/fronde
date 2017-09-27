@@ -211,6 +211,8 @@ class Pablo
       @arg = 'edit'
     elsif @arg == 'run'
       @arg = 'start'
+    elsif @arg == 'init'
+      @arg = 'setup'
     end
 
     if !File.exist?('config/config.yml') && @arg != 'setup'
