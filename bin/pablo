@@ -20,8 +20,9 @@ module BundlerHelper
   def rake_or_bundle_run(cmd, use_system = false)
     cmd.insert(1, '-s') unless @options[:verbose]
     cmd = ['bundle', 'exec'] + cmd if bundler_is_present?
-    puts Rainbow(cmd.join(' ')).blue if @options[:verbose]
-    return cmd.join(' ') if use_system
+    joined_cmd = cmd.join(' ')
+    puts Rainbow(joined_cmd).blue if @options[:verbose]
+    return system(joined_cmd) if use_system
     exec(*cmd)
   end
 
