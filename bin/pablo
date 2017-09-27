@@ -181,6 +181,17 @@ class Pablo
 
   private
 
+  def handle_aliases
+    @arg = ARGV[0]
+    if @arg == 'new'
+      @arg = 'edit'
+    elsif @arg == 'run'
+      @arg = 'start'
+    elsif @arg == 'init'
+      @arg = 'setup'
+    end
+  end
+
   def parse_options
     optparse = OptionParser.new do |opts|
       opts.banner = <<~HELP
@@ -201,14 +212,7 @@ class Pablo
 
     optparse.parse!
 
-    @arg = ARGV[0]
-    if @arg == 'new'
-      @arg = 'edit'
-    elsif @arg == 'run'
-      @arg = 'start'
-    elsif @arg == 'init'
-      @arg = 'setup'
-    end
+    handle_aliases
 
     if !File.exist?('config/config.yml') && @arg != 'setup'
       STDERR.puts Rainbow('ERROR: please run pablo setup before all').red
