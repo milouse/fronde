@@ -170,18 +170,13 @@ class Pablo
   end
 
   def route_command
-    case @arg
-    when 'capify', 'list', 'start', 'edit', 'setup'
-      ARGV.shift
-      send @arg
-
-    when 'stop'
+    if @arg == 'stop'
       rake_or_bundle_run ['rake', 'sinatra:stop']
-
-    when 'compile'
-      rake_or_bundle_run ['rake', 'chapters:build_epubs'], true
-      rake_or_bundle_run ['rake', 'book:make']
+      return
     end
+
+    ARGV.shift
+    send @arg
   end
 
   private
@@ -247,7 +242,14 @@ class Pablo
     exit
   end
 
+  def compile
+    rake_or_bundle_run ['rake', 'chapters:build_epubs'], true
+    rake_or_bundle_run ['rake', 'book:make'], true
+  end
+
   def start
+    compile
+
     loc_env = ENV['APP_ENV'] || 'development'
     if loc_env != 'production'
       puts Rainbow("Neruda is run in #{loc_env} environment").green
