@@ -1,17 +1,24 @@
 ---
 AllCops:
-  TargetRubyVersion: 2.4
+  TargetRubyVersion: 2.5
 
-Metrics/BlockLength:
-  Exclude:
-    - 'lib/**/*.rake'
-    - neruda.gemspec
-
-Metrics/MethodLength:
+Layout/EmptyLineAfterGuardClause:
   Enabled: false
 
 Metrics/AbcSize:
   Enabled: false
+
+Metrics/BlockLength:
+  Max: 30
+
+Metrics/LineLength:
+  Max: 80
+
+Metrics/MethodLength:
+  Max: 15
+
+Style/ConditionalAssignment:
+  EnforcedStyle: assign_inside_condition
 
 Style/ClassAndModuleChildren:
   EnforcedStyle: compact
@@ -19,12 +26,15 @@ Style/ClassAndModuleChildren:
 Style/HashSyntax:
   EnforcedStyle: no_mixed_keys
 
-Style/WordArray:
-  Enabled: false
+Style/PreferredHashMethods:
+  EnforcedStyle: verbose
 
 Style/RegexpLiteral:
   EnforcedStyle: slashes
   AllowInnerSlashes: true
 
-Style/ConditionalAssignment:
-  EnforcedStyle: assign_inside_condition
+Style/SymbolArray:
+  EnforcedStyle: brackets
+
+Style/WordArray:
+  EnforcedStyle: brackets
