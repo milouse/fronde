@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
+require 'neruda/config'
+require 'r18n-core'
+
+R18n.set(Config.settings['lang'] || 'en')
+
 Dir.glob('lib/tasks/*.rake').each { |r| import r }
 
-require 'rubocop/rake_task'
-RuboCop::RakeTask.new
-
-# task :default => [:rubocop, :spec, :cucumber]
-
-task :default => [:rubocop]
+task default: 'site:build'

@@ -2,16 +2,13 @@
 
 source 'https://rubygems.org'
 
-gem 'rake', '~> 12.0'
+gem 'nokogiri'
+gem 'r18n-core'
+gem 'rake'
 
 group :development do
+  gem 'byebug'
+  gem 'pry'
+  gem 'pry-doc'
   gem 'rubocop'
-end
-
-group :test do
-  gem 'org-ruby', '~> 0.9'
-  gem 'rainbow', '~> 2.2'
-  gem 'sinatra', '~> 2.0'
-  gem 'slim', '~> 3.0'
-  gem 'thin', '~> 1.7'
 end
