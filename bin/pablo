@@ -67,7 +67,7 @@ class Pablo
     @options = {
       verbose: false
     }
-    @available_commands = ['install', 'init', 'new', 'edit']
+    @available_commands = ['init', 'install', 'new', 'edit']
     parse_options
     # Be sure required directories are always there
     init_path
@@ -81,30 +81,29 @@ class Pablo
     @arg = ARGV[0]
     if @arg == 'new'
       @arg = 'edit'
-    elsif @arg == 'init'
-      @arg = 'install'
+    elsif @arg == 'install'
+      @arg = 'init'
     end
   end
 
   def parse_options
     optparse = OptionParser.new do |opts|
       opts.banner = <<~HELP
-        Usage:
-            pablo -h
-            pablo [ -v ] command
+        Usage: pablo [-v] <command>
+               pablo -h
 
       HELP
       opts.version = Neruda::VERSION
+      opts.program_name = 'pablo (Neruda gem)'
       opts.on('-v', '--verbose', 'Output more information') do
         @options[:verbose] = true
       end
-      opts.on('-h', '--help', 'Display this screen') do
-        warn opts
-        warn
-        pablo_help
+      opts.on_tail('-h', '--help', 'Display this screen') do
+        pablo_help(opts)
       end
-      opts.on('-V', '--version', 'Show version') do
+      opts.on_tail('-V', '--version', 'Show version') do
         puts opts.ver
+        exit
       end
     end
 
@@ -112,28 +111,30 @@ class Pablo
 
     handle_aliases
 
-    if !File.exist?('config.yml') && @arg != 'install'
-      warn 'ERROR: please run pablo setup before all'
+    if !File.exist?('config.yml') && @arg != 'init'
+      warn 'ERROR: please run pablo init before all'
       exit 1
     end
     return if @available_commands.include?(@arg)
     warn 'ERROR: no or unknown command given.'
-    warn 'Run pablo -h for options and available commands'
+    pablo_help(optparse)
     exit 1
   end
 
   include PabloInit
 
-  def pablo_help
+  def pablo_help(banner)
+    warn banner
     warn <<~HELP
+
       System Commands
-          install         Initialize your Neruda instance
-                          (you just need to do it once).
+          init         Initialize your Neruda instance
+                       (you just need to do it once).
     HELP
     exit
   end
 
-  def install
+  def init
     init_config
     init_rakefile
     cmd = ['rake', 'org:install']
