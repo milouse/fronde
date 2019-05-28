@@ -1,0 +1,5 @@
+---
+pablo:
+  error:
+    no_command: 'ERREUR: Aucune commande ou commande inconnue donnée.'
+  set_author_name: 'Votre nom d\'auteur : '

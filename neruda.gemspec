@@ -22,6 +22,9 @@ Gem::Specification.new do |s|
                    'lib/tasks/org.rake',
                    'lib/tasks/site.rake',
                    'lib/tasks/sync.rake',
+                   # Translations
+                   'locales/en.yml',
+                   'locales/fr.yml',
                    'docs/config.yml.example',
                    'LICENSE']
   s.executables = ['pablo']

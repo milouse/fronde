@@ -18,7 +18,6 @@ def org_config(orgtpl)
   <<~ORGCONFIG
     (package-initialize)
     (add-to-list 'load-path "./org-#{ORG_VERSION}/lisp")
-    (message (concat "Using org-" (org-release)))
 
     (setq org-html-doctype "html5"
           org-html-html5-fancy t
