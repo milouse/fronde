@@ -16,15 +16,28 @@ module PabloInit
   end
 
   def init_config
-    config = {}
-    print 'Your author name: '
-    config['author'] = STDIN.gets.strip
-    print 'Main language of your website [en]: '
-    lang = STDIN.gets.strip
-    lang = 'en' if lang == ''
-    config['lang'] = lang
-    IO.write 'config.yml', config.to_yaml
-    Neruda::Config.reload!
+    config = Neruda::Config.settings.merge
+    changed = false
+    if config['author'].nil? || config['author'] == ''
+      puts "Your author name: "
+      author = STDIN.gets.strip
+      if author != ''
+        config['author'] = author
+        changed = true
+      end
+    end
+    if config['lang'].nil? || config['lang'] == ''
+      puts "Main language of your website [en]: "
+      lang = STDIN.gets.strip
+      lang = 'en' if lang == ''
+      config['lang'] = lang
+      changed = true
+    end
+    if changed
+      Neruda::Config.save(config)
+    else
+      warn 'Already configured'
+    end
   end
 
   def init_rakefile
@@ -35,7 +48,7 @@ module PabloInit
       require 'neruda/config'
       require 'r18n-core'
 
-      R18n.set(Config.settings['lang'] || 'en')
+      R18n.set(Neruda::Config.settings['lang'] || 'en')
 
       neruda_spec = Gem::Specification.find_by_name 'neruda'
       Dir.glob("\#{neruda_spec.gem_dir}/lib/tasks/*.rake").each { |r| import r }
@@ -123,6 +136,11 @@ class Pablo
   def install
     init_config
     init_rakefile
+    cmd = ['rake', 'org:install']
+    cmd.insert(1, '-s') unless @options[:verbose]
+    joined_cmd = cmd.join(' ')
+    puts joined_cmd if @options[:verbose]
+    system joined_cmd
   end
 end
 

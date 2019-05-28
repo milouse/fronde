@@ -11,8 +11,9 @@ module Neruda
         @config
       end
 
-      def reload!
-        load_settings
+      def save(new_config)
+        IO.write 'config.yml', new_config.to_yaml
+        @config = new_config.freeze
       end
 
       private
