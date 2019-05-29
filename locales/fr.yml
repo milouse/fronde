@@ -2,4 +2,5 @@
 pablo:
   error:
     no_command: 'ERREUR: Aucune commande ou commande inconnue donnée.'
-  set_author_name: 'Votre nom d\'auteur : '
+  set_author_name: "Votre nom d'auteur :"
+  set_lang: 'Langue principale de votre site [%1] :'

@@ -1,5 +1,4 @@
 #!/usr/bin/env ruby
-# coding: utf-8
 # frozen_string_literal: true
 
 require 'rake'
@@ -9,7 +8,7 @@ require 'neruda/config'
 require 'neruda/version'
 
 R18n.set(Neruda::Config.settings['lang'] || 'en',
-         File.expand_path('../../locales', __FILE__))
+         File.expand_path('../locales', __dir__))
 
 # Pablo commands
 module PabloCommands
@@ -18,7 +17,7 @@ module PabloCommands
     init_rakefile
     @rake.run('org:install')
   end
-  alias :pablo_install :pablo_init
+  alias pablo_install pablo_init
 
   def pablo_build(file = ARGV)
     if file.nil?
@@ -31,8 +30,32 @@ module PabloCommands
   def pablo_preview
     @rake.run('site:preview')
   end
+end
+
+# Main pablo class
+class Pablo
+  def initialize(opts = {})
+    @options = { verbose: false }.merge(opts)
+    # Be sure required directories are always there
+    init_path
+    init_rake
+  end
+
+  include PabloCommands
 
   private
+
+  def init_path
+    public_path = Neruda::Config.settings['public_folder'] || 'public_html'
+    FileUtils.mkdir_p "#{public_path}/assets"
+    local_blog_path = Neruda::Config.settings['blog_slug'] || 'blog'
+    FileUtils.mkdir_p "src/#{local_blog_path}"
+  end
+
+  def init_rake
+    @rake = Rake.application
+    Rake.verbose(false) unless @options[:verbose]
+  end
 
   def init_config
     config = Neruda::Config.settings.merge
@@ -46,21 +69,16 @@ module PabloCommands
       end
     end
     if config['lang'].nil? || config['lang'] == ''
-      puts "Main language of your website [en]: "
+      config['lang'] = 'en'
+      puts R18n.t.pablo.set_lang(config['lang'])
       lang = STDIN.gets.strip
-      lang = 'en' if lang == ''
-      config['lang'] = lang
+      config['lang'] = lang if lang != ''
       changed = true
     end
-    if changed
-      Neruda::Config.save(config)
-    else
-      warn 'Already configured'
-    end
+    Neruda::Config.save(config) if changed
   end
 
   def init_rakefile
-    return if File.exist? 'Rakefile'
     rakefile = <<~RAKE
       # frozen_string_literal: true
 
@@ -81,91 +99,57 @@ module PabloCommands
   end
 end
 
-# Main pablo class
-class Pablo
-  def initialize
-    @options = {
-      verbose: false
-    }
-    cmd = parse_options
-    # Be sure required directories are always there
-    init_path
-    init_rake
-    send cmd
+def check_command
+  cmd = ARGV[0]
+  if cmd == 'new'
+    cmd = 'edit'
+  elsif cmd == 'install'
+    cmd = 'init'
   end
+  "pablo_#{cmd}".to_sym
+end
 
-  include PabloCommands
+def pablo_help(banner)
+  warn banner
+  warn <<~HELP
 
-  private
+    System Commands
+        init         Initialize your Neruda instance
+                     (you just need to do it once).
+  HELP
+  exit
+end
 
-  def init_path
-    public_path = Neruda::Config.settings['public_folder'] || 'public_html'
-    FileUtils.mkdir_p "#{public_path}/assets"
-    local_blog_path = Neruda::Config.settings['blog_slug'] || 'blog'
-    FileUtils.mkdir_p "src/#{local_blog_path}"
+params = {}
+optparser = OptionParser.new do |opts|
+  opts.banner = <<~HELP
+    Usage: pablo [-v] <command>
+           pablo -h
+
+  HELP
+  opts.version = Neruda::VERSION
+  opts.program_name = 'pablo (Neruda gem)'
+  opts.on('-v', '--verbose', 'Output more information') do
+    params[:verbose] = true
   end
-
-  def init_rake
-    @rake = Rake.application
-    Rake.verbose(false) unless @options[:verbose]
+  opts.on_tail('-h', '--help', 'Display this screen') do
+    pablo_help(opts)
   end
-
-  def check_command
-    cmd = ARGV[0]
-    if cmd == 'new'
-      cmd = 'edit'
-    elsif cmd == 'install'
-      cmd = 'init'
-    end
-    if !File.exist?('config.yml') && cmd != 'init'
-      warn 'ERROR: please run pablo init before all'
-      exit 1
-    end
-    cmd = "pablo_#{cmd}".to_sym
-    return nil unless respond_to?(cmd)
-    ARGV.shift
-    cmd
-  end
-
-  def parse_options
-    optparse = OptionParser.new do |opts|
-      opts.banner = <<~HELP
-        Usage: pablo [-v] <command>
-               pablo -h
-
-      HELP
-      opts.version = Neruda::VERSION
-      opts.program_name = 'pablo (Neruda gem)'
-      opts.on('-v', '--verbose', 'Output more information') do
-        @options[:verbose] = true
-      end
-      opts.on_tail('-h', '--help', 'Display this screen') do
-        pablo_help(opts)
-      end
-      opts.on_tail('-V', '--version', 'Show version') do
-        puts opts.ver
-        exit
-      end
-    end
-    optparse.parse!
-
-    command = check_command
-    return command unless command.nil?
-    warn R18n.t.pablo.error.no_command
-    pablo_help(optparse)
-    exit 1
-  end
-
-  def pablo_help(banner)
-    warn banner
-    warn <<~HELP
-
-      System Commands
-          init         Initialize your Neruda instance
-                       (you just need to do it once).
-    HELP
+  opts.on_tail('-V', '--version', 'Show version') do
+    puts opts.ver
     exit
   end
 end
+optparser.parse!
 
-Pablo.new
+pablo = Pablo.new(params)
+command = check_command
+if command.nil? || !pablo.respond_to?(command)
+  warn R18n.t.pablo.error.no_command
+  pablo_help(optparser)
+  exit 1
+end
+ARGV.shift
+
+pablo.pablo_init if !File.exist?('config.yml') && command != 'pablo_init'
+pablo.send command
