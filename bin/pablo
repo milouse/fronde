@@ -13,22 +13,23 @@ R18n.set(Neruda::Config.settings['lang'] || 'en',
 # Pablo commands
 module PabloCommands
   def pablo_init
-    init_config
-    init_rakefile
-    @rake.run('org:install')
+    @rake.invoke_task('site:config')
+    @rake.invoke_task('org:install')
   end
-  alias pablo_install pablo_init
+  alias pablo_config pablo_init
 
-  def pablo_build(file = ARGV)
+  def pablo_build(file = ARGV[0])
+    @rake.options.build_all = true
     if file.nil?
-      @rake.run('site:build')
+      @rake.invoke_task('site:build')
+      @rake.invoke_task('site:index')
     else
-      @rake.run(ARGV.unshift('-B'))
+      @rake.invoke_task(file)
     end
   end
 
   def pablo_preview
-    @rake.run('site:preview')
+    @rake.invoke_task('site:preview')
   end
 end
 
@@ -53,29 +54,10 @@ class Pablo
   end
 
   def init_rake
+    init_rakefile unless File.exist?('Rakefile')
     @rake = Rake.application
     Rake.verbose(false) unless @options[:verbose]
-  end
-
-  def init_config
-    config = Neruda::Config.settings.merge
-    changed = false
-    if config['author'].nil? || config['author'] == ''
-      puts R18n.t.pablo.set_author_name
-      author = STDIN.gets.strip
-      if author != ''
-        config['author'] = author
-        changed = true
-      end
-    end
-    if config['lang'].nil? || config['lang'] == ''
-      config['lang'] = 'en'
-      puts R18n.t.pablo.set_lang(config['lang'])
-      lang = STDIN.gets.strip
-      config['lang'] = lang if lang != ''
-      changed = true
-    end
-    Neruda::Config.save(config) if changed
+    @rake.raw_load_rakefile
   end
 
   def init_rakefile
@@ -99,16 +81,6 @@ class Pablo
   end
 end
 
-def check_command
-  cmd = ARGV[0]
-  if cmd == 'new'
-    cmd = 'edit'
-  elsif cmd == 'install'
-    cmd = 'init'
-  end
-  "pablo_#{cmd}".to_sym
-end
-
 def pablo_help(banner)
   warn banner
   warn <<~HELP
@@ -116,6 +88,8 @@ def pablo_help(banner)
     System Commands
         init         Initialize your Neruda instance
                      (you just need to do it once).
+        preview      Start a test webserver to preview
+                     your website on http://127.0.0.1:5000
   HELP
   exit
 end
@@ -143,7 +117,7 @@ end
 optparser.parse!
 
 pablo = Pablo.new(params)
-command = check_command
+command = "pablo_#{ARGV[0]}".to_sym
 if command.nil? || !pablo.respond_to?(command)
   warn R18n.t.pablo.error.no_command
   pablo_help(optparser)
@@ -151,5 +125,6 @@ if command.nil? || !pablo.respond_to?(command)
 end
 ARGV.shift
 
-pablo.pablo_init if !File.exist?('config.yml') && command != 'pablo_init'
+init_alias = ['pablo_init', 'pablo_config']
+pablo.pablo_init if !File.exist?('config.yml') && init_alias.include?(command)
 pablo.send command

@@ -4,6 +4,10 @@
 require 'open-uri'
 require 'neruda/config'
 
+def rake_puts(message)
+  Rake.rake_output_message message
+end
+
 def org_last_version
   index = open('https://orgmode.org/index.html', 'r').read
   last_ver = index.match(/https:\/\/orgmode\.org\/org-([0-9.]+)\.tar\.gz/)
@@ -37,17 +41,19 @@ end
 
 namespace :org do
   desc 'Download last version of org-mode'
-  task :download do
+  task :download do |t|
     next if Dir.exist?("org-#{ORG_VERSION}/lisp")
     next if ORG_VERSION.nil?
     tarball = "org-#{ORG_VERSION}.tar.gz"
     sh "curl --progress-bar -O https://orgmode.org/#{tarball}"
     sh "tar xzf #{tarball}"
     File.unlink tarball
-    sh "make -C org-#{ORG_VERSION}"
-    sh "make -C org-#{ORG_VERSION} compile"
-    sh "make -C org-#{ORG_VERSION} autoloads"
-    puts "org-mode #{ORG_VERSION} has been locally installed"
+    make = ['make', '-C', "org-#{ORG_VERSION}"]
+    make << '-s' unless t.application.options[:verbose]
+    sh make.join(' ')
+    sh((make + ['compile']).join(' '))
+    sh((make + ['autoloads']).join(' '))
+    rake_puts "org-mode #{ORG_VERSION} has been locally installed"
   end
 
   file 'org-config.el' do
@@ -56,7 +62,7 @@ namespace :org do
     Neruda::Config.settings['org-html']&.each do |k, v|
       orgtpl << "#{k} \"#{v.strip.gsub(/"/, '\"')}\""
     end
-    puts 'Write org-config.el'
+    rake_puts 'Write org-config.el'
     File.open('org-config.el', 'w') do |f|
       f.puts org_config(orgtpl)
     end

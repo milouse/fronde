@@ -108,10 +108,33 @@ namespace :site do
   end
 
   desc 'Convert all org files'
-  task build: prerequisites_files.concat(['site:index'])
+  task build: prerequisites_files
 
   desc 'Start a test server'
   task :preview do
     run_webrick
+  end
+
+  desc 'Answer common questions to configure your website'
+  task :config do
+    config = Neruda::Config.settings.merge
+    changed = false
+    print "#{R18n.t.pablo.config.author_name(config['author'])} "
+    author = STDIN.gets.strip
+    if author != ''
+      config['author'] = author
+      changed = true
+    end
+    old_lang = config['lang'] || 'en'
+    print "#{R18n.t.pablo.config.lang(old_lang)} "
+    lang = STDIN.gets.strip
+    if lang == '' && old_lang != config['lang']
+      config['lang'] = old_lang
+      changed = true
+    elsif lang != ''
+      config['lang'] = lang
+      changed = true
+    end
+    Neruda::Config.save(config) if changed
   end
 end
