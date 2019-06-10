@@ -23,13 +23,14 @@ def org_config(orgtpl)
     (package-initialize)
     (add-to-list 'load-path "./org-#{ORG_VERSION}/lisp")
 
-    (setq org-html-doctype "html5"
+    (setq org-export-with-toc nil
+          org-confirm-babel-evaluate nil
+          org-html-doctype "html5"
           org-html-html5-fancy t
           org-html-head-include-default-style nil
           org-html-head-include-scripts nil
           org-html-metadata-timestamp-format "%a %d %B %Y à %H:%M"
           #{orgtpl.join("\n      ")}
-          org-export-with-toc nil
           org-html-text-markup-alist '((bold . "<strong>%s</strong>")
                                        (code . "<code>%s</code>")
                                        (italic . "<em>%s</em>")
