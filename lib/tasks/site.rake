@@ -116,10 +116,12 @@ namespace :site do
     index = Neruda::Index.new(Dir.glob("src/#{BLOG_SLUG}/*/content.org"))
     index.entries.each do |k|
       slug = Neruda::Index.slug(k)
-      File.open("src/#{BLOG_SLUG}/#{slug}.org", 'w') do |f|
+      src = "src/#{BLOG_SLUG}/#{slug}.org"
+      File.open(src, 'w') do |f|
         f.puts index.to_s(k)
       end
-      Rake::Task["#{PUBLIC_FOLDER}/#{BLOG_SLUG}/#{slug}.html"].invoke
+      compile_to_html(src, "#{PUBLIC_FOLDER}/#{BLOG_SLUG}/#{slug}.html")
+      print '.' unless Rake::FileUtilsExt.verbose_flag
     end
   end
 
