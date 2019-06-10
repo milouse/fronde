@@ -24,7 +24,9 @@ def org_config(orgtpl)
     (add-to-list 'load-path "#{Dir.pwd}/org-#{ORG_VERSION}/lisp")
     (require 'org)
 
-    (org-link-set-parameters "i18n" :export #'org-i18n-export)
+    (org-link-set-parameters "i18n"
+                             :export #'org-i18n-export
+                             :follow #'org-i18n-follow)
 
     (defun org-i18n-export (link description format)
       "Export a i18n link"
@@ -40,6 +42,10 @@ def org_config(orgtpl)
           (`latex (format "\\\\href{%s}{%s}" path desc))
           (`ascii (format "%s (%s)" desc path))
           (_ path))))
+
+    (defun org-i18n-follow (link)
+      "Visit a i18n link"
+      (browse-url (car (split-string link "|"))))
 
     (setq org-export-with-toc nil
           org-confirm-babel-evaluate nil
