@@ -17,6 +17,12 @@ Metrics/LineLength:
 Metrics/MethodLength:
   Max: 15
 
+Metrics/PerceivedComplexity:
+  Max: 10
+
+Metrics/CyclomaticComplexity:
+  Max: 10
+
 Style/ConditionalAssignment:
   EnforcedStyle: assign_inside_condition
 
