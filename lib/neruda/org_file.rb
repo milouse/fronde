@@ -7,7 +7,7 @@ require 'neruda/index'
 # Eases org files handling and decoration
 module Neruda
   class OrgFile
-    attr_reader :title, :date, :keywords, :lang
+    attr_reader :title, :date, :keywords, :lang, :local_links
 
     def initialize(file_name)
       @file = file_name
@@ -16,6 +16,7 @@ module Neruda
       @date = extract_date
       @keywords = extract_keywords
       @lang = extract_lang
+      @local_links = extract_relative_links
     end
 
     def timekey
@@ -91,6 +92,15 @@ module Neruda
       end
       return (Neruda::Config.settings['lang'] || 'en') if m.nil?
       m[1]
+    end
+
+    def extract_relative_links
+      files = []
+      path = File.dirname(@file)
+      @content.scan(/\[\[file:(?:\.\/)?([^\]]+)\]/).each do |m|
+        files << m[0] if File.exist? "#{path}/#{m[0]}"
+      end
+      files
     end
 
     def keywords_to_html
