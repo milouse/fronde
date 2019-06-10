@@ -21,7 +21,8 @@ ORG_VERSION = org_last_version
 def org_config(orgtpl)
   <<~ORGCONFIG
     (package-initialize)
-    (add-to-list 'load-path "./org-#{ORG_VERSION}/lisp")
+    (add-to-list 'load-path "#{Dir.pwd}/org-#{ORG_VERSION}/lisp")
+    (require 'org)
 
     (setq org-export-with-toc nil
           org-confirm-babel-evaluate nil
