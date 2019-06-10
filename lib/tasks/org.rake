@@ -24,6 +24,23 @@ def org_config(orgtpl)
     (add-to-list 'load-path "#{Dir.pwd}/org-#{ORG_VERSION}/lisp")
     (require 'org)
 
+    (org-link-set-parameters "i18n" :export #'org-i18n-export)
+
+    (defun org-i18n-export (link description format)
+      "Export a i18n link"
+      (let* ((splitted-link (split-string link "|"))
+             (path (car splitted-link))
+             (desc (or description path))
+             (lang (car (cdr splitted-link))))
+        (pcase format
+          (`html (if lang
+                     (format "<a href=\\"%s\\" hreflang=\\"%s\\">%s</a>"
+                             path lang desc)
+                   (format "<a href=\\"%s\\">%s</a>" path desc)))
+          (`latex (format "\\\\href{%s}{%s}" path desc))
+          (`ascii (format "%s (%s)" desc path))
+          (_ path))))
+
     (setq org-export-with-toc nil
           org-confirm-babel-evaluate nil
           org-html-doctype "html5"
