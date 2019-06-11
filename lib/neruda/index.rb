@@ -37,7 +37,7 @@ module Neruda
 
     def to_atom(index_name = 'index')
       content = [atom_header(index_name)]
-      @index[index_name].each do |article|
+      @index[index_name][0...3].each do |article|
         content << atom_entry(article)
       end
       content.join("\n") + '</feed>'
@@ -89,7 +89,7 @@ module Neruda
     end
 
     def header(title = nil)
-      title = Neruda::Config.settings['blog_title'] if title == 'index'
+      title = Neruda::Config.settings['title'] if title == 'index'
       author = Neruda::Config.settings['author']
       <<~HEADER
         #+title: #{title}
@@ -108,7 +108,7 @@ module Neruda
     end
 
     def atom_header(title = nil)
-      blog_host = Neruda::Config.settings['blog_host'] || ''
+      domain = Neruda::Config.settings['domain']
       if ENV['RAKE_ENV'] == 'test'
         upddate = '---testupdate---'
       else
@@ -120,14 +120,14 @@ module Neruda
         <feed xmlns="http://www.w3.org/2005/Atom"
               xmlns:dc="http://purl.org/dc/elements/1.1/"
               xmlns:wfw="http://wellformedweb.org/CommentAPI/"
-              xml:lang="#{Neruda::Config.settings['lang'] || 'en'}">
+              xml:lang="#{Neruda::Config.settings['lang']}">
 
         <title>#{title}</title>
-        <link href="#{blog_host}/atom.xml" rel="self" type="application/atom+xml"/>
-        <link href="#{blog_host}" rel="alternate" type="text/html" title="#{title}"/>
+        <link href="#{domain}/atom.xml" rel="self" type="application/atom+xml"/>
+        <link href="#{domain}" rel="alternate" type="text/html" title="#{title}"/>
         <updated>#{upddate}</updated>
         <author><name>#{Neruda::Config.settings['author'] || ''}</name></author>
-        <id>urn:md5:#{Digest::MD5.hexdigest(blog_host)}</id>
+        <id>urn:md5:#{Digest::MD5.hexdigest(domain)}</id>
         <generator uri="https://fossil.deparis.io/neruda">Neruda</generator>
       ENDATOM
     end
@@ -140,7 +140,7 @@ module Neruda
       <<~ENDENTRY
         <entry>
           <title>#{CGI.escapeHTML(article.title)}</title>
-          <link href="#{article.file}" rel="alternate" type="text/html"
+          <link href="#{article.html_file}" rel="alternate" type="text/html"
                 title="#{CGI.escapeHTML(article.title)}"/>
           <id>urn:md5:#{Digest::MD5.hexdigest(article.timekey)}</id>
           <published>#{article.timestring(:rfc3339)}</published>

@@ -8,10 +8,11 @@ require 'neruda/index'
 module Neruda
   class OrgFile
     attr_reader :title, :date, :author, :keywords,
-                :lang, :local_links, :file
+                :lang, :local_links, :file, :html_file
 
     def initialize(file_name)
       @file = file_name
+      @html_file = html_file_with_domain
       @content = File.open(file_name, 'r').read
       @title = extract_title
       @date = extract_date
@@ -40,68 +41,50 @@ module Neruda
 
     def format(string)
       string.gsub('%k', @keywords.join(', '))
-        .gsub('%K', keywords_to_html)
-        .gsub('%d', date_to_html(:short))
-        .gsub('%D', date_to_html)
-        .gsub('%i', timestring(:short))
-        .gsub('%I', timestring(:rfc3339))
-        .gsub('%a', @author)
-        .gsub('%A', author_to_html)
-        .gsub('%t', @title)
-        .gsub('%l', @lang)
+            .gsub('%K', keywords_to_html)
+            .gsub('%d', date_to_html(:short))
+            .gsub('%D', date_to_html)
+            .gsub('%i', timestring(:short))
+            .gsub('%I', timestring(:rfc3339))
+            .gsub('%a', @author)
+            .gsub('%A', author_to_html)
+            .gsub('%t', @title)
+            .gsub('%l', @lang)
+            .gsub('%u', @html_file)
     end
 
     private
 
     def extract_date
-      begin
-        m = /^#\+date: <([0-9-]{10}) [\w.]+(?: ([0-9:]{8}))?>$/i.match(@content)
-      rescue ArgumentError
-        warn "Error retrieving date for #{@file}"
-        m = nil
-      end
+      m = /^#\+date: *<([0-9-]{10}) [\w.]+(?: ([0-9:]{8}))?> *$/i
+          .match(@content)
       return nil if m.nil?
       time = m[2] || '00:00:00'
       DateTime.strptime("#{m[1]} #{time}", '%Y-%m-%d %H:%M:%S')
     end
 
     def extract_title
-      begin
-        m = /^#\+title: (.+)$/i.match(@content)
-      rescue ArgumentError
-        warn "Error retrieving title for #{@file}"
-        m = nil
-      end
+      m = /^#\+title:(.+)$/i.match(@content)
       return @file if m.nil?
-      m[1]
+      m[1].strip
     end
 
     def extract_author
-      m = /^#\+author: (.+)$/i.match(@content)
+      m = /^#\+author:(.+)$/i.match(@content)
       return Neruda::Config.settings['author'] || '' if m.nil?
-      m[1]
+      m[1].strip
     end
 
     def extract_keywords
-      begin
-        m = /^#\+keywords: (.+)$/i.match(@content)
-      rescue ArgumentError
-        warn "Error retrieving keywords for #{@file}"
-        m = nil
-      end
+      m = /^#\+keywords:(.+)$/i.match(@content)
       return [] if m.nil?
       m[1].split(',').map(&:strip)
     end
 
     def extract_lang
-      begin
-        m = /^#\+language: (.+)$/i.match(@content)
-      rescue ArgumentError
-        warn "Error retrieving lang for #{@file}"
-        m = nil
-      end
-      return (Neruda::Config.settings['lang'] || 'en') if m.nil?
-      m[1]
+      m = /^#\+language:(.+)$/i.match(@content)
+      return Neruda::Config.settings['lang'] if m.nil?
+      m[1].strip
     end
 
     def extract_relative_links
@@ -116,10 +99,10 @@ module Neruda
     def keywords_to_html
       klist = @keywords.map do |k|
         <<~KEYWORDLINK
-        <li class="keyword">
+          <li class="keyword">
             <a href="../#{Index.slug(k)}.html">#{k}</a>
-        </li>
-      KEYWORDLINK
+          </li>
+        KEYWORDLINK
       end.join
       "<ul class=\"keywords-list\">#{klist}</ul>"
     end
@@ -132,6 +115,14 @@ module Neruda
     def author_to_html
       return '' if @author == ''
       "<span class=\"author\">#{@author}</span>"
+    end
+
+    def html_file_with_domain
+      domain = Neruda::Config.settings['domain']
+      pubfolder = Neruda::Config.settings['public_folder']
+      path = @file.sub(/^src\//, "#{pubfolder}/")
+                  .sub(/\/content\.html$/, '/index.html')
+      "#{domain}/#{path}"
     end
   end
 end

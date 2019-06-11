@@ -34,16 +34,16 @@ SAMPLE_ATOM = <<~ATOM
         xml:lang="en">
 
   <title>index</title>
-  <link href="/atom.xml" rel="self" type="application/atom+xml"/>
-  <link href="" rel="alternate" type="text/html" title="index"/>
+  <link href="http://test.com/atom.xml" rel="self" type="application/atom+xml"/>
+  <link href="http://test.com" rel="alternate" type="text/html" title="index"/>
   <updated>---testupdate---</updated>
   <author><name>Test</name></author>
-  <id>urn:md5:d41d8cd98f00b204e9800998ecf8427e</id>
+  <id>urn:md5:1aa0d4413384d91bc0d452f03b505298</id>
   <generator uri="https://fossil.deparis.io/neruda">Neruda</generator>
 
   <entry>
     <title>My third article</title>
-    <link href="./spec/data/test3.org" rel="alternate" type="text/html"
+    <link href="http://test.com/spec/data/test3.org" rel="alternate" type="text/html"
           title="My third article"/>
     <id>urn:md5:8865383febd94ddf9df318267af5ae85</id>
     <published>2019-06-11T23:42:10+00:00</published>
@@ -54,7 +54,7 @@ SAMPLE_ATOM = <<~ATOM
 
   <entry>
     <title>My second article</title>
-    <link href="./spec/data/test2.org" rel="alternate" type="text/html"
+    <link href="http://test.com/spec/data/test2.org" rel="alternate" type="text/html"
           title="My second article"/>
     <id>urn:md5:123104bd8bb4c61e02a1e2a136e2fd6b</id>
     <published>2019-06-11T00:00:00+00:00</published>
@@ -64,7 +64,7 @@ SAMPLE_ATOM = <<~ATOM
 
   <entry>
     <title>My sweet article</title>
-    <link href="./spec/data/test1.org" rel="alternate" type="text/html"
+    <link href="http://test.com/spec/data/test1.org" rel="alternate" type="text/html"
           title="My sweet article"/>
     <id>urn:md5:c47532bbb1e2883c902071591ae1ec9b</id>
     <published></published>
@@ -77,10 +77,12 @@ ATOM
 
 describe 'With working org files' do
   before(:all) do
-    Neruda::Config.load_test('blog_title' => 'Blog', 'author' => 'Test')
-    @index = Neruda::Index.new(['./spec/data/test1.org',
-                                './spec/data/test2.org',
-                                './spec/data/test3.org'])
+    Neruda::Config.load_test('title' => 'Blog',
+                             'author' => 'Test',
+                             'domain' => 'http://test.com')
+    @index = Neruda::Index.new(['spec/data/test1.org',
+                                'spec/data/test2.org',
+                                'spec/data/test3.org'])
   end
 
   it 'should have generated three indexes' do

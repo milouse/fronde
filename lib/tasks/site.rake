@@ -5,8 +5,8 @@ require 'nokogiri'
 require 'neruda/index'
 require 'neruda/org_file'
 
-BLOG_SLUG = Neruda::Config.settings['blog_slug'] || 'blog'
-PUBLIC_FOLDER = Neruda::Config.settings['public_folder'] || 'public_html'
+BLOG_SLUG = Neruda::Config.settings['blog_slug']
+PUBLIC_FOLDER = Neruda::Config.settings['public_folder']
 
 def run_webrick
   # Inspired by ruby un.rb library, which allows normally to start a
@@ -141,23 +141,12 @@ namespace :site do
   desc 'Answer common questions to configure your website'
   task :config do
     config = Neruda::Config.settings.merge
-    changed = false
     print "#{R18n.t.pablo.config.author_name(config['author'])} "
     author = STDIN.gets.strip
-    if author != ''
-      config['author'] = author
-      changed = true
-    end
-    old_lang = config['lang'] || 'en'
-    print "#{R18n.t.pablo.config.lang(old_lang)} "
+    config['author'] = author if author != ''
+    print "#{R18n.t.pablo.config.lang(config['lang'])} "
     lang = STDIN.gets.strip
-    if lang == '' && old_lang != config['lang']
-      config['lang'] = old_lang
-      changed = true
-    elsif lang != ''
-      config['lang'] = lang
-      changed = true
-    end
-    Neruda::Config.save(config) if changed
+    config['lang'] = lang if lang != ''
+    Neruda::Config.save(config)
   end
 end

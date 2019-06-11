@@ -13,6 +13,7 @@ R18n.set(Neruda::Config.settings['lang'] || 'en',
 # Pablo commands
 module PabloCommands
   def pablo_init
+    @rake.options.build_all = true
     @rake.invoke_task('site:config')
     @rake.invoke_task('org:install')
   end
