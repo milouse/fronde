@@ -1,6 +1,8 @@
 # coding: utf-8
 # frozen_string_literal: true
 
+require 'cgi'
+require 'digest/md5'
 require 'neruda/config'
 require 'neruda/org_file'
 
@@ -20,16 +22,25 @@ module Neruda
     def to_s(index_name = 'index')
       content = [header(index_name).strip]
       last_year = nil
-      @index[index_name].each do |k|
-        year = k[:key].slice(0, 4)
+      @index[index_name].each do |article|
+        year = article.timekey.slice(0, 4)
         if year != last_year
           content << ''
           content << title(year)
           last_year = year
         end
-        content << "- #{k[:date]} [[#{k[:path]}][#{k[:title]}]]"
+        path = File.basename(File.dirname(article.file))
+        content << "- #{article.datestring}: [[./#{path}][#{article.title}]]"
       end
       content.join("\n")
+    end
+
+    def to_atom(index_name = 'index')
+      content = [atom_header(index_name)]
+      @index[index_name].each do |article|
+        content << atom_entry(article)
+      end
+      content.join("\n") + '</feed>'
     end
 
     class << self
@@ -57,37 +68,23 @@ module Neruda
 
     def generate
       @sources.each do |f|
-        art = file_info(f)
-        next if art.nil?
-        add_to_indexes(art)
+        next unless File.exist?(f)
+        add_to_indexes(Neruda::OrgFile.new(f))
       end
       sort!
     end
 
-    def file_info(file_name)
-      dirname = File.basename(File.dirname(file_name))
-      return nil unless File.exist?(file_name)
-      org_file = Neruda::OrgFile.new(file_name)
-      {
-        path: "./#{dirname}",
-        title: org_file.title,
-        key: org_file.timekey,
-        date: "#{org_file.datestring}:",
-        keywords: org_file.keywords
-      }
-    end
-
-    def add_to_indexes(file_hash)
-      @index['index'] << file_hash
-      file_hash[:keywords].each do |k|
+    def add_to_indexes(article)
+      @index['index'] << article
+      article.keywords.each do |k|
         @index[k] = [] unless @index.has_key?(k)
-        @index[k] << file_hash
+        @index[k] << article
       end
     end
 
     def sort!
       @index.each do |k, i|
-        @index[k] = i.sort { |a, b| b[:key] <=> a[:key] }
+        @index[k] = i.sort { |a, b| b.timekey <=> a.timekey }
       end
     end
 
@@ -108,6 +105,49 @@ module Neruda
         :UNNUMBERED: notoc
         :END:
       ENDPROP
+    end
+
+    def atom_header(title = nil)
+      blog_host = Neruda::Config.settings['blog_host'] || ''
+      if ENV['RAKE_ENV'] == 'test'
+        upddate = '---testupdate---'
+      else
+        upddate = DateTime.now.rfc3339
+      end
+      title = CGI.escapeHTML(title)
+      <<~ENDATOM
+        <?xml version="1.0" encoding="utf-8"?>
+        <feed xmlns="http://www.w3.org/2005/Atom"
+              xmlns:dc="http://purl.org/dc/elements/1.1/"
+              xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+              xml:lang="#{Neruda::Config.settings['lang'] || 'en'}">
+
+        <title>#{title}</title>
+        <link href="#{blog_host}/atom.xml" rel="self" type="application/atom+xml"/>
+        <link href="#{blog_host}" rel="alternate" type="text/html" title="#{title}"/>
+        <updated>#{upddate}</updated>
+        <author><name>#{Neruda::Config.settings['author'] || ''}</name></author>
+        <id>urn:md5:#{Digest::MD5.hexdigest(blog_host)}</id>
+        <generator uri="https://fossil.deparis.io/neruda">Neruda</generator>
+      ENDATOM
+    end
+
+    def atom_entry(article)
+      keywords = article.keywords.map do |k|
+        "<dc:subject>#{CGI.escapeHTML(k)}</dc:subject>"
+      end.join
+      keywords += "\n  " if keywords != ''
+      <<~ENDENTRY
+        <entry>
+          <title>#{CGI.escapeHTML(article.title)}</title>
+          <link href="#{article.file}" rel="alternate" type="text/html"
+                title="#{CGI.escapeHTML(article.title)}"/>
+          <id>urn:md5:#{Digest::MD5.hexdigest(article.timekey)}</id>
+          <published>#{article.timestring(:rfc3339)}</published>
+          <author><name>#{CGI.escapeHTML(article.author)}</name></author>
+          #{keywords}<content type="html"></content>
+        </entry>
+      ENDENTRY
     end
   end
 end

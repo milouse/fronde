@@ -121,6 +121,11 @@ namespace :site do
         f.puts index.to_s(k)
       end
       compile_to_html(src, "#{PUBLIC_FOLDER}/#{BLOG_SLUG}/#{slug}.html")
+      slug = 'atom' if slug == 'index'
+      atomdest = "#{PUBLIC_FOLDER}/#{BLOG_SLUG}/#{slug}.xml"
+      File.open(atomdest, 'w') do |f|
+        f.puts index.to_atom(k)
+      end
       print '.' unless Rake::FileUtilsExt.verbose_flag
     end
   end

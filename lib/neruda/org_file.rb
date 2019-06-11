@@ -7,13 +7,15 @@ require 'neruda/index'
 # Eases org files handling and decoration
 module Neruda
   class OrgFile
-    attr_reader :title, :date, :keywords, :lang, :local_links
+    attr_reader :title, :date, :author, :keywords,
+                :lang, :local_links, :file
 
     def initialize(file_name)
       @file = file_name
       @content = File.open(file_name, 'r').read
       @title = extract_title
       @date = extract_date
+      @author = extract_author
       @keywords = extract_keywords
       @lang = extract_lang
       @local_links = extract_relative_links
@@ -41,8 +43,9 @@ module Neruda
         .gsub('%K', keywords_to_html)
         .gsub('%d', date_to_html(:short))
         .gsub('%D', date_to_html)
-        .gsub('%i', timestring(:rfc3339))
-        .gsub('%a', Neruda::Config.settings['author'] || '')
+        .gsub('%i', timestring(:short))
+        .gsub('%I', timestring(:rfc3339))
+        .gsub('%a', @author)
         .gsub('%A', author_to_html)
         .gsub('%t', @title)
         .gsub('%l', @lang)
@@ -70,6 +73,12 @@ module Neruda
         m = nil
       end
       return @file if m.nil?
+      m[1]
+    end
+
+    def extract_author
+      m = /^#\+author: (.+)$/i.match(@content)
+      return Neruda::Config.settings['author'] || '' if m.nil?
       m[1]
     end
 
@@ -121,7 +130,8 @@ module Neruda
     end
 
     def author_to_html
-      "<span class=\"author\">#{Neruda::Config.settings['author']}</span>"
+      return '' if @author == ''
+      "<span class=\"author\">#{@author}</span>"
     end
   end
 end

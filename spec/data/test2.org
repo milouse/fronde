@@ -1,5 +1,6 @@
 #+TITLE: My second article
 #+date: <2019-06-11 mar.>
+#+author: Titi
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec aliquet
 sed lectus id convallis. Sed pharetra mauris mauris, vitae fringilla

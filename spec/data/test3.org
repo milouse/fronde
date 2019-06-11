@@ -1,6 +1,6 @@
 #+title: My third article
 #+DATE: <2019-06-11 Tue 23:42:10>
-#+KEYWORDS: toto
+#+KEYWORDS: toto, tutu
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec aliquet
 sed lectus id convallis. Sed pharetra mauris mauris, vitae fringilla
