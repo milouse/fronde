@@ -10,5 +10,6 @@ group :development do
   gem 'byebug'
   gem 'pry'
   gem 'pry-doc'
+  gem 'rspec'
   gem 'rubocop'
 end

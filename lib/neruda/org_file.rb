@@ -42,7 +42,7 @@ module Neruda
         .gsub('%d', date_to_html(:short))
         .gsub('%D', date_to_html)
         .gsub('%i', timestring(:rfc3339))
-        .gsub('%a', Neruda::Config.settings['author'])
+        .gsub('%a', Neruda::Config.settings['author'] || '')
         .gsub('%A', author_to_html)
         .gsub('%t', @title)
         .gsub('%l', @lang)
@@ -52,18 +52,19 @@ module Neruda
 
     def extract_date
       begin
-        m = /^#\+date: <([0-9-]{10}) \w+ ([0-9:]{8})>$/.match(@content)
+        m = /^#\+date: <([0-9-]{10}) [\w.]+(?: ([0-9:]{8}))?>$/i.match(@content)
       rescue ArgumentError
         warn "Error retrieving date for #{@file}"
         m = nil
       end
       return nil if m.nil?
-      DateTime.strptime("#{m[1]} #{m[2]}", '%Y-%m-%d %H:%M:%S')
+      time = m[2] || '00:00:00'
+      DateTime.strptime("#{m[1]} #{time}", '%Y-%m-%d %H:%M:%S')
     end
 
     def extract_title
       begin
-        m = /^#\+title: (.+)$/.match(@content)
+        m = /^#\+title: (.+)$/i.match(@content)
       rescue ArgumentError
         warn "Error retrieving title for #{@file}"
         m = nil
@@ -74,7 +75,7 @@ module Neruda
 
     def extract_keywords
       begin
-        m = /^#\+keywords: (.+)$/.match(@content)
+        m = /^#\+keywords: (.+)$/i.match(@content)
       rescue ArgumentError
         warn "Error retrieving keywords for #{@file}"
         m = nil
@@ -85,7 +86,7 @@ module Neruda
 
     def extract_lang
       begin
-        m = /^#\+language: (.+)$/.match(@content)
+        m = /^#\+language: (.+)$/i.match(@content)
       rescue ArgumentError
         warn "Error retrieving lang for #{@file}"
         m = nil

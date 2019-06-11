@@ -16,6 +16,10 @@ module Neruda
         @config = new_config.freeze
       end
 
+      def load_test(config)
+        @config = config.freeze
+      end
+
       private
 
       def load_settings

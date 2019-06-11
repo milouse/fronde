@@ -18,11 +18,12 @@ module Neruda
     end
 
     def to_s(index_name = 'index')
-      content = [header(index_name)]
+      content = [header(index_name).strip]
       last_year = nil
       @index[index_name].each do |k|
         year = k[:key].slice(0, 4)
         if year != last_year
+          content << ''
           content << title(year)
           last_year = year
         end
@@ -33,8 +34,8 @@ module Neruda
 
     class << self
       def slug(title)
-        title.encode('ascii', fallback: ->(k) { translit(k) })
-          .gsub(/[^\w-]/, '').downcase
+        title.downcase.encode('ascii', fallback: ->(k) { translit(k) })
+             .gsub(' ', '-').gsub(/[^\w-]/, '').gsub(/-$/, '')
       end
 
       private
