@@ -100,7 +100,7 @@ module Neruda
       klist = @keywords.map do |k|
         <<~KEYWORDLINK
           <li class="keyword">
-            <a href="../#{Index.slug(k)}.html">#{k}</a>
+            <a href="../#{Neruda::Index.slug(k)}.html">#{k}</a>
           </li>
         KEYWORDLINK
       end.join
