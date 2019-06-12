@@ -109,7 +109,7 @@ module Neruda
 
     def atom_header(title = nil)
       domain = Neruda::Config.settings['domain']
-      if ENV['RAKE_ENV'] == 'test'
+      if Neruda::Config.settings['TEST'] == 'test'
         upddate = '---testupdate---'
       else
         upddate = DateTime.now.rfc3339

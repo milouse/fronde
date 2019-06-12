@@ -77,7 +77,8 @@ ATOM
 
 describe 'With working org files' do
   before(:all) do
-    Neruda::Config.load_test('title' => 'Blog',
+    Neruda::Config.load_test('TEST' => 'test',
+                             'title' => 'Blog',
                              'author' => 'Test',
                              'domain' => 'http://test.com')
     @index = Neruda::Index.new(['spec/data/test1.org',
