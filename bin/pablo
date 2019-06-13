@@ -23,7 +23,6 @@ module PabloCommands
     @rake.options.build_all = true
     if file.nil?
       @rake.invoke_task('site:build')
-      print "\nRebuild indexes\n"
       @rake.invoke_task('site:index')
     else
       @rake.invoke_task(file)

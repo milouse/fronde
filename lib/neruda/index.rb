@@ -37,7 +37,7 @@ module Neruda
 
     def to_atom(index_name = 'index')
       content = [atom_header(index_name)]
-      @index[index_name][0...3].each do |article|
+      @index[index_name][0...10].each do |article|
         content << atom_entry(article)
       end
       content.join("\n") + '</feed>'
@@ -114,6 +114,7 @@ module Neruda
       else
         upddate = DateTime.now.rfc3339
       end
+      title = Neruda::Config.settings['title'] if title == 'index'
       title = CGI.escapeHTML(title)
       <<~ENDATOM
         <?xml version="1.0" encoding="utf-8"?>
