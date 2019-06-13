@@ -48,10 +48,8 @@ class Pablo
   private
 
   def init_path
-    public_path = Neruda::Config.settings['public_folder'] || 'public_html'
-    FileUtils.mkdir_p "#{public_path}/assets"
-    local_blog_path = Neruda::Config.settings['blog_slug'] || 'blog'
-    FileUtils.mkdir_p "src/#{local_blog_path}"
+    FileUtils.mkdir_p "#{Neruda::Config.settings['public_folder']}/assets"
+    FileUtils.mkdir_p "src/#{Neruda::Config.settings['blog_path']}"
   end
 
   def init_rake

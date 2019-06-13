@@ -2,7 +2,7 @@
 
 require 'neruda/config'
 
-rsync_command = Neruda::Config.settings['rsync'] || 'rsync -vrlpD --delete'
+rsync_command = Neruda::Config.settings['rsync'] || 'rsync -nvrlpD --delete'
 remote_path = Neruda::Config.settings['remote']
 public_folder = Neruda::Config.settings['public_folder'] || 'public_html'
 

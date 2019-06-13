@@ -36,7 +36,7 @@ module Neruda
         @config['lang'] ||= 'en'
         @config['domain'] ||= ''
         @config['public_folder'] ||= 'public_html'
-        @config['blog_slug'] ||= 'blog'
+        @config['blog_path'] ||= 'blog'
         @config['templates'] ||= []
         license = Neruda::Config.settings['license']
         license_meta = ''

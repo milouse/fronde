@@ -5,7 +5,6 @@ require 'nokogiri'
 require 'neruda/index'
 require 'neruda/org_file'
 
-BLOG_SLUG = Neruda::Config.settings['blog_slug']
 PUBLIC_FOLDER = Neruda::Config.settings['public_folder']
 
 def run_webrick
@@ -76,33 +75,11 @@ def compile_to_html(src, dest)
   org_file
 end
 
-def source_for_target(file_name)
-  src = file_name.ext('org')
-  if /\/emacs\.d\//.match?(src)
-    return File.expand_path(src.sub(/^#{PUBLIC_FOLDER}\//, '~/.'))
-  end
-  src.sub!(/^#{PUBLIC_FOLDER}\//, 'src/')
-  return src if ['src/index.org', "src/#{BLOG_SLUG}/index.org"].include?(src)
-  src.sub(/\/index\.org$/, '/content.org')
-end
-
-def target_for_source(file_name)
-  src = file_name.ext('html')
-  if /\/\.emacs\.d\//.match?(src)
-    return "#{PUBLIC_FOLDER}/emacs.d/#{File.basename(src)}"
-  end
-  src.sub(/^src\//, "#{PUBLIC_FOLDER}/").sub(/\/content\.html$/, '/index.html')
-end
-
-prerequisites_files = Rake::FileList[
-  'src/**/*.org',
-  File.expand_path('~/.emacs.d/*.org')
-].exclude(/comments\.org$/).map do |f|
-  target_for_source f
-end
+prerequisites_files = Neruda::OrgFile.expand_sources_list \
+  Rake::FileList.new('src/**/*.org')
 
 namespace :site do
-  rule '.html' => ->(target) { source_for_target(target) } do |t|
+  rule '.html' => ->(tt) { Neruda::OrgFile.source_for_target(tt) } do |t|
     target_dir = t.name.pathmap('%d')
     mkdir_p target_dir
     src = t.prerequisites[0]
@@ -113,16 +90,17 @@ namespace :site do
 
   desc 'Generates all index files'
   task :index do
-    index = Neruda::Index.new(Dir.glob("src/#{BLOG_SLUG}/*/content.org"))
+    blog_path = Neruda::Config.settings['blog_path']
+    index = Neruda::Index.new(Dir.glob("src/#{blog_path}/*/content.org"))
     index.entries.each do |k|
       slug = Neruda::Index.slug(k)
-      src = "src/#{BLOG_SLUG}/#{slug}.org"
+      src = "src/#{blog_path}/#{slug}.org"
       File.open(src, 'w') do |f|
         f.puts index.to_s(k)
       end
-      compile_to_html(src, "#{PUBLIC_FOLDER}/#{BLOG_SLUG}/#{slug}.html")
+      compile_to_html(src, "#{PUBLIC_FOLDER}/#{blog_path}/#{slug}.html")
       slug = 'atom' if slug == 'index'
-      atomdest = "#{PUBLIC_FOLDER}/#{BLOG_SLUG}/#{slug}.xml"
+      atomdest = "#{PUBLIC_FOLDER}/#{blog_path}/#{slug}.xml"
       File.open(atomdest, 'w') do |f|
         f.puts index.to_atom(k)
       end

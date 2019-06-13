@@ -38,7 +38,7 @@ SAMPLE_ATOM = <<~ATOM
 
   <entry>
     <title>My third article</title>
-    <link href="http://perdu.com/spec/data/test3.org" rel="alternate" type="text/html"
+    <link href="http://perdu.com/data/test3.html" rel="alternate" type="text/html"
           title="My third article"/>
     <id>urn:md5:8865383febd94ddf9df318267af5ae85</id>
     <published>2019-06-11T23:42:10+00:00</published>
@@ -49,7 +49,7 @@ SAMPLE_ATOM = <<~ATOM
 
   <entry>
     <title>My second article</title>
-    <link href="http://perdu.com/spec/data/test2.org" rel="alternate" type="text/html"
+    <link href="http://perdu.com/data/test2.html" rel="alternate" type="text/html"
           title="My second article"/>
     <id>urn:md5:123104bd8bb4c61e02a1e2a136e2fd6b</id>
     <published>2019-06-11T00:00:00+00:00</published>
@@ -59,7 +59,7 @@ SAMPLE_ATOM = <<~ATOM
 
   <entry>
     <title>My sweet article</title>
-    <link href="http://perdu.com/spec/data/test1.org" rel="alternate" type="text/html"
+    <link href="http://perdu.com/data/test1.html" rel="alternate" type="text/html"
           title="My sweet article"/>
     <id>urn:md5:c47532bbb1e2883c902071591ae1ec9b</id>
     <published></published>

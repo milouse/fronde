@@ -12,7 +12,7 @@ module Neruda
 
     def initialize(file_name)
       @file = file_name
-      @html_file = html_file_with_domain
+      @html_file = Neruda::OrgFile.html_file_with_domain(@file)
       @content = File.open(file_name, 'r').read
       @title = extract_title
       @date = extract_date
@@ -51,6 +51,53 @@ module Neruda
             .gsub('%t', @title)
             .gsub('%l', @lang)
             .gsub('%u', @html_file)
+    end
+
+    class << self
+      def html_file_with_domain(file_name)
+        domain = Neruda::Config.settings['domain']
+        pubfolder = Neruda::Config.settings['public_folder']
+        path = Neruda::OrgFile.target_for_source(file_name)
+        domain + path.gsub(/^#{pubfolder}\//, '/')
+      end
+
+      def source_for_target(file_name)
+        file_name.sub!(/\.html$/, '.org')
+        pubfolder = Neruda::Config.settings['public_folder']
+        file_name.sub!(/^#{pubfolder}\//, 'src/')
+        blogpath = Neruda::Config.settings['blog_path']
+        return file_name unless /\/#{blogpath}\//.match?(file_name)
+        file_name.sub(/\/index\.org$/, '/content.org')
+        puts 'trolol', file_name
+        file_name
+      end
+
+      def target_for_source(file_name)
+        file_name = file_name.sub(/\.org$/, '.html')
+        pubfolder = Neruda::Config.settings['public_folder']
+        if /^src\//.match?(file_name)
+          file_name.sub!(/^src\//, "#{pubfolder}/")
+        else
+          subfolder = File.basename(File.dirname(file_name))
+          leaf = File.basename(file_name)
+          file_name = "#{pubfolder}/#{subfolder}/#{leaf}"
+        end
+        blogpath = Neruda::Config.settings['blog_path']
+        return file_name unless /\/#{blogpath}\//.match?(file_name)
+        file_name.sub(/\/content\.html$/, '/index.html')
+      end
+
+      def expand_sources_list(rake_list)
+        return [] unless rake_list
+        conf = Neruda::Config.settings
+        unless conf['external_sources'].nil?
+          rake_list = rake_list.include(conf['external_sources'])
+        end
+        (conf['exclude_sources'] || []).each do |x|
+          rake_list = rake_list.exclude Regexp.new(x)
+        end
+        rake_list.map { |s| Neruda::OrgFile.target_for_source(s) }
+      end
     end
 
     private
@@ -115,14 +162,6 @@ module Neruda
     def author_to_html
       return '' if @author == ''
       "<span class=\"author\">#{@author}</span>"
-    end
-
-    def html_file_with_domain
-      domain = Neruda::Config.settings['domain']
-      pubfolder = Neruda::Config.settings['public_folder']
-      path = @file.sub(/^src\//, "#{pubfolder}/")
-                  .sub(/\/content\.html$/, '/index.html')
-      "#{domain}/#{path}"
     end
   end
 end

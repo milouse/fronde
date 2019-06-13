@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# rubocop:disable Style/FormatStringToken, Metric/LineLength
 describe 'With working org files' do
   it 'should parse without date' do
     o = Neruda::OrgFile.new('spec/data/test1.org')
@@ -24,6 +25,14 @@ describe 'With working org files' do
     expect(o.timekey).to eq('20190611234210')
     expect(o.format('%i - (%t)')).to eq('2019-06-11 - (My third article)')
   end
+end
+# rubocop:enable Style/FormatStringToken, Metric/LineLength
+
+describe 'With configuration' do
+  after(:each) do
+    # Reset config
+    Neruda::Config.load_test({})
+  end
 
   it 'should respect author name' do
     Neruda::Config.load_test('author' => 'Test')
@@ -33,5 +42,60 @@ describe 'With working org files' do
     expect(o.author).to eq('Titi')
     o = Neruda::OrgFile.new('spec/data/test3.org')
     expect(o.author).to eq('Test')
+  end
+
+  it 'should compute the right html_file path for existing sources' do
+    o = Neruda::OrgFile.new('spec/data/test1.org')
+    expect(o.html_file).to eq('/data/test1.html')
+    Neruda::Config.load_test('domain' => 'http://perdu.com')
+    o = Neruda::OrgFile.new('spec/data/test1.org')
+    expect(o.html_file).to eq('http://perdu.com/data/test1.html')
+    o = Neruda::OrgFile.new('spec/data/content.org')
+    expect(o.html_file).to eq('http://perdu.com/data/content.html')
+    # The following are weird tests. We begin to test theoric stuff here
+    Neruda::Config.load_test('domain' => 'http://perdu.com',
+                             'blog_path' => 'data')
+    o = Neruda::OrgFile.new('spec/data/test1.org')
+    expect(o.html_file).to eq('http://perdu.com/data/test1.html')
+    o = Neruda::OrgFile.new('spec/data/content.org')
+    expect(o.html_file).to eq('http://perdu.com/data/index.html')
+  end
+
+  it 'should compute the right html_file path for theoritical sources' do
+    expect(Neruda::OrgFile.target_for_source('src/test.org')).to \
+      eq('public_html/test.html')
+    expect(Neruda::OrgFile.target_for_source('src/blog/test.org')).to \
+      eq('public_html/blog/test.html')
+    expect(Neruda::OrgFile.target_for_source('src/blog/toto/tata.org')).to \
+      eq('public_html/blog/toto/tata.html')
+    expect(Neruda::OrgFile.target_for_source('src/blog/toto/content.org')).to \
+      eq('public_html/blog/toto/index.html')
+    expect(Neruda::OrgFile.target_for_source('~/tata/tutu/content.org')).to \
+      eq('public_html/tutu/content.html')
+    expect(Neruda::OrgFile.target_for_source('~/tata/blog/content.org')).to \
+      eq('public_html/blog/index.html')
+  end
+end
+
+require 'rake'
+describe 'With Rake::FileList' do
+  it 'should compute all target files' do
+    Neruda::Config.load_test('external_sources' => ['spec/data/*'])
+    fl = Neruda::OrgFile.expand_sources_list(Rake::FileList.new)
+    expect(fl).not_to be_nil
+    expect(fl).to contain_exactly('public_html/data/test1.html',
+                                  'public_html/data/test2.html',
+                                  'public_html/data/test3.html',
+                                  'public_html/data/content.html')
+  end
+
+  it 'should compute all target files' do
+    Neruda::Config.load_test('external_sources' => ['spec/data/*'],
+                             'exclude_sources' => ['/content\.org$'])
+    fl = Neruda::OrgFile.expand_sources_list(Rake::FileList.new)
+    expect(fl).not_to be_nil
+    expect(fl).to contain_exactly('public_html/data/test1.html',
+                                  'public_html/data/test2.html',
+                                  'public_html/data/test3.html')
   end
 end
