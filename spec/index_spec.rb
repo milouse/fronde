@@ -1,11 +1,6 @@
 # coding: utf-8
 # frozen_string_literal: true
 
-require 'r18n-core'
-require './lib/neruda/index'
-
-R18n.set('en', File.expand_path('../locales', __dir__))
-
 SAMPLE_INDEX = <<~IDX1
   #+title: Blog
   #+author: Test
@@ -33,17 +28,17 @@ SAMPLE_ATOM = <<~ATOM
         xmlns:wfw="http://wellformedweb.org/CommentAPI/"
         xml:lang="en">
 
-  <title>index</title>
-  <link href="http://test.com/atom.xml" rel="self" type="application/atom+xml"/>
-  <link href="http://test.com" rel="alternate" type="text/html" title="index"/>
+  <title>Blog</title>
+  <link href="http://perdu.com/atom.xml" rel="self" type="application/atom+xml"/>
+  <link href="http://perdu.com" rel="alternate" type="text/html" title="Blog"/>
   <updated>---testupdate---</updated>
   <author><name>Test</name></author>
-  <id>urn:md5:1aa0d4413384d91bc0d452f03b505298</id>
+  <id>urn:md5:75d53866bcb20465b3287cf237234464</id>
   <generator uri="https://fossil.deparis.io/neruda">Neruda</generator>
 
   <entry>
     <title>My third article</title>
-    <link href="http://test.com/spec/data/test3.org" rel="alternate" type="text/html"
+    <link href="http://perdu.com/spec/data/test3.org" rel="alternate" type="text/html"
           title="My third article"/>
     <id>urn:md5:8865383febd94ddf9df318267af5ae85</id>
     <published>2019-06-11T23:42:10+00:00</published>
@@ -54,7 +49,7 @@ SAMPLE_ATOM = <<~ATOM
 
   <entry>
     <title>My second article</title>
-    <link href="http://test.com/spec/data/test2.org" rel="alternate" type="text/html"
+    <link href="http://perdu.com/spec/data/test2.org" rel="alternate" type="text/html"
           title="My second article"/>
     <id>urn:md5:123104bd8bb4c61e02a1e2a136e2fd6b</id>
     <published>2019-06-11T00:00:00+00:00</published>
@@ -64,7 +59,7 @@ SAMPLE_ATOM = <<~ATOM
 
   <entry>
     <title>My sweet article</title>
-    <link href="http://test.com/spec/data/test1.org" rel="alternate" type="text/html"
+    <link href="http://perdu.com/spec/data/test1.org" rel="alternate" type="text/html"
           title="My sweet article"/>
     <id>urn:md5:c47532bbb1e2883c902071591ae1ec9b</id>
     <published></published>
@@ -80,7 +75,7 @@ describe 'With working org files' do
     Neruda::Config.load_test('TEST' => 'test',
                              'title' => 'Blog',
                              'author' => 'Test',
-                             'domain' => 'http://test.com')
+                             'domain' => 'http://perdu.com')
     @index = Neruda::Index.new(['spec/data/test1.org',
                                 'spec/data/test2.org',
                                 'spec/data/test3.org'])

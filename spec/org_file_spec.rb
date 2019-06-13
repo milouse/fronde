@@ -1,13 +1,8 @@
 # frozen_string_literal: true
 
-require 'r18n-core'
-require './lib/neruda/org_file'
-
-R18n.set('en', File.expand_path('../locales', __dir__))
-
 describe 'With working org files' do
   it 'should parse without date' do
-    o = Neruda::OrgFile.new('./spec/data/test1.org')
+    o = Neruda::OrgFile.new('spec/data/test1.org')
     expect(o.title).to eq('My sweet article')
     expect(o.date).to be_nil
     expect(o.timekey).to eq('00000000000000')
@@ -15,7 +10,7 @@ describe 'With working org files' do
   end
 
   it 'should parse with a partial date' do
-    o = Neruda::OrgFile.new('./spec/data/test2.org')
+    o = Neruda::OrgFile.new('spec/data/test2.org')
     expect(o.title).to eq('My second article')
     expect(o.date).to eq(DateTime.strptime('2019-06-11 00:00:00', '%Y-%m-%d %H:%M:%S'))
     expect(o.timekey).to eq('20190611000000')
@@ -23,7 +18,7 @@ describe 'With working org files' do
   end
 
   it 'should parse with a complete date' do
-    o = Neruda::OrgFile.new('./spec/data/test3.org')
+    o = Neruda::OrgFile.new('spec/data/test3.org')
     expect(o.title).to eq('My third article')
     expect(o.date).to eq(DateTime.strptime('2019-06-11 23:42:10', '%Y-%m-%d %H:%M:%S'))
     expect(o.timekey).to eq('20190611234210')
@@ -32,11 +27,11 @@ describe 'With working org files' do
 
   it 'should respect author name' do
     Neruda::Config.load_test('author' => 'Test')
-    o = Neruda::OrgFile.new('./spec/data/test1.org')
+    o = Neruda::OrgFile.new('spec/data/test1.org')
     expect(o.author).to eq('Test')
-    o = Neruda::OrgFile.new('./spec/data/test2.org')
+    o = Neruda::OrgFile.new('spec/data/test2.org')
     expect(o.author).to eq('Titi')
-    o = Neruda::OrgFile.new('./spec/data/test3.org')
+    o = Neruda::OrgFile.new('spec/data/test3.org')
     expect(o.author).to eq('Test')
   end
 end
