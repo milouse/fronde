@@ -43,27 +43,6 @@ module Neruda
       content.join("\n") + '</feed>'
     end
 
-    class << self
-      def slug(title)
-        title.downcase.encode('ascii', fallback: ->(k) { translit(k) })
-             .gsub(' ', '-').gsub(/[^\w-]/, '').gsub(/-$/, '')
-      end
-
-      private
-
-      def translit(char)
-        return 'a' if ['á', 'à', 'â', 'ä', 'ǎ', 'ã', 'å'].include?(char)
-        return 'e' if ['é', 'è', 'ê', 'ë', 'ě', 'ẽ'].include?(char)
-        return 'i' if ['í', 'ì', 'î', 'ï', 'ǐ', 'ĩ'].include?(char)
-        return 'o' if ['ó', 'ò', 'ô', 'ö', 'ǒ', 'õ'].include?(char)
-        return 'u' if ['ú', 'ù', 'û', 'ü', 'ǔ', 'ũ'].include?(char)
-        return 'y' if ['ý', 'ỳ', 'ŷ', 'ÿ', 'ỹ'].include?(char)
-        return 'c' if char == 'ç'
-        return 'n' if char == 'ñ'
-        '-'
-      end
-    end
-
     private
 
     def generate

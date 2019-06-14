@@ -91,9 +91,10 @@ namespace :site do
   desc 'Generates all index files'
   task :index do
     blog_path = Neruda::Config.settings['blog_path']
+    next unless Dir.exist?("src/#{blog_path}")
     index = Neruda::Index.new(Dir.glob("src/#{blog_path}/*/content.org"))
     index.entries.each do |k|
-      slug = Neruda::Index.slug(k)
+      slug = Neruda::OrgFile.slug(k)
       src = "src/#{blog_path}/#{slug}.org"
       File.open(src, 'w') do |f|
         f.puts index.to_s(k)
@@ -114,17 +115,5 @@ namespace :site do
   desc 'Start a test server'
   task :preview do
     run_webrick
-  end
-
-  desc 'Answer common questions to configure your website'
-  task :config do
-    config = Neruda::Config.settings.merge
-    print "#{R18n.t.pablo.config.author_name(config['author'])} "
-    author = STDIN.gets.strip
-    config['author'] = author if author != ''
-    print "#{R18n.t.pablo.config.lang(config['lang'])} "
-    lang = STDIN.gets.strip
-    config['lang'] = lang if lang != ''
-    Neruda::Config.save(config)
   end
 end

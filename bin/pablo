@@ -13,8 +13,14 @@ R18n.set(Neruda::Config.settings['lang'] || 'en',
 # Pablo commands
 module PabloCommands
   def pablo_init
+    cnf = @options.merge
+    cnf.delete(:verbose)
+    cnf.delete(:blog)
+    cnf.transform_keys!(&:to_s)
+    Neruda::Config.save(Neruda::Config.settings.merge(cnf))
+    o = Neruda::OrgFile.new('src/index.org', @options)
+    o.write unless File.exist? 'src/index.org'
     @rake.options.build_all = true
-    @rake.invoke_task('site:config')
     @rake.invoke_task('org:install')
   end
   alias pablo_config pablo_init
@@ -31,6 +37,19 @@ module PabloCommands
 
   def pablo_preview
     @rake.invoke_task('site:preview')
+  end
+
+  def pablo_open
+    filename = ARGV[0] || Neruda::OrgFile.file_name(@options[:title],
+                                                    @options[:blog])
+    FileUtils.mkdir_p File.dirname(filename)
+    o = Neruda::OrgFile.new(filename, @options)
+    o.write unless File.exist? filename
+
+    editor = ENV['EDITOR'] || ENV['VISUAL'] || 'emacs'
+    cmd = [editor, filename]
+    cmd.insert(1, '+6') if editor.match?(/^emacs/)
+    system(*cmd)
   end
 end
 
@@ -49,7 +68,7 @@ class Pablo
 
   def init_path
     FileUtils.mkdir_p "#{Neruda::Config.settings['public_folder']}/assets"
-    FileUtils.mkdir_p "src/#{Neruda::Config.settings['blog_path']}"
+    FileUtils.mkdir_p 'src'
   end
 
   def init_rake
@@ -84,6 +103,9 @@ def pablo_help(banner)
   warn banner
   warn <<~HELP
 
+    Commands
+        open [path]  Open or create an org file for edition.
+
     System Commands
         init         Initialize your Neruda instance
                      (you just need to do it once).
@@ -102,18 +124,22 @@ optparser = OptionParser.new do |opts|
   HELP
   opts.version = Neruda::VERSION
   opts.program_name = 'pablo (Neruda gem)'
-  opts.on('-v', '--verbose', 'Output more information') do
-    params[:verbose] = true
-  end
-  opts.on_tail('-h', '--help', 'Display this screen') do
-    pablo_help(opts)
-  end
-  opts.on_tail('-V', '--version', 'Show version') do
-    puts opts.ver
-    exit
-  end
+  opts.on '-aAUTHOR', '--author AUTHOR'
+  opts.on '-lLOCALE', '--lang LOCALE'
+  opts.on '-tTITLE', '--title TITLE'
+  opts.on '-b', '--blog'
+  opts.on_tail '-v', '--verbose'
+  opts.on_tail '-h', '--help'
+  opts.on_tail '-V', '--version'
 end
-optparser.parse!
+optparser.parse!(into: params)
+
+if params[:version]
+  warn optparser.ver
+  exit
+elsif params[:help]
+  pablo_help optparser
+end
 
 pablo = Pablo.new(params)
 command = "pablo_#{ARGV[0]}".to_sym

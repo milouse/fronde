@@ -1,4 +1,3 @@
-# coding: utf-8
 # frozen_string_literal: true
 
 SAMPLE_INDEX = <<~IDX1
@@ -91,15 +90,5 @@ describe 'With working org files' do
 
   it 'should generate an atom feed' do
     expect(@index.to_atom).to eq(SAMPLE_ATOM.strip)
-  end
-end
-
-describe 'With various tag names' do
-  it 'should transliterate them' do
-    expect(Neruda::Index.slug('toto')).to eq('toto')
-    expect(Neruda::Index.slug('TotO')).to eq('toto')
-    expect(Neruda::Index.slug('Tôto')).to eq('toto')
-    expect(Neruda::Index.slug('Tôto tata')).to eq('toto-tata')
-    expect(Neruda::Index.slug('ÀùïỸç/+*= trulu°`')).to eq('auiyc-trulu')
   end
 end

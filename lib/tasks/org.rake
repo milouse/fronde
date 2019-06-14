@@ -47,7 +47,8 @@ def org_config(orgtpl)
       "Visit a i18n link"
       (browse-url (car (split-string link "|"))))
 
-    (setq org-export-with-toc nil
+    (setq enable-local-variables :all
+          org-export-with-toc nil
           org-confirm-babel-evaluate nil
           org-html-doctype "html5"
           org-html-html5-fancy t

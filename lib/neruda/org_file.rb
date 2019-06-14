@@ -1,3 +1,4 @@
+# coding: utf-8
 # frozen_string_literal: true
 
 require 'time'
@@ -10,16 +11,26 @@ module Neruda
     attr_reader :title, :date, :author, :keywords,
                 :lang, :local_links, :file, :html_file
 
-    def initialize(file_name)
+    def initialize(file_name, opts = {})
       @file = file_name
       @html_file = Neruda::OrgFile.html_file_with_domain(@file)
-      @content = File.open(file_name, 'r').read
-      @title = extract_title
-      @date = extract_date
-      @author = extract_author
-      @keywords = extract_keywords
-      @lang = extract_lang
-      @local_links = extract_relative_links
+      if File.exist?(@file)
+        extract_data
+      else
+        @title = opts[:title] || ''
+        @date = DateTime.now
+        @author = opts[:author] || default_author
+        @keywords = []
+        @lang = Neruda::Config.settings['lang']
+        @local_links = []
+        @content = <<~ORG
+          #+title: #{@title}
+          #+date: <#{@date.strftime('%Y-%m-%d %a. %H:%M:%S')}>
+          #+author: #{@author}
+          #+language: #{@lang}
+
+        ORG
+      end
     end
 
     def timekey
@@ -53,38 +64,46 @@ module Neruda
             .gsub('%u', @html_file)
     end
 
+    def write
+      IO.write @file, @content
+    end
+
+    def slug
+      Neruda::OrgFile.slug(@title)
+    end
+
     class << self
       def html_file_with_domain(file_name)
         domain = Neruda::Config.settings['domain']
         pubfolder = Neruda::Config.settings['public_folder']
         path = Neruda::OrgFile.target_for_source(file_name)
-        domain + path.gsub(/^#{pubfolder}\//, '/')
+        domain + path.sub(/^#{pubfolder}\//, '/')
       end
 
       def source_for_target(file_name)
-        file_name.sub!(/\.html$/, '.org')
+        # file_name may be frozen...
+        src = file_name.sub(/\.html$/, '.org')
         pubfolder = Neruda::Config.settings['public_folder']
-        file_name.sub!(/^#{pubfolder}\//, 'src/')
+        src.sub!(/^#{pubfolder}\//, 'src/')
         blogpath = Neruda::Config.settings['blog_path']
-        return file_name unless /\/#{blogpath}\//.match?(file_name)
-        file_name.sub(/\/index\.org$/, '/content.org')
-        puts 'trolol', file_name
-        file_name
+        return src unless /\/#{blogpath}\//.match?(src)
+        src.sub(/\/index\.org$/, '/content.org')
       end
 
       def target_for_source(file_name)
-        file_name = file_name.sub(/\.org$/, '.html')
+        # file_name may be frozen...
+        target = file_name.sub(/\.org$/, '.html')
         pubfolder = Neruda::Config.settings['public_folder']
-        if /^src\//.match?(file_name)
-          file_name.sub!(/^src\//, "#{pubfolder}/")
+        if /^src\//.match?(target)
+          target.sub!(/^src\//, "#{pubfolder}/")
         else
-          subfolder = File.basename(File.dirname(file_name))
-          leaf = File.basename(file_name)
-          file_name = "#{pubfolder}/#{subfolder}/#{leaf}"
+          subfolder = File.basename(File.dirname(target))
+          leaf = File.basename(target)
+          target = "#{pubfolder}/#{subfolder}/#{leaf}"
         end
         blogpath = Neruda::Config.settings['blog_path']
-        return file_name unless /\/#{blogpath}\//.match?(file_name)
-        file_name.sub(/\/content\.html$/, '/index.html')
+        return target unless /\/#{blogpath}\//.match?(target)
+        target.sub(/\/content\.html$/, '/index.html')
       end
 
       def expand_sources_list(rake_list)
@@ -98,9 +117,47 @@ module Neruda
         end
         rake_list.map { |s| Neruda::OrgFile.target_for_source(s) }
       end
+
+      def file_name(title, for_blog = false)
+        title = 'new' if title.nil? || title == ''
+        filename = Neruda::OrgFile.slug title
+        return "src/#{filename}.org" unless for_blog
+        blog_path = Neruda::Config.settings['blog_path']
+        "src/#{blog_path}/#{filename}/content.org"
+      end
+
+      def slug(title)
+        title.downcase.gsub(' ', '-')
+             .encode('ascii', fallback: ->(k) { translit(k) })
+             .gsub(/[^\w-]/, '').gsub(/-$/, '')
+      end
+
+      private
+
+      def translit(char)
+        return 'a' if ['á', 'à', 'â', 'ä', 'ǎ', 'ã', 'å'].include?(char)
+        return 'e' if ['é', 'è', 'ê', 'ë', 'ě', 'ẽ'].include?(char)
+        return 'i' if ['í', 'ì', 'î', 'ï', 'ǐ', 'ĩ'].include?(char)
+        return 'o' if ['ó', 'ò', 'ô', 'ö', 'ǒ', 'õ'].include?(char)
+        return 'u' if ['ú', 'ù', 'û', 'ü', 'ǔ', 'ũ'].include?(char)
+        return 'y' if ['ý', 'ỳ', 'ŷ', 'ÿ', 'ỹ'].include?(char)
+        return 'c' if char == 'ç'
+        return 'n' if char == 'ñ'
+        '-'
+      end
     end
 
     private
+
+    def extract_data
+      @content = File.open(@file, 'r').read
+      @title = extract_title
+      @date = extract_date
+      @author = extract_author
+      @keywords = extract_keywords
+      @lang = extract_lang
+      @local_links = extract_relative_links
+    end
 
     def extract_date
       m = /^#\+date: *<([0-9-]{10}) [\w.]+(?: ([0-9:]{8}))?> *$/i
@@ -116,9 +173,13 @@ module Neruda
       m[1].strip
     end
 
+    def default_author
+      Neruda::Config.settings['author'] || ENV['USER'] || ''
+    end
+
     def extract_author
       m = /^#\+author:(.+)$/i.match(@content)
-      return Neruda::Config.settings['author'] || '' if m.nil?
+      return default_author if m.nil?
       m[1].strip
     end
 
@@ -147,7 +208,7 @@ module Neruda
       klist = @keywords.map do |k|
         <<~KEYWORDLINK
           <li class="keyword">
-            <a href="../#{Neruda::Index.slug(k)}.html">#{k}</a>
+            <a href="../#{Neruda::OrgFile.slug(k)}.html">#{k}</a>
           </li>
         KEYWORDLINK
       end.join

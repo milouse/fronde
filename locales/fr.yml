@@ -2,6 +2,3 @@
 pablo:
   error:
     no_command: 'ERREUR: Aucune commande ou commande inconnue donnée.'
-  config:
-    author_name: "Votre nom d'auteur [%1] :"
-    lang: 'Langue principale de votre site [%1] :'

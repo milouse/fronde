@@ -1,3 +1,4 @@
+# coding: utf-8
 # frozen_string_literal: true
 
 # rubocop:disable Style/FormatStringToken, Metric/LineLength
@@ -27,6 +28,16 @@ describe 'With working org files' do
   end
 end
 # rubocop:enable Style/FormatStringToken, Metric/LineLength
+
+describe 'With various titles' do
+  it 'should transliterate them into slugs' do
+    expect(Neruda::OrgFile.slug('toto')).to eq('toto')
+    expect(Neruda::OrgFile.slug('TotO')).to eq('toto')
+    expect(Neruda::OrgFile.slug('Tôto')).to eq('toto')
+    expect(Neruda::OrgFile.slug('Tôto tata')).to eq('toto-tata')
+    expect(Neruda::OrgFile.slug('ÀùïỸç/+*= trulu°`')).to eq('auiyc-trulu')
+  end
+end
 
 describe 'With configuration' do
   after(:each) do

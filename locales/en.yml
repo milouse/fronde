@@ -2,6 +2,3 @@
 pablo:
   error:
     no_command: 'ERROR: no command or unknown command given.'
-  config:
-    author_name: 'Your author name [%1]:'
-    lang: 'Main language of your website [%1]:'
