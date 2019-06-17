@@ -9,15 +9,15 @@ SAMPLE_INDEX = <<~IDX1
   :UNNUMBERED: notoc
   :END:
 
-  - 2019-06-11: [[./data][My third article]]
-  - 2019-06-11: [[./data][My second article]]
+  - 2019-06-11: [[../data/test3.html][My third article]]
+  - 2019-06-11: [[../data/test2.html][My second article]]
 
   * 0000
   :PROPERTIES:
   :UNNUMBERED: notoc
   :END:
 
-  - : [[./data][My sweet article]]
+  - : [[../data/test1.html][My sweet article]]
 IDX1
 
 SAMPLE_ATOM = <<~ATOM
@@ -28,8 +28,8 @@ SAMPLE_ATOM = <<~ATOM
         xml:lang="en">
 
   <title>Blog</title>
-  <link href="http://perdu.com/atom.xml" rel="self" type="application/atom+xml"/>
-  <link href="http://perdu.com" rel="alternate" type="text/html" title="Blog"/>
+  <link href="http://perdu.com/feeds/index.xml" rel="self" type="application/atom+xml"/>
+  <link href="http://perdu.com/blog" rel="alternate" type="text/html" title="Blog"/>
   <updated>---testupdate---</updated>
   <author><name>Test</name></author>
   <id>urn:md5:75d53866bcb20465b3287cf237234464</id>

@@ -8,12 +8,13 @@ require 'neruda/index'
 # Eases org files handling and decoration
 module Neruda
   class OrgFile
-    attr_reader :title, :date, :author, :keywords,
-                :lang, :local_links, :file, :html_file
+    attr_reader :title, :date, :author, :keywords, :lang,
+                :local_links, :file, :html_file, :url
 
     def initialize(file_name, opts = {})
       @file = file_name
-      @html_file = Neruda::OrgFile.html_file_with_domain(@file)
+      @html_file = Neruda::OrgFile.html_file(@file)
+      @url = Neruda::OrgFile.html_file_with_domain(@file)
       if File.exist?(@file)
         extract_data
       else
@@ -73,11 +74,14 @@ module Neruda
     end
 
     class << self
-      def html_file_with_domain(file_name)
-        domain = Neruda::Config.settings['domain']
-        pubfolder = Neruda::Config.settings['public_folder']
+      def html_file(file_name)
         path = Neruda::OrgFile.target_for_source(file_name)
-        domain + path.sub(/^#{pubfolder}\//, '/')
+        pubfolder = Neruda::Config.settings['public_folder']
+        path.sub(/^#{pubfolder}\//, '/')
+      end
+
+      def html_file_with_domain(file_name)
+        Neruda::Config.settings['domain'] + html_file(file_name)
       end
 
       def source_for_target(file_name)
@@ -208,7 +212,7 @@ module Neruda
       klist = @keywords.map do |k|
         <<~KEYWORDLINK
           <li class="keyword">
-            <a href="../#{Neruda::OrgFile.slug(k)}.html">#{k}</a>
+            <a href="/tags/#{Neruda::OrgFile.slug(k)}.html">#{k}</a>
           </li>
         KEYWORDLINK
       end.join

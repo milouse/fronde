@@ -1,4 +1,3 @@
-# coding: utf-8
 # frozen_string_literal: true
 
 require 'cgi'
@@ -12,6 +11,9 @@ module Neruda
     def initialize(file_list)
       @sources = file_list
       @index = { 'index' => [] }
+      @slugs = { 'index' => 'index' }
+      @blog_path = Neruda::Config.settings['blog_path']
+      @pubdir = Neruda::Config.settings['public_folder']
       generate
     end
 
@@ -29,8 +31,8 @@ module Neruda
           content << title(year)
           last_year = year
         end
-        path = File.basename(File.dirname(article.file))
-        content << "- #{article.datestring}: [[./#{path}][#{article.title}]]"
+        link = "[[..#{article.html_file}][#{article.title}]]"
+        content << "- #{article.datestring}: #{link}"
       end
       content.join("\n")
     end
@@ -43,7 +45,38 @@ module Neruda
       content.join("\n") + '</feed>'
     end
 
+    def write(index_name)
+      src = index_source_path(index_name)
+      File.open(src, 'w') do |f|
+        f.puts to_s(index_name)
+      end
+      src
+    end
+
+    def write_atom(index_name)
+      slug = @slugs[index_name]
+      atomdest = "#{@pubdir}/feeds/#{slug}.xml"
+      File.open(atomdest, 'w') do |f|
+        f.puts to_atom(index_name)
+      end
+      atomdest
+    end
+
+    def index_public_path(index_name)
+      slug = @slugs[index_name]
+      dest = [@pubdir, 'tags', "#{slug}.html"]
+      dest[1] = @blog_path if slug == 'index'
+      dest.join('/')
+    end
+
     private
+
+    def index_source_path(index_name)
+      slug = @slugs[index_name]
+      src = ['src', 'tags', "#{slug}.org"]
+      src[1] = @blog_path if slug == 'index'
+      src.join('/')
+    end
 
     def generate
       @sources.each do |f|
@@ -56,7 +89,10 @@ module Neruda
     def add_to_indexes(article)
       @index['index'] << article
       article.keywords.each do |k|
-        @index[k] = [] unless @index.has_key?(k)
+        unless @index.has_key?(k)
+          @index[k] = []
+          @slugs[k] = Neruda::OrgFile.slug k
+        end
         @index[k] << article
       end
     end
@@ -93,8 +129,13 @@ module Neruda
       else
         upddate = DateTime.now.rfc3339
       end
-      title = Neruda::Config.settings['title'] if title == 'index'
-      title = CGI.escapeHTML(title)
+      slug = Neruda::OrgFile.slug(title)
+      tagurl = "#{domain}/tags/#{slug}.html"
+      if title == 'index'
+        title = Neruda::Config.settings['title']
+        tagurl = "#{domain}/#{@blog_path}"
+      end
+      title_esc = CGI.escapeHTML(title)
       <<~ENDATOM
         <?xml version="1.0" encoding="utf-8"?>
         <feed xmlns="http://www.w3.org/2005/Atom"
@@ -102,9 +143,9 @@ module Neruda
               xmlns:wfw="http://wellformedweb.org/CommentAPI/"
               xml:lang="#{Neruda::Config.settings['lang']}">
 
-        <title>#{title}</title>
-        <link href="#{domain}/atom.xml" rel="self" type="application/atom+xml"/>
-        <link href="#{domain}" rel="alternate" type="text/html" title="#{title}"/>
+        <title>#{title_esc}</title>
+        <link href="#{domain}/feeds/#{slug}.xml" rel="self" type="application/atom+xml"/>
+        <link href="#{tagurl}" rel="alternate" type="text/html" title="#{title_esc}"/>
         <updated>#{upddate}</updated>
         <author><name>#{Neruda::Config.settings['author'] || ''}</name></author>
         <id>urn:md5:#{Digest::MD5.hexdigest(domain)}</id>
@@ -117,11 +158,12 @@ module Neruda
         "<dc:subject>#{CGI.escapeHTML(k)}</dc:subject>"
       end.join
       keywords += "\n  " if keywords != ''
+      title_esc = CGI.escapeHTML(article.title)
       <<~ENDENTRY
         <entry>
-          <title>#{CGI.escapeHTML(article.title)}</title>
-          <link href="#{article.html_file}" rel="alternate" type="text/html"
-                title="#{CGI.escapeHTML(article.title)}"/>
+          <title>#{title_esc}</title>
+          <link href="#{article.url}" rel="alternate" type="text/html"
+                title="#{title_esc}"/>
           <id>urn:md5:#{Digest::MD5.hexdigest(article.timekey)}</id>
           <published>#{article.timestring(:rfc3339)}</published>
           <author><name>#{CGI.escapeHTML(article.author)}</name></author>

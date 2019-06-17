@@ -60,16 +60,33 @@ describe 'With configuration' do
     expect(o.html_file).to eq('/data/test1.html')
     Neruda::Config.load_test('domain' => 'http://perdu.com')
     o = Neruda::OrgFile.new('spec/data/test1.org')
-    expect(o.html_file).to eq('http://perdu.com/data/test1.html')
+    expect(o.html_file).to eq('/data/test1.html')
     o = Neruda::OrgFile.new('spec/data/content.org')
-    expect(o.html_file).to eq('http://perdu.com/data/content.html')
+    expect(o.html_file).to eq('/data/content.html')
     # The following are weird tests. We begin to test theoric stuff here
     Neruda::Config.load_test('domain' => 'http://perdu.com',
                              'blog_path' => 'data')
     o = Neruda::OrgFile.new('spec/data/test1.org')
-    expect(o.html_file).to eq('http://perdu.com/data/test1.html')
+    expect(o.html_file).to eq('/data/test1.html')
     o = Neruda::OrgFile.new('spec/data/content.org')
-    expect(o.html_file).to eq('http://perdu.com/data/index.html')
+    expect(o.html_file).to eq('/data/index.html')
+  end
+
+  it 'should compute the right url for existing sources' do
+    o = Neruda::OrgFile.new('spec/data/test1.org')
+    expect(o.url).to eq('/data/test1.html')
+    Neruda::Config.load_test('domain' => 'http://perdu.com')
+    o = Neruda::OrgFile.new('spec/data/test1.org')
+    expect(o.url).to eq('http://perdu.com/data/test1.html')
+    o = Neruda::OrgFile.new('spec/data/content.org')
+    expect(o.url).to eq('http://perdu.com/data/content.html')
+    # The following are weird tests. We begin to test theoric stuff here
+    Neruda::Config.load_test('domain' => 'http://perdu.com',
+                             'blog_path' => 'data')
+    o = Neruda::OrgFile.new('spec/data/test1.org')
+    expect(o.url).to eq('http://perdu.com/data/test1.html')
+    o = Neruda::OrgFile.new('spec/data/content.org')
+    expect(o.url).to eq('http://perdu.com/data/index.html')
   end
 
   it 'should compute the right html_file path for theoritical sources' do
