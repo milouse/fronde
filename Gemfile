@@ -2,9 +2,11 @@
 
 source 'https://rubygems.org'
 
-gem 'nokogiri'
-gem 'r18n-core'
-gem 'rake'
+ruby '>= 2.5'
+gem 'nokogiri', '~> 1.10'
+gem 'r18n-core', '~> 3.2'
+gem 'rainbow', '~> 3.0'
+gem 'rake', '~> 12.3'
 
 group :development do
   gem 'byebug'
