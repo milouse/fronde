@@ -150,6 +150,6 @@ if command.nil? || !pablo.respond_to?(command)
 end
 ARGV.shift
 
-init_alias = ['pablo_init', 'pablo_config']
-pablo.pablo_init if !File.exist?('config.yml') && init_alias.include?(command)
+init_cmds = ['pablo_init', 'pablo_config']
+pablo.pablo_init unless File.exist?('config.yml') || init_cmds.include?(command)
 pablo.send command
