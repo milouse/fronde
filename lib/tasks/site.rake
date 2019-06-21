@@ -63,6 +63,23 @@ def copy_resources(org_file, src_dir)
   end
 end
 
+def copy_theme_files
+  theme = Neruda::Config.settings['theme']
+  theme = 'default' if theme.nil?
+  theme_path = nil
+  [File.expand_path("../../themes/#{theme}", __dir__),
+   "themes/#{theme}"].each do |t|
+    next unless Dir.exist?(t)
+    theme_path = t
+    break
+  end
+  return false if theme_path.nil?
+  rm_r "#{PUBLIC_FOLDER}/assets", secure: true, force: true
+  mkdir_p "#{PUBLIC_FOLDER}/assets"
+  cp_r "#{theme_path}/.", "#{PUBLIC_FOLDER}/assets"
+  true
+end
+
 def emacs_command(file_name)
   default_emacs = 'emacs -Q -q --batch -nw -l ./org-config.el'
   emacs_command = Neruda::Config.settings['emacs'] || default_emacs
@@ -105,11 +122,7 @@ namespace :site do
 
   desc 'Publish chosen theme files'
   task :publish_theme do
-    theme = Neruda::Config.settings['theme']
-    next if theme.nil?
-    rm_r "#{PUBLIC_FOLDER}/assets", secure: true, force: true
-    mkdir_p "#{PUBLIC_FOLDER}/assets"
-    cp_r "themes/#{theme}/.", "#{PUBLIC_FOLDER}/assets"
+    next unless copy_theme_files
     print Rainbow('.').magenta unless Rake::FileUtilsExt.verbose_flag
   end
 

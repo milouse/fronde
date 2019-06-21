@@ -24,6 +24,12 @@ Gem::Specification.new do |s|
                    # Translations
                    'locales/en.yml',
                    'locales/fr.yml',
+                   # Default theme
+                   'themes/default/css/reset.css',
+                   'themes/default/css/style.css',
+                   'themes/default/fonts/Yanone_Kaffeesatz_400.woff',
+                   'themes/default/fonts/Yanone_Kaffeesatz_400.woff2',
+                   # Docs
                    'docs/config.yml.example',
                    'LICENSE']
   s.executables = ['pablo']
