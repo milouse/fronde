@@ -102,8 +102,17 @@ namespace :site do
     end
   end
 
+  desc 'Publish chosen theme files'
+  task :publish_theme do
+    theme = Neruda::Config.settings['theme']
+    next if theme.nil?
+    rm_r "#{PUBLIC_FOLDER}/assets", secure: true, force: true
+    mkdir_p "#{PUBLIC_FOLDER}/assets"
+    cp_r "themes/#{theme}/.", "#{PUBLIC_FOLDER}/assets"
+  end
+
   desc 'Convert all org files'
-  task build: prerequisites_files
+  task build: ['site:publish_theme'].concat(prerequisites_files)
 
   desc 'Start a test server'
   task :preview do
