@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'webrick'
+require 'rainbow'
 require 'nokogiri'
 require 'neruda/index'
 require 'neruda/org_file'
@@ -86,7 +87,7 @@ namespace :site do
     src = t.prerequisites[0]
     org_file = compile_to_html(src, t.name)
     copy_resources(org_file, src.pathmap('%d'))
-    print '.' unless Rake::FileUtilsExt.verbose_flag
+    print Rainbow('.').green unless Rake::FileUtilsExt.verbose_flag
   end
 
   desc 'Generates all index files'
@@ -98,7 +99,7 @@ namespace :site do
     index.entries.each do |k|
       compile_to_html(index.write(k), index.index_public_path(k))
       index.write_atom(k)
-      print '.' unless Rake::FileUtilsExt.verbose_flag
+      print Rainbow('.').blue unless Rake::FileUtilsExt.verbose_flag
     end
   end
 
@@ -109,10 +110,11 @@ namespace :site do
     rm_r "#{PUBLIC_FOLDER}/assets", secure: true, force: true
     mkdir_p "#{PUBLIC_FOLDER}/assets"
     cp_r "themes/#{theme}/.", "#{PUBLIC_FOLDER}/assets"
+    print Rainbow('.').magenta unless Rake::FileUtilsExt.verbose_flag
   end
 
   desc 'Convert all org files'
-  task build: ['site:publish_theme'].concat(prerequisites_files)
+  task build: prerequisites_files.concat(['site:publish_theme'])
 
   desc 'Start a test server'
   task :preview do
