@@ -9,7 +9,7 @@ require 'neruda/index'
 module Neruda
   class OrgFile
     attr_reader :title, :date, :author, :keywords, :lang,
-                :local_links, :file, :html_file, :url
+                :local_links, :file, :html_file, :url, :excerpt
 
     def initialize(file_name, opts = {})
       @file = file_name
@@ -24,6 +24,7 @@ module Neruda
         @keywords = []
         @lang = Neruda::Config.settings['lang']
         @local_links = []
+        @excerpt = ''
         @content = <<~ORG
           #+title: #{@title}
           #+date: <#{@date.strftime('%Y-%m-%d %a. %H:%M:%S')}>
@@ -63,6 +64,8 @@ module Neruda
             .gsub('%t', @title)
             .gsub('%l', @lang)
             .gsub('%u', @html_file)
+            .gsub('%x', @excerpt)
+            .gsub('%X', excerpt_to_html)
     end
 
     def write
@@ -154,13 +157,14 @@ module Neruda
     private
 
     def extract_data
-      @content = File.open(@file, 'r').read
+      @content = IO.read @file
       @title = extract_title
       @date = extract_date
       @author = extract_author
       @keywords = extract_keywords
       @lang = extract_lang
       @local_links = extract_relative_links
+      @excerpt = extract_excerpt
     end
 
     def extract_date
@@ -208,6 +212,24 @@ module Neruda
       files
     end
 
+    def extract_excerpt
+      clean = @content.gsub(/\r/, "\n").split("\n\n")
+      return '' if clean.empty?
+      excerpt = []
+      guard = 0
+      clean.each do |l|
+        next if l[0] == '#'
+        l = l.gsub(/^\*+ /, '').gsub(/\[\[[^\]]+\]\]/, '')
+             .gsub(/\[\[[^\]]+\]\[([^\]]+)\]\]/, '\1')
+             .gsub(/\[[^:]+:[^\]]+\]/, '').gsub(/\s+/, ' ').strip
+        next if l == ''
+        excerpt << l
+        guard += l.length
+        break if guard > 300
+      end
+      excerpt.join(' ')
+    end
+
     def keywords_to_html
       klist = @keywords.map do |k|
         <<~KEYWORDLINK
@@ -227,6 +249,12 @@ module Neruda
     def author_to_html
       return '' if @author == ''
       "<span class=\"author\">#{@author}</span>"
+    end
+
+    def excerpt_to_html
+      return '<p></p>' if @excerpt == ''
+      excerpt = @excerpt.split("\n\n").join('</p><p>')
+      "<p>#{excerpt}</p>"
     end
   end
 end
