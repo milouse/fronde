@@ -1,4 +1,3 @@
-# coding: utf-8
 # frozen_string_literal: true
 
 require 'yaml'
@@ -20,6 +19,17 @@ module Neruda
       def load_test(config)
         @config = config
         add_default_settings
+      end
+
+      def org_last_version
+        return @org_version if @org_version
+        index = open('https://orgmode.org/index.html', 'r').read
+        last_ver = index.match(/https:\/\/orgmode\.org\/org-([0-9.]+)\.tar\.gz/)
+        if last_ver.nil?
+          warn 'Org last version not found'
+          return nil
+        end
+        @org_version = last_ver[1]
       end
 
       private

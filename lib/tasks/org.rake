@@ -1,4 +1,3 @@
-# coding: utf-8
 # frozen_string_literal: true
 
 require 'open-uri'
@@ -8,20 +7,10 @@ def rake_puts(message)
   Rake.rake_output_message message
 end
 
-def org_last_version
-  index = open('https://orgmode.org/index.html', 'r').read
-  last_ver = index.match(/https:\/\/orgmode\.org\/org-([0-9.]+)\.tar\.gz/)
-  return last_ver[1] unless last_ver.nil?
-  warn 'Org last version not found'
-  nil
-end
-
-ORG_VERSION = org_last_version
-
 def org_config(orgtpl)
   <<~ORGCONFIG
     (package-initialize)
-    (add-to-list 'load-path "#{Dir.pwd}/org-#{ORG_VERSION}/lisp")
+    (add-to-list 'load-path "#{Dir.pwd}/org-#{Neruda::Config.org_last_version}/lisp")
     (require 'org)
 
     (org-link-set-parameters "i18n"
@@ -68,22 +57,23 @@ end
 namespace :org do
   desc 'Download last version of org-mode'
   task :download do |t|
-    next if Dir.exist?("org-#{ORG_VERSION}/lisp")
-    next if ORG_VERSION.nil?
-    tarball = "org-#{ORG_VERSION}.tar.gz"
+    org_version = Neruda::Config.org_last_version
+    next if Neruda::Config.org_last_version.nil?
+    next if Dir.exist?("org-#{org_version}/lisp")
+    tarball = "org-#{org_version}.tar.gz"
     sh "curl --progress-bar -O https://orgmode.org/#{tarball}"
     sh "tar xzf #{tarball}"
     File.unlink tarball
-    make = ['make', '-C', "org-#{ORG_VERSION}"]
+    make = ['make', '-C', "org-#{org_version}"]
     make << '-s' unless t.application.options[:verbose]
     sh make.join(' ')
     sh((make + ['compile']).join(' '))
     sh((make + ['autoloads']).join(' '))
-    rake_puts "org-mode #{ORG_VERSION} has been locally installed"
+    rake_puts "org-mode #{org_version} has been locally installed"
   end
 
   file 'org-config.el' do
-    next if ORG_VERSION.nil?
+    next if Neruda::Config.org_last_version.nil?
     orgtpl = []
     Neruda::Config.settings['org-html']&.each do |k, v|
       orgtpl << "#{k} \"#{v.strip.gsub(/"/, '\"')}\""
