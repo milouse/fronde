@@ -7,6 +7,7 @@ require 'neruda/index'
 require 'neruda/org_file'
 
 PUBLIC_FOLDER = Neruda::Config.settings['public_folder']
+BLOG_PATH = Neruda::Config.settings['blog_path']
 
 def run_webrick
   # Inspired by ruby un.rb library, which allows normally to start a
@@ -98,6 +99,7 @@ end
 
 prerequisites_files = Neruda::OrgFile.expand_sources_list \
   Rake::FileList.new('src/**/*.org')
+prerequisites_files.delete("#{PUBLIC_FOLDER}/#{BLOG_PATH}/index.html")
 
 namespace :site do
   rule '.html' => ->(tt) { Neruda::OrgFile.source_for_target(tt) } do |t|
@@ -109,10 +111,9 @@ namespace :site do
 
   desc 'Generates all index files'
   task :index do
-    blog_path = Neruda::Config.settings['blog_path']
-    next unless Dir.exist?("src/#{blog_path}")
+    next unless Dir.exist?("src/#{BLOG_PATH}")
     mkdir_p ['src/tags', "#{PUBLIC_FOLDER}/feeds"]
-    index = Neruda::Index.new(Dir.glob("src/#{blog_path}/*/content.org"))
+    index = Neruda::Index.new(Dir.glob("src/#{BLOG_PATH}/*/content.org"))
     index.entries.each do |k|
       compile_to_html(index.write(k), index.index_public_path(k))
       index.write_atom(k)
