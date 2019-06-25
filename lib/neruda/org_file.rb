@@ -1,4 +1,3 @@
-# coding: utf-8
 # frozen_string_literal: true
 
 require 'time'
@@ -18,20 +17,7 @@ module Neruda
       if File.exist?(@file)
         extract_data
       else
-        @title = opts[:title] || ''
-        @date = DateTime.now
-        @author = opts[:author] || default_author
-        @keywords = []
-        @lang = Neruda::Config.settings['lang']
-        @local_links = []
-        @excerpt = ''
-        @content = <<~ORG
-          #+title: #{@title}
-          #+date: <#{@date.strftime('%Y-%m-%d %a. %H:%M:%S')}>
-          #+author: #{@author}
-          #+language: #{@lang}
-
-        ORG
+        init_empty_file(opts)
       end
     end
 
@@ -155,6 +141,23 @@ module Neruda
     end
 
     private
+
+    def init_empty_file(opts)
+      @title = opts[:title] || ''
+      @date = DateTime.now
+      @author = opts[:author] || default_author
+      @keywords = []
+      @lang = Neruda::Config.settings['lang']
+      @local_links = []
+      @excerpt = ''
+      @content = <<~ORG
+        #+title: #{@title}
+        #+date: <#{@date.strftime('%Y-%m-%d %a. %H:%M:%S')}>
+        #+author: #{@author}
+        #+language: #{@lang}
+
+      ORG
+    end
 
     def extract_data
       @content = IO.read @file
