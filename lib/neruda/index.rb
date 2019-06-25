@@ -31,8 +31,10 @@ module Neruda
           content << title(year)
           last_year = year
         end
-        link = "[[..#{article.html_file}][#{article.title}]]"
-        content << "** #{article.datestring}: #{link}\n\n#{article.format('%x')}"
+        line = ["- #{article.datestring}:",
+                "[[..#{article.html_file}][#{article.title}]]"]
+        line << "-- #{article.excerpt}" if article.excerpt != ''
+        content << line.join(' ')
       end
       content.join("\n")
     end
@@ -167,7 +169,7 @@ module Neruda
           <id>urn:md5:#{Digest::MD5.hexdigest(article.timekey)}</id>
           <published>#{article.timestring(:rfc3339)}</published>
           <author><name>#{CGI.escapeHTML(article.author)}</name></author>
-          #{keywords}<content type="html">#{CGI.escapeHTML(article.format('%X'))}</content>
+          #{keywords}<content type="html">#{CGI.escapeHTML(article.excerpt)}</content>
         </entry>
       ENDENTRY
     end

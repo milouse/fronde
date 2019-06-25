@@ -51,7 +51,7 @@ module Neruda
             .gsub('%l', @lang)
             .gsub('%u', @html_file)
             .gsub('%x', @excerpt)
-            .gsub('%X', excerpt_to_html)
+            .gsub('%X', "<p>#{@excerpt}</p>")
     end
 
     def write
@@ -216,21 +216,7 @@ module Neruda
     end
 
     def extract_excerpt
-      clean = @content.gsub(/\r/, "\n").split("\n\n")
-      return '' if clean.empty?
-      excerpt = []
-      guard = 0
-      clean.each do |l|
-        next if l[0] == '#'
-        l = l.gsub(/^\*+ /, '').gsub(/\[\[[^\]]+\]\]/, '')
-             .gsub(/\[\[[^\]]+\]\[([^\]]+)\]\]/, '\1')
-             .gsub(/\[[^:]+:[^\]]+\]/, '').gsub(/\s+/, ' ').strip
-        next if l == ''
-        excerpt << l
-        guard += l.length
-        break if guard > 300
-      end
-      excerpt.join(' ')
+      @content.scan(/^#\+description:(.+)$/i).map { |l| l[0].strip }.join(' ')
     end
 
     def keywords_to_html
@@ -252,12 +238,6 @@ module Neruda
     def author_to_html
       return '' if @author == ''
       "<span class=\"author\">#{@author}</span>"
-    end
-
-    def excerpt_to_html
-      return '<p></p>' if @excerpt == ''
-      excerpt = @excerpt.split("\n\n").join('</p><p>')
-      "<p>#{excerpt}</p>"
     end
   end
 end
