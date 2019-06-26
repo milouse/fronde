@@ -64,13 +64,6 @@ module Neruda
       atomdest
     end
 
-    def index_public_path(index_name)
-      slug = @slugs[index_name]
-      dest = [@pubdir, 'tags', "#{slug}.html"]
-      dest[1] = @blog_path if slug == 'index'
-      dest.join('/')
-    end
-
     private
 
     def index_source_path(index_name)

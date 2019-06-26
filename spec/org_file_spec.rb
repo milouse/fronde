@@ -69,7 +69,7 @@ describe 'With configuration' do
     o = Neruda::OrgFile.new('spec/data/test1.org')
     expect(o.html_file).to eq('/data/test1.html')
     o = Neruda::OrgFile.new('spec/data/content.org')
-    expect(o.html_file).to eq('/data/index.html')
+    expect(o.html_file).to eq('/data/content.html')
   end
 
   it 'should compute the right url for existing sources' do
@@ -86,7 +86,7 @@ describe 'With configuration' do
     o = Neruda::OrgFile.new('spec/data/test1.org')
     expect(o.url).to eq('http://perdu.com/data/test1.html')
     o = Neruda::OrgFile.new('spec/data/content.org')
-    expect(o.url).to eq('http://perdu.com/data/index.html')
+    expect(o.url).to eq('http://perdu.com/data/content.html')
   end
 
   it 'should compute the right html_file path for theoritical sources' do
@@ -97,33 +97,10 @@ describe 'With configuration' do
     expect(Neruda::OrgFile.target_for_source('src/blog/toto/tata.org')).to \
       eq('public_html/blog/toto/tata.html')
     expect(Neruda::OrgFile.target_for_source('src/blog/toto/content.org')).to \
-      eq('public_html/blog/toto/index.html')
+      eq('public_html/blog/toto/content.html')
     expect(Neruda::OrgFile.target_for_source('~/tata/tutu/content.org')).to \
       eq('public_html/tutu/content.html')
     expect(Neruda::OrgFile.target_for_source('~/tata/blog/content.org')).to \
-      eq('public_html/blog/index.html')
-  end
-end
-
-require 'rake'
-describe 'With Rake::FileList' do
-  it 'should compute all target files' do
-    Neruda::Config.load_test('external_sources' => ['spec/data/*'])
-    fl = Neruda::OrgFile.expand_sources_list(Rake::FileList.new)
-    expect(fl).not_to be_nil
-    expect(fl).to contain_exactly('public_html/data/test1.html',
-                                  'public_html/data/test2.html',
-                                  'public_html/data/test3.html',
-                                  'public_html/data/content.html')
-  end
-
-  it 'should compute all target files' do
-    Neruda::Config.load_test('external_sources' => ['spec/data/*'],
-                             'exclude_sources' => ['/content\.org$'])
-    fl = Neruda::OrgFile.expand_sources_list(Rake::FileList.new)
-    expect(fl).not_to be_nil
-    expect(fl).to contain_exactly('public_html/data/test1.html',
-                                  'public_html/data/test2.html',
-                                  'public_html/data/test3.html')
+      eq('public_html/blog/content.html')
   end
 end

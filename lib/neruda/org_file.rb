@@ -8,7 +8,7 @@ require 'neruda/index'
 module Neruda
   class OrgFile
     attr_reader :title, :date, :author, :keywords, :lang,
-                :local_links, :file, :html_file, :url, :excerpt
+                :file, :html_file, :url, :excerpt
 
     def initialize(file_name, opts = {})
       @file = file_name
@@ -87,28 +87,10 @@ module Neruda
         # file_name may be frozen...
         target = file_name.sub(/\.org$/, '.html')
         pubfolder = Neruda::Config.settings['public_folder']
-        if /^src\//.match?(target)
-          target.sub!(/^src\//, "#{pubfolder}/")
-        else
-          subfolder = File.basename(File.dirname(target))
-          leaf = File.basename(target)
-          target = "#{pubfolder}/#{subfolder}/#{leaf}"
-        end
-        blogpath = Neruda::Config.settings['blog_path']
-        return target unless /\/#{blogpath}\//.match?(target)
-        target.sub(/\/content\.html$/, '/index.html')
-      end
-
-      def expand_sources_list(rake_list)
-        return [] unless rake_list
-        conf = Neruda::Config.settings
-        unless conf['external_sources'].nil?
-          rake_list = rake_list.include(conf['external_sources'])
-        end
-        (conf['exclude_sources'] || []).each do |x|
-          rake_list = rake_list.exclude Regexp.new(x)
-        end
-        rake_list.map { |s| Neruda::OrgFile.target_for_source(s) }
+        return target.sub(/^src\//, "#{pubfolder}/") if /^src\//.match?(target)
+        subfolder = File.basename(File.dirname(target))
+        leaf = File.basename(target)
+        "#{pubfolder}/#{subfolder}/#{leaf}"
       end
 
       def file_name(title, for_blog = false)
@@ -148,7 +130,6 @@ module Neruda
       @author = opts[:author] || default_author
       @keywords = []
       @lang = Neruda::Config.settings['lang']
-      @local_links = []
       @excerpt = ''
       @content = <<~ORG
         #+title: #{@title}
@@ -166,7 +147,6 @@ module Neruda
       @author = extract_author
       @keywords = extract_keywords
       @lang = extract_lang
-      @local_links = extract_relative_links
       @excerpt = extract_excerpt
     end
 
@@ -204,15 +184,6 @@ module Neruda
       m = /^#\+language:(.+)$/i.match(@content)
       return Neruda::Config.settings['lang'] if m.nil?
       m[1].strip
-    end
-
-    def extract_relative_links
-      files = []
-      path = File.dirname(@file)
-      @content.scan(/\[\[file:(?:\.\/)?([^\]]+)\]/).each do |m|
-        files << m[0] if File.exist? "#{path}/#{m[0]}"
-      end
-      files
     end
 
     def extract_excerpt

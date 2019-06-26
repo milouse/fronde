@@ -3,14 +3,76 @@
 require 'open-uri'
 require 'neruda/config'
 
-def rake_puts(message)
-  Rake.rake_output_message message
+def org_project(project_name, opts)
+  orgtpl = opts['org_headers']
+  base_directory = File.expand_path(opts['path'])
+  publish_in = [Dir.pwd, Neruda::Config.settings['public_folder']]
+  publish_in << project_name unless project_name == 'org'
+  publish_in = publish_in.join('/')
+  recline = [opts['recursive'] || 't']
+  default_ex_ptrn = Neruda::Config.settings['exclude_pattern']
+  if opts['exclude']
+    recline << ":exclude \"#{opts['exclude']}\""
+  elsif project_name == 'org' && default_ex_ptrn
+    recline << ":exclude \"#{default_ex_ptrn}\""
+  end
+  <<~ORGPROJECT
+    ("#{project_name}"
+     :base-directory "#{base_directory}"
+     :base-extension "org"
+     :recursive #{recline.join("\n ")}
+     :publishing-directory "#{publish_in}"
+     :publishing-function pablo-publish-to-html-and-customize-output
+     :section-numbers nil
+     :with-toc nil
+     #{orgtpl})
+    ("#{project_name}-assets"
+     :base-directory "#{base_directory}"
+     :base-extension "jpg\\\\|gif\\\\|png\\\\|pdf"
+     :recursive #{recline[0]}
+     :publishing-directory "#{publish_in}"
+     :publishing-function org-publish-attachment)
+  ORGPROJECT
 end
 
-def org_config(orgtpl)
+def org_templates
+  orgtpl = []
+  Neruda::Config.settings['org-html']&.each do |k, v|
+    orgtpl << ":#{k} \"#{v.strip.gsub(/"/, '\"')}\""
+  end
+  orgtpl.join("\n ")
+end
+
+def generate_org_projects
+  orgtpl = org_templates
+  projects = { 'org' => org_project('org', 'org_headers' => orgtpl,
+                                           'path' => './src') }
+  Neruda::Config.settings['external_sources']&.each do |s|
+    opts = { 'org_headers' => orgtpl }
+    if s.is_a? String
+      opts['path'] = s
+    elsif s.is_a? Hash
+      opts.merge! s
+    end
+    next unless opts.has_key?('path')
+    pname = File.basename(opts['path']).sub(/^\./, '')
+    projects[pname] = org_project(pname, opts)
+  end
+  projects
+end
+
+def org_config
+  projects = generate_org_projects
+  project_names = projects.keys.map { |p| ["\"#{p}\"", "\"#{p}-assets\""] }
+                          .flatten.join(' ')
+  all_projects = projects.values.join("\n").gsub(/\n\n/, "\n")
+                         .gsub(/\n/, "\n        ")
+  workdir = Dir.pwd
   <<~ORGCONFIG
+    ;; Needed for nice htmlize
     (package-initialize)
-    (add-to-list 'load-path "#{Dir.pwd}/org-#{Neruda::Config.org_last_version}/lisp")
+    ;; Load org mode
+    (add-to-list 'load-path "#{workdir}/org-#{Neruda::Config.org_last_version}/lisp")
     (require 'org)
 
     (org-link-set-parameters "i18n"
@@ -36,21 +98,44 @@ def org_config(orgtpl)
       "Visit a i18n link"
       (browse-url (car (split-string link "|"))))
 
-    (setq enable-local-variables :all
-          org-export-with-toc nil
+    (defun pablo-publish-to-html-and-customize-output (plist filename pub-dir)
+      "Wrap the `org-html-publish-to-html' function and customize its output.
+
+    FILENAME is the filename of the Org file to be published.  PLIST
+    is the property list for the given project.  PUB-DIR is the
+    publishing directory.
+
+    Return output file name."
+      (let* ((html-file (org-html-publish-to-html plist filename pub-dir))
+             (command (concat "rake 'site:customize_output[" html-file "]'")))
+        (message (replace-regexp-in-string "\\n$" "" (shell-command-to-string command)))
+        html-file))
+
+    (setq make-backup-files nil
+          enable-local-variables :all
+          org-publish-timestamp-directory "#{workdir}/tmp/"
+          org-id-locations-file "#{workdir}/tmp/org-id-locations"
           org-confirm-babel-evaluate nil
           org-html-doctype "html5"
           org-html-html5-fancy t
           org-html-head-include-default-style nil
           org-html-head-include-scripts nil
           org-html-metadata-timestamp-format "%a %d %B %Y à %H:%M"
-          #{orgtpl.join("\n      ")}
           org-html-text-markup-alist '((bold . "<strong>%s</strong>")
                                        (code . "<code>%s</code>")
                                        (italic . "<em>%s</em>")
                                        (strike-through . "<del>%s</del>")
                                        (underline . "<span class=\\"underline\\">%s</span>")
-                                       (verbatim . "<code>%s</code>")))
+                                       (verbatim . "<code>%s</code>"))
+          org-publish-project-alist
+          `(#{all_projects.strip}
+            ("theme"
+             :base-directory "#{workdir}/themes/#{Neruda::Config.settings['theme']}"
+             :base-extension "jpg\\\\|gif\\\\|png\\\\|js\\\\|css"
+             :recursive t
+             :publishing-directory "#{workdir}/#{Neruda::Config.settings['public_folder']}/assets"
+             :publishing-function org-publish-attachment)
+            ("website" :components (#{project_names} "theme"))))
   ORGCONFIG
 end
 
@@ -69,18 +154,14 @@ namespace :org do
     sh make.join(' ')
     sh((make + ['compile']).join(' '))
     sh((make + ['autoloads']).join(' '))
-    rake_puts "org-mode #{org_version} has been locally installed"
+    Rake.rake_output_message "org-mode #{org_version} has been locally installed"
   end
 
   file 'org-config.el' do
     next if Neruda::Config.org_last_version.nil?
-    orgtpl = []
-    Neruda::Config.settings['org-html']&.each do |k, v|
-      orgtpl << "#{k} \"#{v.strip.gsub(/"/, '\"')}\""
-    end
-    rake_puts 'Write org-config.el'
+    Rake.rake_output_message 'Write org-config.el'
     File.open('org-config.el', 'w') do |f|
-      f.puts org_config(orgtpl)
+      f.puts org_config
     end
   end
 

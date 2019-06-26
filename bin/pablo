@@ -28,10 +28,10 @@ module PabloCommands
   def pablo_build(file = ARGV[0])
     @rake.options.build_all = true
     if file.nil?
-      @rake.invoke_task('site:build')
       @rake.invoke_task('site:index')
+      @rake.invoke_task('site:build')
     else
-      @rake.invoke_task(file)
+      @rake.invoke_task("site:build[#{file}]")
     end
   end
 
