@@ -2,8 +2,8 @@
 
 require 'yaml'
 
-# Wrapper for configuration
 module Neruda
+  # Wrapper for configuration
   class Config
     class << self
       def settings

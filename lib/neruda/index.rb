@@ -5,8 +5,63 @@ require 'digest/md5'
 require 'neruda/config'
 require 'neruda/org_file'
 
-# Generates OrgFile listings around their keywords
 module Neruda
+  # Embed Atom feeds sepecific methods
+  module Atom
+    def atom_header(title = nil)
+      domain = Neruda::Config.settings['domain']
+      if Neruda::Config.settings['TEST'] == 'test'
+        upddate = DateTime.strptime('1987-03-23 10:42:42', '%Y-%m-%d %H:%M:%S')
+      else
+        upddate = DateTime.now.rfc3339
+      end
+      slug = Neruda::OrgFile.slug(title)
+      tagurl = "#{domain}/tags/#{slug}.html"
+      if title == 'index'
+        title = Neruda::Config.settings['title']
+        tagurl = "#{domain}/#{@blog_path}"
+      end
+      title_esc = CGI.escapeHTML(title)
+      <<~ENDATOM
+        <?xml version="1.0" encoding="utf-8"?>
+        <feed xmlns="http://www.w3.org/2005/Atom"
+              xmlns:dc="http://purl.org/dc/elements/1.1/"
+              xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+              xml:lang="#{Neruda::Config.settings['lang']}">
+
+        <title>#{title_esc}</title>
+        <link href="#{domain}/feeds/#{slug}.xml" rel="self" type="application/atom+xml"/>
+        <link href="#{tagurl}" rel="alternate" type="text/html" title="#{title_esc}"/>
+        <updated>#{upddate}</updated>
+        <author><name>#{Neruda::Config.settings['author'] || ''}</name></author>
+        <id>urn:md5:#{Digest::MD5.hexdigest(domain)}</id>
+        <generator uri="https://fossil.deparis.io/neruda">Neruda</generator>
+      ENDATOM
+    end
+
+    def atom_entry(article)
+      keywords = article.keywords.map do |k|
+        "<dc:subject>#{CGI.escapeHTML(k)}</dc:subject>"
+      end.join
+      keywords += "\n  " if keywords != ''
+      title_esc = CGI.escapeHTML(article.title)
+      <<~ENDENTRY
+        <entry>
+          <title>#{title_esc}</title>
+          <link href="#{article.url}" rel="alternate" type="text/html"
+                title="#{title_esc}"/>
+          <id>urn:md5:#{Digest::MD5.hexdigest(article.timekey)}</id>
+          <published>#{article.timestring(:rfc3339)}</published>
+          <author><name>#{CGI.escapeHTML(article.author)}</name></author>
+          #{keywords}<content type="html">#{CGI.escapeHTML(article.excerpt)}</content>
+        </entry>
+      ENDENTRY
+    end
+  end
+end
+
+module Neruda
+  # Generates OrgFile listings around their keywords
   class Index
     def initialize(file_list)
       @sources = file_list
@@ -64,6 +119,15 @@ module Neruda
       atomdest
     end
 
+    def write_all(verbose = true)
+      entries.each do |k|
+        src = write(k)
+        warn "Generated index file #{src}" if verbose
+        atom = write_atom(k)
+        warn "Generated atom feed #{atom}" if verbose
+      end
+    end
+
     private
 
     def index_source_path(index_name)
@@ -117,54 +181,6 @@ module Neruda
       ENDPROP
     end
 
-    def atom_header(title = nil)
-      domain = Neruda::Config.settings['domain']
-      if Neruda::Config.settings['TEST'] == 'test'
-        upddate = '---testupdate---'
-      else
-        upddate = DateTime.now.rfc3339
-      end
-      slug = Neruda::OrgFile.slug(title)
-      tagurl = "#{domain}/tags/#{slug}.html"
-      if title == 'index'
-        title = Neruda::Config.settings['title']
-        tagurl = "#{domain}/#{@blog_path}"
-      end
-      title_esc = CGI.escapeHTML(title)
-      <<~ENDATOM
-        <?xml version="1.0" encoding="utf-8"?>
-        <feed xmlns="http://www.w3.org/2005/Atom"
-              xmlns:dc="http://purl.org/dc/elements/1.1/"
-              xmlns:wfw="http://wellformedweb.org/CommentAPI/"
-              xml:lang="#{Neruda::Config.settings['lang']}">
-
-        <title>#{title_esc}</title>
-        <link href="#{domain}/feeds/#{slug}.xml" rel="self" type="application/atom+xml"/>
-        <link href="#{tagurl}" rel="alternate" type="text/html" title="#{title_esc}"/>
-        <updated>#{upddate}</updated>
-        <author><name>#{Neruda::Config.settings['author'] || ''}</name></author>
-        <id>urn:md5:#{Digest::MD5.hexdigest(domain)}</id>
-        <generator uri="https://fossil.deparis.io/neruda">Neruda</generator>
-      ENDATOM
-    end
-
-    def atom_entry(article)
-      keywords = article.keywords.map do |k|
-        "<dc:subject>#{CGI.escapeHTML(k)}</dc:subject>"
-      end.join
-      keywords += "\n  " if keywords != ''
-      title_esc = CGI.escapeHTML(article.title)
-      <<~ENDENTRY
-        <entry>
-          <title>#{title_esc}</title>
-          <link href="#{article.url}" rel="alternate" type="text/html"
-                title="#{title_esc}"/>
-          <id>urn:md5:#{Digest::MD5.hexdigest(article.timekey)}</id>
-          <published>#{article.timestring(:rfc3339)}</published>
-          <author><name>#{CGI.escapeHTML(article.author)}</name></author>
-          #{keywords}<content type="html">#{CGI.escapeHTML(article.excerpt)}</content>
-        </entry>
-      ENDENTRY
-    end
+    include Neruda::Atom
   end
 end

@@ -1,4 +1,3 @@
-# coding: utf-8
 # frozen_string_literal: true
 
 # rubocop:disable Style/FormatStringToken, Metric/LineLength
@@ -9,6 +8,7 @@ describe 'With working org files' do
     expect(o.date).to be_nil
     expect(o.timekey).to eq('00000000000000')
     expect(o.format('%i - (%t)')).to eq(' - (My sweet article)')
+    expect(o.slug).to eq('my-sweet-article')
   end
 
   it 'should parse with a partial date' do
@@ -17,6 +17,7 @@ describe 'With working org files' do
     expect(o.date).to eq(DateTime.strptime('2019-06-11 00:00:00', '%Y-%m-%d %H:%M:%S'))
     expect(o.timekey).to eq('20190611000000')
     expect(o.format('%i - (%t)')).to eq('2019-06-11 - (My second article)')
+    expect(o.lang).to eq('es')
   end
 
   it 'should parse with a complete date' do
@@ -37,8 +38,49 @@ describe 'With various titles' do
     expect(Neruda::OrgFile.slug('Tôto tata')).to eq('toto-tata')
     expect(Neruda::OrgFile.slug('ÀùïỸç/+*= trulu°`')).to eq('auiyc-trulu')
   end
+
+  it 'should give correct file_name' do
+    expect(Neruda::OrgFile.file_name('toto')).to eq('src/toto.org')
+    expect(Neruda::OrgFile.file_name('TotO')).to eq('src/toto.org')
+    expect(Neruda::OrgFile.file_name('Tôto')).to eq('src/toto.org')
+    expect(Neruda::OrgFile.file_name('Tôto tata')).to eq('src/toto-tata.org')
+    expect(Neruda::OrgFile.file_name('ÀùïỸç/+*= trulu°`')).to \
+      eq('src/auiyc-trulu.org')
+  end
 end
 
+describe 'Without a working file' do
+  after(:each) do
+    FileUtils.rm 'spec/data/__test__.org', force: true
+  end
+
+  it 'should raise if file_name is nil' do
+    expect { Neruda::OrgFile.new(nil) }.to raise_error(ArgumentError)
+    expect { Neruda::OrgFile.new('') }.to raise_error(ArgumentError)
+  end
+
+  it 'should return a new org file structure' do
+    o = Neruda::OrgFile.new('spec/data/__test__.org', title: 'test')
+    expect(o.title).to eq('test')
+    expect(o.date).not_to be_nil
+    expect(o.date).to be_an_instance_of(DateTime)
+    date = o.date.strftime('%Y-%m-%d %a. %H:%M:%S')
+    expect(o.author).not_to be_nil
+    expect(o.author).to be_an_instance_of(String)
+    o.write
+    empty_content = <<~CONTENT
+      #+title: test
+      #+date: <#{date}>
+      #+author: #{o.author}
+      #+language: en
+
+    CONTENT
+    expect(File.exist?('spec/data/__test__.org')).to be(true)
+    expect(IO.read('spec/data/__test__.org')).to eq(empty_content)
+  end
+end
+
+# rubocop:disable Metric/BlockLength
 describe 'With configuration' do
   after(:each) do
     # Reset config
@@ -104,3 +146,4 @@ describe 'With configuration' do
       eq('public_html/blog/content.html')
   end
 end
+# rubocop:enable Metric/BlockLength

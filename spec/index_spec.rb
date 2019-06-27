@@ -30,7 +30,7 @@ SAMPLE_ATOM = <<~ATOM
   <title>Blog</title>
   <link href="http://perdu.com/feeds/index.xml" rel="self" type="application/atom+xml"/>
   <link href="http://perdu.com/blog" rel="alternate" type="text/html" title="Blog"/>
-  <updated>---testupdate---</updated>
+  <updated>1987-03-23T10:42:42+00:00</updated>
   <author><name>Test</name></author>
   <id>urn:md5:75d53866bcb20465b3287cf237234464</id>
   <generator uri="https://fossil.deparis.io/neruda">Neruda</generator>

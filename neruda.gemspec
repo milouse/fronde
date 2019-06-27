@@ -16,6 +16,7 @@ Gem::Specification.new do |s|
   s.files       = ['lib/neruda/config.rb',
                    'lib/neruda/index.rb',
                    'lib/neruda/org_file.rb',
+                   'lib/neruda/utils.rb',
                    'lib/neruda/version.rb',
                    # Rake tasks
                    'lib/tasks/org.rake',
