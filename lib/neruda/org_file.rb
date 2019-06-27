@@ -39,16 +39,18 @@ module Neruda
     end
 
     def format(string)
-      string.gsub('%k', @keywords.join(', '))
-            .gsub('%K', keywords_to_html)
+      license = Neruda::Config.settings['license'] || ''
+      string.gsub('%a', @author)
+            .gsub('%A', author_to_html)
             .gsub('%d', date_to_html(:short))
             .gsub('%D', date_to_html)
             .gsub('%i', timestring(:short))
             .gsub('%I', timestring(:rfc3339))
-            .gsub('%a', @author)
-            .gsub('%A', author_to_html)
-            .gsub('%t', @title)
+            .gsub('%k', @keywords.join(', '))
+            .gsub('%K', keywords_to_html)
             .gsub('%l', @lang)
+            .gsub('%L', license.gsub(/\s+/, ' ').strip)
+            .gsub('%t', @title)
             .gsub('%u', @html_file)
             .gsub('%x', @excerpt)
             .gsub('%X', "<p>#{@excerpt}</p>")

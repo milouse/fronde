@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'thread'
 require 'webrick'
 require 'rainbow'
 require 'nokogiri'
@@ -36,33 +37,40 @@ def apply_template(elem, position, content)
   end
 end
 
-def template_in_file?(dom, content)
+def template_in_file?(head, content)
   digest = Digest::MD5.hexdigest(content)
   check = " Neruda Template: #{digest} "
-  head = dom.xpath('//head')
   head.children.to_a.filter(&:comment?).each do |c|
     return true if c.text == check
   end
-  head.first.prepend_child(Nokogiri::XML::Comment.new(dom, check))
+  head.first.prepend_child("<!--#{check}-->\n")
   false
 end
 
 def customize_output(org_file, file_name)
   templates = Neruda::Config.settings['templates']
   return if templates.nil? || templates.empty?
-  Rake.rake_output_message "Customizing file #{file_name} from #{org_file.file}"
   dom = Nokogiri::HTML(File.open(file_name, 'r'))
   templates.each do |t|
     next unless t.has_key?('selector') && t.has_key?('content')
     if t.has_key?('path')
-      check_path = [Dir.pwd, Neruda::Config.settings['public_folder']].join('/')
-      next unless File.fnmatch?(check_path + t['path'], file_name)
+      check_path = [Neruda::Config.settings['public_folder'], t['path']].join
+      next unless File.fnmatch?(check_path, file_name)
     end
-    next if template_in_file?(dom, t['content'])
+    next if template_in_file?(dom.xpath('//head'), t['content'])
     apply_template(dom.css(t['selector']), t['type'] || 'after',
                    org_file.format(t['content']))
   end
   dom.write_to(File.open(file_name, 'w'))
+end
+
+def build_indexes(index, verbose = true)
+  index.entries.each do |k|
+    src = index.write(k)
+    warn "Generated index file #{src}" if verbose
+    atom = index.write_atom(k)
+    warn "Generated atom feed #{atom}" if verbose
+  end
 end
 
 def emacs_command(file_name = nil, verbose = true)
@@ -79,6 +87,32 @@ def emacs_command(file_name = nil, verbose = true)
   emacs_command.join(' ')
 end
 
+THROBBER_FRAMES = {
+  'basic' => '-\|/',
+  'basicdots' => '⋯⋱⋮⋰',
+  'moon' => '🌑🌒🌓🌔🌕🌖🌗🌘',
+  'clock' => '🕛🕐🕑🕒🕓🕔🕕🕖🕗🕘🕙🕚',
+  'bricks' => '⣾⣽⣻⢿⡿⣟⣯⣷',
+  'points' => '·⁘∷⁛∷⁘',
+  'quadrant2' => '▙▛▜▟',
+  'default' => ['⠁ ⠂ ⠄ ⡀ ⠄ ⠂ ⠁', '⠂ ⠁ ⠂ ⠄ ⡀ ⠄ ⠂', '⠄ ⠂ ⠁ ⠂ ⠄ ⡀ ⠄',
+                '⡀ ⠄ ⠂ ⠁ ⠂ ⠄ ⡀', '⠄ ⡀ ⠄ ⠂ ⠁ ⠂ ⠄', '⠂ ⠄ ⡀ ⠄ ⠂ ⠁ ⠂']
+}.freeze
+
+def throbber(thread, message)
+  model = Neruda::Config.settings['throbber'] || 'default'
+  model = 'default' unless THROBBER_FRAMES.has_key?(model)
+  frames = THROBBER_FRAMES[model]
+  current = 0
+  while thread.alive?
+    sleep 0.1
+    print "#{message} #{frames[current % frames.length]}\r"
+    current += 1
+  end
+  done = Rainbow('done'.ljust(frames[0].length)).green
+  print "#{message} #{done}\n"
+end
+
 namespace :site do
   desc 'Generates all index files'
   task :index do
@@ -86,13 +120,15 @@ namespace :site do
     next unless Dir.exist?("src/#{blog_path}")
     mkdir_p ['src/tags', "#{Neruda::Config.settings['public_folder']}/feeds"]
     index = Neruda::Index.new(Dir.glob("src/#{blog_path}/*/content.org"))
-    index.entries.each do |k|
-      src = index.write(k)
-      Rake.rake_output_message "Generated index file #{src}"
-      atom = index.write_atom(k)
-      Rake.rake_output_message "Generated atom feed #{atom}"
-      print Rainbow('.').blue unless Rake::FileUtilsExt.verbose_flag
+    verbose = Rake::FileUtilsExt.verbose_flag
+    if verbose
+      build_indexes(index)
+      next
     end
+    build = Thread.new do
+      build_indexes(index, false)
+    end
+    throbber(build, 'Generating indexes:')
   end
 
   desc 'Customize HTML output for a given file'
@@ -101,14 +137,23 @@ namespace :site do
       warn 'No source file given'
       next
     end
+    verbose = Rake::FileUtilsExt.verbose_flag
     source = Neruda::OrgFile.source_for_target(args[:target])
+    warn "Customizing file #{args[:target]} from #{source}" if verbose
     customize_output(Neruda::OrgFile.new(source), args[:target])
+    print Rainbow('.').bold.green unless verbose
   end
 
-  desc 'Convert all org files'
+  desc 'Convert one or all org files'
   task :build, :target do |_, args|
-    sh emacs_command(args[:target], Rake::FileUtilsExt.verbose_flag)
-    print Rainbow('.').green unless Rake::FileUtilsExt.verbose_flag
+    if Rake::FileUtilsExt.verbose_flag
+      sh emacs_command(args[:target])
+      next
+    end
+    build = Thread.new do
+      sh emacs_command(args[:target], false)
+    end
+    throbber(build, 'Publishing:')
   end
 
   desc 'Start a test server'

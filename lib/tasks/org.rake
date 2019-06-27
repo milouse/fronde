@@ -28,7 +28,7 @@ def org_project(project_name, opts)
      #{orgtpl})
     ("#{project_name}-assets"
      :base-directory "#{base_directory}"
-     :base-extension "jpg\\\\|gif\\\\|png\\\\|pdf"
+     :base-extension "jpg\\\\|gif\\\\|png\\\\|svg\\\\|pdf"
      :recursive #{recline[0]}
      :publishing-directory "#{publish_in}"
      :publishing-function org-publish-attachment)
@@ -107,7 +107,9 @@ def org_config
 
     Return output file name."
       (let* ((html-file (org-html-publish-to-html plist filename pub-dir))
-             (command (concat "rake 'site:customize_output[" html-file "]'")))
+             (workdir "#{workdir}/")
+             (relative-html-file (substring html-file (length workdir)))
+             (command (concat "rake 'site:customize_output[" relative-html-file "]'")))
         (message (replace-regexp-in-string "\\n$" "" (shell-command-to-string command)))
         html-file))
 
@@ -131,7 +133,7 @@ def org_config
           `(#{all_projects.strip}
             ("theme"
              :base-directory "#{workdir}/themes/#{Neruda::Config.settings['theme']}"
-             :base-extension "jpg\\\\|gif\\\\|png\\\\|js\\\\|css"
+             :base-extension "jpg\\\\|gif\\\\|png\\\\|js\\\\|css\\\\|otf\\\\|ttf\\\\|woff2?"
              :recursive t
              :publishing-directory "#{workdir}/#{Neruda::Config.settings['public_folder']}/assets"
              :publishing-function org-publish-attachment)
@@ -154,12 +156,12 @@ namespace :org do
     sh make.join(' ')
     sh((make + ['compile']).join(' '))
     sh((make + ['autoloads']).join(' '))
-    Rake.rake_output_message "org-mode #{org_version} has been locally installed"
+    warn "org-mode #{org_version} has been locally installed"
   end
 
   file 'org-config.el' do
     next if Neruda::Config.org_last_version.nil?
-    Rake.rake_output_message 'Write org-config.el'
+    warn 'Write org-config.el'
     File.open('org-config.el', 'w') do |f|
       f.puts org_config
     end
