@@ -14,4 +14,5 @@ group :development do
   gem 'pry-doc'
   gem 'rspec'
   gem 'rubocop'
+  gem 'simplecov'
 end

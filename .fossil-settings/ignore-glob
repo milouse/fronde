@@ -1,9 +1,4 @@
 .ruby-gemset
-config
-private
-public
+coverage
 tmp
-views
-config.ru
 neruda-*.gem
-README.md

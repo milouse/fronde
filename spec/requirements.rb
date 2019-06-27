@@ -2,6 +2,9 @@
 
 $LOAD_PATH.unshift('./lib')
 
+require 'simplecov'
+SimpleCov.start
+
 # The following requires other components automatically
 require 'neruda/org_file'
 
