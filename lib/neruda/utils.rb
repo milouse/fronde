@@ -21,10 +21,6 @@ module Neruda
 
     class << self
       def throbber(thread, message)
-        if Neruda::Config.settings['TEST'] == 'test'
-          thread.join
-          return puts_point
-        end
         model = Neruda::Config.settings['throbber'] || 'default'
         model = 'default' unless Neruda::Utils::THROBBER_FRAMES.has_key?(model)
         frames = Neruda::Utils::THROBBER_FRAMES[model]
@@ -36,10 +32,6 @@ module Neruda
         end
         done = Rainbow('done'.ljust(frames[0].length)).green
         puts "#{message} #{done}"
-      end
-
-      def puts_point(color = :blue)
-        print Rainbow('.').send(color)
       end
     end
   end

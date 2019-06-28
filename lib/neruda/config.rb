@@ -25,10 +25,12 @@ module Neruda
         return @org_version if @org_version
         index = open('https://orgmode.org/index.html', 'r').read
         last_ver = index.match(/https:\/\/orgmode\.org\/org-([0-9.]+)\.tar\.gz/)
+        # :nocov:
         if last_ver.nil?
           warn 'Org last version not found'
           return nil
         end
+        # :nocov:
         @org_version = last_ver[1]
       end
 

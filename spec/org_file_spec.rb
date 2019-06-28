@@ -8,7 +8,6 @@ describe 'With working org files' do
     expect(o.date).to be_nil
     expect(o.timekey).to eq('00000000000000')
     expect(o.format('%i - (%t)')).to eq(' - (My sweet article)')
-    expect(o.slug).to eq('my-sweet-article')
   end
 
   it 'should parse with a partial date' do
@@ -16,6 +15,7 @@ describe 'With working org files' do
     expect(o.title).to eq('My second article')
     expect(o.date).to eq(DateTime.strptime('2019-06-11 00:00:00', '%Y-%m-%d %H:%M:%S'))
     expect(o.timekey).to eq('20190611000000')
+    expect(o.datestring).to eq('2019-06-11')
     expect(o.format('%i - (%t)')).to eq('2019-06-11 - (My second article)')
     expect(o.lang).to eq('es')
   end
@@ -25,6 +25,7 @@ describe 'With working org files' do
     expect(o.title).to eq('My third article')
     expect(o.date).to eq(DateTime.strptime('2019-06-11 23:42:10', '%Y-%m-%d %H:%M:%S'))
     expect(o.timekey).to eq('20190611234210')
+    expect(o.datestring).to eq('2019-06-11')
     expect(o.format('%i - (%t)')).to eq('2019-06-11 - (My third article)')
   end
 end
@@ -46,6 +47,11 @@ describe 'With various titles' do
     expect(Neruda::OrgFile.file_name('Tôto tata')).to eq('src/toto-tata.org')
     expect(Neruda::OrgFile.file_name('ÀùïỸç/+*= trulu°`')).to \
       eq('src/auiyc-trulu.org')
+    expect(Neruda::OrgFile.file_name('Tôto', true)).to \
+      eq('src/blog/toto/content.org')
+    Neruda::Config.load_test('blog_path' => 'test')
+    expect(Neruda::OrgFile.file_name('Tôto', true)).to \
+      eq('src/test/toto/content.org')
   end
 end
 
@@ -60,10 +66,11 @@ describe 'Without a working file' do
   end
 
   it 'should return a new org file structure' do
+    now = DateTime.now
     o = Neruda::OrgFile.new('spec/data/__test__.org', title: 'test')
     expect(o.title).to eq('test')
-    expect(o.date).not_to be_nil
-    expect(o.date).to be_an_instance_of(DateTime)
+    o_date_str = o.date.strftime('%Y-%m-%d %H:%M')
+    expect(o_date_str).to eq(now.strftime('%Y-%m-%d %H:%M'))
     date = o.date.strftime('%Y-%m-%d %a. %H:%M:%S')
     expect(o.author).not_to be_nil
     expect(o.author).to be_an_instance_of(String)
@@ -144,6 +151,19 @@ describe 'With configuration' do
       eq('public_html/tutu/content.html')
     expect(Neruda::OrgFile.target_for_source('~/tata/blog/content.org')).to \
       eq('public_html/blog/content.html')
+  end
+
+  it 'should compute the right source path for theoritical targets' do
+    expect(Neruda::OrgFile.source_for_target('public_html/test.html')).to \
+      eq('src/test.org')
+    expect(Neruda::OrgFile.source_for_target('public_html/blog/test.html')).to \
+      eq('src/blog/test.org')
+    lp = 'public_html/blog/toto/tata.html'
+    expect(Neruda::OrgFile.source_for_target(lp)).to \
+      eq('src/blog/toto/tata.org')
+    lp = 'public_html/blog/toto/content.html'
+    expect(Neruda::OrgFile.source_for_target(lp)).to \
+      eq('src/blog/toto/content.org')
   end
 end
 # rubocop:enable Metric/BlockLength

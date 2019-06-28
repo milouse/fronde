@@ -144,8 +144,8 @@ end
 
 namespace :org do
   desc 'Download last version of org-mode'
-  task :download do |t|
-    verbose = t.application.options[:verbose]
+  task :download do
+    verbose = Rake::FileUtilsExt.verbose_flag
     org_version = Neruda::Config.org_last_version
     next if Neruda::Config.org_last_version.nil?
     next if Dir.exist?("org-#{org_version}/lisp")
@@ -180,5 +180,8 @@ namespace :org do
   end
 
   desc 'Install org'
-  task install: ['org:download', 'org-config.el']
+  task install: ['org:download', 'org-config.el'] do
+    mkdir_p "#{Neruda::Config.settings['public_folder']}/assets"
+    mkdir_p 'src'
+  end
 end

@@ -16,8 +16,7 @@ def run_webrick
   s = WEBrick::HTTPServer.new(options)
   routes.each do |req, dest|
     s.mount_proc req do |_, res|
-      displayfile = File.open(dest, 'r')
-      res.body = displayfile.read
+      res.body = IO.read(dest)
     end
   end
   ['TERM', 'QUIT', 'INT'].each { |sig| trap(sig, proc { s.shutdown }) }
@@ -46,10 +45,23 @@ def template_in_file?(head, content)
   false
 end
 
+def open_dom(file_name)
+  file = File.new file_name, 'r'
+  dom = Nokogiri::HTML file
+  file.close
+  dom
+end
+
+def write_dom(file_name, dom)
+  file = File.new file_name, 'w'
+  dom.write_to file
+  file.close
+end
+
 def customize_output(org_file, file_name)
   templates = Neruda::Config.settings['templates']
   return if templates.nil? || templates.empty?
-  dom = Nokogiri::HTML(File.open(file_name, 'r'))
+  dom = open_dom(file_name)
   templates.each do |t|
     next unless t.has_key?('selector') && t.has_key?('content')
     if t.has_key?('path')
@@ -60,7 +72,7 @@ def customize_output(org_file, file_name)
     apply_template(dom.css(t['selector']), t['type'] || 'after',
                    org_file.format(t['content']))
   end
-  dom.write_to(File.open(file_name, 'w'))
+  write_dom(file_name, dom)
 end
 
 def emacs_command(file_name = nil, verbose = true)
@@ -82,7 +94,6 @@ namespace :site do
   task :index do
     blog_path = Neruda::Config.settings['blog_path']
     next unless Dir.exist?("src/#{blog_path}")
-    mkdir_p ['src/tags', "#{Neruda::Config.settings['public_folder']}/feeds"]
     index = Neruda::Index.new(Dir.glob("src/#{blog_path}/*/content.org"))
     verbose = Rake::FileUtilsExt.verbose_flag
     if verbose
@@ -96,21 +107,21 @@ namespace :site do
   end
 
   desc 'Customize HTML output for a given file'
-  task :customize_output, :target do |t, args|
+  task :customize_output, :target do |_, args|
     if args[:target].nil?
       warn 'No source file given'
       next
     end
-    verbose = t.application.options[:verbose]
     source = Neruda::OrgFile.source_for_target(args[:target])
-    warn "Customizing file #{args[:target]} from #{source}" if verbose
+    if Rake::FileUtilsExt.verbose_flag
+      warn "Customizing file #{args[:target]} from #{source}"
+    end
     customize_output(Neruda::OrgFile.new(source), args[:target])
-    Neruda::Utils.puts_point unless verbose
   end
 
   desc 'Convert one or all org files'
-  task :build, :target do |t, args|
-    if t.application.options[:verbose]
+  task :build, :target do |_, args|
+    if Rake::FileUtilsExt.verbose_flag
       sh emacs_command(args[:target])
       next
     end
@@ -120,8 +131,10 @@ namespace :site do
     Neruda::Utils.throbber(build, 'Publishing:')
   end
 
+  # :nocov:
   desc 'Start a test server'
   task :preview do
     run_webrick
   end
+  # :nocov:
 end

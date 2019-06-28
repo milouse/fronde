@@ -18,10 +18,10 @@ module PabloCommands
     cnf.delete(:blog)
     cnf.transform_keys!(&:to_s)
     Neruda::Config.save(Neruda::Config.settings.merge(cnf))
-    o = Neruda::OrgFile.new('src/index.org', @options)
-    o.write unless File.exist? 'src/index.org'
     @rake.options.build_all = true
     @rake.invoke_task('org:install')
+    o = Neruda::OrgFile.new('src/index.org', @options)
+    o.write unless File.exist? 'src/index.org'
   end
   alias pablo_config pablo_init
 
@@ -57,19 +57,12 @@ end
 class Pablo
   def initialize(opts = {})
     @options = { verbose: false }.merge(opts)
-    # Be sure required directories are always there
-    init_path
     init_rake
   end
 
   include PabloCommands
 
   private
-
-  def init_path
-    FileUtils.mkdir_p "#{Neruda::Config.settings['public_folder']}/assets"
-    FileUtils.mkdir_p 'src'
-  end
 
   def init_rake
     init_rakefile unless File.exist?('Rakefile')
@@ -93,9 +86,7 @@ class Pablo
 
       task default: 'site:build'
     RAKE
-    File.open('Rakefile', 'w') do |f|
-      f.puts rakefile
-    end
+    IO.write 'Rakefile', rakefile
   end
 end
 

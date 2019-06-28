@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'cgi'
+require 'fileutils'
 require 'digest/md5'
 require 'neruda/config'
 require 'neruda/org_file'
@@ -10,11 +11,7 @@ module Neruda
   module Atom
     def atom_header(title = nil)
       domain = Neruda::Config.settings['domain']
-      if Neruda::Config.settings['TEST'] == 'test'
-        upddate = DateTime.strptime('1987-03-23 10:42:42', '%Y-%m-%d %H:%M:%S')
-      else
-        upddate = DateTime.now.rfc3339
-      end
+      upddate = @date.rfc3339
       slug = Neruda::OrgFile.slug(title)
       tagurl = "#{domain}/tags/#{slug}.html"
       if title == 'index'
@@ -63,12 +60,15 @@ end
 module Neruda
   # Generates OrgFile listings around their keywords
   class Index
+    attr_reader :date
+
     def initialize(file_list)
       @sources = file_list
       @index = { 'index' => [] }
       @slugs = { 'index' => 'index' }
       @blog_path = Neruda::Config.settings['blog_path']
       @pubdir = Neruda::Config.settings['public_folder']
+      @date = DateTime.now
       generate
     end
 
@@ -103,19 +103,17 @@ module Neruda
     end
 
     def write(index_name)
+      FileUtils.mkdir_p 'src/tags' unless index_name == 'index'
       src = index_source_path(index_name)
-      File.open(src, 'w') do |f|
-        f.puts to_s(index_name)
-      end
+      IO.write(src, to_s(index_name))
       src
     end
 
     def write_atom(index_name)
       slug = @slugs[index_name]
+      FileUtils.mkdir_p "#{@pubdir}/feeds"
       atomdest = "#{@pubdir}/feeds/#{slug}.xml"
-      File.open(atomdest, 'w') do |f|
-        f.puts to_atom(index_name)
-      end
+      IO.write(atomdest, to_atom(index_name))
       atomdest
     end
 

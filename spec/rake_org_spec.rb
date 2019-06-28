@@ -6,33 +6,49 @@ require 'fileutils'
 
 describe 'With working org files' do
   before(:all) do
+    init_testing_website
     @org_dir = "org-#{Neruda::Config.org_last_version}"
-    Dir.chdir 'spec/data'
-    rakefile = <<~RAKE
-      # frozen_string_literal: true
-
-      Dir.pwd
-      Dir.glob('../../lib/tasks/*.rake').each { |r| import r }
-
-      Neruda::Config.load_test('TEST' => 'test')
-
-      task default: 'site:build'
-    RAKE
-    IO.write('Rakefile', rakefile)
+    # When run with all other specs, config may have been already loaded
+    Neruda::Config.send(:load_settings)
     @rake = Rake.application
-    Rake.verbose(false)
     @rake.raw_load_rakefile
+    Rake.verbose(false)
+  end
+
+  before(:each) do
     @rake.options.build_all = true
+    @rake.tasks.each(&:reenable)
+  end
+
+  after(:each) do
+    FileUtils.rm 'org-config.el', force: true
   end
 
   after(:all) do
-    FileUtils.rm_r @org_dir, force: true
-    FileUtils.rm ['org-config.el', 'Rakefile'], force: true
+    Dir.chdir File.expand_path('../', __dir__)
+    FileUtils.rm_r 'spec/data/website_testing', force: true
   end
 
-  it 'Should do stuff' do
+  it 'should compile org-config.el' do
+    @rake.invoke_task('org-config.el')
+    expect(File.exist?('org-config.el')).to be(true)
+    proof = File.expand_path('data/org-config-proof.el', __dir__)
+    proof_content = IO.read(proof).gsub(/__TEST_DIR__/, Dir.pwd)
+    expect(IO.read('org-config.el')).to eq(proof_content)
+  end
+
+  it 'Should install org-mode', slow: true do
     @rake.invoke_task('org:install')
     expect(File.exist?('org-config.el')).to be(true)
-    expect(Dir.exist?(@org_dir)).to be(true)
+    expect(File.exist?("#{@org_dir}/lisp/org-loaddefs.el")).to be(true)
+  end
+
+  it 'Should install org-mode in verbose mode', slow: true do
+    # This one is mainly for coverage
+    FileUtils.rm_r @org_dir, force: true
+    Rake.verbose(true)
+    @rake.invoke_task('org:install')
+    expect(File.exist?('org-config.el')).to be(true)
+    expect(File.exist?("#{@org_dir}/lisp/org-loaddefs.el")).to be(true)
   end
 end

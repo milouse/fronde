@@ -63,10 +63,6 @@ module Neruda
       IO.write @file, @content
     end
 
-    def slug
-      Neruda::OrgFile.slug(@title)
-    end
-
     private
 
     def init_empty_file(opts)
@@ -176,10 +172,7 @@ module Neruda
         # file_name may be frozen...
         src = file_name.sub(/\.html$/, '.org')
         pubfolder = Neruda::Config.settings['public_folder']
-        src.sub!(/^#{pubfolder}\//, 'src/')
-        blogpath = Neruda::Config.settings['blog_path']
-        return src unless /\/#{blogpath}\//.match?(src)
-        src.sub(/\/index\.org$/, '/content.org')
+        src.sub(/^#{pubfolder}\//, 'src/')
       end
 
       def target_for_source(file_name)

@@ -30,7 +30,7 @@ SAMPLE_ATOM = <<~ATOM
   <title>Blog</title>
   <link href="http://perdu.com/feeds/index.xml" rel="self" type="application/atom+xml"/>
   <link href="http://perdu.com/blog" rel="alternate" type="text/html" title="Blog"/>
-  <updated>1987-03-23T10:42:42+00:00</updated>
+  <updated>%s</updated>
   <author><name>Test</name></author>
   <id>urn:md5:75d53866bcb20465b3287cf237234464</id>
   <generator uri="https://fossil.deparis.io/neruda">Neruda</generator>
@@ -70,11 +70,12 @@ SAMPLE_ATOM = <<~ATOM
 ATOM
 
 describe 'With working org files' do
-  before(:all) do
-    Neruda::Config.load_test('TEST' => 'test',
-                             'title' => 'Blog',
+  before(:each) do
+    Neruda::Config.load_test('title' => 'Blog',
                              'author' => 'Test',
+                             'public_path' => 'spec/data/indexes',
                              'domain' => 'http://perdu.com')
+    @now = DateTime.now
     @index = Neruda::Index.new(['spec/data/test1.org',
                                 'spec/data/test2.org',
                                 'spec/data/test3.org'])
@@ -89,6 +90,44 @@ describe 'With working org files' do
   end
 
   it 'should generate an atom feed' do
-    expect(@index.to_atom).to eq(SAMPLE_ATOM.strip)
+    index_date_str = @index.date.strftime('%Y-%m-%d %H:%M')
+    expect(index_date_str).to eq(@now.strftime('%Y-%m-%d %H:%M'))
+    expect(@index.to_atom).to eq(SAMPLE_ATOM.strip % @index.date.rfc3339)
+  end
+
+  describe 'when trying to save them' do
+    before(:each) do
+      FileUtils.mkdir_p 'spec/data/indexes/src/blog'
+      Dir.chdir 'spec/data/indexes'
+    end
+
+    after(:each) do
+      Dir.chdir File.expand_path('../', __dir__)
+      FileUtils.rm_r 'spec/data/indexes', force: true
+    end
+
+    it 'should correctly save one index' do
+      @index.write('index')
+      expect(File.exist?('src/blog/index.org')).to be(true)
+      expect(IO.read('src/blog/index.org')).to \
+        eq(SAMPLE_INDEX.strip)
+    end
+
+    it 'should correctly save one atom feed' do
+      @index.write_atom('index')
+      expect(File.exist?('public_html/feeds/index.xml')).to be(true)
+      expect(IO.read('public_html/feeds/index.xml')).to \
+        eq(SAMPLE_ATOM.strip % @index.date.rfc3339)
+    end
+
+    it 'should write it all' do
+      @index.write_all
+      expect(File.exist?('src/blog/index.org')).to be(true)
+      expect(File.exist?('src/tags/toto.org')).to be(true)
+      expect(File.exist?('src/tags/tutu.org')).to be(true)
+      expect(File.exist?('public_html/feeds/index.xml')).to be(true)
+      expect(File.exist?('public_html/feeds/toto.xml')).to be(true)
+      expect(File.exist?('public_html/feeds/tutu.xml')).to be(true)
+    end
   end
 end
