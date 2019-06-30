@@ -7,6 +7,7 @@ require 'neruda/index'
 require 'neruda/utils'
 require 'neruda/org_file'
 
+# :nocov:
 def run_webrick
   # Inspired by ruby un.rb library, which allows normally to start a
   # webrick server in one line: ruby -run -e httpd public_html -p 5000
@@ -22,6 +23,7 @@ def run_webrick
   ['TERM', 'QUIT', 'INT'].each { |sig| trap(sig, proc { s.shutdown }) }
   s.start
 end
+# :nocov:
 
 def apply_template(elem, position, content)
   elem.each do |e|

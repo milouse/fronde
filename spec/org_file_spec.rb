@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# rubocop:disable Style/FormatStringToken, Metric/LineLength
+# rubocop:disable Style/FormatStringToken
 describe 'With working org files' do
   it 'should parse without date' do
     o = Neruda::OrgFile.new('spec/data/test1.org')
@@ -29,7 +29,7 @@ describe 'With working org files' do
     expect(o.format('%i - (%t)')).to eq('2019-06-11 - (My third article)')
   end
 end
-# rubocop:enable Style/FormatStringToken, Metric/LineLength
+# rubocop:enable Style/FormatStringToken
 
 describe 'With various titles' do
   it 'should transliterate them into slugs' do
@@ -87,7 +87,6 @@ describe 'Without a working file' do
   end
 end
 
-# rubocop:disable Metric/BlockLength
 describe 'With configuration' do
   after(:each) do
     # Reset config
@@ -166,4 +165,3 @@ describe 'With configuration' do
       eq('src/blog/toto/content.org')
   end
 end
-# rubocop:enable Metric/BlockLength

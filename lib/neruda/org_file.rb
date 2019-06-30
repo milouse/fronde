@@ -7,8 +7,51 @@ require 'neruda/index'
 module Neruda
   # Eases org files handling and decoration
   class OrgFile
-    attr_reader :title, :date, :author, :keywords, :lang,
-                :file, :html_file, :url, :excerpt
+    # @return [String] the title of the current org document, taken from
+    #   the `#+title:` header.
+    attr_reader :title
+
+    # @return [DateTime] the date and time of the current org document,
+    #   taken from the `#+date:` header.
+    attr_reader :date
+
+    # The author of the current org document, taken from the `#+author:`
+    #   header.
+    #
+    # If the current document doesn't have any authorship information,
+    # the one from the `config.yml` file will be used instead
+    #
+    # @return [String] the author name
+    attr_reader :author
+
+    # @return [Array] the keywords list of the current org document,
+    #   taken from the `#+keywords:` header.
+    attr_reader :keywords
+
+    # The locale of the current org document, taken from the
+    #   `#+language:` header.
+    #
+    # If the current document doesn't have any language information, the
+    # one from the `config.yml` file will be used instead, or "en" by
+    # default.
+    #
+    # @return [String] the document lang
+    attr_reader :lang
+
+    # @return [String] the relative path to the source of this document.
+    attr_reader :file
+
+    # @return [String] the relative path to the generated html file of
+    #   this document.
+    attr_reader :html_file
+
+    # @return [String] the url of this document, build from the `domain`
+    #   settings and the above {#html_file} attribute.
+    attr_reader :url
+
+    # @return [String] the description of this org document, taken from
+    #   the `#+description:` header.
+    attr_reader :excerpt
 
     def initialize(file_name, opts = {})
       if file_name.nil? || file_name == ''
