@@ -1,4 +1,5 @@
 .ruby-gemset
 coverage
+doc
 tmp
 neruda-*.gem
