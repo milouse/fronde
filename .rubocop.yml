@@ -10,9 +10,13 @@ Metrics/AbcSize:
 
 Metrics/BlockLength:
   Max: 30
+  Exclude:
+  - spec/*
 
 Metrics/LineLength:
   Max: 80
+  Exclude:
+  - spec/*
 
 Metrics/MethodLength:
   Max: 15
