@@ -2,7 +2,6 @@
 
 require 'rake'
 require 'open-uri'
-require 'fileutils'
 
 describe 'With working org files' do
   before(:all) do

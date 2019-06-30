@@ -1,8 +1,13 @@
 # frozen_string_literal: true
 
+require 'fileutils'
+require 'simplecov'
+
+require 'r18n-core'
+R18n.set('en', File.expand_path('../locales', __dir__))
+
 $LOAD_PATH.unshift('./lib')
 
-require 'simplecov'
 SimpleCov.start do
   add_group 'Core libs', 'lib/neruda'
   add_group 'Rake tasks', 'lib/tasks'
@@ -11,9 +16,6 @@ end
 
 # The following requires other components automatically
 require 'neruda/org_file'
-
-require 'r18n-core'
-R18n.set('en', File.expand_path('../locales', __dir__))
 
 def init_testing_website
   FileUtils.mkdir_p 'spec/data/website_testing'
@@ -48,7 +50,7 @@ def init_testing_website
   IO.write('config.yml', config)
 end
 
-def install_testing_rake
+def init_rake_and_install_org
   # When run with all other specs, config may have been already loaded
   Neruda::Config.send(:load_settings)
   rake = Rake.application
