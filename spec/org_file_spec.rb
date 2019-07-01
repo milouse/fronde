@@ -2,7 +2,7 @@
 
 # rubocop:disable Style/FormatStringToken
 describe 'With working org files' do
-  it 'should parse without date' do
+  it 'should parse without date', core: true do
     o = Neruda::OrgFile.new('spec/data/test1.org')
     expect(o.title).to eq('My sweet article')
     expect(o.date).to be_nil
@@ -10,7 +10,7 @@ describe 'With working org files' do
     expect(o.format('%i - (%t)')).to eq(' - (My sweet article)')
   end
 
-  it 'should parse with a partial date' do
+  it 'should parse with a partial date', core: true do
     o = Neruda::OrgFile.new('spec/data/test2.org')
     expect(o.title).to eq('My second article')
     expect(o.date).to eq(DateTime.strptime('2019-06-11 00:00:00', '%Y-%m-%d %H:%M:%S'))
@@ -20,7 +20,7 @@ describe 'With working org files' do
     expect(o.lang).to eq('es')
   end
 
-  it 'should parse with a complete date' do
+  it 'should parse with a complete date', core: true do
     o = Neruda::OrgFile.new('spec/data/test3.org')
     expect(o.title).to eq('My third article')
     expect(o.date).to eq(DateTime.strptime('2019-06-11 23:42:10', '%Y-%m-%d %H:%M:%S'))
@@ -32,7 +32,7 @@ end
 # rubocop:enable Style/FormatStringToken
 
 describe 'With various titles' do
-  it 'should transliterate them into slugs' do
+  it 'should transliterate them into slugs', core: true do
     expect(Neruda::OrgFile.slug('toto')).to eq('toto')
     expect(Neruda::OrgFile.slug('TotO')).to eq('toto')
     expect(Neruda::OrgFile.slug('Tôto')).to eq('toto')
@@ -40,7 +40,7 @@ describe 'With various titles' do
     expect(Neruda::OrgFile.slug('ÀùïỸç/+*= trulu°`')).to eq('auiyc-trulu')
   end
 
-  it 'should give correct file_name' do
+  it 'should give correct file_name', core: true do
     expect(Neruda::OrgFile.file_name('toto')).to eq('src/toto.org')
     expect(Neruda::OrgFile.file_name('TotO')).to eq('src/toto.org')
     expect(Neruda::OrgFile.file_name('Tôto')).to eq('src/toto.org')
@@ -60,12 +60,12 @@ describe 'Without a working file' do
     FileUtils.rm 'spec/data/__test__.org', force: true
   end
 
-  it 'should raise if file_name is nil' do
+  it 'should raise if file_name is nil', core: true do
     expect { Neruda::OrgFile.new(nil) }.to raise_error(ArgumentError)
     expect { Neruda::OrgFile.new('') }.to raise_error(ArgumentError)
   end
 
-  it 'should return a new org file structure' do
+  it 'should return a new org file structure', core: true do
     now = DateTime.now
     o = Neruda::OrgFile.new('spec/data/__test__.org', title: 'test')
     expect(o.title).to eq('test')
@@ -93,7 +93,7 @@ describe 'With configuration' do
     Neruda::Config.load_test({})
   end
 
-  it 'should respect author name' do
+  it 'should respect author name', core: true do
     Neruda::Config.load_test('author' => 'Test')
     o = Neruda::OrgFile.new('spec/data/test1.org')
     expect(o.author).to eq('Test')
@@ -103,7 +103,7 @@ describe 'With configuration' do
     expect(o.author).to eq('Test')
   end
 
-  it 'should compute the right html_file path for existing sources' do
+  it 'should compute the right html_file path for existing sources', core: true do
     o = Neruda::OrgFile.new('spec/data/test1.org')
     expect(o.html_file).to eq('/data/test1.html')
     Neruda::Config.load_test('domain' => 'http://perdu.com')
@@ -120,7 +120,7 @@ describe 'With configuration' do
     expect(o.html_file).to eq('/data/content.html')
   end
 
-  it 'should compute the right url for existing sources' do
+  it 'should compute the right url for existing sources', core: true do
     o = Neruda::OrgFile.new('spec/data/test1.org')
     expect(o.url).to eq('/data/test1.html')
     Neruda::Config.load_test('domain' => 'http://perdu.com')
@@ -137,7 +137,7 @@ describe 'With configuration' do
     expect(o.url).to eq('http://perdu.com/data/content.html')
   end
 
-  it 'should compute the right html_file path for theoritical sources' do
+  it 'should compute the right html_file path for theoritical sources', core: true do
     expect(Neruda::OrgFile.target_for_source('src/test.org')).to \
       eq('public_html/test.html')
     expect(Neruda::OrgFile.target_for_source('src/blog/test.org')).to \
@@ -152,7 +152,7 @@ describe 'With configuration' do
       eq('public_html/blog/content.html')
   end
 
-  it 'should compute the right source path for theoritical targets' do
+  it 'should compute the right source path for theoritical targets', core: true do
     expect(Neruda::OrgFile.source_for_target('public_html/test.html')).to \
       eq('src/test.org')
     expect(Neruda::OrgFile.source_for_target('public_html/blog/test.html')).to \

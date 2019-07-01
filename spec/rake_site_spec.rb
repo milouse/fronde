@@ -30,18 +30,18 @@ describe 'With working org files' do
       FileUtils.rm 'public_html/index.html', force: true
     end
 
-    it 'should build something' do
+    it 'should build something', rake: true do
       @rake.invoke_task('site:build')
       expect(File.exist?('public_html/index.html')).to be(true)
     end
 
-    it 'should build something even in verbose mode' do
+    it 'should build something even in verbose mode', rake: true do
       Rake.verbose(true)
       @rake.invoke_task('site:build')
       expect(File.exist?('public_html/index.html')).to be(true)
     end
 
-    it 'should build one specific file' do
+    it 'should build one specific file', rake: true do
       o = Neruda::OrgFile.new('src/tutu.org', 'title' => 'Tutu test')
       o.write
       @rake.invoke_task('site:build[src/tutu.org]')
@@ -71,12 +71,12 @@ describe 'With working org files' do
       FileUtils.rm 'public_html/customize_test.html'
     end
 
-    it 'should return an error if no file is given' do
+    it 'should return an error if no file is given', rake: true do
       expect { @rake.invoke_task('site:customize_output') }.to \
         output("No source file given\n").to_stderr
     end
 
-    it 'should customize a given html file with simple template' do
+    it 'should customize a given html file with simple template', rake: true do
       Neruda::Config.load_test(
         'templates' => [
           { 'selector' => 'title',
@@ -101,7 +101,7 @@ describe 'With working org files' do
       expect(IO.read('public_html/customize_test.html')).to eq(result)
     end
 
-    it 'should customize a given html file with before' do
+    it 'should customize a given html file with before', rake: true do
       Neruda::Config.load_test(
         'templates' => [
           { 'selector' => 'title',
@@ -127,7 +127,7 @@ describe 'With working org files' do
       expect(IO.read('public_html/customize_test.html')).to eq(result)
     end
 
-    it 'should customize a given html file with after' do
+    it 'should customize a given html file with after', rake: true do
       Neruda::Config.load_test(
         'templates' => [
           { 'selector' => 'title',
@@ -154,7 +154,7 @@ describe 'With working org files' do
       expect(IO.read('public_html/customize_test.html')).to eq(result)
     end
 
-    it 'should customize a given html file with replace content' do
+    it 'should customize a given html file with replace content', rake: true do
       Neruda::Config.load_test(
         'templates' => [
           { 'selector' => 'body>h1',
@@ -223,7 +223,7 @@ describe 'With working org files' do
         FileUtils.rm_r 'public_html/customize', force: true
       end
 
-      it 'should customize a file on a specific path' do
+      it 'should customize a file on a specific path', rake: true do
         @rake.invoke_task('site:customize_output[public_html/customize_test.html]')
         expect(IO.read('public_html/customize_test.html')).to eq(@html_base)
         @rake.options.build_all = true
@@ -232,7 +232,7 @@ describe 'With working org files' do
         expect(IO.read('public_html/customize/test.html')).to eq(@result)
       end
 
-      it 'should not customize twice a file' do
+      it 'should not customize twice a file', rake: true do
         @rake.invoke_task('site:customize_output[public_html/customize/test.html]')
         expect(IO.read('public_html/customize/test.html')).to eq(@result)
         @rake.options.build_all = true
@@ -285,7 +285,7 @@ describe 'Generate indexes process' do
     FileUtils.rm_r 'spec/data/website_testing', force: true
   end
 
-  it 'should not generate index without blog folder' do
+  it 'should not generate index without blog folder', rake: true do
     expect(File.exist?('src/news/test1.org')).to be(true)
     @rake.invoke_task('site:index')
     expect(File.exist?('public_html/tags/toto.html')).to be(false)
@@ -295,7 +295,7 @@ describe 'Generate indexes process' do
     expect(File.exist?('public_html/feeds/tata.xml')).to be(false)
   end
 
-  it 'should not generate index without blog folder when calling build' do
+  it 'should not generate index without blog folder when calling build', rake: true do
     expect(File.exist?('src/news/test1.org')).to be(true)
     @rake.invoke_task('site:build')
     expect(File.exist?('public_html/tags/toto.html')).to be(false)
@@ -305,7 +305,7 @@ describe 'Generate indexes process' do
     expect(File.exist?('public_html/feeds/tata.xml')).to be(false)
   end
 
-  it 'should generate indexes with a correct blog path' do
+  it 'should generate indexes with a correct blog path', rake: true do
     expect(File.exist?('src/news/test1.org')).to be(true)
     Neruda::Config.load_test('blog_path' => 'news')
     @rake.invoke_task('site:index')
@@ -316,7 +316,7 @@ describe 'Generate indexes process' do
     expect(File.exist?('public_html/feeds/tata.xml')).to be(true)
   end
 
-  it 'should generate indexes with a correct blog path, even with build' do
+  it 'should generate indexes with a correct blog path, even with build', rake: true do
     expect(File.exist?('src/news/test1.org')).to be(true)
     Neruda::Config.load_test('blog_path' => 'news')
     @rake.invoke_task('site:build')

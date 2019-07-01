@@ -28,7 +28,7 @@ describe 'With working org files' do
     FileUtils.rm_r 'spec/data/website_testing', force: true
   end
 
-  it 'should compile org-config.el' do
+  it 'should compile org-config.el', rake: true do
     @rake.invoke_task('org-config.el')
     expect(File.exist?('org-config.el')).to be(true)
     proof = File.expand_path('data/org-config-proof.el', __dir__)
@@ -36,13 +36,13 @@ describe 'With working org files' do
     expect(IO.read('org-config.el')).to eq(proof_content)
   end
 
-  it 'Should install org-mode', slow: true do
+  it 'Should install org-mode', rake: true do
     @rake.invoke_task('org:install')
     expect(File.exist?('org-config.el')).to be(true)
     expect(File.exist?("#{@org_dir}/lisp/org-loaddefs.el")).to be(true)
   end
 
-  it 'Should install org-mode in verbose mode', slow: true do
+  it 'Should install org-mode in verbose mode', rake: true do
     # This one is mainly for coverage
     FileUtils.rm_r @org_dir, force: true
     Rake.verbose(true)

@@ -81,15 +81,15 @@ describe 'With working org files' do
                                 'spec/data/test3.org'])
   end
 
-  it 'should have generated three indexes' do
+  it 'should have generated three indexes', core: true do
     expect(@index.entries.length).to eq(3)
   end
 
-  it 'should generate a main index' do
+  it 'should generate a main index', core: true do
     expect(@index.to_s).to eq(SAMPLE_INDEX.strip)
   end
 
-  it 'should generate an atom feed' do
+  it 'should generate an atom feed', core: true do
     index_date_str = @index.date.strftime('%Y-%m-%d %H:%M')
     expect(index_date_str).to eq(@now.strftime('%Y-%m-%d %H:%M'))
     expect(@index.to_atom).to eq(SAMPLE_ATOM.strip % @index.date.rfc3339)
@@ -106,21 +106,21 @@ describe 'With working org files' do
       FileUtils.rm_r 'spec/data/indexes', force: true
     end
 
-    it 'should correctly save one index' do
+    it 'should correctly save one index', core: true do
       @index.write('index')
       expect(File.exist?('src/blog/index.org')).to be(true)
       expect(IO.read('src/blog/index.org')).to \
         eq(SAMPLE_INDEX.strip)
     end
 
-    it 'should correctly save one atom feed' do
+    it 'should correctly save one atom feed', core: true do
       @index.write_atom('index')
       expect(File.exist?('public_html/feeds/index.xml')).to be(true)
       expect(IO.read('public_html/feeds/index.xml')).to \
         eq(SAMPLE_ATOM.strip % @index.date.rfc3339)
     end
 
-    it 'should write it all' do
+    it 'should write it all', core: true do
       @index.write_all
       expect(File.exist?('src/blog/index.org')).to be(true)
       expect(File.exist?('src/tags/toto.org')).to be(true)
