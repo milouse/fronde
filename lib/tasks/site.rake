@@ -121,16 +121,23 @@ namespace :site do
     customize_output(Neruda::OrgFile.new(source), args[:target])
   end
 
-  desc 'Convert one or all org files'
-  task :build, :target do |_, args|
-    if Rake::FileUtilsExt.verbose_flag
-      sh emacs_command(args[:target])
-      next
-    end
+  desc 'Convert all org files'
+  task build: :index do
     build = Thread.new do
-      sh emacs_command(args[:target], false)
+      sh emacs_command(nil, Rake::FileUtilsExt.verbose_flag)
     end
     Neruda::Utils.throbber(build, 'Publishing:')
+  end
+
+  namespace :build do
+    desc 'Convert one org file'
+    task :one, :target do |_, args|
+      if args[:target].nil?
+        warn 'No source file given'
+        next
+      end
+      sh emacs_command(args[:target], Rake::FileUtilsExt.verbose_flag)
+    end
   end
 
   # :nocov:

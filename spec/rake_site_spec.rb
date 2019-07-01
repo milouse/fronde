@@ -44,9 +44,14 @@ describe 'With working org files' do
     it 'should build one specific file', rake: true do
       o = Neruda::OrgFile.new('src/tutu.org', 'title' => 'Tutu test')
       o.write
-      @rake.invoke_task('site:build[src/tutu.org]')
+      @rake.invoke_task('site:build:one[src/tutu.org]')
       expect(File.exist?('public_html/index.html')).to be(false)
       expect(File.exist?('public_html/tutu.html')).to be(true)
+    end
+
+    it 'should return an error if no file is given in build:one', rake: true do
+      expect { @rake.invoke_task('site:build:one') }.to \
+        output("No source file given\n").to_stderr
     end
   end
 
@@ -254,21 +259,21 @@ describe 'Generate indexes process' do
       My website
     ORG
     IO.write('src/index.org', org_content)
-    FileUtils.mkdir_p 'src/news'
+    FileUtils.mkdir_p ['src/news/test1', 'src/news/test2']
     file1 = <<~ORG
       #+title: Index file
-      #+keywords: toto, tata
+      #+keywords: toto, titi
 
       My website
     ORG
-    IO.write('src/news/test1.org', file1)
+    IO.write('src/news/test1/content.org', file1)
     file2 = <<~ORG
       #+title: Index file
       #+keywords: toto
 
       My website
     ORG
-    IO.write('src/news/test2.org', file2)
+    IO.write('src/news/test2/content.org', file2)
   end
 
   before(:each) do
@@ -286,44 +291,58 @@ describe 'Generate indexes process' do
   end
 
   it 'should not generate index without blog folder', rake: true do
-    expect(File.exist?('src/news/test1.org')).to be(true)
     @rake.invoke_task('site:index')
-    expect(File.exist?('public_html/tags/toto.html')).to be(false)
-    expect(File.exist?('public_html/tags/tata.html')).to be(false)
+    expect(File.exist?('src/news/index.org')).to be(false)
+    expect(File.exist?('src/tags/toto.org')).to be(false)
+    expect(File.exist?('src/tags/titi.org')).to be(false)
     expect(File.exist?('public_html/feeds/index.xml')).to be(false)
     expect(File.exist?('public_html/feeds/toto.xml')).to be(false)
-    expect(File.exist?('public_html/feeds/tata.xml')).to be(false)
+    expect(File.exist?('public_html/feeds/titi.xml')).to be(false)
   end
 
   it 'should not generate index without blog folder when calling build', rake: true do
-    expect(File.exist?('src/news/test1.org')).to be(true)
     @rake.invoke_task('site:build')
+    expect(File.exist?('src/news/index.org')).to be(false)
+    expect(File.exist?('src/tags/toto.org')).to be(false)
+    expect(File.exist?('src/tags/titi.org')).to be(false)
+    expect(File.exist?('public_html/news/index.html')).to be(false)
     expect(File.exist?('public_html/tags/toto.html')).to be(false)
-    expect(File.exist?('public_html/tags/tata.html')).to be(false)
+    expect(File.exist?('public_html/tags/titi.html')).to be(false)
     expect(File.exist?('public_html/feeds/index.xml')).to be(false)
     expect(File.exist?('public_html/feeds/toto.xml')).to be(false)
-    expect(File.exist?('public_html/feeds/tata.xml')).to be(false)
+    expect(File.exist?('public_html/feeds/titi.xml')).to be(false)
   end
 
   it 'should generate indexes with a correct blog path', rake: true do
-    expect(File.exist?('src/news/test1.org')).to be(true)
     Neruda::Config.load_test('blog_path' => 'news')
     @rake.invoke_task('site:index')
-    expect(File.exist?('public_html/tags/toto.html')).to be(true)
-    expect(File.exist?('public_html/tags/tata.html')).to be(true)
+    expect(File.exist?('src/news/index.org')).to be(true)
+    expect(File.exist?('src/tags/toto.org')).to be(true)
+    expect(File.exist?('src/tags/titi.org')).to be(true)
     expect(File.exist?('public_html/feeds/index.xml')).to be(true)
     expect(File.exist?('public_html/feeds/toto.xml')).to be(true)
-    expect(File.exist?('public_html/feeds/tata.xml')).to be(true)
+    expect(File.exist?('public_html/feeds/titi.xml')).to be(true)
   end
 
   it 'should generate indexes with a correct blog path, even with build', rake: true do
-    expect(File.exist?('src/news/test1.org')).to be(true)
     Neruda::Config.load_test('blog_path' => 'news')
     @rake.invoke_task('site:build')
+    expect(File.exist?('src/news/index.org')).to be(true)
+    expect(File.exist?('src/tags/toto.org')).to be(true)
+    expect(File.exist?('src/tags/titi.org')).to be(true)
+    expect(File.exist?('public_html/news/index.html')).to be(true)
     expect(File.exist?('public_html/tags/toto.html')).to be(true)
-    expect(File.exist?('public_html/tags/tata.html')).to be(true)
+    expect(File.exist?('public_html/tags/titi.html')).to be(true)
     expect(File.exist?('public_html/feeds/index.xml')).to be(true)
     expect(File.exist?('public_html/feeds/toto.xml')).to be(true)
-    expect(File.exist?('public_html/feeds/tata.xml')).to be(true)
+    expect(File.exist?('public_html/feeds/titi.xml')).to be(true)
+  end
+
+  it 'should use website title for blog index', rake: true do
+    Neruda::Config.load_test('blog_path' => 'news', 'title' => 'Big title')
+    Rake.verbose(true) # Check this too
+    @rake.invoke_task('site:index')
+    expect(File.exist?('src/news/index.org')).to be(true)
+    expect(File.exist?('src/tags/toto.org')).to be(true)
   end
 end

@@ -9,13 +9,15 @@ require 'neruda/org_file'
 module Neruda
   # Embed Atom feeds sepecific methods
   module Atom
-    def atom_header(title = nil)
+    def atom_header(title)
       domain = Neruda::Config.settings['domain']
       upddate = @date.rfc3339
       slug = Neruda::OrgFile.slug(title)
       tagurl = "#{domain}/tags/#{slug}.html"
       if title == 'index'
-        title = Neruda::Config.settings['title']
+        if Neruda::Config.settings['title']
+          title = Neruda::Config.settings['title']
+        end
         tagurl = "#{domain}/#{@blog_path}"
       end
       title_esc = CGI.escapeHTML(title)

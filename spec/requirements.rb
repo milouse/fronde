@@ -23,6 +23,8 @@ def init_testing_website
   rakefile = <<~RAKE
     # frozen_string_literal: true
 
+    $LOAD_PATH.unshift('../../../lib')
+
     Dir.glob('../../../lib/tasks/*.rake').each { |r| import r }
 
     task default: 'site:build'
