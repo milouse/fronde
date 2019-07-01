@@ -30,8 +30,7 @@ Gem::Specification.new do |s|
                    'themes/default/css/style.css',
                    'themes/default/fonts/Yanone_Kaffeesatz_400.woff',
                    'themes/default/fonts/Yanone_Kaffeesatz_400.woff2',
-                   # Docs
-                   'docs/config.yml.example',
+                   # Others
                    'LICENSE']
   s.executables = ['pablo']
   s.homepage    = 'https://fossil.deparis.io/neruda/'
