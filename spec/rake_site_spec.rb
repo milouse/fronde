@@ -346,3 +346,71 @@ describe 'Generate indexes process' do
     expect(File.exist?('src/tags/toto.org')).to be(true)
   end
 end
+
+
+
+describe 'Generate indexes process with direct blog files' do
+  before(:all) do
+    init_testing_website
+    @rake = init_rake_and_install_org
+    org_content = <<~ORG
+      #+title: Index file
+
+      My website
+    ORG
+    IO.write('src/index.org', org_content)
+    FileUtils.mkdir_p ['src/news/test1', 'src/news/test2']
+    file1 = <<~ORG
+      #+title: Index file
+      #+keywords: toto, titi
+
+      My website
+    ORG
+    IO.write('src/news/test1.org', file1)
+    file2 = <<~ORG
+      #+title: Index file
+      #+keywords: toto
+
+      My website
+    ORG
+    IO.write('src/news/test2.org', file2)
+    Neruda::Config.load_test('blog_path' => 'news')
+  end
+
+  before(:each) do
+    @rake.options.build_all = true
+    @rake.tasks.each(&:reenable)
+  end
+
+  after(:each) do
+    FileUtils.rm_r ['tmp', 'src/tags', 'public_html'], force: true
+  end
+
+  after(:all) do
+    Dir.chdir File.expand_path('../', __dir__)
+    FileUtils.rm_r 'spec/data/website_testing', force: true
+  end
+
+  it 'should generate indexes with a correct blog path', rake: true do
+    @rake.invoke_task('site:index')
+    expect(File.exist?('src/news/index.org')).to be(true)
+    expect(File.exist?('src/tags/toto.org')).to be(true)
+    expect(File.exist?('src/tags/titi.org')).to be(true)
+    expect(File.exist?('public_html/feeds/index.xml')).to be(true)
+    expect(File.exist?('public_html/feeds/toto.xml')).to be(true)
+    expect(File.exist?('public_html/feeds/titi.xml')).to be(true)
+  end
+
+  it 'should generate indexes with a correct blog path, even with build', rake: true do
+    @rake.invoke_task('site:build')
+    expect(File.exist?('src/news/index.org')).to be(true)
+    expect(File.exist?('src/tags/toto.org')).to be(true)
+    expect(File.exist?('src/tags/titi.org')).to be(true)
+    expect(File.exist?('public_html/news/index.html')).to be(true)
+    expect(File.exist?('public_html/tags/toto.html')).to be(true)
+    expect(File.exist?('public_html/tags/titi.html')).to be(true)
+    expect(File.exist?('public_html/feeds/index.xml')).to be(true)
+    expect(File.exist?('public_html/feeds/toto.xml')).to be(true)
+    expect(File.exist?('public_html/feeds/titi.xml')).to be(true)
+  end
+end

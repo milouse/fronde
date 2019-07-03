@@ -96,7 +96,8 @@ namespace :site do
   task :index do
     blog_path = Neruda::Config.settings['blog_path']
     next unless Dir.exist?("src/#{blog_path}")
-    index = Neruda::Index.new(Dir.glob("src/#{blog_path}/*/content.org"))
+    blog_pattern = Neruda::Config.settings['blog_pattern']
+    index = Neruda::Index.new(Dir.glob("src/#{blog_pattern}"))
     verbose = Rake::FileUtilsExt.verbose_flag
     if verbose
       index.write_all

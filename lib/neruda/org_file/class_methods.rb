@@ -30,14 +30,6 @@ module Neruda
       "#{pubfolder}/#{subfolder}/#{leaf}"
     end
 
-    def file_name(title, for_blog = false)
-      title = 'new' if title.nil? || title == ''
-      filename = Neruda::OrgFile.slug title
-      return "src/#{filename}.org" unless for_blog
-      blog_path = Neruda::Config.settings['blog_path']
-      "src/#{blog_path}/#{filename}/content.org"
-    end
-
     def slug(title)
       title.downcase.gsub(' ', '-')
            .encode('ascii', fallback: ->(k) { translit(k) })

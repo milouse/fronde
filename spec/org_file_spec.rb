@@ -39,20 +39,6 @@ describe 'With various titles' do
     expect(Neruda::OrgFile.slug('Tôto tata')).to eq('toto-tata')
     expect(Neruda::OrgFile.slug('ÀùïỸç/+*= trulu°`')).to eq('auiyc-trulu')
   end
-
-  it 'should give correct file_name', core: true do
-    expect(Neruda::OrgFile.file_name('toto')).to eq('src/toto.org')
-    expect(Neruda::OrgFile.file_name('TotO')).to eq('src/toto.org')
-    expect(Neruda::OrgFile.file_name('Tôto')).to eq('src/toto.org')
-    expect(Neruda::OrgFile.file_name('Tôto tata')).to eq('src/toto-tata.org')
-    expect(Neruda::OrgFile.file_name('ÀùïỸç/+*= trulu°`')).to \
-      eq('src/auiyc-trulu.org')
-    expect(Neruda::OrgFile.file_name('Tôto', true)).to \
-      eq('src/blog/toto/content.org')
-    Neruda::Config.load_test('blog_path' => 'test')
-    expect(Neruda::OrgFile.file_name('Tôto', true)).to \
-      eq('src/test/toto/content.org')
-  end
 end
 
 describe 'Without a working file' do

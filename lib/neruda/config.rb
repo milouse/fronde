@@ -92,6 +92,7 @@ module Neruda
         @config['domain'] ||= ''
         @config['public_folder'] ||= 'public_html'
         @config['blog_path'] ||= 'blog'
+        @config['blog_pattern'] ||= "#{@config['blog_path']}/**/*.org"
         @config['templates'] ||= []
       end
     end

@@ -39,8 +39,7 @@ module PabloCommands
   end
 
   def pablo_open
-    filename = ARGV[0] || Neruda::OrgFile.file_name(@options[:title],
-                                                    @options[:blog])
+    filename = ARGV[0] || new_file_name
     FileUtils.mkdir_p File.dirname(filename)
     o = Neruda::OrgFile.new(filename, @options)
     o.write unless File.exist? filename
@@ -49,6 +48,17 @@ module PabloCommands
     cmd = [editor, filename]
     cmd.insert(1, '+6') if editor.match?(/^emacs/)
     system(*cmd)
+  end
+
+  private
+
+  def new_file_name
+    title = @options[:title]
+    title = 'new' if title.nil? || title == ''
+    filename = Neruda::OrgFile.slug title
+    return "#{filename}.org" unless @options[:blog]
+    blog_path = Neruda::Config.settings['blog_path']
+    "#{blog_path}/#{filename}"
   end
 end
 
