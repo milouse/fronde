@@ -9,7 +9,11 @@ require 'neruda/org_file/extracter'
 require 'neruda/org_file/htmlizer'
 
 module Neruda
-  # Eases org files handling and decoration
+  # Handles org files.
+  #
+  # This class is responsible for reading or writing existing or new org
+  # files, and formating their content to be used on the generated
+  # website.
   class OrgFile
     # @return [String] the title of the current org document, taken from
     #   the `#+title:` header.
