@@ -1,8 +1,12 @@
 # frozen_string_literal: true
 
 require 'time'
+require 'fileutils'
 require 'neruda/config'
 require 'neruda/index'
+require 'neruda/org_file/class_methods'
+require 'neruda/org_file/extracter'
+require 'neruda/org_file/htmlizer'
 
 module Neruda
   # Eases org files handling and decoration
@@ -53,6 +57,43 @@ module Neruda
     #   the `#+description:` header.
     attr_reader :excerpt
 
+    extend Neruda::OrgFileClassMethods
+
+    include Neruda::OrgFileExtracter
+    include Neruda::OrgFileHtmlizer
+
+    # Prepares the file named by `file_name` for read and write
+    #   operations.
+    #
+    # If the file `file_name` does not exist, the new instance may be
+    # populated by data given in the `opts` parameter.
+    #
+    # @example
+    #     File.exist? './test.org'
+    #     => true
+    #     o = Neruda::OrgFile.new('./test.org')
+    #     => #<Neruda::OrgFile @file='./test.org'...>
+    #     o.title
+    #     => "This is an existing test file"
+    #     File.exist? '/tmp/does_not_exist.org'
+    #     => false
+    #     o = Neruda::OrgFile.new('/tmp/does_not_exist.org')
+    #     => #<Neruda::OrgFile @file='/tmp/does_not_exist.org'...>
+    #     o.title
+    #     => ""
+    #     File.exist? '/tmp/other.org'
+    #     => false
+    #     o = Neruda::OrgFile.new('/tmp/other.org', 'title' => 'New file')
+    #     => #<Neruda::OrgFile @file='/tmp/other.org'...>
+    #     o.title
+    #     => "New file"
+    #
+    # @param file_name [String] path to the corresponding org mode file
+    # @param opts [Hash] optional data to initialize new org file
+    # @option opts [String] title ('') the title of the new org file
+    # @option opts [String] author (system user or '') the author of the
+    #   document
+    # @return [Neruda::OrgFile] the new instance of Neruda::OrgFile
     def initialize(file_name, opts = {})
       if file_name.nil? || file_name == ''
         raise ArgumentError, 'file_name is nil'
@@ -67,11 +108,52 @@ module Neruda
       end
     end
 
+    # Returns a String representation of the document date, which aims
+    #   to be used to sort several OrgFiles.
+    #
+    # The format used for the key is `%Y%m%d%H%M%S`. If the current
+    # OrgFile instance does not have a date, this mehod return
+    # `00000000000000`. If the current OrgFile instance does not have
+    # time information, the date is padded with zeros.
+    #
+    # @example with the org header `#+date: <2019-07-03 Wed 20:52:49>`
+    #     org_file.date
+    #     => #<DateTime: 2019-07-03T20:52:49+02:00...>
+    #     org_file.timekey
+    #     => "20190703205349"
+    #
+    # @example with the org header `#+date: <2019-07-03 Wed>`
+    #     org_file.date
+    #     => #<DateTime: 2019-07-03T00:00:00+02:00...>
+    #     org_file.timekey
+    #     => "20190703000000"
+    #
+    # @example with no date header in the org file
+    #     org_file.date
+    #     => nil
+    #     org_file.timekey
+    #     => "00000000000000"
+    #
+    # @return [String] the document key
     def timekey
       return '00000000000000' if @date.nil?
       @date.strftime('%Y%m%d%H%M%S')
     end
 
+    # Returns the current OrgFile instance DateTime as a String.
+    #
+    # This method accepts three values for the `dateformat` parameter:
+    #
+    # - `:full` (or `:long`) outputs a complete date and time
+    #   representation, localized through R18n;
+    # - `:short` outputs a short date representation (without time),
+    #   localized with R18n;
+    # - `:rfc3339` outputs the RFC 3339 date and time representation,
+    #   used in atom feed.
+    #
+    # @param dateformat [Symbol] the format to use to convert DateTime
+    #   into String
+    # @return [String] the document DateTime string representation
     def timestring(dateformat = :full)
       return '' if @date.nil?
       return R18n.l @date.to_date if dateformat == :short
@@ -80,10 +162,44 @@ module Neruda
       R18n.l @date, :full
     end
 
+    # Aliases {#timestring} with **:short** `dateformat`.
+    #
+    # @return [#timestring(:short)]
     def datestring
       timestring(:short)
     end
 
+    # Formats given `string` with values of the current OrgFile.
+    #
+    # This method expects to find percent-tags in the given `string` and
+    # replace them by their corresponding value.
+    #
+    # ## Format
+    #
+    # - **%a**: the raw author name;
+    # - **%A**: the HTML rendering of the author name, equivalent to
+    #           `<span class="author">%a</span>`;
+    # - **%d**: the `:short` date HTML representation, equivalent
+    #           to `<time datetime="%I">%i</time>`;
+    # - **%D**: the `:full` date and time HTML representation;
+    # - **%i**: the raw `:short` date and time;
+    # - **%I**: the raw `:rfc3339` date and time;
+    # - **%k**: the keywords separated by a comma;
+    # - **%K**: the HTML list rendering of the keywords;
+    # - **%l**: the lang of the document;
+    # - **%L**: the license information, taken from the
+    #           {Neruda::Config#settings};
+    # - **%t**: the title of the document;
+    # - **%u**: the web path to the related published HTML document;
+    # - **%x**: the raw description (eXcerpt);
+    # - **%X**: the description, enclosed in an HTML `p` tag, equivalent
+    #           to `<p>%x</p>`.
+    #
+    # @example
+    #     org_file.format("Article written by %a the %d")
+    #     => "Article written by Alice Smith the Wednesday 3rd July"
+    #
+    # @return [String] the given `string` after replacement occurs
     def format(string)
       license = Neruda::Config.settings['license'] || ''
       string.gsub('%a', @author)
@@ -102,7 +218,15 @@ module Neruda
             .gsub('%X', "<p>#{@excerpt}</p>")
     end
 
+    # Writes the current OrgFile content to the underlying file.
+    #
+    # The intermediate parent folders are created if necessary.
+    #
+    # @return [Integer] the length written (as returned by the
+    #   underlying `IO.write` method call)
     def write
+      file_dir = File.dirname @file
+      FileUtils.mkdir_p file_dir unless Dir.exist? file_dir
       IO.write @file, @content
     end
 
@@ -122,139 +246,6 @@ module Neruda
         #+language: #{@lang}
 
       ORG
-    end
-
-    def extract_data
-      @content = IO.read @file
-      @title = extract_title
-      @date = extract_date
-      @author = extract_author
-      @keywords = extract_keywords
-      @lang = extract_lang
-      @excerpt = extract_excerpt
-    end
-
-    def extract_date
-      m = /^#\+date: *<([0-9-]{10}) [\w.]+(?: ([0-9:]{8}))?> *$/i
-          .match(@content)
-      return nil if m.nil?
-      time = m[2] || '00:00:00'
-      DateTime.strptime("#{m[1]} #{time}", '%Y-%m-%d %H:%M:%S')
-    end
-
-    def extract_title
-      m = /^#\+title:(.+)$/i.match(@content)
-      return @file if m.nil?
-      m[1].strip
-    end
-
-    def default_author
-      Neruda::Config.settings['author'] || ENV['USER'] || ''
-    end
-
-    def extract_author
-      m = /^#\+author:(.+)$/i.match(@content)
-      return default_author if m.nil?
-      m[1].strip
-    end
-
-    def extract_keywords
-      m = /^#\+keywords:(.+)$/i.match(@content)
-      return [] if m.nil?
-      m[1].split(',').map(&:strip)
-    end
-
-    def extract_lang
-      m = /^#\+language:(.+)$/i.match(@content)
-      return Neruda::Config.settings['lang'] if m.nil?
-      m[1].strip
-    end
-
-    def extract_excerpt
-      @content.scan(/^#\+description:(.+)$/i).map { |l| l[0].strip }.join(' ')
-    end
-
-    def keywords_to_html
-      klist = @keywords.map do |k|
-        <<~KEYWORDLINK
-          <li class="keyword">
-            <a href="/tags/#{Neruda::OrgFile.slug(k)}.html">#{k}</a>
-          </li>
-        KEYWORDLINK
-      end.join
-      "<ul class=\"keywords-list\">#{klist}</ul>"
-    end
-
-    def date_to_html(dateformat = :full)
-      return '' if @date.nil?
-      "<time datetime=\"#{@date.rfc3339}\">#{timestring(dateformat)}</time>"
-    end
-
-    def author_to_html
-      return '' if @author == ''
-      "<span class=\"author\">#{@author}</span>"
-    end
-  end
-end
-
-module Neruda
-  # Class methods definitions
-  class OrgFile
-    class << self
-      def html_file(file_name)
-        path = Neruda::OrgFile.target_for_source(file_name)
-        pubfolder = Neruda::Config.settings['public_folder']
-        path.sub(/^#{pubfolder}\//, '/')
-      end
-
-      def html_file_with_domain(file_name)
-        Neruda::Config.settings['domain'] + html_file(file_name)
-      end
-
-      def source_for_target(file_name)
-        # file_name may be frozen...
-        src = file_name.sub(/\.html$/, '.org')
-        pubfolder = Neruda::Config.settings['public_folder']
-        src.sub(/^#{pubfolder}\//, 'src/')
-      end
-
-      def target_for_source(file_name)
-        # file_name may be frozen...
-        target = file_name.sub(/\.org$/, '.html')
-        pubfolder = Neruda::Config.settings['public_folder']
-        return target.sub(/^src\//, "#{pubfolder}/") if /^src\//.match?(target)
-        subfolder = File.basename(File.dirname(target))
-        leaf = File.basename(target)
-        "#{pubfolder}/#{subfolder}/#{leaf}"
-      end
-
-      def file_name(title, for_blog = false)
-        title = 'new' if title.nil? || title == ''
-        filename = Neruda::OrgFile.slug title
-        return "src/#{filename}.org" unless for_blog
-        blog_path = Neruda::Config.settings['blog_path']
-        "src/#{blog_path}/#{filename}/content.org"
-      end
-
-      def slug(title)
-        title.downcase.gsub(' ', '-')
-             .encode('ascii', fallback: ->(k) { translit(k) })
-             .gsub(/[^\w-]/, '').gsub(/-$/, '')
-      end
-
-      private
-
-      def translit(char)
-        return 'a' if ['á', 'à', 'â', 'ä', 'ǎ', 'ã', 'å'].include?(char)
-        return 'e' if ['é', 'è', 'ê', 'ë', 'ě', 'ẽ'].include?(char)
-        return 'i' if ['í', 'ì', 'î', 'ï', 'ǐ', 'ĩ'].include?(char)
-        return 'o' if ['ó', 'ò', 'ô', 'ö', 'ǒ', 'õ'].include?(char)
-        return 'u' if ['ú', 'ù', 'û', 'ü', 'ǔ', 'ũ'].include?(char)
-        return 'y' if ['ý', 'ỳ', 'ŷ', 'ÿ', 'ỹ'].include?(char)
-        return 'c' if char == 'ç'
-        return 'n' if char == 'ñ'
-        '-'
-      end
     end
   end
 end

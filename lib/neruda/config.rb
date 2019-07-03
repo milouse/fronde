@@ -42,7 +42,7 @@ module Neruda
       # parameter. Later call to {Neruda::Config#settings} will,
       # obviously, use these new settings.
       #
-      # @params [Hash] the settings to save
+      # @param new_config [Hash] the settings to save
       # @return [Hash] the new settings after save
       def save(new_config)
         IO.write 'config.yml', new_config.to_yaml
@@ -54,7 +54,7 @@ module Neruda
       # This method is handy for testing purpose. Later call to
       # {Neruda::Config#settings} will use these new settings.
       #
-      # @params [Hash] the settings to artificially load
+      # @param config [Hash] the settings to artificially load
       # @return [Hash] the new settings
       def load_test(config)
         @config = config
