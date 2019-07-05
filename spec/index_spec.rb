@@ -107,7 +107,7 @@ describe 'With working org files' do
     end
 
     it 'should correctly save one index', core: true do
-      @index.write('index')
+      @index.write_org('index')
       expect(File.exist?('src/blog/index.org')).to be(true)
       expect(IO.read('src/blog/index.org')).to \
         eq(SAMPLE_INDEX.strip)

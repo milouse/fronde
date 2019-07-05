@@ -13,6 +13,7 @@ Metrics/BlockLength:
   Exclude:
   - spec/*
   - lib/tasks/*
+  - neruda.gemspec
 
 Metrics/LineLength:
   Max: 80
@@ -27,6 +28,9 @@ Metrics/PerceivedComplexity:
 
 Metrics/CyclomaticComplexity:
   Max: 10
+
+Style/Alias:
+  EnforcedStyle: prefer_alias_method
 
 Style/ConditionalAssignment:
   EnforcedStyle: assign_inside_condition

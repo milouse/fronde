@@ -15,6 +15,8 @@ Gem::Specification.new do |s|
   s.email       = 'etienne@depar.is'
   s.files       = ['lib/neruda/config.rb',
                    'lib/neruda/index.rb',
+                   'lib/neruda/index/atom_generator.rb',
+                   'lib/neruda/index/org_generator.rb',
                    'lib/neruda/org_file.rb',
                    'lib/neruda/org_file/class_methods.rb',
                    'lib/neruda/org_file/extracter.rb',
