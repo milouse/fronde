@@ -3,21 +3,24 @@
 SAMPLE_INDEX = <<~IDX1
   #+title: Blog
   #+author: Test
+  #+language: en
 
   * 2019
   :PROPERTIES:
+  :HTML_CONTAINER_CLASS: index-year
   :UNNUMBERED: notoc
   :END:
 
-  - 2019-06-11: [[../data/test3.html][My third article]]
-  - 2019-06-11: [[../data/test2.html][My second article]]
+  - [[../data/test3.html][My third article]] / Published on 11th of June 23:42
+  - [[../data/test2.html][My second article]] / Published on 11th of June
 
-  * 0000
+  * Unsorted
   :PROPERTIES:
+  :HTML_CONTAINER_CLASS: index-year
   :UNNUMBERED: notoc
   :END:
 
-  - : [[../data/test1.html][My sweet article]]
+  - [[../data/test1.html][My sweet article]]
 IDX1
 
 SAMPLE_ATOM = <<~ATOM

@@ -14,10 +14,7 @@ module Neruda
           content << org_title(year)
           last_year = year
         end
-        line = ["- #{article.datestring}:",
-                "[[..#{article.html_file}][#{article.title}]]"]
-        line << "-- #{article.excerpt}" if article.excerpt != ''
-        content << line.join(' ')
+        content << org_entry(article)
       end
       content.join("\n")
     end
@@ -34,15 +31,23 @@ module Neruda
 
     def org_header(title = nil)
       title = Neruda::Config.settings['title'] if title == 'index'
-      author = Neruda::Config.settings['author']
       <<~HEADER
         #+title: #{title}
-        #+author: #{author}
+        #+author: #{Neruda::Config.settings['author']}
+        #+language: #{Neruda::Config.settings['lang']}
       HEADER
     end
 
+    def org_entry(article)
+      published = R18n.t.neruda.index.published_on(article.datestring(:human))
+      line = "- [[..#{article.html_file}][#{article.title}]]"
+      line += " / #{published}" if article.date
+      line += " \\\\\n  #{article.excerpt}" if article.excerpt != ''
+      line
+    end
+
     def org_title(year)
-      year = R18n.t('Unsorted') if year == '00000000000000'
+      year = R18n.t.neruda.index.unsorted if year == '0000'
       <<~ENDPROP
         * #{year}
         :PROPERTIES:

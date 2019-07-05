@@ -25,7 +25,7 @@ module Neruda
     # @return [String] the HTML `time` tag
     def date_to_html(dateformat = :full)
       return '' if @date.nil?
-      "<time datetime=\"#{@date.rfc3339}\">#{timestring(dateformat)}</time>"
+      "<time datetime=\"#{@date.rfc3339}\">#{datestring(dateformat)}</time>"
     end
 
     # Format {Neruda::OrgFile#author} in a HTML `span` tag with a

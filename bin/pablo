@@ -7,7 +7,7 @@ require 'r18n-core'
 require 'neruda/config'
 require 'neruda/version'
 
-R18n.set(Neruda::Config.settings['lang'] || 'en',
+R18n.set(Neruda::Config.settings['lang'],
          File.expand_path('../locales', __dir__))
 
 # Pablo commands
@@ -23,7 +23,7 @@ module PabloCommands
     o = Neruda::OrgFile.new('src/index.org', @options)
     o.write unless File.exist? 'src/index.org'
   end
-  alias pablo_config pablo_init
+  alias_method :pablo_config, :pablo_init
 
   def pablo_build(file = ARGV[0])
     @rake.options.build_all = true

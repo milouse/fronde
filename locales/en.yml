@@ -2,3 +2,7 @@
 pablo:
   error:
     no_command: 'ERROR: no command or unknown command given.'
+neruda:
+  index:
+    unsorted: Unsorted
+    published_on: Published on %1

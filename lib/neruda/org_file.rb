@@ -158,19 +158,18 @@ module Neruda
     # @param dateformat [Symbol] the format to use to convert DateTime
     #   into String
     # @return [String] the document DateTime string representation
-    def timestring(dateformat = :full)
+    def datestring(dateformat = :full)
       return '' if @date.nil?
       return R18n.l @date.to_date if dateformat == :short
+      if dateformat == :human
+        if @date.strftime('%H%M%S') == '000000'
+          return R18n.l @date.to_date, :human
+        end
+        return R18n.l @date, :human
+      end
       return @date.rfc3339 if dateformat == :rfc3339
       dateformat == :full if dateformat == :long
       R18n.l @date, :full
-    end
-
-    # Aliases {#timestring} with **:short** `dateformat`.
-    #
-    # @return [#timestring(:short)]
-    def datestring
-      timestring(:short)
     end
 
     # Formats given `string` with values of the current OrgFile.
@@ -210,8 +209,8 @@ module Neruda
             .gsub('%A', author_to_html)
             .gsub('%d', date_to_html(:short))
             .gsub('%D', date_to_html)
-            .gsub('%i', timestring(:short))
-            .gsub('%I', timestring(:rfc3339))
+            .gsub('%i', datestring(:short))
+            .gsub('%I', datestring(:rfc3339))
             .gsub('%k', @keywords.join(', '))
             .gsub('%K', keywords_to_html)
             .gsub('%l', @lang)

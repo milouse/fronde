@@ -74,7 +74,7 @@ module Neruda
           <link href="#{article.url}" rel="alternate" type="text/html"
                 title="#{title_esc}"/>
           <id>urn:md5:#{Digest::MD5.hexdigest(article.timekey)}</id>
-          <published>#{article.timestring(:rfc3339)}</published>
+          <published>#{article.datestring(:rfc3339)}</published>
           <author><name>#{CGI.escapeHTML(article.author)}</name></author>
           #{keywords}<content type="html">#{CGI.escapeHTML(article.excerpt)}</content>
         </entry>

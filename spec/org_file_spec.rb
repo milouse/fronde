@@ -15,7 +15,7 @@ describe 'With working org files' do
     expect(o.title).to eq('My second article')
     expect(o.date).to eq(DateTime.strptime('2019-06-11 00:00:00', '%Y-%m-%d %H:%M:%S'))
     expect(o.timekey).to eq('20190611000000')
-    expect(o.datestring).to eq('2019-06-11')
+    expect(o.datestring(:short)).to eq('2019-06-11')
     expect(o.format('%i - (%t)')).to eq('2019-06-11 - (My second article)')
     expect(o.lang).to eq('es')
   end
@@ -25,7 +25,7 @@ describe 'With working org files' do
     expect(o.title).to eq('My third article')
     expect(o.date).to eq(DateTime.strptime('2019-06-11 23:42:10', '%Y-%m-%d %H:%M:%S'))
     expect(o.timekey).to eq('20190611234210')
-    expect(o.datestring).to eq('2019-06-11')
+    expect(o.datestring(:short)).to eq('2019-06-11')
     expect(o.format('%i - (%t)')).to eq('2019-06-11 - (My third article)')
   end
 end
