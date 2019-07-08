@@ -60,16 +60,26 @@ def write_dom(file_name, dom)
   file.close
 end
 
+def check_path(file_name, pathes)
+  pub_folder = Neruda::Config.settings['public_folder']
+  if pathes.is_a?(Array)
+    pathes.each do |tp|
+      return true if File.fnmatch?("#{pub_folder}#{tp}",
+                                   file_name, File::FNM_DOTMATCH)
+    end
+    return false
+  end
+  File.fnmatch?("#{pub_folder}#{pathes}",
+                file_name, File::FNM_DOTMATCH)
+end
+
 def customize_output(org_file, file_name)
   templates = Neruda::Config.settings['templates']
   return if templates.nil? || templates.empty?
   dom = open_dom(file_name)
   templates.each do |t|
     next unless t.has_key?('selector') && t.has_key?('content')
-    if t.has_key?('path')
-      check_path = [Neruda::Config.settings['public_folder'], t['path']].join
-      next unless File.fnmatch?(check_path, file_name)
-    end
+    next if t.has_key?('path') && !check_path(file_name, t['path'])
     next if template_in_file?(dom.xpath('//head'), t['content'])
     apply_template(dom.css(t['selector']), t['type'] || 'after',
                    org_file.format(t['content']))
