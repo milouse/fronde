@@ -162,7 +162,6 @@ namespace :org do
       sh curl.join(' ')
       sh "tar xzf #{tarball}"
       File.unlink tarball
-      sh make.join(' ')
       sh((make + ['compile']).join(' '))
       sh((make + ['autoloads']).join(' '))
     end
