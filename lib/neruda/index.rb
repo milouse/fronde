@@ -16,14 +16,16 @@ module Neruda
     include Neruda::IndexAtomGenerator
     include Neruda::IndexOrgGenerator
 
-    def initialize(file_list)
-      @sources = file_list
-      @index = { 'index' => [] }
-      @slugs = { 'index' => 'index' }
+    def initialize(file_list = nil)
       @blog_path = Neruda::Config.settings['blog_path']
       @pubdir = Neruda::Config.settings['public_folder']
+      @index = { 'index' => [] }
+      @slugs = { 'index' => 'index' }
       @date = DateTime.now
-      generate
+      @sources = sources_list(file_list)
+      filter_and_prefix_sources!
+      @sources.each { |f| add_to_indexes(Neruda::OrgFile.new(f)) }
+      sort!
     end
 
     def entries
@@ -41,19 +43,34 @@ module Neruda
 
     private
 
+    def sources_list(file_list)
+      return file_list unless file_list.nil?
+      Dir.glob(Neruda::Config.settings['blog_pattern'],
+               base: "src/#{@blog_path}")
+    end
+
+    def filter_and_prefix_sources!
+      exclude = Neruda::Config.settings['exclude_pattern']
+      sources = []
+      @sources.each do |f|
+        next if f == 'index.org'
+        if File.exist?(f)
+          file_path = f
+        else
+          file_path = "src/#{@blog_path}/#{f}"
+          next unless File.exist?(file_path)
+        end
+        next if exclude && file_path.match(exclude)
+        sources << file_path
+      end
+      @sources = sources
+    end
+
     def index_source_path(index_name)
       slug = @slugs[index_name]
       src = ['src', 'tags', "#{slug}.org"]
       src[1] = @blog_path if slug == 'index'
       src.join('/')
-    end
-
-    def generate
-      @sources.each do |f|
-        next unless File.exist?(f)
-        add_to_indexes(Neruda::OrgFile.new(f))
-      end
-      sort!
     end
 
     def add_to_indexes(article)
