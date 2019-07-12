@@ -1,0 +1,19 @@
+#+title: Neruda
+#+lang: en
+#+keywords: static website generator, ruby, gem, org mode, emacs
+#+description: Neruda is a ruby gem, which helps you to manage your
+#+description: static website generated with org mode
+
+#+attr_html: :alt Pablo Neruda signature :style width:150px;float:right;
+[[file:media/Firma_Pablo_Neruda.svg]]
+
+* What's for?
+
+Neruda is a static website generator made for [[https://orgmode.org][org files]]. It improves the
+default org mode HTML exporting/publishing routine.
+
+* Features
+
+- Do not require any emacs lisp knowledge
+- Allow fine customization of generated html files
+- Switch between various themes
