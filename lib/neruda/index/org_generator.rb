@@ -40,7 +40,7 @@ module Neruda
 
     def org_entry(article)
       published = R18n.t.neruda.index.published_on(article.datestring(:human))
-      line = "- [[..#{article.html_file}][#{article.title}]]"
+      line = "- *[[..#{article.html_file}][#{article.title}]]*"
       line += " / #{published}" if article.date
       line += " \\\\\n  #{article.excerpt}" if article.excerpt != ''
       line
