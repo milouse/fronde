@@ -1,0 +1,6 @@
+^.byebug_history$
+^.ruby-gemset$
+^neruda-.*\.gem$
+^doc
+^coverage
+^.yardoc
