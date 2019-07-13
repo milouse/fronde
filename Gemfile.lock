@@ -12,6 +12,8 @@ GEM
     mini_portile2 (2.4.0)
     nokogiri (1.10.3)
       mini_portile2 (~> 2.4.0)
+    org-ruby (0.9.12)
+      rubypants (~> 0.2)
     parallel (1.17.0)
     parser (2.6.3.0)
       ast (~> 2.4.0)
@@ -45,6 +47,7 @@ GEM
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 1.4.0, < 1.7)
     ruby-progressbar (1.10.0)
+    rubypants (0.7.0)
     simplecov (0.16.1)
       docile (~> 1.1)
       json (>= 1.8, < 3)
@@ -59,6 +62,7 @@ PLATFORMS
 DEPENDENCIES
   byebug
   nokogiri (~> 1.10)
+  org-ruby
   pry
   pry-doc
   r18n-core (~> 3.2)
