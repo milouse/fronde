@@ -184,7 +184,7 @@ describe 'With working org files' do
       expect(IO.read('public_html/customize_test.html')).to eq(result)
     end
 
-    describe 'Multiple pass on customize' do
+    describe 'Multiple customize call' do
       before(:each) do
         FileUtils.mkdir_p 'public_html/customize'
         @html_base = <<~HTML
@@ -198,6 +198,7 @@ describe 'With working org files' do
             </body>
           </html>
         HTML
+        IO.write('public_html/customize/test.html', @html_base)
         @metatag = '<meta property="test" content="TEST">'
         @result = <<~RESULT
           <!DOCTYPE html>
@@ -213,7 +214,6 @@ describe 'With working org files' do
             </body>
           </html>
         RESULT
-        IO.write('public_html/customize/test.html', @html_base)
         Neruda::Config.load_test(
           'templates' => [
             { 'selector' => 'title',
@@ -244,6 +244,63 @@ describe 'With working org files' do
         @rake['site:customize_output'].reenable
         @rake.invoke_task('site:customize_output[public_html/customize/test.html]')
         expect(IO.read('public_html/customize/test.html')).to eq(@result)
+      end
+    end
+
+    describe 'Multiple path to customize' do
+      before(:each) do
+        FileUtils.mkdir_p ['public_html/customize', 'public_html/other']
+        @html_base = <<~HTML
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <title>My website</title>
+            </head>
+            <body>
+              <h1>My website</h1>
+            </body>
+          </html>
+        HTML
+        IO.write('public_html/customize/test.html', @html_base)
+        IO.write('public_html/other/file.html', @html_base)
+        @metatag = '<meta property="test" content="TEST">'
+        @result = <<~RESULT
+          <!DOCTYPE html>
+          <html>
+            <head>
+          <!-- Neruda Template: #{Digest::MD5.hexdigest(@metatag)} -->
+
+              <meta property="test" content="TEST">
+          <title>My website</title>
+            </head>
+            <body>
+              <h1>My website</h1>
+            </body>
+          </html>
+        RESULT
+        Neruda::Config.load_test(
+          'templates' => [
+            { 'selector' => 'title',
+              'path' => ['/customize/*', '/other/*'],
+              'type' => 'before',
+              'content' => @metatag }
+          ]
+        )
+      end
+
+      after(:each) do
+        FileUtils.rm_r ['public_html/customize', 'public_html/other'], force: true
+      end
+
+      it 'should customize a file on a specific path', rake: true do
+        @rake.invoke_task('site:customize_output[public_html/customize_test.html]')
+        expect(IO.read('public_html/customize_test.html')).to eq(@html_base)
+        @rake['site:customize_output'].reenable
+        @rake.invoke_task('site:customize_output[public_html/customize/test.html]')
+        expect(IO.read('public_html/customize/test.html')).to eq(@result)
+        @rake['site:customize_output'].reenable
+        @rake.invoke_task('site:customize_output[public_html/other/file.html]')
+        expect(IO.read('public_html/other/file.html')).to eq(@result)
       end
     end
   end
