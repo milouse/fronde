@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'yaml'
+require 'open-uri'
 
 module Neruda
   # Wrapper for configuration

@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require 'open-uri'
 # Neruda::Config is required by Neruda::Utils
 require 'neruda/utils'
 
