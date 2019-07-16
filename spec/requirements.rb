@@ -37,6 +37,7 @@ def init_testing_website
     title: This is a website about test
     exclude_pattern: tata\\.org
     org-html:
+      html-head-include-default-style: nil
       html-head: |
         <link rel="stylesheet" type="text/css" media="screen" href="style.css"/>
     external_sources:

@@ -49,8 +49,6 @@ Return output file name."
       org-confirm-babel-evaluate nil
       org-html-doctype "html5"
       org-html-html5-fancy t
-      org-html-head-include-default-style nil
-      org-html-head-include-scripts nil
       org-html-metadata-timestamp-format "%a %d %B %Y à %H:%M"
       org-html-text-markup-alist '((bold . "<strong>%s</strong>")
                                    (code . "<code>%s</code>")
@@ -68,7 +66,9 @@ Return output file name."
          :publishing-function pablo-publish-to-html-and-customize-output
          :section-numbers nil
          :with-toc nil
-         :html-head "<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\" href=\"style.css\"/>")
+         :html-head "<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\" href=\"style.css\"/>"
+         :html-head-include-default-style nil
+         :html-head-include-scripts nil)
         ("org-assets"
          :base-directory "__TEST_DIR__/src"
          :base-extension "jpg\\|gif\\|png\\|svg\\|pdf"
@@ -84,7 +84,9 @@ Return output file name."
          :publishing-function pablo-publish-to-html-and-customize-output
          :section-numbers nil
          :with-toc nil
-         :html-head "<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\" href=\"style.css\"/>")
+         :html-head "<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\" href=\"style.css\"/>"
+         :html-head-include-default-style nil
+         :html-head-include-scripts nil)
         ("test-assets"
          :base-directory "__TEST_DIR__/titi/test"
          :base-extension "jpg\\|gif\\|png\\|svg\\|pdf"
@@ -99,7 +101,9 @@ Return output file name."
          :publishing-function pablo-publish-to-html-and-customize-output
          :section-numbers nil
          :with-toc nil
-         :html-head "<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\" href=\"style.css\"/>")
+         :html-head "<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\" href=\"style.css\"/>"
+         :html-head-include-default-style nil
+         :html-head-include-scripts nil)
         ("tata-assets"
          :base-directory "__TEST_DIR__/titi/tutu/tata"
          :base-extension "jpg\\|gif\\|png\\|svg\\|pdf"
@@ -107,7 +111,7 @@ Return output file name."
          :publishing-directory "__TEST_DIR__/public_html/tata"
          :publishing-function org-publish-attachment)
         ("theme"
-         :base-directory "__TEST_DIR__/themes/"
+         :base-directory "__BASE_DIR__/themes/default"
          :base-extension "jpg\\|gif\\|png\\|js\\|css\\|otf\\|ttf\\|woff2?"
          :recursive t
          :publishing-directory "__TEST_DIR__/public_html/assets"
