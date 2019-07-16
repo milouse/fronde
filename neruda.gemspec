@@ -21,6 +21,8 @@ Gem::Specification.new do |s|
                    'lib/neruda/org_file/class_methods.rb',
                    'lib/neruda/org_file/extracter.rb',
                    'lib/neruda/org_file/htmlizer.rb',
+                   'lib/neruda/org_config_el.rb',
+                   'lib/neruda/org_config.el',
                    'lib/neruda/utils.rb',
                    'lib/neruda/version.rb',
                    # Rake tasks

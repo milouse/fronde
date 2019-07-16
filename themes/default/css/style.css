@@ -115,7 +115,7 @@ dl {margin: 0 0 1.5em 0;}
 dt {font-weight: bold;}
 dd {margin-left: 1.5em;}
 
-pre{background-color:  rgb(238, 238, 238); padding: 10px; margin: 10px; overflow: auto;}
+pre{padding: 10px; margin: 10px; overflow: auto;}
 
 /* Quotes */
 blockquote {
@@ -143,11 +143,11 @@ aside, nav, article, figure {
 *****************/
 header {
 	margin: 0 auto;
-	padding: 2.5em 0 0 0;
+	padding: 0 0 2.5em 0;
 }
 
 /* Banner */
-header h1 {font-size: 3.571em; line-height: 0;}
+header h1 {font-size: 3.571em;}
 
 /* Main Nav */
 header nav {
@@ -206,4 +206,9 @@ header nav li:first-child a {
 	border-radius: 10px;
 	-moz-border-radius: 10px;
 	-webkit-border-radius: 10px;
+}
+.org-src-container label.org-src-name {
+    display: block;
+    text-align: center;
+    font-size: smaller;
 }
