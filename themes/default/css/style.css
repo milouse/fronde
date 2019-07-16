@@ -4,7 +4,6 @@
  * inspired by https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/
  */
 
-
 /*
 	Name: Smashing HTML5
 	Date: July 2009
@@ -28,9 +27,6 @@
 		/* from https://fonts.gstatic.com/s/yanonekaffeesatz/v8/YDAoLskQQ5MOAgvHUQCcLfGwxTS8d1Q9KiDNCMKLFUM.woff2 */
 		url('../fonts/Yanone_Kaffeesatz_400.woff2') format('woff2');
 }
-
-@import url("reset.css");
-
 
 /***** Global *****/
 /* Body */
