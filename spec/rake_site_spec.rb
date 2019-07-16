@@ -404,8 +404,6 @@ describe 'Generate indexes process' do
   end
 end
 
-
-
 describe 'Generate indexes process with direct blog files' do
   before(:all) do
     init_testing_website

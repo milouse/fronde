@@ -17,6 +17,7 @@ end
 # The following requires other components automatically
 require 'neruda/org_file'
 
+# rubocop:disable Metrics/MethodLength
 def init_testing_website
   FileUtils.mkdir_p 'spec/data/website_testing'
   Dir.chdir 'spec/data/website_testing'
@@ -51,6 +52,7 @@ def init_testing_website
   CONF
   IO.write('config.yml', config)
 end
+# rubocop:enable Metrics/MethodLength
 
 def init_rake_and_install_org
   # When run with all other specs, config may have been already loaded
