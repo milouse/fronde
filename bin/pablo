@@ -4,7 +4,7 @@
 require 'rake'
 require 'optparse'
 require 'r18n-core'
-require 'neruda/config'
+require 'neruda/utils'
 require 'neruda/version'
 
 R18n.set(Neruda::Config.settings['lang'],
@@ -15,7 +15,7 @@ module PabloCommands
   def pablo_init
     cnf = @options.merge
     cnf.delete(:verbose)
-    cnf.delete(:blog)
+    cnf.delete(:directory)
     cnf.transform_keys!(&:to_s)
     Neruda::Config.save(Neruda::Config.settings.merge(cnf))
     @rake.options.build_all = true
@@ -50,13 +50,26 @@ module PabloCommands
     system(*cmd)
   end
 
+  def pablo_help(command = 'basic', error = false)
+    warn R18n.t.pablo.error.no_command if error
+    command = 'basic' unless Neruda::Utils::PABLO_COMMANDS.include?(command)
+    cmd_opt = Neruda::Utils::PABLO_COMMANDS[command]
+    label = cmd_opt[:label] || command
+    warn "Usage: pablo #{label} [options]\n\n"
+    warn cmd_opt[:desc] + "\n\n" if cmd_opt.has_key?(:desc)
+    warn "Options\n#{Neruda::Utils.summarize_command(command)}\n"
+    warn "Commands\n#{Neruda::Utils.list_commands}\n" if command == 'basic'
+    exit 1 if error
+    exit
+  end
+
   private
 
   def new_file_name
     title = @options[:title]
     title = 'new' if title.nil? || title == ''
     filename = Neruda::OrgFile.slug title
-    return "#{filename}.org" unless @options[:blog]
+    return "#{filename}.org" unless @options[:directory]
     blog_path = Neruda::Config.settings['blog_path']
     "#{blog_path}/#{filename}"
   end
@@ -99,55 +112,29 @@ class Pablo
   end
 end
 
-def pablo_help(banner)
-  warn banner
-  warn <<~HELP
-
-    Commands
-        open [path]  Open or create an org file for edition.
-
-    System Commands
-        init         Initialize your Neruda instance
-                     (you just need to do it once).
-        preview      Start a test webserver to preview
-                     your website on http://127.0.0.1:5000
-  HELP
-  exit
-end
-
 params = {}
 optparser = OptionParser.new do |opts|
-  opts.banner = <<~HELP
-    Usage: pablo [-v] <command>
-           pablo -h
-
-  HELP
   opts.version = Neruda::VERSION
-  opts.program_name = 'pablo (Neruda gem)'
-  opts.on '-aAUTHOR', '--author AUTHOR'
-  opts.on '-lLOCALE', '--lang LOCALE'
-  opts.on '-tTITLE', '--title TITLE'
-  opts.on '-b', '--blog'
-  opts.on_tail '-v', '--verbose'
-  opts.on_tail '-h', '--help'
-  opts.on_tail '-V', '--version'
+  Neruda::Utils::PABLO_OPTIONS.each do |k, opt|
+    short, long = Neruda::Utils.decorate_option(k)
+    opts.send(opt[:meth] || :on, short, long, opt[:desc])
+  end
 end
 optparser.parse!(into: params)
 
 if params[:version]
   warn optparser.ver
   exit
-elsif params[:help]
-  pablo_help optparser
 end
 
+if ARGV[0] == 'help'
+  params[:help] = true
+  ARGV.shift
+end
 pablo = Pablo.new(params)
 command = "pablo_#{ARGV[0]}".to_sym
-if command.nil? || !pablo.respond_to?(command)
-  warn R18n.t.pablo.error.no_command
-  pablo_help(optparser)
-  exit 1
-end
+err = command.nil? || !pablo.respond_to?(command)
+pablo.pablo_help(ARGV[0], err) if err || params[:help]
 ARGV.shift
 
 init_cmds = ['pablo_init', 'pablo_config']
