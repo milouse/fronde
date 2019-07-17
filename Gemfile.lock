@@ -71,6 +71,7 @@ DEPENDENCIES
   rspec
   rubocop
   simplecov
+  yard
 
 RUBY VERSION
    ruby 2.6.3p62

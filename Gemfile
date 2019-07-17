@@ -16,4 +16,5 @@ group :development do
   gem 'rspec'
   gem 'rubocop'
   gem 'simplecov'
+  gem 'yard'
 end

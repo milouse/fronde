@@ -24,7 +24,7 @@ module Neruda
       #   is running in the background.
       #
       # The animation is chosen among a bunch of themes, with the
-      # configuration option `throbber` (retrieved via
+      # configuration option ~throbber~ (retrieved via
       # {Neruda::Config#settings}).
       #
       # @example

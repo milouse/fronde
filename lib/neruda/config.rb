@@ -10,19 +10,23 @@ module Neruda
   # being build settings among different steps or tasks.
   #
   # It expects the website author to holds their custom settings in a
-  # YAML file named `config.yml` available at the root of their
+  # YAML file named ~config.yml~ available at the root of their
   # project.
   #
   # For example, with the given config file:
   #
-  #     ---
-  #     title: My website
-  #     author: Alice Doe
+  # #+begin_src
+  # ---
+  # title: My website
+  # author: Alice Doe
+  # #+end_src
   #
   # Settings will be available like this:
   #
-  #     Neruda::Config.settings['author']
-  #     => "Alice Doe"
+  # #+begin_src
+  # Neruda::Config.settings['author']
+  # => "Alice Doe"
+  # #+end_src
   class Config
     class << self
       # Access the current website settings
@@ -36,12 +40,13 @@ module Neruda
         @config
       end
 
-      # Save the settings given as a parameter to the `config.yml` file.
+      # Save the settings given as a parameter to the ~config.yml~ file.
       #
       # Not only this method overwrite the old settings, but it replace
       # the current shared settings with the ones given in
-      # parameter. Later call to {Neruda::Config#settings} will,
-      # obviously, use these new settings.
+      # parameter. Later call to
+      # {file:Neruda/Config.html#settings-class_method settings}
+      # will, obviously, use these new settings.
       #
       # @param new_config [Hash] the settings to save
       # @return [Hash] the new settings after save
@@ -50,10 +55,11 @@ module Neruda
         @config = new_config.freeze
       end
 
-      # Load the given settings as if they comes from the `config.yml` file.
+      # Load the given settings as if they comes from the ~config.yml~ file.
       #
       # This method is handy for testing purpose. Later call to
-      # {Neruda::Config#settings} will use these new settings.
+      # {file:Neruda/Config.html#settings-class_method settings} will
+      # use these new settings.
       #
       # @param config [Hash] the settings to artificially load
       # @return [Hash] the new settings

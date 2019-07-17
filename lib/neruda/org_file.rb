@@ -16,31 +16,31 @@ module Neruda
   # website.
   class OrgFile
     # @return [String] the title of the current org document, taken from
-    #   the `#+title:` header.
+    #   the ~#+title:~ header.
     attr_reader :title
 
     # @return [DateTime] the date and time of the current org document,
-    #   taken from the `#+date:` header.
+    #   taken from the ~#+date:~ header.
     attr_reader :date
 
-    # The author of the current org document, taken from the `#+author:`
+    # The author of the current org document, taken from the ~#+author:~
     #   header.
     #
     # If the current document doesn't have any authorship information,
-    # the one from the `config.yml` file will be used instead
+    # the one from the ~config.yml~ file will be used instead
     #
     # @return [String] the author name
     attr_reader :author
 
     # @return [Array] the keywords list of the current org document,
-    #   taken from the `#+keywords:` header.
+    #   taken from the ~#+keywords:~ header.
     attr_reader :keywords
 
     # The locale of the current org document, taken from the
-    #   `#+language:` header.
+    #   ~#+language:~ header.
     #
     # If the current document doesn't have any language information, the
-    # one from the `config.yml` file will be used instead, or "en" by
+    # one from the ~config.yml~ file will be used instead, or "en" by
     # default.
     #
     # @return [String] the document lang
@@ -53,12 +53,12 @@ module Neruda
     #   this document.
     attr_reader :html_file
 
-    # @return [String] the url of this document, build from the `domain`
-    #   settings and the above {#html_file} attribute.
+    # @return [String] the url of this document, build from the ~domain~
+    #   settings and the above {#html_file @html_file} attribute.
     attr_reader :url
 
     # @return [String] the description of this org document, taken from
-    #   the `#+description:` header.
+    #   the ~#+description:~ header.
     attr_reader :excerpt
 
     extend Neruda::OrgFileClassMethods
@@ -66,11 +66,11 @@ module Neruda
     include Neruda::OrgFileExtracter
     include Neruda::OrgFileHtmlizer
 
-    # Prepares the file named by `file_name` for read and write
+    # Prepares the file named by ~file_name~ for read and write
     #   operations.
     #
-    # If the file `file_name` does not exist, the new instance may be
-    # populated by data given in the `opts` parameter.
+    # If the file ~file_name~ does not exist, the new instance may be
+    # populated by data given in the ~opts~ parameter.
     #
     # @example
     #     File.exist? './test.org'
@@ -87,7 +87,7 @@ module Neruda
     #     => ""
     #     File.exist? '/tmp/other.org'
     #     => false
-    #     o = Neruda::OrgFile.new('/tmp/other.org', 'title' => 'New file')
+    #     o = Neruda::OrgFile.new('/tmp/other.org', title: 'New file')
     #     => #<Neruda::OrgFile @file='/tmp/other.org'...>
     #     o.title
     #     => "New file"
@@ -115,18 +115,18 @@ module Neruda
     # Returns a String representation of the document date, which aims
     #   to be used to sort several OrgFiles.
     #
-    # The format used for the key is `%Y%m%d%H%M%S`. If the current
+    # The format used for the key is ~%Y%m%d%H%M%S~. If the current
     # OrgFile instance does not have a date, this mehod return
-    # `00000000000000`. If the current OrgFile instance does not have
+    # ~00000000000000~. If the current OrgFile instance does not have
     # time information, the date is padded with zeros.
     #
-    # @example with the org header `#+date: <2019-07-03 Wed 20:52:49>`
+    # @example with the org header ~#+date: <2019-07-03 Wed 20:52:49>~
     #     org_file.date
     #     => #<DateTime: 2019-07-03T20:52:49+02:00...>
     #     org_file.timekey
     #     => "20190703205349"
     #
-    # @example with the org header `#+date: <2019-07-03 Wed>`
+    # @example with the org header ~#+date: <2019-07-03 Wed>~
     #     org_file.date
     #     => #<DateTime: 2019-07-03T00:00:00+02:00...>
     #     org_file.timekey
@@ -146,13 +146,13 @@ module Neruda
 
     # Returns the current OrgFile instance DateTime as a String.
     #
-    # This method accepts three values for the `dateformat` parameter:
+    # This method accepts three values for the ~dateformat~ parameter:
     #
-    # - `:full` (or `:long`) outputs a complete date and time
+    # - ~:full~ (or ~:long~) :: outputs a complete date and time
     #   representation, localized through R18n;
-    # - `:short` outputs a short date representation (without time),
+    # - ~:short~ :: outputs a short date representation (without time),
     #   localized with R18n;
-    # - `:rfc3339` outputs the RFC 3339 date and time representation,
+    # - ~:rfc3339~ :: outputs the RFC 3339 date and time representation,
     #   used in atom feed.
     #
     # @param dateformat [Symbol] the format to use to convert DateTime
@@ -172,37 +172,37 @@ module Neruda
       R18n.l @date, :full
     end
 
-    # Formats given `string` with values of the current OrgFile.
+    # Formats given ~string~ with values of the current OrgFile.
     #
-    # This method expects to find percent-tags in the given `string` and
+    # This method expects to find percent-tags in the given ~string~ and
     # replace them by their corresponding value.
     #
-    # ## Format
+    # *** Format:
     #
-    # - **%a**: the raw author name;
-    # - **%A**: the HTML rendering of the author name, equivalent to
-    #           `<span class="author">%a</span>`;
-    # - **%d**: the `:short` date HTML representation, equivalent
-    #           to `<time datetime="%I">%i</time>`;
-    # - **%D**: the `:full` date and time HTML representation;
-    # - **%i**: the raw `:short` date and time;
-    # - **%I**: the raw `:rfc3339` date and time;
-    # - **%k**: the keywords separated by a comma;
-    # - **%K**: the HTML list rendering of the keywords;
-    # - **%l**: the lang of the document;
-    # - **%L**: the license information, taken from the
-    #           {Neruda::Config#settings};
-    # - **%t**: the title of the document;
-    # - **%u**: the web path to the related published HTML document;
-    # - **%x**: the raw description (eXcerpt);
-    # - **%X**: the description, enclosed in an HTML `p` tag, equivalent
-    #           to `<p>%x</p>`.
+    # - %a :: the raw author name
+    # - %A :: the HTML rendering of the author name, equivalent to
+    #         ~<span class="author">%a</span>~
+    # - %d :: the ~:short~ date HTML representation, equivalent
+    #         to ~<time datetime="%I">%i</time>~
+    # - %D :: the ~:full~ date and time HTML representation
+    # - %i :: the raw ~:short~ date and time
+    # - %I :: the raw ~:rfc3339~ date and time
+    # - %k :: the keywords separated by a comma
+    # - %K :: the HTML list rendering of the keywords
+    # - %l :: the lang of the document
+    # - %L :: the license information, taken from the
+    #         {Neruda::Config#settings}
+    # - %t :: the title of the document
+    # - %u :: the web path to the related published HTML document
+    # - %x :: the raw description (eXcerpt)
+    # - %X :: the description, enclosed in an HTML ~p~ tag, equivalent
+    #         to ~<p>%x</p>~
     #
     # @example
     #     org_file.format("Article written by %a the %d")
     #     => "Article written by Alice Smith the Wednesday 3rd July"
     #
-    # @return [String] the given `string` after replacement occurs
+    # @return [String] the given ~string~ after replacement occurs
     def format(string)
       license = Neruda::Config.settings['license'] || ''
       string.gsub('%a', @author)
@@ -226,7 +226,7 @@ module Neruda
     # The intermediate parent folders are created if necessary.
     #
     # @return [Integer] the length written (as returned by the
-    #   underlying `IO.write` method call)
+    #   underlying ~IO.write~ method call)
     def write
       file_dir = File.dirname @file
       FileUtils.mkdir_p file_dir unless Dir.exist? file_dir

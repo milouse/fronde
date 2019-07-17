@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Neruda
-  # This module contains utilitary methods to ease `org-config.el`
+  # This module contains utilitary methods to ease ~org-config.el~
   # file generation
   module OrgConfigEl
     class << self
