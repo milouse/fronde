@@ -9,6 +9,9 @@ R18n.set('en', File.expand_path('../locales', __dir__))
 $LOAD_PATH.unshift('./lib')
 
 SimpleCov.start do
+  # Remove dev only tools from coverage check
+  add_filter ['lib/tasks/sync.rake', 'lib/tasks/doc.rake']
+  # Sort coverage results into usefull groups
   add_group 'Core libs', 'lib/neruda'
   add_group 'Rake tasks', 'lib/tasks'
   add_group 'Specs', 'spec'
