@@ -4,12 +4,14 @@ module Neruda
   # This module holds class methods for the {Neruda::OrgFile} class.
   module OrgFileClassMethods
     def html_file(file_name)
+      return nil if file_name.nil?
       path = Neruda::OrgFile.target_for_source(file_name)
       pubfolder = Neruda::Config.settings['public_folder']
       path.sub(/^#{pubfolder}\//, '/')
     end
 
     def html_file_with_domain(file_name)
+      return nil if file_name.nil?
       Neruda::Config.settings['domain'] + html_file(file_name)
     end
 

@@ -46,9 +46,9 @@ describe 'Without a working file' do
     FileUtils.rm 'spec/data/__test__.org', force: true
   end
 
-  it 'should raise if file_name is nil', core: true do
-    expect { Neruda::OrgFile.new(nil) }.to raise_error(ArgumentError)
-    expect { Neruda::OrgFile.new('') }.to raise_error(ArgumentError)
+  it 'should raise if file_name is nil and try to write', core: true do
+    expect { Neruda::OrgFile.new(nil).write }.to raise_error(TypeError)
+    expect { Neruda::OrgFile.new('').write }.to raise_error(TypeError)
   end
 
   it 'should return a new org file structure', core: true do

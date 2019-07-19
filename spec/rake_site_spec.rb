@@ -22,7 +22,9 @@ describe 'With working org files' do
 
   describe 'build process' do
     before(:each) do
-      o = Neruda::OrgFile.new('src/index.org', 'title' => 'My website')
+      o = Neruda::OrgFile.new('src/index.org',
+                              title: 'My website',
+                              content: 'Nice content.')
       o.write
     end
 
@@ -33,6 +35,16 @@ describe 'With working org files' do
     it 'should build something', rake: true do
       @rake.invoke_task('site:build')
       expect(File.exist?('public_html/index.html')).to be(true)
+    end
+
+    it 'should render simple html', rake: true do
+      o = Neruda::OrgFile.new('src/index.org')
+      expect(o.to_html).to eq("<p>\nNice content.</p>")
+    end
+
+    it 'should render simple html even without file', rake: true do
+      o = Neruda::OrgFile.new(nil, content: 'My *bold* content.')
+      expect(o.to_html).to eq("<p>\nMy <strong>bold</strong> content.</p>")
     end
 
     it 'should build something even in verbose mode', rake: true do

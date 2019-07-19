@@ -87,20 +87,6 @@ def customize_output(org_file, file_name)
   write_dom(file_name, dom)
 end
 
-def emacs_command(file_name = nil, verbose = true)
-  default_emacs = 'emacs -Q -q --batch -nw -l ./org-config.el'
-  emacs_command = [Neruda::Config.settings['emacs'] || default_emacs]
-  emacs_command << '--eval \'(setq inhibit-message t)\'' unless verbose
-  if file_name.nil?
-    emacs_command << '--eval \'(org-publish "website")\''
-  else
-    file_name = File.expand_path(file_name)
-    emacs_command.concat(["--eval '(find-file \"#{file_name}\")'",
-                          '-f org-publish-current-file'])
-  end
-  emacs_command.join(' ')
-end
-
 namespace :site do
   desc 'Generates all index files'
   task :index do
@@ -134,7 +120,7 @@ namespace :site do
   desc 'Convert all org files'
   task build: :index do
     build = Thread.new do
-      sh emacs_command(nil, Rake::FileUtilsExt.verbose_flag)
+      Neruda::OrgFile.new(nil, verbose: Rake::FileUtilsExt.verbose_flag).publish
     end
     Neruda::Utils.throbber(build, 'Publishing:')
   end
@@ -146,7 +132,8 @@ namespace :site do
         warn 'No source file given'
         next
       end
-      sh emacs_command(args[:target], Rake::FileUtilsExt.verbose_flag)
+      Neruda::OrgFile.new(args[:target],
+                          verbose: Rake::FileUtilsExt.verbose_flag).publish
     end
   end
 

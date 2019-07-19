@@ -4,3 +4,4 @@
 ^doc
 ^coverage
 ^.yardoc
+^org-[0-9.]*

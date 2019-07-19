@@ -10,7 +10,6 @@ gem 'rake', '~> 12.3'
 
 group :development do
   gem 'byebug'
-  gem 'org-ruby'
   gem 'pry'
   gem 'pry-doc'
   gem 'rspec'

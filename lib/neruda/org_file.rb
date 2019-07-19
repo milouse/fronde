@@ -2,11 +2,11 @@
 
 require 'time'
 require 'fileutils'
-require 'neruda/config'
-require 'neruda/index'
-require 'neruda/org_file/class_methods'
-require 'neruda/org_file/extracter'
+# neruda/config is required by htmlizer
 require 'neruda/org_file/htmlizer'
+require 'neruda/org_file/extracter'
+require 'neruda/org_file/class_methods'
+require 'neruda/index'
 
 module Neruda
   # Handles org files.
@@ -97,18 +97,21 @@ module Neruda
     # @option opts [String] title ('') the title of the new org file
     # @option opts [String] author (system user or '') the author of the
     #   document
+    # @option opts [Boolean] verbose (false) weither the
+    #   {Neruda::OrgFileHtmlizer#publish publish} or
+    #   {Neruda::OrgFileHtmlizer#to_html to_html} methods should output
+    #   emacs process messages
     # @return [Neruda::OrgFile] the new instance of Neruda::OrgFile
     def initialize(file_name, opts = {})
-      if file_name.nil? || file_name == ''
-        raise ArgumentError, 'file_name is nil'
-      end
-      @file = file_name
-      @html_file = Neruda::OrgFile.html_file(@file)
-      @url = Neruda::OrgFile.html_file_with_domain(@file)
-      if File.exist?(@file)
+      file_name = nil if file_name == ''
+      @file = File.expand_path(file_name) unless file_name.nil?
+      @html_file = Neruda::OrgFile.html_file @file
+      @url = Neruda::OrgFile.html_file_with_domain @file
+      @options = opts
+      if @file && File.exist?(@file)
         extract_data
       else
-        init_empty_file(opts)
+        init_empty_file
       end
     end
 
@@ -228,6 +231,7 @@ module Neruda
     # @return [Integer] the length written (as returned by the
     #   underlying ~IO.write~ method call)
     def write
+      raise TypeError, 'no conversion from nil file name to path.' if @file.nil?
       file_dir = File.dirname @file
       FileUtils.mkdir_p file_dir unless Dir.exist? file_dir
       IO.write @file, @content
@@ -235,14 +239,14 @@ module Neruda
 
     private
 
-    def init_empty_file(opts)
-      @title = opts[:title] || ''
+    def init_empty_file
+      @title = @options[:title] || ''
       @date = DateTime.now
-      @author = opts[:author] || default_author
+      @author = @options[:author] || default_author
       @keywords = []
       @lang = Neruda::Config.settings['lang']
       @excerpt = ''
-      @content = <<~ORG
+      @content = @options[:content] || <<~ORG
         #+title: #{@title}
         #+date: <#{@date.strftime('%Y-%m-%d %a. %H:%M:%S')}>
         #+author: #{@author}
