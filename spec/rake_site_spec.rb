@@ -20,7 +20,7 @@ describe 'With working org files' do
     FileUtils.rm_r 'spec/data/website_testing', force: true
   end
 
-  describe 'Build process' do
+  describe 'build process' do
     before(:each) do
       o = Neruda::OrgFile.new('src/index.org', 'title' => 'My website')
       o.write
@@ -42,7 +42,7 @@ describe 'With working org files' do
     end
 
     it 'should build one specific file', rake: true do
-      o = Neruda::OrgFile.new('src/tutu.org', 'title' => 'Tutu test')
+      o = Neruda::OrgFile.new('src/tutu.org', title: 'Tutu test')
       o.write
       @rake.invoke_task('site:build:one[src/tutu.org]')
       expect(File.exist?('public_html/index.html')).to be(false)
@@ -55,7 +55,7 @@ describe 'With working org files' do
     end
   end
 
-  describe 'Customize process' do
+  describe 'customize process' do
     before(:each) do
       html_base = <<~HTML
         <!DOCTYPE html>
