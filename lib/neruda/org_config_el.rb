@@ -59,7 +59,7 @@ module Neruda
       # rubocop:disable Metrics/LineLength
       def org_default_theme_options
         {
-          'html-head' => '<link rel="stylesheet" type="text/css" media="screen" href="/assets/css/style.css">',
+          'html-head' => '<link rel="stylesheet" type="text/css" media="screen" href="#{Neruda::Config.settings['domain']}/assets/css/style.css">',
           'html-head-include-default-style' => 't',
           'html-head-include-scripts' => 'nil'
         }

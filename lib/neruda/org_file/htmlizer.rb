@@ -37,10 +37,11 @@ module Neruda
     #
     # @return [String] the HTML keywords list
     def keywords_to_html
+      domain = Neruda::Config.settings['domain']
       klist = @keywords.map do |k|
         <<~KEYWORDLINK
           <li class="keyword">
-            <a href="/tags/#{Neruda::OrgFile.slug(k)}.html">#{k}</a>
+            <a href="#{domain}/tags/#{Neruda::OrgFile.slug(k)}.html">#{k}</a>
           </li>
         KEYWORDLINK
       end.join
