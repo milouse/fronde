@@ -1,19 +1,43 @@
 #+title: Neruda
+#+author: Étienne Deparis
 #+lang: en
 #+keywords: static website generator, ruby, gem, org mode, emacs
 #+description: Neruda is a ruby gem, which helps you to manage your
 #+description: static website generated with org mode
 
-#+attr_html: :alt Pablo Neruda signature :style width:150px;float:right;
-[[file:media/Firma_Pablo_Neruda.svg]]
-
 * What's for?
+
+#+attr_html: :style width:150px;float:right;margin-top:-4.5em;margin-left:2em;
+[[file:themes/default/assets/Firma_Pablo_Neruda.svg]]
 
 Neruda is a static website generator made for [[https://orgmode.org][org files]]. It improves the
 default org mode HTML exporting/publishing routine.
 
 * Features
 
+- Inherit all [[https://orgmode.org][org mode features]] (tables, syntax highlighting,
+  code blocks evaluation, multiple languages support…)
 - Do not require any emacs lisp knowledge
+- Do not require any server-side code, nor databases
 - Allow fine customization of generated html files
-- Switch between various themes
+- Switch easily between various themes
+- Native tags and [[https://en.wikipedia.org/wiki/Atom_(Web_standard)][ATOM feeds]] support
+
+* How to install it
+
+Neruda is a [[https://rubygems.org/][Ruby gem]]. You need a working Ruby environment to use it. We
+recommand you to use [[https://rvm.io][RVM]] and a specific gemset. However it will works
+with a global ruby installation too.
+
+#+caption: Installation procedure with RVM
+#+begin_src shell
+rvm get latest
+rvm use ruby-2.6.3@neruda --create
+gem install neruda
+#+end_src
+
+Now, you're ready to create your first Neruda website.
+
+#+begin_src shell
+pablo init -t "My first neruda website"
+#+end_src
