@@ -3,6 +3,12 @@ pablo:
   error:
     no_command: 'ERROR: no command or unknown command given.'
 neruda:
+  long_date_format: '%A %-d of %B, %Y at %H:%M'
   index:
     unsorted: Unsorted
     published_on: Published on %1
+  org:
+    postamble:
+      written_by: Written by %a
+      with_emacs: with %c, and published with <a href="https://deparis.io/neruda">Neruda</a>
+      last_modification: Last modification on %C

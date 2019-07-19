@@ -43,6 +43,7 @@ def init_testing_website
       html-head-include-default-style: nil
       html-head: |
         <link rel="stylesheet" type="text/css" media="screen" href="style.css"/>
+      html-postamble: '<footer>Published by Neruda.</footer>'
     external_sources:
     - path: 'titi/test'
       recursive: nil

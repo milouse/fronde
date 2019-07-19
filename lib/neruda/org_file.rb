@@ -171,8 +171,8 @@ module Neruda
         return R18n.l @date, :human
       end
       return @date.rfc3339 if dateformat == :rfc3339
-      dateformat == :full if dateformat == :long
-      R18n.l @date, :full
+      # If date format is full, use the one from our config
+      R18n.l @date, R18n.t.neruda.long_date_format
     end
 
     # Formats given ~string~ with values of the current OrgFile.

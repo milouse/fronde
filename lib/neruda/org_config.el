@@ -49,7 +49,7 @@ Return output file name."
       org-confirm-babel-evaluate nil
       org-html-doctype "html5"
       org-html-html5-fancy t
-      org-html-metadata-timestamp-format "%a %d %B %Y à %H:%M"
+      org-html-metadata-timestamp-format "__LONG_DATE_FMT__"
       org-html-text-markup-alist '((bold . "<strong>%s</strong>")
                                    (code . "<code>%s</code>")
                                    (italic . "<em>%s</em>")

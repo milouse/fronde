@@ -3,6 +3,12 @@ pablo:
   error:
     no_command: 'ERREUR: Aucune commande ou commande inconnue donnée.'
 neruda:
+  long_date_format: '%A %-d %B %Y à %H:%M'
   index:
     unsorted: Non triés
     published_on: Publié le %1
+  org:
+    postamble:
+      written_by: Écrit par %a
+      with_emacs: avec %c et publié avec <a href="https://deparis.io/neruda">Neruda</a>
+      last_modification: dernière modification le %C

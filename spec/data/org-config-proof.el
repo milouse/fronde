@@ -49,7 +49,7 @@ Return output file name."
       org-confirm-babel-evaluate nil
       org-html-doctype "html5"
       org-html-html5-fancy t
-      org-html-metadata-timestamp-format "%a %d %B %Y à %H:%M"
+      org-html-metadata-timestamp-format "%A %-d of %B, %Y at %H:%M"
       org-html-text-markup-alist '((bold . "<strong>%s</strong>")
                                    (code . "<code>%s</code>")
                                    (italic . "<em>%s</em>")
@@ -67,6 +67,7 @@ Return output file name."
          :section-numbers nil
          :with-toc nil
          :html-head "<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\" href=\"style.css\"/>"
+         :html-postamble "<footer>Published by Neruda.</footer>"
          :html-head-include-default-style nil
          :html-head-include-scripts nil)
         ("org-assets"
@@ -85,6 +86,7 @@ Return output file name."
          :section-numbers nil
          :with-toc nil
          :html-head "<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\" href=\"style.css\"/>"
+         :html-postamble "<footer>Published by Neruda.</footer>"
          :html-head-include-default-style nil
          :html-head-include-scripts nil)
         ("test-assets"
@@ -102,6 +104,7 @@ Return output file name."
          :section-numbers nil
          :with-toc nil
          :html-head "<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\" href=\"style.css\"/>"
+         :html-postamble "<footer>Published by Neruda.</footer>"
          :html-head-include-default-style nil
          :html-head-include-scripts nil)
         ("tata-assets"

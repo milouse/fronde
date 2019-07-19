@@ -20,6 +20,7 @@ module Neruda
                .gsub('__ALL_PROJECTS__', all_projects.strip)
                .gsub('__THEME_CONFIG__', org_theme_config.strip)
                .gsub('__ALL_PROJECTS_NAMES__', project_names)
+               .gsub('__LONG_DATE_FMT__', R18n.t.neruda.long_date_format)
       end
 
       private
@@ -56,15 +57,22 @@ module Neruda
         ORGPROJECT
       end
 
-      # rubocop:disable Metrics/LineLength
       def org_default_theme_options
-        {
-          'html-head' => '<link rel="stylesheet" type="text/css" media="screen" href="#{Neruda::Config.settings['domain']}/assets/css/style.css">',
+        stylesheet = <<~CSS
+          <link rel="stylesheet" type="text/css" media="screen"
+                href="#{Neruda::Config.settings['domain']}/assets/css/style.css">
+        CSS
+        postamble = <<~POSTAMBLE
+          <p><span class="author">#{R18n.t.neruda.org.postamble.written_by}</span>
+          #{R18n.t.neruda.org.postamble.with_emacs}</p>
+          <p class="date">#{R18n.t.neruda.org.postamble.last_modification}</p>
+          <p class="validation">%v</p>
+        POSTAMBLE
+        { 'html-head' => stylesheet.strip,
+          'html-postamble' => postamble.strip,
           'html-head-include-default-style' => 't',
-          'html-head-include-scripts' => 'nil'
-        }
+          'html-head-include-scripts' => 'nil' }
       end
-      # rubocop:enable Metrics/LineLength
 
       def org_templates
         orgtpl = []
