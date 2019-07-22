@@ -8,20 +8,37 @@ require 'neruda/utils'
 require 'neruda/org_file'
 
 # :nocov:
-def run_webrick
-  # Inspired by ruby un.rb library, which allows normally to start a
-  # webrick server in one line: ruby -run -e httpd public_html -p 5000
-  routes = Neruda::Config.settings['routes'] || {}
-  options = { Port: Neruda::Config.settings['server_port'] || 5000,
-              DocumentRoot: Neruda::Config.settings['public_folder'] }
-  s = WEBrick::HTTPServer.new(options)
-  routes.each do |req, dest|
-    s.mount_proc req do |_, res|
-      res.body = IO.read(dest)
-    end
+class PreviewServlet < WEBrick::HTTPServlet::AbstractServlet
+  include WEBrick::HTTPUtils
+
+  def do_GET(request, response) # rubocop:disable Naming/MethodName
+    file = local_path(request.path)
+    response.body = parse_body(file, "http://#{request.host}:#{request.port}")
+    response.status = 200
+    response.content_type = mime_type(file, DefaultMimeTypes)
   end
-  ['TERM', 'QUIT', 'INT'].each { |sig| trap(sig, proc { s.shutdown }) }
-  s.start
+
+  private
+
+  def local_path(requested_path)
+    routes = Neruda::Config.settings['routes'] || {}
+    return routes[requested_path] if routes.keys.include? requested_path
+    local_path = Neruda::Config.settings['public_folder'] + requested_path
+    if File.directory? local_path
+      local_path = local_path.delete_suffix('/') + '/index.html'
+    end
+    return local_path if File.exist? local_path
+    raise WEBrick::HTTPStatus::NotFound, 'Not found.'
+  end
+
+  def parse_body(local_path, local_host)
+    body = IO.read local_path
+    return body unless local_path.match?(/\.(?:ht|x)ml$/)
+    domain = Neruda::Config.settings['domain']
+    return body if domain == ''
+    body.gsub(/"file:\/\//, '"' + local_host)
+        .gsub(/"#{domain}/, '"' + local_host)
+  end
 end
 # :nocov:
 
@@ -140,7 +157,13 @@ namespace :site do
   # :nocov:
   desc 'Start a test server'
   task :preview do
-    run_webrick
+    # Inspired by ruby un.rb library, which allows normally to start a
+    # webrick server in one line: ruby -run -e httpd public_html -p 5000
+    port = Neruda::Config.settings['server_port'] || 5000
+    s = WEBrick::HTTPServer.new(Port: port)
+    s.mount '/', PreviewServlet
+    ['TERM', 'QUIT', 'INT'].each { |sig| trap(sig, proc { s.shutdown }) }
+    s.start
   end
   # :nocov:
 end
