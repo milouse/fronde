@@ -75,11 +75,9 @@ module Neruda
       end
 
       def org_templates
-        orgtpl = []
-        curtheme = Neruda::Config.settings['theme'] || 'default'
-        orgtplopts = {}
-        orgtplopts.merge!(org_default_theme_options) if curtheme == 'default'
+        orgtplopts = org_default_theme_options.merge
         orgtplopts.merge!(Neruda::Config.settings['org-html'] || {})
+        orgtpl = []
         orgtplopts.each do |k, v|
           val = v.strip.gsub(/"/, '\"')
           if ['t', 'nil', '1'].include? val
