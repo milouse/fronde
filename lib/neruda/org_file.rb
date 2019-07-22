@@ -104,7 +104,7 @@ module Neruda
     # @return [Neruda::OrgFile] the new instance of Neruda::OrgFile
     def initialize(file_name, opts = {})
       file_name = nil if file_name == ''
-      @file = File.expand_path(file_name) unless file_name.nil?
+      @file = file_name
       @html_file = Neruda::OrgFile.html_file @file
       @url = Neruda::OrgFile.html_file_with_domain @file
       @options = opts
