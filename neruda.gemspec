@@ -14,6 +14,8 @@ Gem::Specification.new do |s|
   s.author      = 'Étienne Deparis'
   s.email       = 'etienne@depar.is'
   s.files       = ['lib/neruda/config.rb',
+                   'lib/neruda/config/lisp_config.rb',
+                   'lib/neruda/config/org-config.el',
                    'lib/neruda/index.rb',
                    'lib/neruda/index/atom_generator.rb',
                    'lib/neruda/index/org_generator.rb',
@@ -21,8 +23,6 @@ Gem::Specification.new do |s|
                    'lib/neruda/org_file/class_methods.rb',
                    'lib/neruda/org_file/extracter.rb',
                    'lib/neruda/org_file/htmlizer.rb',
-                   'lib/neruda/org_config_el.rb',
-                   'lib/neruda/org_config.el',
                    'lib/neruda/utils.rb',
                    'lib/neruda/version.rb',
                    # Rake tasks

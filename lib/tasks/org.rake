@@ -2,7 +2,6 @@
 
 # Neruda::Config is required by Neruda::Utils
 require 'neruda/utils'
-require 'neruda/org_config_el'
 
 namespace :org do
   desc 'Download last version of org-mode'
@@ -37,7 +36,7 @@ namespace :org do
 
   file 'org-config.el' do
     next if Neruda::Config.org_last_version.nil?
-    IO.write('org-config.el', Neruda::OrgConfigEl.org_config)
+    Neruda::Config.write_org_lisp_config
   end
 
   desc 'Install org'

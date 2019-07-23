@@ -2,6 +2,7 @@
 
 require 'yaml'
 require 'open-uri'
+require 'neruda/config/lisp_config'
 
 module Neruda
   # Wrapper for configuration
@@ -28,6 +29,8 @@ module Neruda
   # => "Alice Doe"
   # #+end_src
   class Config
+    extend Neruda::LispConfig
+
     class << self
       # Access the current website settings
       #
