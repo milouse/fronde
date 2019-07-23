@@ -23,6 +23,7 @@ Gem::Specification.new do |s|
                    'lib/neruda/org_file/class_methods.rb',
                    'lib/neruda/org_file/extracter.rb',
                    'lib/neruda/org_file/htmlizer.rb',
+                   'lib/neruda/templater.rb',
                    'lib/neruda/utils.rb',
                    'lib/neruda/preview.rb',
                    'lib/neruda/version.rb',
