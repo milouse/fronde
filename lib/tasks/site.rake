@@ -1,46 +1,10 @@
 # frozen_string_literal: true
 
-require 'webrick'
 require 'nokogiri'
 require 'digest/md5'
 require 'neruda/index'
 require 'neruda/utils'
 require 'neruda/org_file'
-
-# :nocov:
-class PreviewServlet < WEBrick::HTTPServlet::AbstractServlet
-  include WEBrick::HTTPUtils
-
-  def do_GET(request, response) # rubocop:disable Naming/MethodName
-    file = local_path(request.path)
-    response.body = parse_body(file, "http://#{request.host}:#{request.port}")
-    response.status = 200
-    response.content_type = mime_type(file, DefaultMimeTypes)
-  end
-
-  private
-
-  def local_path(requested_path)
-    routes = Neruda::Config.settings['routes'] || {}
-    return routes[requested_path] if routes.keys.include? requested_path
-    local_path = Neruda::Config.settings['public_folder'] + requested_path
-    if File.directory? local_path
-      local_path = local_path.delete_suffix('/') + '/index.html'
-    end
-    return local_path if File.exist? local_path
-    raise WEBrick::HTTPStatus::NotFound, 'Not found.'
-  end
-
-  def parse_body(local_path, local_host)
-    body = IO.read local_path
-    return body unless local_path.match?(/\.(?:ht|x)ml$/)
-    domain = Neruda::Config.settings['domain']
-    return body if domain == ''
-    body.gsub(/"file:\/\//, '"' + local_host)
-        .gsub(/"#{domain}/, '"' + local_host)
-  end
-end
-# :nocov:
 
 def apply_template(elem, position, content)
   elem.each do |e|
@@ -157,13 +121,8 @@ namespace :site do
   # :nocov:
   desc 'Start a test server'
   task :preview do
-    # Inspired by ruby un.rb library, which allows normally to start a
-    # webrick server in one line: ruby -run -e httpd public_html -p 5000
-    port = Neruda::Config.settings['server_port'] || 5000
-    s = WEBrick::HTTPServer.new(Port: port)
-    s.mount '/', PreviewServlet
-    ['TERM', 'QUIT', 'INT'].each { |sig| trap(sig, proc { s.shutdown }) }
-    s.start
+    require 'neruda/preview'
+    Neruda.start_preview
   end
   # :nocov:
 end
