@@ -29,6 +29,13 @@ module Neruda
 
     private
 
+    def index_source_path(index_name)
+      slug = Neruda::OrgFile.slug index_name
+      src = ['src', 'tags', "#{slug}.org"]
+      src[1] = @blog_path if slug == 'index'
+      src.join('/')
+    end
+
     def org_header(title = nil)
       title = Neruda::Config.settings['title'] if title == 'index'
       <<~HEADER

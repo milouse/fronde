@@ -20,7 +20,6 @@ module Neruda
       @blog_path = Neruda::Config.settings['blog_path']
       @pubdir = Neruda::Config.settings['public_folder']
       @index = { 'index' => [] }
-      @slugs = { 'index' => 'index' }
       @date = DateTime.now
       @sources = sources_list(file_list)
       filter_and_prefix_sources!
@@ -66,21 +65,12 @@ module Neruda
       @sources = sources
     end
 
-    def index_source_path(index_name)
-      slug = @slugs[index_name]
-      src = ['src', 'tags', "#{slug}.org"]
-      src[1] = @blog_path if slug == 'index'
-      src.join('/')
-    end
-
     def add_to_indexes(article)
       @index['index'] << article
       article.keywords.each do |k|
-        unless @index.has_key?(k)
-          @index[k] = []
-          @slugs[k] = Neruda::OrgFile.slug k
-        end
-        @index[k] << article
+        slug = Neruda::OrgFile.slug k
+        @index[slug] = [] unless @index.has_key?(slug)
+        @index[slug] << article
       end
     end
 

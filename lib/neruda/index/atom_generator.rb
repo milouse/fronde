@@ -15,7 +15,7 @@ module Neruda
     end
 
     def write_atom(index_name)
-      slug = @slugs[index_name]
+      slug = Neruda::OrgFile.slug index_name
       FileUtils.mkdir_p "#{@pubdir}/feeds"
       atomdest = "#{@pubdir}/feeds/#{slug}.xml"
       IO.write(atomdest, to_atom(index_name))
