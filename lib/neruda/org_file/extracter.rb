@@ -18,10 +18,11 @@ module Neruda
     end
 
     def extract_date
-      m = /^#\+date: *<([0-9-]{10}) [\w.]+(?: ([0-9:]{8}))?> *$/i
-          .match(@content)
+      timerx = '([0-9:]{5})(?::([0-9]{2}))?'
+      m = /^#\+date: *<([0-9-]{10}) [\w.]+(?: #{timerx})?> *$/i.match(@content)
       return nil if m.nil?
-      time = m[2] || '00:00:00'
+      time = '00:00:00'
+      time = "#{m[2]}:#{m[3] || '00'}" if m[2]
       DateTime.strptime("#{m[1]} #{time}", '%Y-%m-%d %H:%M:%S')
     end
 

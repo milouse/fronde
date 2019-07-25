@@ -20,6 +20,15 @@ describe 'With working org files' do
     expect(o.lang).to eq('es')
   end
 
+  it 'should parse with a complete date, but partial time', core: true do
+    o = Neruda::OrgFile.new('spec/data/test4.org')
+    expect(o.title).to eq('Fourth test')
+    expect(o.date).to eq(DateTime.strptime('2019-07-25 20:45:00', '%Y-%m-%d %H:%M:%S'))
+    expect(o.timekey).to eq('20190725204500')
+    expect(o.datestring(:short)).to eq('2019-07-25')
+    expect(o.format('%i - (%t)')).to eq('2019-07-25 - (Fourth test)')
+  end
+
   it 'should parse with a complete date', core: true do
     o = Neruda::OrgFile.new('spec/data/test3.org')
     expect(o.title).to eq('My third article')
