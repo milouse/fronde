@@ -1,0 +1,346 @@
+/**
+ * This file has been generated with the `org-html-htmlize-generate-css'
+ * command of org mode, with the Dracula theme enabled.
+ * The Dracula theme is released under an MIT license and thus the
+ * following is also released under this license.
+ * See https://github.com/dracula/emacs for details.
+ */
+
+.src {
+    color: #f8f8f2;
+    background-color: #282a36;
+    padding: .6em 1em;
+}
+pre.src a:hover {
+    text-decoration: underline;
+}
+
+.org-bold {
+    /* bold */
+    font-weight: bold;
+}
+.org-bold-italic {
+    /* bold-italic */
+    font-weight: bold;
+    font-style: italic;
+}
+
+.org-builtin {
+    /* font-lock-builtin-face */
+    color: #ffb86c;
+}
+.org-button {
+    /* button */
+    color: #8be9fd;
+    text-decoration: underline;
+}
+.org-comment {
+    /* font-lock-comment-face */
+    color: #6272a4;
+}
+.org-comment-delimiter {
+    /* font-lock-comment-delimiter-face */
+    color: #6272a4;
+}
+.org-constant {
+    /* font-lock-constant-face */
+    color: #8be9fd;
+}
+.org-cursor {
+    /* cursor */
+    background-color: #8be9fd;
+}
+.org-doc {
+    /* font-lock-doc-face */
+    color: #6272a4;
+}
+.org-error {
+    /* error */
+    color: #ffc0cb;
+    font-weight: bold;
+}
+.org-escape-glyph {
+    /* escape-glyph */
+    color: #00ffff;
+}
+.org-file-name-shadow {
+    /* file-name-shadow */
+    color: #b3b3b3;
+}
+.org-fringe {
+    /* fringe */
+    color: #b6b6b2;
+    background-color: #282a36;
+}
+.org-function-name {
+    /* font-lock-function-name-face */
+    color: #50fa7b;
+    font-weight: bold;
+}
+.org-glyphless-char {
+    /* glyphless-char */
+    font-size: 60%;
+}
+.org-header-line {
+    /* header-line */
+    background-color: #282a36;
+}
+.org-header-line-highlight {
+    /* header-line-highlight */
+    color: #ccccc7;
+    background-color: #464752;
+}
+.org-help-argument-name {
+    /* help-argument-name */
+    font-style: italic;
+}
+.org-highlight {
+    /* highlight */
+    color: #ccccc7;
+    background-color: #464752;
+}
+.org-hl-line {
+    /* hl-line */
+    background-color: #44475a;
+}
+.org-homoglyph {
+    /* homoglyph */
+    color: #00ffff;
+}
+.org-italic {
+    /* italic */
+    font-style: italic;
+}
+.org-keyword {
+    /* font-lock-keyword-face */
+    color: #ff79c6;
+    font-weight: bold;
+}
+.org-lazy-highlight {
+    /* lazy-highlight */
+    color: #e2e2dc;
+    background-color: #464752;
+}
+.org-line-number-current-line {
+    /* line-number-current-line */
+    color: #b3b3b3;
+    background-color: #282a36;
+}
+.org-link {
+    /* link */
+    color: #8be9fd;
+    text-decoration: underline;
+}
+.org-link-visited {
+    /* link-visited */
+    color: #ee82ee;
+    text-decoration: underline;
+}
+.org-linum {
+    /* linum */
+    color: #565761;
+    background-color: #282a36;
+    font-style: italic;
+}
+.org-match {
+    /* match */
+    background-color: #3a5fcd;
+}
+.org-negation-char {
+    /* font-lock-negation-char-face */
+    color: #8be9fd;
+}
+.org-next-error {
+    /* next-error */
+    color: #282a36;
+    background-color: #f1fa8c;
+}
+.org-nobreak-hyphen {
+    /* nobreak-hyphen */
+    color: #00ffff;
+}
+.org-nobreak-space {
+    /* nobreak-space */
+    color: #00ffff;
+    text-decoration: underline;
+}
+.org-outline-1 {
+    /* outline-1 */
+    color: #50fa7b;
+}
+.org-outline-2 {
+    /* outline-2 */
+    color: #bd93f9;
+}
+.org-outline-3 {
+    /* outline-3 */
+    color: #8be9fd;
+}
+.org-outline-4 {
+    /* outline-4 */
+    color: #ffb86c;
+}
+.org-outline-5 {
+    /* outline-5 */
+    color: #ffb86c;
+}
+.org-outline-6 {
+    /* outline-6 */
+    color: #0189cc;
+}
+.org-outline-7 {
+    /* outline-7 */
+    color: #ffb86c;
+}
+.org-outline-8 {
+    /* outline-8 */
+    color: #f1fa8c;
+}
+.org-page-break-lines {
+    /* page-break-lines */
+    color: #6272a4;
+}
+.org-preprocessor {
+    /* font-lock-preprocessor-face */
+    color: #ffb86c;
+}
+.org-py-builtins {
+    /* py-builtins-face */
+    color: #ffb86c;
+}
+.org-py-class-name {
+    /* py-class-name-face */
+    color: #bd93f9;
+}
+.org-py-decorators {
+    /* py-decorators-face */
+    color: #ff79c6;
+    font-weight: bold;
+}
+.org-py-def-class {
+    /* py-def-class-face */
+    color: #ff79c6;
+    font-weight: bold;
+}
+.org-py-exception-name {
+    /* py-exception-name-face */
+    color: #ffb86c;
+}
+.org-py-import-from {
+    /* py-import-from-face */
+    color: #ff79c6;
+    font-weight: bold;
+}
+.org-py-number {
+    /* py-number-face */
+    color: #f8f8f2;
+    background-color: #282a36;
+}
+.org-py-object-reference {
+    /* py-object-reference-face */
+    color: #ff79c6;
+    font-weight: bold;
+}
+.org-py-pseudo-keyword {
+    /* py-pseudo-keyword-face */
+    color: #ff79c6;
+    font-weight: bold;
+}
+.org-py-try-if {
+    /* py-try-if-face */
+    color: #ff79c6;
+    font-weight: bold;
+}
+.org-py-variable-name {
+    /* py-variable-name-face */
+    color: #f8f8f2;
+    background-color: #282a36;
+}
+.org-py-xxx-tag {
+    /* py-XXX-tag-face */
+    color: #f1fa8c;
+}
+.org-query-replace {
+    /* query-replace */
+    color: #ffb86c;
+    background-color: #464752;
+    font-weight: bold;
+}
+.org-regexp-grouping-backslash {
+    /* font-lock-regexp-grouping-backslash */
+    font-weight: bold;
+}
+.org-regexp-grouping-construct {
+    /* font-lock-regexp-grouping-construct */
+    font-weight: bold;
+}
+.org-region {
+    /* region */
+    color: #282a36;
+    background-color: #f1fa8c;
+}
+.org-shadow {
+    /* shadow */
+    color: #b3b3b3;
+}
+.org-show-paren-match {
+    /* show-paren-match */
+    background-color: #4f94cd;
+}
+.org-show-paren-match-expression {
+    /* show-paren-match-expression */
+    background-color: #4f94cd;
+}
+.org-show-paren-mismatch {
+    /* show-paren-mismatch */
+    color: #ffffff;
+    background-color: #a020f0;
+}
+.org-string {
+    /* font-lock-string-face */
+    color: #f1fa8c;
+}
+.org-success {
+    /* success */
+    color: #00ff00;
+    font-weight: bold;
+}
+.org-tooltip {
+    /* tooltip */
+    color: #000000;
+    background-color: #ffffe0;
+}
+.org-trailing-whitespace {
+    /* trailing-whitespace */
+    background-color: #ffb86c;
+}
+.org-type {
+    /* font-lock-type-face */
+    color: #bd93f9;
+}
+.org-underline {
+    /* underline */
+    text-decoration: underline;
+}
+.org-variable-name {
+    /* font-lock-variable-name-face */
+    color: #f8f8f2;
+}
+.org-vertical-border {
+    /* vertical-border */
+    color: #373844;
+}
+.org-warning {
+    /* warning */
+    color: #ffb86c;
+}
+.org-warning-1 {
+    /* font-lock-warning-face */
+    color: #ffb86c;
+    background-color: #373844;
+}
+.org-which-func {
+    /* which-func */
+    color: #50fa7b;
+    font-weight: bold;
+}

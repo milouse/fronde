@@ -19,9 +19,9 @@ end
 
 namespace :doc do
   desc 'Compile documentation from source code with yard'
-  task generate: ['org:download'] do
+  task generate: ['org:download', 'htmlize.el'] do
     org_config = <<~ORGCONFIG
-      (package-initialize)
+      (load-file "#{Dir.pwd}/htmlize.el")
       (add-to-list 'load-path "#{Dir.pwd}/org-9.2.4/lisp")
       (require 'org)
       (setq org-export-with-toc nil

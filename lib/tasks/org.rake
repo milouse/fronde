@@ -34,7 +34,21 @@ namespace :org do
     end
   end
 
-  file 'org-config.el' do
+  file 'htmlize.el' do
+    verbose = Rake::FileUtilsExt.verbose_flag
+    curl = ['curl', '--progress-bar', '-O',
+            'https://raw.githubusercontent.com/hniksic/emacs-htmlize/master/htmlize.el']
+    curl[1] = '-s' unless verbose
+    build = Thread.new { sh curl.join(' ') }
+    if verbose
+      build.join
+      warn 'htmlize.el has been locally installed'
+    else
+      Neruda::Utils.throbber(build, 'Installing htmlize.el:')
+    end
+  end
+
+  file 'org-config.el' => 'htmlize.el' do
     next if Neruda::Config.org_last_version.nil?
     Neruda::Config.write_org_lisp_config
   end

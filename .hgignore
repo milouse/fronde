@@ -4,4 +4,5 @@
 ^doc
 ^coverage
 ^.yardoc
+^htmlize.el$
 ^org-[0-9.]*

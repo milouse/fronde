@@ -156,6 +156,8 @@ module Neruda
       stylesheet = <<~CSS
         <link rel="stylesheet" type="text/css" media="screen"
               href="#{settings['domain']}/assets/css/style.css">
+        <link rel="stylesheet" type="text/css" media="screen"
+              href="#{settings['domain']}/assets/css/htmlize.css">
       CSS
       main_feed = [Dir.pwd, settings['public_folder'], 'feeds', 'index.xml']
       return stylesheet unless File.exist? main_feed.join('/')

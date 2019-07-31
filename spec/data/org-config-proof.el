@@ -1,5 +1,5 @@
-;; Needed for nice htmlize
-(package-initialize)
+;; Load modern version of htmlize.el
+(load-file "__TEST_DIR__/htmlize.el")
 ;; Load org mode
 (add-to-list 'load-path "__TEST_DIR__/org-9.2.4/lisp")
 (require 'org)
@@ -49,6 +49,7 @@ Return output file name."
       org-confirm-babel-evaluate nil
       org-html-doctype "html5"
       org-html-html5-fancy t
+      org-html-htmlize-output-type 'css
       org-html-metadata-timestamp-format "%A %-d of %B, %Y at %H:%M"
       org-html-text-markup-alist '((bold . "<strong>%s</strong>")
                                    (code . "<code>%s</code>")
