@@ -13,7 +13,7 @@
   (let* ((splitted-link (split-string link "|"))
          (path (car splitted-link))
          (desc (or description path))
-         (lang (car (cdr splitted-link))))
+         (lang (cadr splitted-link)))
     (pcase format
       (`html (if lang
                  (format "<a href=\"%s\" hreflang=\"%s\">%s</a>"
