@@ -89,17 +89,13 @@ module Neruda
     end
 
     def org_default_theme_options
-      stylesheet = <<~CSS
-        <link rel="stylesheet" type="text/css" media="screen"
-              href="#{settings['domain']}/assets/css/style.css">
-      CSS
       postamble = <<~POSTAMBLE
         <p><span class="author">#{R18n.t.neruda.org.postamble.written_by}</span>
         #{R18n.t.neruda.org.postamble.with_emacs}</p>
         <p class="date">#{R18n.t.neruda.org.postamble.last_modification}</p>
         <p class="validation">%v</p>
       POSTAMBLE
-      { 'html-head' => stylesheet.strip,
+      { 'html-head' => build_html_head.strip,
         'html-postamble' => postamble.strip,
         'html-head-include-default-style' => 't',
         'html-head-include-scripts' => 'nil' }
@@ -141,8 +137,11 @@ module Neruda
     def org_theme_config
       curtheme = settings['theme'] || 'default'
       workdir = Dir.pwd
-      sourcedir = workdir
-      sourcedir = File.expand_path('../../../', __dir__) if curtheme == 'default'
+      if curtheme == 'default'
+        sourcedir = File.expand_path('../../../', __dir__)
+      else
+        sourcedir = workdir
+      end
       <<~THEMECONFIG
         ("theme"
                  :base-directory "#{sourcedir}/themes/#{curtheme}"
@@ -151,6 +150,20 @@ module Neruda
                  :publishing-directory "#{workdir}/#{settings['public_folder']}/assets"
                  :publishing-function org-publish-attachment)
       THEMECONFIG
+    end
+
+    def build_html_head
+      stylesheet = <<~CSS
+        <link rel="stylesheet" type="text/css" media="screen"
+              href="#{settings['domain']}/assets/css/style.css">
+      CSS
+      main_feed = [Dir.pwd, settings['public_folder'], 'feeds', 'index.xml']
+      return stylesheet unless File.exist? main_feed.join('/')
+      <<~ATOM
+        #{stylesheet.strip}
+        <link rel="alternate" type="application/atom+xml" title="Atom 1.0"
+              href="#{settings['domain']}/feeds/index.xml" />
+      ATOM
     end
   end
 end
