@@ -1,9 +1,35 @@
 # frozen_string_literal: true
 
+require 'open-uri'
+
 module Neruda
   # This module contains utilitary methods to ease ~org-config.el~
   # file generation
   module LispConfig
+    # Fetch and return the last published version of org mode.
+    #
+    # @return [String] the new x.x.x version string of org mode
+    def org_last_version
+      return @org_version if @org_version
+      index = open('https://orgmode.org/index.html', 'r').read
+      last_ver = index.match(/https:\/\/orgmode\.org\/org-([0-9.]+)\.tar\.gz/)
+      # :nocov:
+      if last_ver.nil?
+        warn 'Org last version not found'
+        return nil
+      end
+      # :nocov:
+      @org_version = last_ver[1]
+    end
+
+    # Generate emacs lisp configuration file for org mode and write it.
+    #
+    # This method saves the generated configuration in the file
+    # ~org-config.el~ at the root of your project, overwriting it if it
+    # existed already.
+    #
+    # @return [Integer] the length written (as returned by the
+    #   underlying ~IO.write~ method call)
     def write_org_lisp_config
       projects = org_generate_projects
       workdir = Dir.pwd
