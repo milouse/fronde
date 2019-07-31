@@ -7,11 +7,10 @@
 
 * What's for?
 
-#+attr_html: :style width:150px;float:right;margin-top:-4.5em;margin-left:2em;
-[[file:themes/default/assets/Firma_Pablo_Neruda.svg]]
-
 Neruda is a static website generator made for [[https://orgmode.org][org files]]. It improves the
 default org mode HTML exporting/publishing routine.
+
+See [[https://deparis.io/neruda/][the official website]] for more information.
 
 * Features
 
