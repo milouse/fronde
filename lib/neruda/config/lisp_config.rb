@@ -35,6 +35,7 @@ module Neruda
       workdir = Dir.pwd
       content = IO.read(File.expand_path('./org-config.el', __dir__))
                   .gsub('__WORK_DIR__', workdir)
+                  .gsub('__NERUDA_DIR__', __dir__)
                   .gsub('__ORG_VER__', org_last_version)
                   .gsub('__ALL_PROJECTS__', all_projects(projects).strip)
                   .gsub('__THEME_CONFIG__', org_theme_config.strip)
@@ -75,7 +76,7 @@ module Neruda
          :base-extension "org"
          :recursive #{recline.join("\n ")}
          :publishing-directory "#{publish_in}"
-         :publishing-function pablo-publish-to-html-and-customize-output
+         :publishing-function neruda/publish-to-html-and-customize-output
          :section-numbers nil
          :with-toc nil
          #{orgtpl})

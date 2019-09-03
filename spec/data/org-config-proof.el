@@ -1,62 +1,8 @@
-;; Load modern version of htmlize.el
-(load-file "__TEST_DIR__/htmlize.el")
-;; Load org mode
-(add-to-list 'load-path "__TEST_DIR__/org-9.2.4/lisp")
-(require 'org)
+;; Load neruda lib
+(load-file "__BASE_DIR__/lib/neruda/config/ox-neruda.el")
+(neruda/init-export-variables "__TEST_DIR__" "__ORG_VERSION__")
 
-(org-link-set-parameters "i18n"
-                         :export #'org-i18n-export
-                         :follow #'org-i18n-follow)
-
-(defun org-i18n-export (link description format)
-  "Export a i18n link"
-  (let* ((splitted-link (split-string link "|"))
-         (path (car splitted-link))
-         (desc (or description path))
-         (lang (cadr splitted-link)))
-    (pcase format
-      (`html (if lang
-                 (format "<a href=\"%s\" hreflang=\"%s\">%s</a>"
-                         path lang desc)
-               (format "<a href=\"%s\">%s</a>" path desc)))
-      (`latex (format "\\href{%s}{%s}" path desc))
-      (`ascii (format "%s (%s)" desc path))
-      (_ path))))
-
-(defun org-i18n-follow (link)
-  "Visit a i18n link"
-  (browse-url (car (split-string link "|"))))
-
-(defun pablo-publish-to-html-and-customize-output (plist filename pub-dir)
-  "Wrap the `org-html-publish-to-html' function and customize its output.
-
-FILENAME is the filename of the Org file to be published.  PLIST
-is the property list for the given project.  PUB-DIR is the
-publishing directory.
-
-Return output file name."
-  (let* ((html-file (org-html-publish-to-html plist filename pub-dir))
-         (workdir "__TEST_DIR__/")
-         (relative-html-file (substring html-file (length workdir)))
-         (command (concat "rake 'site:customize_output[" relative-html-file "]'")))
-    (message (replace-regexp-in-string "\n$" "" (shell-command-to-string command)))
-    html-file))
-
-(setq make-backup-files nil
-      enable-local-variables :all
-      org-publish-timestamp-directory "__TEST_DIR__/tmp/"
-      org-id-locations-file "__TEST_DIR__/tmp/org-id-locations"
-      org-confirm-babel-evaluate nil
-      org-html-doctype "html5"
-      org-html-html5-fancy t
-      org-html-htmlize-output-type 'css
-      org-html-metadata-timestamp-format "%A %-d of %B, %Y at %H:%M"
-      org-html-text-markup-alist '((bold . "<strong>%s</strong>")
-                                   (code . "<code>%s</code>")
-                                   (italic . "<em>%s</em>")
-                                   (strike-through . "<del>%s</del>")
-                                   (underline . "<span class=\"underline\">%s</span>")
-                                   (verbatim . "<code>%s</code>"))
+(setq org-html-metadata-timestamp-format "%A %-d of %B, %Y at %H:%M"
       org-publish-project-alist
       `(("org"
          :base-directory "__TEST_DIR__/src"
@@ -64,7 +10,7 @@ Return output file name."
          :recursive t
          :exclude "tata\.org"
          :publishing-directory "__TEST_DIR__/public_html"
-         :publishing-function pablo-publish-to-html-and-customize-output
+         :publishing-function neruda/publish-to-html-and-customize-output
          :section-numbers nil
          :with-toc nil
          :html-head "<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\" href=\"style.css\"/>"
@@ -83,7 +29,7 @@ Return output file name."
          :recursive nil
          :exclude "ugly\.org"
          :publishing-directory "__TEST_DIR__/public_html/test"
-         :publishing-function pablo-publish-to-html-and-customize-output
+         :publishing-function neruda/publish-to-html-and-customize-output
          :section-numbers nil
          :with-toc nil
          :html-head "<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\" href=\"style.css\"/>"
@@ -101,7 +47,7 @@ Return output file name."
          :base-extension "org"
          :recursive t
          :publishing-directory "__TEST_DIR__/public_html/tata"
-         :publishing-function pablo-publish-to-html-and-customize-output
+         :publishing-function neruda/publish-to-html-and-customize-output
          :section-numbers nil
          :with-toc nil
          :html-head "<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\" href=\"style.css\"/>"

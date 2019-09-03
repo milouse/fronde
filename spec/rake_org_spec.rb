@@ -36,6 +36,7 @@ describe 'With working org files' do
     proof_content = IO.read(proof)
                       .gsub(/__TEST_DIR__/, Dir.pwd)
                       .gsub(/__BASE_DIR__/, base_dir)
+                      .gsub(/__ORG_VERSION__/, Neruda::Config.org_last_version)
     expect(IO.read('org-config.el')).to eq(proof_content)
   end
 
