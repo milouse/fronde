@@ -27,6 +27,9 @@ def init_testing_website
   rakefile = <<~RAKE
     # frozen_string_literal: true
 
+    require 'r18n-core'
+    R18n.set('en', '../../../locales')
+
     $LOAD_PATH.unshift('../../../lib')
 
     Dir.glob('../../../lib/tasks/*.rake').each { |r| import r }
