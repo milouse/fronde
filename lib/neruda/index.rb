@@ -32,7 +32,7 @@ module Neruda
     end
 
     def write_all(verbose = true)
-      entries.each do |k|
+      @index.keys.each do |k|
         src = write_org(k)
         warn "Generated index file #{src}" if verbose
         atom = write_atom(k)
