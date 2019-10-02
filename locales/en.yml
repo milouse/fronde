@@ -7,6 +7,9 @@ neruda:
   index:
     unsorted: Unsorted
     published_on: Published on %1
+    all_tags: All tags
+    by_name: By alphabetical order
+    by_weight: By publication number
   org:
     postamble:
       written_by: Written by %a

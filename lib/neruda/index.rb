@@ -39,6 +39,8 @@ module Neruda
         atom = write_atom(k)
         warn "Generated atom feed #{atom}" if verbose
       end
+      write_org_list
+      warn 'Generated all tags index' if verbose
     end
 
     private

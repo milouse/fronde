@@ -7,6 +7,9 @@ neruda:
   index:
     unsorted: Non triés
     published_on: Publié le %1
+    all_tags: Toutes les étiquettes
+    by_name: Par ordre alphabétique
+    by_weight: Par nombre de publication
   org:
     postamble:
       written_by: Écrit par %a

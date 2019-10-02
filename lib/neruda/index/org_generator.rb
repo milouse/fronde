@@ -27,7 +27,35 @@ module Neruda
       src
     end
 
+    def write_org_list
+      domain = Neruda::Config.settings['domain']
+      content = [org_header(R18n.t.neruda.index.all_tags)]
+      sort_tags_by_name_and_weight.each do |t, tags|
+        content << ''
+        content << org_title(R18n.t.neruda.index.send(t))
+        tags.each do |k|
+          title = @tags_names[k] || k
+          link = "[[#{domain}/tags/#{k}.html][#{title}]]"
+          content << "- #{link} (#{@index[k].length})"
+        end
+      end
+      FileUtils.mkdir_p 'src/tags'
+      src = 'src/tags/index.org'
+      IO.write(src, content.join("\n"))
+      src
+    end
+
     private
+
+    def sort_tags_by_name_and_weight
+      tags_sorted = {}
+      all_keys = @index.keys.reject { |k| k == 'index' }
+      tags_sorted[:by_name] = all_keys.sort
+      tags_sorted[:by_weight] = all_keys.sort do |a, b|
+        @index[b].length <=> @index[a].length
+      end
+      tags_sorted
+    end
 
     def index_source_path(index_name)
       slug = Neruda::OrgFile.slug index_name
