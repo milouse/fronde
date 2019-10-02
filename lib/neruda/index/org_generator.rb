@@ -37,7 +37,11 @@ module Neruda
     end
 
     def org_header(title = nil)
-      title = Neruda::Config.settings['title'] if title == 'index'
+      if title.nil? || title == 'index'
+        title = Neruda::Config.settings['title']
+      elsif @tags_names.has_key?(title)
+        title = @tags_names[title]
+      end
       <<~HEADER
         #+title: #{title}
         #+author: #{Neruda::Config.settings['author']}

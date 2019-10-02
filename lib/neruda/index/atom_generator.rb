@@ -38,6 +38,8 @@ module Neruda
           title = Neruda::Config.settings['title']
         end
         tagurl = "#{domain}/#{@blog_path}"
+      elsif @tags_names.has_key?(title)
+        title = @tags_names[title]
       end
       title_esc = CGI.escapeHTML(title)
       <<~ENDATOM

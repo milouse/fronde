@@ -20,6 +20,7 @@ module Neruda
       @blog_path = Neruda::Config.settings['blog_path']
       @pubdir = Neruda::Config.settings['public_folder']
       @index = { 'index' => [] }
+      @tags_names = {}
       @date = DateTime.now
       @sources = sources_list(file_list)
       filter_and_prefix_sources!
@@ -69,6 +70,7 @@ module Neruda
       @index['index'] << article
       article.keywords.each do |k|
         slug = Neruda::OrgFile.slug k
+        @tags_names[slug] = k # Overwrite is permitted
         @index[slug] = [] unless @index.has_key?(slug)
         @index[slug] << article
       end
