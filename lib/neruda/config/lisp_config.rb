@@ -44,6 +44,22 @@ module Neruda
       IO.write("#{workdir}/org-config.el", content)
     end
 
+    # Generate emacs directory variables file.
+    #
+    # This method generate the file ~.dir-locals.el~, which is
+    # responsible to load neruda org mode settings when visiting an
+    # org file of this neruda instance.
+    #
+    # @return [Integer] the length written (as returned by the
+    #   underlying ~IO.write~ method call)
+    def write_dir_locals
+      workdir = Dir.pwd
+      IO.write(
+        "#{workdir}/.dir-locals.el",
+        "((org-mode . ((eval . (load-file \"#{workdir}/org-config.el\")))))"
+      )
+    end
+
     private
 
     def project_names(projects)

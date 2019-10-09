@@ -57,8 +57,12 @@ namespace :org do
     Neruda::Config.write_org_lisp_config
   end
 
+  file '.dir-locals.el' do
+    Neruda::Config.write_dir_locals
+  end
+
   desc 'Install org'
-  task install: ['org:download', 'org-config.el'] do
+  task install: ['org:download', 'org-config.el', '.dir-locals.el'] do
     mkdir_p "#{Neruda::Config.settings['public_folder']}/assets"
     mkdir_p 'src'
   end

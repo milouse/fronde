@@ -20,7 +20,7 @@ describe 'With working org files' do
   end
 
   after(:each) do
-    FileUtils.rm 'org-config.el', force: true
+    FileUtils.rm ['.dir-locals.el', 'org-config.el'], force: true
   end
 
   after(:all) do
@@ -40,9 +40,19 @@ describe 'With working org files' do
     expect(IO.read('org-config.el')).to eq(proof_content)
   end
 
+  it 'should create .dir-locals.el', rake: true do
+    @rake.invoke_task('.dir-locals.el')
+    expect(File.exist?('.dir-locals.el')).to be(true)
+    proof = File.expand_path('org-config.el', Dir.pwd)
+    expect(IO.read('.dir-locals.el')).to(
+      eq("((org-mode . ((eval . (load-file \"#{proof}\")))))")
+    )
+  end
+
   it 'Should install org-mode', rake: true do
     @rake.invoke_task('org:install')
     expect(File.exist?('org-config.el')).to be(true)
+    expect(File.exist?('.dir-locals.el')).to be(true)
     expect(File.exist?("#{@org_dir}/lisp/org-loaddefs.el")).to be(true)
   end
 
@@ -52,6 +62,7 @@ describe 'With working org files' do
     Rake.verbose(true)
     @rake.invoke_task('org:install')
     expect(File.exist?('org-config.el')).to be(true)
+    expect(File.exist?('.dir-locals.el')).to be(true)
     expect(File.exist?("#{@org_dir}/lisp/org-loaddefs.el")).to be(true)
   end
 end
