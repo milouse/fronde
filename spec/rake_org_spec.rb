@@ -50,10 +50,13 @@ describe 'With working org files' do
   end
 
   it 'Should install org-mode', rake: true do
+    FileUtils.mkdir 'org-2.3'
+    expect(Dir.exist?('org-2.3')).to be(true)
     @rake.invoke_task('org:install')
     expect(File.exist?('org-config.el')).to be(true)
     expect(File.exist?('.dir-locals.el')).to be(true)
     expect(File.exist?("#{@org_dir}/lisp/org-loaddefs.el")).to be(true)
+    expect(Dir.exist?('org-2.3')).to be(false)
   end
 
   it 'Should install org-mode in verbose mode', rake: true do
