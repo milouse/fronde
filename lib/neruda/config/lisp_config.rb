@@ -40,7 +40,7 @@ module Neruda
                   .gsub('__ALL_PROJECTS__', all_projects(projects).strip)
                   .gsub('__THEME_CONFIG__', org_theme_config.strip)
                   .gsub('__ALL_PROJECTS_NAMES__', project_names(projects))
-                  .gsub('__LONG_DATE_FMT__', R18n.t.neruda.long_date_format)
+                  .gsub('__LONG_DATE_FMT__', r18n_full_datetime_format)
       IO.write("#{workdir}/org-config.el", content)
     end
 
@@ -61,6 +61,18 @@ module Neruda
     end
 
     private
+
+    def r18n_full_datetime_format
+      locale = R18n.get.locale
+      date_fmt = R18n.t.neruda.index.full_date_format(
+        date: locale.full_format
+      )
+      date_fmt = locale.year_format.sub('_', date_fmt)
+      time_fmt = locale.time_format.delete('_').strip
+      R18n.t.neruda.index.full_date_with_time_format(
+        date: date_fmt, time: time_fmt
+      )
+    end
 
     def project_names(projects)
       projects.keys.map { |p| ["\"#{p}\"", "\"#{p}-assets\""] }

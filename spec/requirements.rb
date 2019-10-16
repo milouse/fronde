@@ -5,6 +5,7 @@ require 'simplecov'
 
 require 'r18n-core'
 R18n.set('en', File.expand_path('../locales', __dir__))
+R18n::Filters.on(:named_variables)
 
 $LOAD_PATH.unshift('./lib')
 
@@ -29,6 +30,7 @@ def init_testing_website
 
     require 'r18n-core'
     R18n.set('en', '../../../locales')
+    R18n::Filters.on(:named_variables)
 
     $LOAD_PATH.unshift('../../../lib')
 

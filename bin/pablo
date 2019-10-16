@@ -103,6 +103,7 @@ class Pablo
       neruda_spec = Gem::Specification.find_by_name 'neruda'
       R18n.set(Neruda::Config.settings['lang'] || 'en',
                "\#{neruda_spec.gem_dir}/locales")
+      R18n::Filters.on(:named_variables)
 
       Dir.glob("\#{neruda_spec.gem_dir}/lib/tasks/*.rake").each { |r| import r }
 

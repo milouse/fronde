@@ -23,6 +23,10 @@ module Neruda
     #   taken from the ~#+date:~ header.
     attr_reader :date
 
+    # @return [Boolean] wether a time has been extracted from the
+    #   current org document ~#+date:~ header.
+    attr_reader :notime
+
     # The author of the current org document, taken from the ~#+author:~
     #   header.
     #
@@ -160,19 +164,23 @@ module Neruda
     #
     # @param dateformat [Symbol] the format to use to convert DateTime
     #   into String
+    # @param year [Boolean] wether or not the ~:full~ format must
+    #   contain the year
     # @return [String] the document DateTime string representation
-    def datestring(dateformat = :full)
+    def datestring(dateformat = :full, year = true)
       return '' if @date.nil?
       return R18n.l @date.to_date if dateformat == :short
-      if dateformat == :human
-        if @date.strftime('%H%M%S') == '000000'
-          return R18n.l @date.to_date, :human
-        end
-        return R18n.l @date, :human
-      end
       return @date.rfc3339 if dateformat == :rfc3339
-      # If date format is full, use the one from our config
-      R18n.l @date, R18n.t.neruda.long_date_format
+      locale = R18n.get.locale
+      long_fmt = R18n.t.neruda.index.full_date_format(
+        date: locale.format_date_full(@date, year)
+      )
+      unless @notime
+        long_fmt = R18n.t.neruda.index.full_date_with_time_format(
+          date: long_fmt, time: locale.time_format.delete('_').strip
+        )
+      end
+      locale.strftime(@date, long_fmt)
     end
 
     # Formats given ~string~ with values of the current OrgFile.
@@ -242,6 +250,7 @@ module Neruda
     def init_empty_file
       @title = @options[:title] || ''
       @date = DateTime.now
+      @notime = false
       @author = @options[:author] || default_author
       @keywords = []
       @lang = Neruda::Config.settings['lang']

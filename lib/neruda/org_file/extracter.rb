@@ -21,8 +21,12 @@ module Neruda
       timerx = '([0-9:]{5})(?::([0-9]{2}))?'
       m = /^#\+date: *<([0-9-]{10}) [\w.]+(?: #{timerx})?> *$/i.match(@content)
       return nil if m.nil?
-      time = '00:00:00'
-      time = "#{m[2]}:#{m[3] || '00'}" if m[2]
+      @notime = m[2].nil?
+      if @notime
+        time = '00:00:00'
+      else
+        time = "#{m[2]}:#{m[3] || '00'}"
+      end
       DateTime.strptime("#{m[1]} #{time}", '%Y-%m-%d %H:%M:%S')
     end
 

@@ -11,8 +11,8 @@ SAMPLE_INDEX = <<~IDX1
   :UNNUMBERED: notoc
   :END:
 
-  - *[[../data/test3.html][My third article]]* / Published on 11th of June 23:42
-  - *[[../data/test2.html][My second article]]* / Published on 11th of June
+  - *[[../data/test3.html][My third article]]* / Published on Tuesday 11th of June at 23:42
+  - *[[../data/test2.html][My second article]]* / Published on Tuesday 11th of June
 
   * Unsorted
   :PROPERTIES:

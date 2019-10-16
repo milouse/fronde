@@ -3,13 +3,14 @@ pablo:
   error:
     no_command: 'ERROR: no command or unknown command given.'
 neruda:
-  long_date_format: '%A %-d of %B, %Y at %H:%M'
   index:
     unsorted: Unsorted
     published_on: Published on %1
     all_tags: All tags
     by_name: By alphabetical order
     by_weight: By publication number
+    full_date_format: '%A %{date}'
+    full_date_with_time_format: '%{date} at %{time}'
   org:
     postamble:
       written_by: Written by %a
