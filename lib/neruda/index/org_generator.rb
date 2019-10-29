@@ -32,7 +32,7 @@ module Neruda
       content = [org_header(R18n.t.neruda.index.all_tags)]
       sort_tags_by_name_and_weight.each do |t, tags|
         content << ''
-        content << org_title(R18n.t.neruda.index.send(t))
+        content << org_title(R18n.t.neruda.index.send(t), 'index-tags')
         tags.each do |k|
           title = @tags_names[k] || k
           link = "[[#{domain}/tags/#{k}.html][#{title}]]"
@@ -88,12 +88,12 @@ module Neruda
       line
     end
 
-    def org_title(year)
+    def org_title(year, html_class = 'index-year')
       year = R18n.t.neruda.index.unsorted if year == '0000'
       <<~ENDPROP
         * #{year}
         :PROPERTIES:
-        :HTML_CONTAINER_CLASS: index-year
+        :HTML_CONTAINER_CLASS: #{html_class}
         :UNNUMBERED: notoc
         :END:
       ENDPROP
