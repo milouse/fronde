@@ -67,12 +67,12 @@ module Neruda
 
     def emacs_command(arguments = [])
       default_emacs = Neruda::Config.settings['emacs']
-      emacs_cmd = [default_emacs || 'emacs -Q -q --batch -nw']
+      emacs_cmd = [default_emacs || 'emacs -Q --batch -nw']
       emacs_cmd << '--eval \'(setq enable-dir-local-variables nil)\''
       unless @options[:verbose]
         emacs_cmd << '--eval \'(setq inhibit-message t)\''
       end
-      emacs_cmd << '-l ./org-config.el' if File.exist?('org-config.el')
+      emacs_cmd << '-l ./org-config.el'
       emacs_cmd << "--eval '(find-file \"#{@file}\")'" unless @file.nil?
       emacs_cmd.concat(arguments)
       emacs_cmd.join(' ')
