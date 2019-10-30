@@ -28,12 +28,6 @@
 
 ;;; Code:
 
-;;; Dependencies
-
-(require 'org)
-(require 'ox-html)
-
-
 ;;; Function Declarations
 
 (defvar neruda/current-work-dir nil
@@ -94,6 +88,8 @@ ORG-VERSION is used to load the right local version of org-mode."
   (add-to-list 'load-path (expand-file-name
                             (concat "org-" org-version "/lisp")
                             neruda/current-work-dir))
+  (require 'org)
+  (require 'ox-html)
   (org-link-set-parameters "i18n"
     :export #'neruda/org-i18n-export
     :follow #'neruda/org-i18n-follow)
