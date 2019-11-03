@@ -1,4 +1,5 @@
 ^.byebug_history$
+^.ignore$
 ^.ruby-gemset$
 ^neruda-.*\.gem$
 ^doc
