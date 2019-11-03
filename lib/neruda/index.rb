@@ -22,10 +22,14 @@ module Neruda
       @index = { 'index' => [] }
       @tags_names = {}
       @date = DateTime.now
-      @sources = sources_list(file_list)
-      filter_and_prefix_sources!
-      @sources.each { |f| add_to_indexes(Neruda::OrgFile.new(f)) }
-      sort!
+      if @blog_path.nil?
+        @sources = []
+      else
+        @sources = sources_list(file_list)
+        filter_and_prefix_sources!
+        @sources.each { |f| add_to_indexes(Neruda::OrgFile.new(f)) }
+        sort!
+      end
     end
 
     def entries
@@ -34,10 +38,10 @@ module Neruda
 
     def write_all(verbose = true)
       @index.keys.each do |k|
-        src = write_org(k)
-        warn "Generated index file #{src}" if verbose
-        atom = write_atom(k)
-        warn "Generated atom feed #{atom}" if verbose
+        write_org(k)
+        warn "Generated index file for #{k}" if verbose
+        write_atom(k)
+        warn "Generated atom feed for #{k}" if verbose
       end
       write_org_list
       warn 'Generated all tags index' if verbose

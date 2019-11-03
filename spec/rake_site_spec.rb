@@ -343,7 +343,7 @@ describe 'With a testing website' do
     end
   end
 
-  describe 'Generate indexes process' do
+  describe 'generate indexes process' do
     before(:all) do
       write_base_files
     end

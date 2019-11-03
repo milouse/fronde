@@ -8,6 +8,7 @@ namespace :site do
   desc 'Generates all index files'
   task :index do
     blog_path = Neruda::Config.settings['blog_path']
+    next if blog_path.nil?
     next unless Dir.exist?("src/#{blog_path}")
     index = Neruda::Index.new
     verbose = Rake::FileUtilsExt.verbose_flag

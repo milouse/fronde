@@ -21,13 +21,14 @@ module Neruda
     alias_method :to_s, :to_org
 
     def write_org(index_name)
+      return 0 if @blog_path.nil?
       FileUtils.mkdir_p 'src/tags' unless index_name == 'index'
       src = index_source_path(index_name)
       IO.write(src, to_org(index_name))
-      src
     end
 
     def write_org_list
+      return 0 if @blog_path.nil?
       domain = Neruda::Config.settings['domain']
       content = [org_header(R18n.t.neruda.index.all_tags)]
       sort_tags_by_name_and_weight.each do |t, tags|
@@ -42,7 +43,6 @@ module Neruda
       FileUtils.mkdir_p 'src/tags'
       src = 'src/tags/index.org'
       IO.write(src, content.join("\n"))
-      src
     end
 
     private

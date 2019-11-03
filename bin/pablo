@@ -70,8 +70,7 @@ module PabloCommands
     title = 'new' if title.nil? || title == ''
     filename = Neruda::OrgFile.slug title
     return "#{filename}.org" unless @options[:directory]
-    blog_path = Neruda::Config.settings['blog_path']
-    "#{blog_path}/#{filename}"
+    "#{filename}/index.org"
   end
 end
 

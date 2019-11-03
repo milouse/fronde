@@ -188,8 +188,7 @@ module Neruda
         <link rel="stylesheet" type="text/css" media="screen"
               href="#{settings['domain']}/assets/css/htmlize.css">
       CSS
-      main_feed = [Dir.pwd, settings['public_folder'], 'feeds', 'index.xml']
-      return stylesheet unless File.exist? main_feed.join('/')
+      return stylesheet if settings['blog_path'].nil?
       <<~ATOM
         #{stylesheet.strip}
         <link rel="alternate" type="application/atom+xml" title="Atom 1.0"

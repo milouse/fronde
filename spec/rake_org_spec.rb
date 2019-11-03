@@ -40,6 +40,22 @@ describe 'With working org files' do
     expect(IO.read('org-config.el')).to eq(proof_content)
   end
 
+  it 'should compile org-config.el for blog', rake: true do
+    old_conf = Neruda::Config.settings.dup
+    old_conf['theme'] = 'toto'
+    Neruda::Config.load_test(old_conf)
+    @rake.invoke_task('org-config.el')
+    expect(File.exist?('org-config.el')).to be(true)
+    proof = File.expand_path('data/org-config-blog-proof.el', __dir__)
+    base_dir = File.expand_path('../', __dir__)
+    proof_content = IO.read(proof)
+                      .gsub(/__TEST_DIR__/, Dir.pwd)
+                      .gsub(/__BASE_DIR__/, base_dir)
+                      .gsub(/__ORG_VERSION__/, Neruda::Config.org_last_version)
+    expect(IO.read('org-config.el')).to eq(proof_content)
+    Neruda::Config.send(:load_settings)
+  end
+
   it 'should create .dir-locals.el', rake: true do
     @rake.invoke_task('.dir-locals.el')
     expect(File.exist?('.dir-locals.el')).to be(true)

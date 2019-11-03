@@ -84,9 +84,9 @@ module Neruda
         @config['lang'] ||= 'en'
         @config['domain'] ||= ''
         @config['public_folder'] ||= 'public_html'
-        @config['blog_path'] ||= 'blog'
-        @config['blog_pattern'] ||= '**/*.org'
         @config['templates'] ||= []
+        return if @config['blog_path'].nil?
+        @config['blog_pattern'] ||= '**/*.org'
       end
     end
   end
