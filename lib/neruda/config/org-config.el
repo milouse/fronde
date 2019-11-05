@@ -5,7 +5,9 @@
 (load-file "__NERUDA_DIR__/ox-neruda.el")
 (neruda/init-export-variables "__WORK_DIR__")
 
-(setq org-html-metadata-timestamp-format "__LONG_DATE_FMT__"
+(setq user-mail-address "__AUTHOR_EMAIL__"
+      user-full-name "__AUTHOR_NAME__"
+      org-html-metadata-timestamp-format "__LONG_DATE_FMT__"
       org-publish-project-alist
       `(__ALL_PROJECTS__
         __THEME_CONFIG__

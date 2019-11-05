@@ -41,6 +41,8 @@ module Neruda
                   .gsub('__THEME_CONFIG__', org_theme_config.strip)
                   .gsub('__ALL_PROJECTS_NAMES__', project_names(projects))
                   .gsub('__LONG_DATE_FMT__', r18n_full_datetime_format)
+                  .gsub('__AUTHOR_EMAIL__', settings['author_email'] || '')
+                  .gsub('__AUTHOR_NAME__', settings['author'])
       IO.write("#{workdir}/org-config.el", content)
     end
 
