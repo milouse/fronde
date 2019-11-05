@@ -28,6 +28,9 @@
 
 ;;; Code:
 
+(require 'org)
+(require 'ox-html)
+
 ;;; Function Declarations
 
 (defvar neruda/current-work-dir nil
@@ -73,27 +76,14 @@ Return output file name."
     (message (replace-regexp-in-string "\n$" "" (shell-command-to-string command)))
     html-file))
 
-(defun neruda/init-export-variables (work-dir org-version)
+(defun neruda/init-export-variables (work-dir)
   "Initialize some variables needed for customized export.
 
 WORK-DIR is used to initialize `neruda/current-work-dir', which is then
-used to to load website specific dependencies.
-
-ORG-VERSION is used to load the right local version of org-mode."
+used to to load website specific dependencies."
   (setq neruda/current-work-dir work-dir
-        neruda/org-temp-dir (expand-file-name "tmp" neruda/current-work-dir))
-  ;; Load modern version of htmlize.el
-  (load-file (expand-file-name "htmlize.el" neruda/current-work-dir))
-  ;; Load org mode
-  (add-to-list 'load-path (expand-file-name
-                            (concat "org-" org-version "/lisp")
-                            neruda/current-work-dir))
-  (require 'org)
-  (require 'ox-html)
-  (org-link-set-parameters "i18n"
-    :export #'neruda/org-i18n-export
-    :follow #'neruda/org-i18n-follow)
-  (setq org-publish-timestamp-directory (expand-file-name "timestamps/" neruda/org-temp-dir)
+        neruda/org-temp-dir (expand-file-name "tmp" neruda/current-work-dir)
+        org-publish-timestamp-directory (expand-file-name "timestamps/" neruda/org-temp-dir)
         org-id-locations-file (expand-file-name "id-locations.el" neruda/org-temp-dir)
         make-backup-files nil
         enable-local-variables :all
@@ -106,7 +96,10 @@ ORG-VERSION is used to load the right local version of org-mode."
                                      (italic . "<em>%s</em>")
                                      (strike-through . "<del>%s</del>")
                                      (underline . "<span class=\"underline\">%s</span>")
-                                      (verbatim . "<code>%s</code>"))))
+                                      (verbatim . "<code>%s</code>")))
+  (org-link-set-parameters "i18n"
+    :export #'neruda/org-i18n-export
+    :follow #'neruda/org-i18n-follow))
 
 
 (provide 'ox-neruda)
