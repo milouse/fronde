@@ -106,7 +106,7 @@ module Neruda
          :base-extension "org"
          :recursive #{recline.join("\n ")}
          :publishing-directory "#{publish_in}"
-         :publishing-function neruda/publish-to-html-and-customize-output
+         :publishing-function org-neruda-publish-to-html
          :section-numbers nil
          :with-toc nil
          #{orgtpl})
