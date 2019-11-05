@@ -251,7 +251,7 @@ module Neruda
       @title = @options[:title] || ''
       @date = DateTime.now
       @notime = false
-      @author = @options[:author] || default_author
+      @author = @options[:author] || Neruda::Config.settings['author']
       @keywords = []
       @lang = Neruda::Config.settings['lang']
       @excerpt = ''

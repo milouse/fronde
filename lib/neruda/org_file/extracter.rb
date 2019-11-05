@@ -36,13 +36,9 @@ module Neruda
       m[1].strip
     end
 
-    def default_author
-      Neruda::Config.settings['author'] || ENV['USER'] || ''
-    end
-
     def extract_author
       m = /^#\+author:(.+)$/i.match(@content)
-      return default_author if m.nil?
+      return Neruda::Config.settings['author'] if m.nil?
       m[1].strip
     end
 

@@ -82,6 +82,7 @@ module Neruda
 
       def add_default_settings
         @config['lang'] ||= 'en'
+        @config['author'] ||= (ENV['USER'] || '')
         @config['domain'] ||= ''
         @config['public_folder'] ||= 'public_html'
         @config['templates'] ||= []
