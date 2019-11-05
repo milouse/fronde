@@ -25,7 +25,7 @@ namespace :site do
   desc 'Customize HTML output for a given file'
   task :customize_output, :target do |_, args|
     if args[:target].nil?
-      warn 'No source file given'
+      warn 'No target file given'
       next
     end
     require 'neruda/templater'
