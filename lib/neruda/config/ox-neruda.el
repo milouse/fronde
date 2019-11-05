@@ -70,11 +70,15 @@ is the property list for the given project.  PUB-DIR is the
 publishing directory.
 
 Return output file name."
-  (let* ((html-file (org-html-publish-to-html plist filename pub-dir))
-         (relative-html-file (substring html-file (+ 1 (length neruda/current-work-dir))))
-         (command (concat "rake 'site:customize_output[" relative-html-file "]'")))
+  (let* ((target-html-file ;; (org-publish-org-to 'neruda filename ".html" plist pub-dir))
+           (org-html-publish-to-html plist filename pub-dir))
+          (relative-target-html-file (substring target-html-file
+                                       (+ 1 (length neruda/current-work-dir))))
+          ;; Always be verbose, this is the parent task to hide these messages
+          (command (format "rake -v 'site:customize_output[%s]'"
+                     relative-target-html-file)))
     (message (replace-regexp-in-string "\n$" "" (shell-command-to-string command)))
-    html-file))
+    target-html-file))
 
 (defun neruda/init-export-variables (work-dir)
   "Initialize some variables needed for customized export.
