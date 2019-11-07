@@ -101,9 +101,8 @@ module Neruda
     # @option opts [String] title ('') the title of the new org file
     # @option opts [String] author (system user or '') the author of the
     #   document
-    # @option opts [Boolean] verbose (false) weither the
-    #   {Neruda::OrgFileHtmlizer#publish publish} or
-    #   {Neruda::OrgFileHtmlizer#to_html to_html} methods should output
+    # @option opts [Boolean] verbose (false) if the
+    #   {Neruda::OrgFileHtmlizer#publish publish} method should output
     #   emacs process messages
     # @return [Neruda::OrgFile] the new instance of Neruda::OrgFile
     def initialize(file_name, opts = {})

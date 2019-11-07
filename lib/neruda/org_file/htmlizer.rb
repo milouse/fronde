@@ -6,18 +6,6 @@ module Neruda
   # This module holds HTML formatter methods for the {Neruda::OrgFile}
   # class.
   module OrgFileHtmlizer
-    # Output current file content as a HTML formatted string.
-    #
-    # @return [String] the file content in HTML
-    def to_html
-      backup = setup_chunk_dir
-      IO.write(@file, @content)
-      call_emacs ['--eval "(org-html-export-to-html nil nil nil t)"']
-      result = IO.read(@html_file).strip
-      remove_chunk_dir(backup)
-      result
-    end
-
     # Publish the current file or the entire project if
     #   {Neruda::OrgFile#file @file} is ~nil~.
     #
@@ -85,23 +73,6 @@ module Neruda
         return system(command)
       end
       system command, out: '/dev/null', err: '/dev/null'
-    end
-
-    def setup_chunk_dir
-      old_file = @file
-      old_html_file = @html_file
-      tmp_dir = "#{Dir.pwd}/tmp"
-      FileUtils.mkdir(tmp_dir) unless Dir.exist?(tmp_dir)
-      @file = "#{tmp_dir}/chunk.org"
-      @html_file = @file.sub(/\.org$/, '.html')
-      [tmp_dir, old_file, old_html_file]
-    end
-
-    def remove_chunk_dir(backup)
-      FileUtils.rm [@file, @html_file]
-      FileUtils.rm_r backup[0] if Dir.empty?(backup[0])
-      @file = backup[1]
-      @html_file = backup[2]
     end
   end
 end
