@@ -9,12 +9,12 @@ module Neruda
   class Templater
     def initialize(source, dom, opts = {})
       @dom = dom
+      @org_file = source
       @position = opts['type'] || 'after'
       @content = opts['content']
       @element = @dom.css(opts['selector'])
       digest = Digest::MD5.hexdigest(@content)
       @check_line = " Neruda Template: #{digest} "
-      @org_file = Neruda::OrgFile.new(source)
     end
 
     def apply
@@ -33,14 +33,15 @@ module Neruda
     end
 
     class << self
-      def customize_output(file_name)
-        templates = Neruda::Config.settings['templates']
-        return if templates.nil? || templates.empty?
+      def customize_output(file_name, source = nil)
+        templates_to_apply = filter_templates(file_name)
+        return if templates_to_apply.empty?
+        if source.nil?
+          sourcepath = Neruda::OrgFile.source_for_target(file_name)
+          source = Neruda::OrgFile.new(sourcepath)
+        end
         dom = open_dom(file_name)
-        templates.each do |t|
-          next unless t.has_key?('selector') && t.has_key?('content')
-          next if t.has_key?('path') && !check_path(file_name, t['path'])
-          source = Neruda::OrgFile.source_for_target(file_name)
+        templates_to_apply.each do |t|
           tpl = Neruda::Templater.new(source, dom, t)
           next if tpl.in_head?
           tpl.apply
@@ -49,6 +50,20 @@ module Neruda
       end
 
       private
+
+      def filter_templates(file_name)
+        templates = Neruda::Config.settings['templates']
+        return [] if templates.nil? || templates.empty?
+        templates.filter do |t|
+          if !t.has_key?('selector') || !t.has_key?('content')
+            false
+          elsif t.has_key?('path') && !check_path(file_name, t['path'])
+            false
+          else
+            true
+          end
+        end
+      end
 
       def open_dom(file_name)
         file = File.new file_name, 'r'

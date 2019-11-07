@@ -31,10 +31,6 @@
 (require 'org)
 (require 'ox-html)
 
-(org-export-define-derived-backend 'neruda 'html
-  :translate-alist
-  '((inner-template . org-neruda-inner-template)))
-
 ;;; Function Declarations
 
 (defvar neruda/current-work-dir nil
@@ -63,79 +59,28 @@ org timestamps and id locations).")
   "Visit a i18n link"
   (browse-url (car (split-string link "|"))))
 
-(defun org-neruda-inner-template (contents info)
-  "Return complete document string after HTML conversion.
-CONTENTS is the transcoded contents string.  INFO is a plist
-holding export options."
-  (let ((basickeys '(:description :keywords :creator :title :date
-                      :author :email :language))
-         (data-file
-           ;; publishing are made from the src directory
-           (format "%s/tmp/chunks/%s.data"
-             neruda/current-work-dir
-             (substring (plist-get info :output-file)
-               (+ 1 (length (concat neruda/current-work-dir "/public_html")))))))
-    (let ((data-dir (file-name-directory data-file)))
-      (unless (file-exists-p data-dir)) (make-directory data-dir t))
-    (with-current-buffer (find-file data-file)
-      (insert "---\n")
-      (dolist (key basickeys)
-        (let ((value (org-export-data (plist-get info key) info))
-               (keyname (substring (symbol-name key) 1)))
-          (if (eq key :description)
-            (insert (format "%s: |\n%s\n" keyname
-                      (replace-regexp-in-string "^" "  " value)))
-            (insert (format "%s: \"%s\"\n" keyname
-                      (replace-regexp-in-string "\"" "\\\\\"" value))))))
-      (save-buffer)))
-  ;; Don't forget to run the parent method
-  (org-html-inner-template contents info))
+(org-link-set-parameters "i18n"
+  :export #'neruda/org-i18n-export
+  :follow #'neruda/org-i18n-follow)
 
 
-;;; End-user functions
+;;; Set configuration options
 
-(defun org-neruda-publish-to-html (plist filename pub-dir)
-  "Publish an org file for Neruda static website generator.
-
-FILENAME is the filename of the Org file to be published.  PLIST
-is the property list for the given project.  PUB-DIR is the
-publishing directory.
-
-Return output file name."
-  (let* ((target-html-file ;; (org-publish-org-to 'neruda filename ".html" plist pub-dir))
-           (org-html-publish-to-html plist filename pub-dir))
-          (relative-target-html-file (substring target-html-file
-                                       (+ 1 (length neruda/current-work-dir))))
-          ;; Always be verbose, this is the parent task to hide these messages
-          (command (format "rake -v 'site:customize_output[%s]'"
-                     relative-target-html-file)))
-    (message (replace-regexp-in-string "\n$" "" (shell-command-to-string command)))
-    target-html-file))
-
-(defun neruda/init-export-variables (work-dir)
-  "Initialize some variables needed for customized export.
-
-WORK-DIR is used to initialize `neruda/current-work-dir', which is then
-used to to load website specific dependencies."
-  (setq neruda/current-work-dir work-dir
-        neruda/org-temp-dir (expand-file-name "tmp" neruda/current-work-dir)
-        org-publish-timestamp-directory (expand-file-name "timestamps/" neruda/org-temp-dir)
-        org-id-locations-file (expand-file-name "id-locations.el" neruda/org-temp-dir)
-        make-backup-files nil
-        enable-local-variables :all
-        org-confirm-babel-evaluate nil
-        org-html-doctype "html5"
-        org-html-html5-fancy t
-        org-html-htmlize-output-type 'css
-        org-html-text-markup-alist '((bold . "<strong>%s</strong>")
-                                     (code . "<code>%s</code>")
-                                     (italic . "<em>%s</em>")
-                                     (strike-through . "<del>%s</del>")
-                                     (underline . "<span class=\"underline\">%s</span>")
-                                      (verbatim . "<code>%s</code>")))
-  (org-link-set-parameters "i18n"
-    :export #'neruda/org-i18n-export
-    :follow #'neruda/org-i18n-follow))
+(setq neruda/org-temp-dir (expand-file-name "tmp" neruda/current-work-dir)
+      org-publish-timestamp-directory (expand-file-name "timestamps/" neruda/org-temp-dir)
+      org-id-locations-file (expand-file-name "id-locations.el" neruda/org-temp-dir)
+      make-backup-files nil
+      enable-local-variables :all
+      org-confirm-babel-evaluate nil
+      org-html-doctype "html5"
+      org-html-html5-fancy t
+      org-html-htmlize-output-type 'css
+      org-html-text-markup-alist '((bold . "<strong>%s</strong>")
+                                    (code . "<code>%s</code>")
+                                    (italic . "<em>%s</em>")
+                                    (strike-through . "<del>%s</del>")
+                                    (underline . "<span class=\"underline\">%s</span>")
+                                    (verbatim . "<code>%s</code>")))
 
 
 (provide 'ox-neruda)

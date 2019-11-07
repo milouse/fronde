@@ -1,8 +1,13 @@
-;; Load neruda lib
-(load-file "__BASE_DIR__/lib/neruda/config/ox-neruda.el")
-(neruda/init-export-variables "__TEST_DIR__" "__ORG_VERSION__")
+;; Add custom org mode to load path
+(add-to-list 'load-path (expand-file-name "org-__ORG_VERSION__/lisp" "__TEST_DIR__"))
+;; Load modern version of htmlize.el
+(load-file (expand-file-name "htmlize.el" "__TEST_DIR__"))
 
-(setq org-html-metadata-timestamp-format "%A %-d of %B, %Y at %H:%M"
+;; Current project options
+(setq neruda/current-work-dir "__TEST_DIR__"
+      user-mail-address ""
+      user-full-name "Tata"
+      org-html-metadata-timestamp-format "%A %-d of %B, %Y at %H:%M"
       org-publish-project-alist
       `(("org"
          :base-directory "__TEST_DIR__/src"
@@ -10,7 +15,7 @@
          :recursive t
          :exclude "tata\.org"
          :publishing-directory "__TEST_DIR__/public_html"
-         :publishing-function neruda/publish-to-html-and-customize-output
+         :publishing-function org-html-publish-to-html
          :section-numbers nil
          :with-toc nil
          :html-head "<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\" href=\"style.css\"/>"
@@ -29,7 +34,7 @@
          :recursive nil
          :exclude "ugly\.org"
          :publishing-directory "__TEST_DIR__/public_html/test"
-         :publishing-function neruda/publish-to-html-and-customize-output
+         :publishing-function org-html-publish-to-html
          :section-numbers nil
          :with-toc nil
          :html-head "<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\" href=\"style.css\"/>"
@@ -47,7 +52,7 @@
          :base-extension "org"
          :recursive t
          :publishing-directory "__TEST_DIR__/public_html/tata"
-         :publishing-function neruda/publish-to-html-and-customize-output
+         :publishing-function org-html-publish-to-html
          :section-numbers nil
          :with-toc nil
          :html-head "<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\" href=\"style.css\"/>"
@@ -67,3 +72,6 @@
          :publishing-directory "__TEST_DIR__/public_html/assets"
          :publishing-function org-publish-attachment)
         ("website" :components ("org" "org-assets" "test" "test-assets" "tata" "tata-assets" "theme"))))
+
+;; Load neruda lib
+(load-file (expand-file-name "ox-neruda.el" "__BASE_DIR__/lib/neruda/config"))

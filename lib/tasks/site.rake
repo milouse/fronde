@@ -3,6 +3,7 @@
 require 'neruda/index'
 require 'neruda/utils'
 require 'neruda/org_file'
+require 'neruda/templater'
 
 namespace :site do
   desc 'Generates all index files'
@@ -22,34 +23,34 @@ namespace :site do
     Neruda::Utils.throbber(build, 'Generating indexes:')
   end
 
-  desc 'Customize HTML output for a given file'
-  task :customize_output, :target do |_, args|
-    if args[:target].nil?
-      warn 'No target file given'
-      next
-    end
-    require 'neruda/templater'
-    warn "Customizing file #{args[:target]}" if Rake::FileUtilsExt.verbose_flag
-    Neruda::Templater.customize_output(args[:target])
-  end
-
   desc 'Convert all org files'
   task build: :index do
-    build = Thread.new do
+    build_html = Thread.new do
       Neruda::OrgFile.new(nil, verbose: Rake::FileUtilsExt.verbose_flag).publish
     end
-    Neruda::Utils.throbber(build, 'Publishing:')
+    Neruda::Utils.throbber(build_html, 'Publishing:')
+    customize_html = Thread.new do
+      pubfolder = Neruda::Config.settings['public_folder']
+      Dir["#{pubfolder}/**/*.html"].each do |f|
+        Neruda::Templater.customize_output(f)
+      end
+    end
+    Neruda::Utils.throbber(customize_html, 'Customizing:')
   end
 
   namespace :build do
     desc 'Convert one org file'
-    task :one, :target do |_, args|
-      if args[:target].nil?
+    task :one, :source do |_, args|
+      if args[:source].nil?
         warn 'No source file given'
         next
       end
-      Neruda::OrgFile.new(args[:target],
-                          verbose: Rake::FileUtilsExt.verbose_flag).publish
+      verbose = Rake::FileUtilsExt.verbose_flag
+      o = Neruda::OrgFile.new(args[:source], verbose: verbose)
+      o.publish
+      target = Neruda::OrgFile.target_for_source(args[:source])
+      warn "Customizing file #{target}" if verbose
+      Neruda::Templater.customize_output(target, o)
     end
   end
 
