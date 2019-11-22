@@ -43,8 +43,15 @@ module Neruda
         write_atom(k)
         warn "Generated atom feed for #{k}" if verbose
       end
-      write_org_list
+      write_org_lists
       warn 'Generated all tags index' if verbose
+    end
+
+    def sort_by(kind)
+      if [:name, :weight].include?(kind)
+        return sort_tags_by_name_and_weight["by_#{kind}".to_sym]
+      end
+      raise ArgumentError, "#{kind} not in [:name, :weight]"
     end
 
     private
@@ -86,6 +93,16 @@ module Neruda
       @index.each do |k, i|
         @index[k] = i.sort { |a, b| b.timekey <=> a.timekey }
       end
+    end
+
+    def sort_tags_by_name_and_weight
+      tags_sorted = {}
+      all_keys = @index.keys.reject { |k| k == 'index' }
+      tags_sorted[:by_name] = all_keys.sort
+      tags_sorted[:by_weight] = all_keys.sort do |a, b|
+        @index[b].length <=> @index[a].length
+      end
+      tags_sorted
     end
   end
 end

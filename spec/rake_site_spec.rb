@@ -118,29 +118,52 @@ describe 'With a testing website' do
       expect(File.exist?('public_html/feeds/titi.xml')).to be(false)
     end
 
-    it 'should generate indexes with a correct blog path', rake: true do
-      Neruda::Config.load_test('blog_path' => 'news')
-      @rake.invoke_task('site:index')
-      expect(File.exist?('src/news/index.org')).to be(true)
-      expect(File.exist?('src/tags/toto.org')).to be(true)
-      expect(File.exist?('src/tags/titi.org')).to be(true)
-      expect(File.exist?('public_html/feeds/index.xml')).to be(true)
-      expect(File.exist?('public_html/feeds/toto.xml')).to be(true)
-      expect(File.exist?('public_html/feeds/titi.xml')).to be(true)
-    end
+    describe 'with a correct blog path' do
+      before(:each) do
+        Neruda::Config.load_test('blog_path' => 'news')
+      end
 
-    it 'should generate indexes with a correct blog path, even with build', rake: true do
-      Neruda::Config.load_test('blog_path' => 'news')
-      @rake.invoke_task('site:build')
-      expect(File.exist?('src/news/index.org')).to be(true)
-      expect(File.exist?('src/tags/toto.org')).to be(true)
-      expect(File.exist?('src/tags/titi.org')).to be(true)
-      expect(File.exist?('public_html/news/index.html')).to be(true)
-      expect(File.exist?('public_html/tags/toto.html')).to be(true)
-      expect(File.exist?('public_html/tags/titi.html')).to be(true)
-      expect(File.exist?('public_html/feeds/index.xml')).to be(true)
-      expect(File.exist?('public_html/feeds/toto.xml')).to be(true)
-      expect(File.exist?('public_html/feeds/titi.xml')).to be(true)
+      it 'should generate indexes', rake: true do
+        @rake.invoke_task('site:index')
+        expect(File.exist?('src/news/index.org')).to be(true)
+        expect(File.exist?('src/tags/toto.org')).to be(true)
+        expect(File.exist?('src/tags/titi.org')).to be(true)
+        expect(File.exist?('public_html/feeds/index.xml')).to be(true)
+        expect(File.exist?('public_html/feeds/toto.xml')).to be(true)
+        expect(File.exist?('public_html/feeds/titi.xml')).to be(true)
+      end
+
+      it 'should generate indexes, even verbosely', rake: true do
+        Rake.verbose(true)
+        @rake.invoke_task('site:index')
+        expect(File.exist?('src/news/index.org')).to be(true)
+        expect(File.exist?('src/tags/toto.org')).to be(true)
+        expect(File.exist?('src/tags/titi.org')).to be(true)
+        expect(File.exist?('public_html/feeds/index.xml')).to be(true)
+        expect(File.exist?('public_html/feeds/toto.xml')).to be(true)
+        expect(File.exist?('public_html/feeds/titi.xml')).to be(true)
+      end
+
+      it 'should generate indexes, even with build', rake: true do
+        @rake.invoke_task('site:build')
+        expect(File.exist?('src/news/index.org')).to be(true)
+        expect(File.exist?('src/tags/toto.org')).to be(true)
+        expect(File.exist?('src/tags/titi.org')).to be(true)
+        expect(File.exist?('public_html/news/index.html')).to be(true)
+        expect(File.exist?('public_html/tags/toto.html')).to be(true)
+        expect(File.exist?('public_html/tags/titi.html')).to be(true)
+        expect(File.exist?('public_html/feeds/index.xml')).to be(true)
+        expect(File.exist?('public_html/feeds/toto.xml')).to be(true)
+        expect(File.exist?('public_html/feeds/titi.xml')).to be(true)
+      end
+
+      it 'should list all tags by name', rake: true do
+        expect { @rake.invoke_task('tags:name') }.to output("titi\ntoto\n").to_stdout
+      end
+
+      it 'should list all tags by weight', rake: true do
+        expect { @rake.invoke_task('tags:weight') }.to output("toto\ntiti\n").to_stdout
+      end
     end
 
     it 'should use website title for blog index', rake: true do
@@ -149,49 +172,6 @@ describe 'With a testing website' do
       @rake.invoke_task('site:index')
       expect(File.exist?('src/news/index.org')).to be(true)
       expect(File.exist?('src/tags/toto.org')).to be(true)
-    end
-  end
-
-  describe 'Generate indexes process with direct blog files' do
-    before(:all) do
-      write_base_files
-      Neruda::Config.load_test('blog_path' => 'news')
-    end
-
-    before(:each) do
-      @rake.options.build_all = true
-      @rake.tasks.each(&:reenable)
-    end
-
-    after(:each) do
-      FileUtils.rm_r ['tmp', 'src/tags', 'public_html'], force: true
-    end
-
-    after(:all) do
-      FileUtils.rm_r ['src/index.org', 'src/news']
-    end
-
-    it 'should generate indexes with a correct blog path', rake: true do
-      @rake.invoke_task('site:index')
-      expect(File.exist?('src/news/index.org')).to be(true)
-      expect(File.exist?('src/tags/toto.org')).to be(true)
-      expect(File.exist?('src/tags/titi.org')).to be(true)
-      expect(File.exist?('public_html/feeds/index.xml')).to be(true)
-      expect(File.exist?('public_html/feeds/toto.xml')).to be(true)
-      expect(File.exist?('public_html/feeds/titi.xml')).to be(true)
-    end
-
-    it 'should generate indexes with a correct blog path, even with build', rake: true do
-      @rake.invoke_task('site:build')
-      expect(File.exist?('src/news/index.org')).to be(true)
-      expect(File.exist?('src/tags/toto.org')).to be(true)
-      expect(File.exist?('src/tags/titi.org')).to be(true)
-      expect(File.exist?('public_html/news/index.html')).to be(true)
-      expect(File.exist?('public_html/tags/toto.html')).to be(true)
-      expect(File.exist?('public_html/tags/titi.html')).to be(true)
-      expect(File.exist?('public_html/feeds/index.xml')).to be(true)
-      expect(File.exist?('public_html/feeds/toto.xml')).to be(true)
-      expect(File.exist?('public_html/feeds/titi.xml')).to be(true)
     end
   end
 end

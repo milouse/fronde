@@ -66,7 +66,7 @@ SAMPLE_ATOM = <<~ATOM
     <id>urn:md5:c47532bbb1e2883c902071591ae1ec9b</id>
     <published></published>
     <author><name>Test</name></author>
-    <dc:subject>toto</dc:subject>
+    <dc:subject>tutu</dc:subject>
     <content type="html"></content>
   </entry>
   </feed>
@@ -133,6 +133,20 @@ describe 'With blog settings' do
         expect(File.exist?('public_html/feeds/index.xml')).to be(true)
         expect(File.exist?('public_html/feeds/toto.xml')).to be(true)
         expect(File.exist?('public_html/feeds/tutu.xml')).to be(true)
+      end
+
+      it 'should list tags by name', core: true do
+        list = @index.sort_by :name
+        expect(list).to eql(['toto', 'tutu'])
+      end
+
+      it 'should list tags by weight', core: true do
+        list = @index.sort_by :weight
+        expect(list).to eql(['tutu', 'toto'])
+      end
+
+      it 'should raise an error if sort_by is called with bad argument', core: true do
+        expect { @index.sort_by(:test) }.to raise_error(ArgumentError)
       end
     end
   end

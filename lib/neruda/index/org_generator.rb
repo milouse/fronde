@@ -27,7 +27,7 @@ module Neruda
       IO.write(src, to_org(index_name))
     end
 
-    def write_org_list
+    def write_org_lists
       return 0 if @blog_path.nil?
       domain = Neruda::Config.settings['domain']
       content = [org_header(R18n.t.neruda.index.all_tags)]
@@ -46,16 +46,6 @@ module Neruda
     end
 
     private
-
-    def sort_tags_by_name_and_weight
-      tags_sorted = {}
-      all_keys = @index.keys.reject { |k| k == 'index' }
-      tags_sorted[:by_name] = all_keys.sort
-      tags_sorted[:by_weight] = all_keys.sort do |a, b|
-        @index[b].length <=> @index[a].length
-      end
-      tags_sorted
-    end
 
     def index_source_path(index_name)
       slug = Neruda::OrgFile.slug index_name
