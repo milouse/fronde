@@ -120,6 +120,7 @@ describe 'With a testing website' do
 
     describe 'with a correct blog path' do
       before(:each) do
+        Rake.verbose(false)
         Neruda::Config.load_test('blog_path' => 'news')
       end
 
