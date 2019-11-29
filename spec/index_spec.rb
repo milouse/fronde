@@ -137,12 +137,12 @@ describe 'With blog settings' do
 
       it 'should list tags by name', core: true do
         list = @index.sort_by :name
-        expect(list).to eql(['toto', 'tutu'])
+        expect(list).to eql(['tutu (2)', 'toto (1)'])
       end
 
       it 'should list tags by weight', core: true do
         list = @index.sort_by :weight
-        expect(list).to eql(['tutu', 'toto'])
+        expect(list).to eql(['toto (1)', 'tutu (2)'])
       end
 
       it 'should raise an error if sort_by is called with bad argument', core: true do

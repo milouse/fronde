@@ -159,11 +159,11 @@ describe 'With a testing website' do
       end
 
       it 'should list all tags by name', rake: true do
-        expect { @rake.invoke_task('tags:name') }.to output("titi\ntoto\n").to_stdout
+        expect { @rake.invoke_task('tags:name') }.to output("toto (2)\ntiti (1)\n").to_stdout
       end
 
       it 'should list all tags by weight', rake: true do
-        expect { @rake.invoke_task('tags:weight') }.to output("toto\ntiti\n").to_stdout
+        expect { @rake.invoke_task('tags:weight') }.to output("titi (1)\ntoto (2)\n").to_stdout
       end
     end
 
