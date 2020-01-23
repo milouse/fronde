@@ -252,7 +252,7 @@ module Neruda
       @notime = false
       @author = @options[:author] || Neruda::Config.settings['author']
       @keywords = []
-      @lang = Neruda::Config.settings['lang']
+      @lang = @options[:lang] || Neruda::Config.settings['lang']
       @excerpt = ''
       @content = @options[:content] || <<~ORG
         #+title: #{@title}
