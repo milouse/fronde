@@ -133,8 +133,11 @@ if ARGV[0] == 'help'
 end
 pablo = Pablo.new(params)
 command = "pablo_#{ARGV[0]}".to_sym
-err = command.nil? || !pablo.respond_to?(command)
-pablo.pablo_help(ARGV[0], err) if err || params[:help]
+if params[:help]
+  pablo.pablo_help(ARGV[0])
+elsif command.nil? || !pablo.respond_to?(command)
+  pablo.pablo_help(ARGV[0], true)
+end
 ARGV.shift
 
 init_cmds = ['pablo_init', 'pablo_config']
