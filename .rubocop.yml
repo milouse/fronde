@@ -2,8 +2,19 @@
 AllCops:
   TargetRubyVersion: 2.5
 
+Layout:
+  Severity: warning
+
 Layout/EmptyLineAfterGuardClause:
   Enabled: false
+
+Layout/LineLength:
+  Max: 80
+  Exclude:
+  - spec/*
+
+Metrics:
+  Severity: warning
 
 Metrics/AbcSize:
   Enabled: false
@@ -14,11 +25,6 @@ Metrics/BlockLength:
   - spec/*
   - lib/tasks/*
   - neruda.gemspec
-
-Metrics/LineLength:
-  Max: 80
-  Exclude:
-  - spec/*
 
 Metrics/MethodLength:
   Max: 15
