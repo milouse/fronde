@@ -112,14 +112,14 @@ class Pablo
   end
 end
 
-params = {}
-optparser = OptionParser.new do |opts|
-  opts.version = Neruda::VERSION
-  Neruda::Utils::PABLO_OPTIONS.each do |k, opt|
-    short, long = Neruda::Utils.decorate_option(k)
-    opts.send(opt[:meth] || :on, short, long, opt[:desc])
-  end
+optparser = OptionParser.new
+optparser.version = Neruda::VERSION
+
+Neruda::Utils::PABLO_OPTIONS.each do |k, opt|
+  optparser.send(opt[:meth] || :on, *Neruda::Utils.decorate_option(k))
 end
+
+params = {}
 optparser.parse!(into: params)
 
 if params[:version]

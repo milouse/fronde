@@ -95,8 +95,8 @@ module Neruda
         opt = Neruda::Utils::PABLO_OPTIONS[short]
         long = "--#{opt[:long]}"
         return [short, long] if opt[:boolean]
-        key = ' ' + (opt[:keyword] || opt[:long].upcase)
-        [short + key, long + key]
+        key = opt[:keyword] || opt[:long].upcase
+        [short + key, long + ' ' + key]
       end
 
       # Returns the ~pablo~ help summary for a given command.
