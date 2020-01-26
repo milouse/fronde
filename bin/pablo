@@ -52,13 +52,13 @@ module PabloCommands
 
   def pablo_help(command = 'basic', error = false)
     warn R18n.t.pablo.error.no_command if error
-    command = 'basic' unless Neruda::Utils::PABLO_COMMANDS.include?(command)
-    cmd_opt = Neruda::Utils::PABLO_COMMANDS[command]
+    cmd = Neruda::Utils.resolve_possible_alias(command)
+    cmd_opt = Neruda::Utils::PABLO_COMMANDS[cmd]
     label = cmd_opt[:label] || command
     warn "Usage: pablo #{label} [options]\n\n"
     warn cmd_opt[:desc] + "\n\n" if cmd_opt.has_key?(:desc)
-    warn "Options\n#{Neruda::Utils.summarize_command(command)}\n"
-    warn "Commands\n#{Neruda::Utils.list_commands}\n" if command == 'basic'
+    warn "Options\n#{Neruda::Utils.summarize_command(cmd)}\n"
+    warn "Commands\n#{Neruda::Utils.list_commands}\n" if cmd == 'basic'
     exit 1 if error
     exit
   end
@@ -133,10 +133,10 @@ if ARGV[0] == 'help'
 end
 pablo = Pablo.new(params)
 command = "pablo_#{ARGV[0]}".to_sym
-if params[:help]
-  pablo.pablo_help(ARGV[0])
-elsif command.nil? || !pablo.respond_to?(command)
-  pablo.pablo_help(ARGV[0], true)
+cmd_err = !pablo.respond_to?(command)
+if params[:help] || cmd_err
+  cmd_err = false if params[:help] && !ARGV[0]
+  pablo.pablo_help(ARGV[0], cmd_err)
 end
 ARGV.shift
 

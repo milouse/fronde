@@ -41,11 +41,13 @@ module Neruda
       'init' => { opts: ['-a', '-l', '-t', '-v', '-h'],
                   desc: 'Initialize your Neruda instance ' \
                         '(you just need to do it once).' },
+      'config' => { alias: 'init' },
       'preview' => { opts: ['-h'],
                      desc: 'Start a test webserver to preview ' \
                            'your website on http://127.0.0.1:5000' },
       'open' => { opts: ['-a', '-l', '-t', '-d', '-p', '-v', '-h'],
                   desc: 'Open or create an org file for edition.' },
+      'edit' => { alias: 'open' },
       'help' => { opts: ['-h'], desc: 'Alias for the -h switch.' },
       'basic' => { opts: ['-h', '-V'], label: '<command>' }
     }.freeze
@@ -124,6 +126,18 @@ module Neruda
           lines += "    #{cmd.ljust(10)} #{opt[:desc]}\n"
         end
         lines
+      end
+
+      # Returns the real command name for a given command, which may be
+      #   an alias.
+      #
+      # @param command [String] the command to resolve
+      # @return [String]
+      def resolve_possible_alias(command)
+        return 'basic' unless Neruda::Utils::PABLO_COMMANDS.include?(command)
+        cmd_opt = Neruda::Utils::PABLO_COMMANDS[command]
+        return cmd_opt[:alias] if cmd_opt.has_key?(:alias)
+        command
       end
     end
   end
