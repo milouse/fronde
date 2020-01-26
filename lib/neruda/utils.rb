@@ -142,6 +142,17 @@ module Neruda
         return cmd_opt[:alias] if cmd_opt.has_key?(:alias)
         command
       end
+
+      # Try to discover the current host operating system.
+      #
+      # @return [String] either apple, windows or linux (default)
+      def current_os
+        if ENV['OS'] == 'Windows_NT' || RUBY_PLATFORM =~ /cygwin/
+          return 'windows'
+        end
+        return 'apple' if RUBY_PLATFORM =~ /darwin/
+        'linux'
+      end
     end
   end
 end

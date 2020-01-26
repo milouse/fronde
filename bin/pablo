@@ -35,6 +35,19 @@ module PabloCommands
   end
 
   def pablo_preview
+    Thread.new do
+      sleep 1
+      port = Neruda::Config.settings['server_port'] || 5000
+      uri = "http://127.0.0.1:#{port}/"
+      current_os = Neruda::Utils.current_os
+      if current_os == 'windows'
+        system 'start', uri
+      elsif current_os == 'apple'
+        system 'open', uri
+      else
+        system 'gio', 'open', uri
+      end
+    end
     @rake.invoke_task('site:preview')
   end
 
