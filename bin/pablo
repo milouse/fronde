@@ -48,6 +48,7 @@ module PabloCommands
     cmd.insert(1, '+6') if editor.match?(/^emacs/)
     system(*cmd)
   end
+  alias_method :pablo_edit, :pablo_open
 
   def pablo_help(command = 'basic', error = false)
     warn R18n.t.pablo.error.no_command if error
