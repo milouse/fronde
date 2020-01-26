@@ -48,6 +48,9 @@ module Neruda
       'open' => { opts: ['-a', '-l', '-t', '-d', '-p', '-v', '-h'],
                   desc: 'Open or create an org file for edition.' },
       'edit' => { alias: 'open' },
+      'publish' => { opts: ['-h'],
+                     desc: 'Push local changes to your public ' \
+                           'server online.' },
       'help' => { opts: ['-h'], desc: 'Alias for the -h switch.' },
       'basic' => { opts: ['-h', '-V'], label: '<command>' }
     }.freeze

@@ -50,6 +50,10 @@ module PabloCommands
   end
   alias_method :pablo_edit, :pablo_open
 
+  def pablo_publish
+    @rake.invoke_task('sync:push')
+  end
+
   def pablo_help(command = 'basic', error = false)
     warn R18n.t.pablo.error.no_command if error
     cmd = Neruda::Utils.resolve_possible_alias(command)
