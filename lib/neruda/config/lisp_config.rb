@@ -91,13 +91,13 @@ module Neruda
       orgtpl = opts['org_headers']
       base_directory = File.expand_path(opts['path'])
       publish_in = [Dir.pwd, settings['public_folder']]
-      publish_in << project_name unless project_name == 'org'
+      publish_in << project_name unless project_name == 'neruda'
       publish_in = publish_in.join('/')
       recline = [opts['recursive'] || 't']
       default_ex_ptrn = settings['exclude_pattern']
       if opts['exclude']
         recline << ":exclude \"#{opts['exclude']}\""
-      elsif project_name == 'org' && default_ex_ptrn
+      elsif project_name == 'neruda' && default_ex_ptrn
         recline << ":exclude \"#{default_ex_ptrn}\""
       end
       <<~ORGPROJECT
@@ -147,17 +147,24 @@ module Neruda
       orgtpl.join("\n ")
     end
 
+    def org_external_projects_opts(seed, orgtpl)
+      opts = { 'org_headers' => orgtpl }
+      if seed.is_a? String
+        opts['path'] = seed
+      elsif seed.is_a? Hash
+        opts.merge! seed
+      end
+      opts
+    end
+
     def org_generate_projects
       orgtpl = org_templates
-      projects = { 'org' => org_project('org', 'org_headers' => orgtpl,
-                                               'path' => './src') }
+      default_project = org_project(
+        'neruda', 'org_headers' => orgtpl, 'path' => './src'
+      )
+      projects = { 'neruda' => default_project }
       settings['external_sources']&.each do |s|
-        opts = { 'org_headers' => orgtpl }
-        if s.is_a? String
-          opts['path'] = s
-        elsif s.is_a? Hash
-          opts.merge! s
-        end
+        opts = org_external_projects_opts(s, orgtpl)
         next unless opts.has_key?('path')
         pname = File.basename(opts['path']).sub(/^\./, '')
         projects[pname] = org_project(pname, opts)
