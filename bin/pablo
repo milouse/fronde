@@ -35,38 +35,55 @@ module PabloCommands
   end
 
   def pablo_preview
+    Thread.new do
+      sleep 1
+      port = Neruda::Config.settings['server_port'] || 5000
+      uri = "http://127.0.0.1:#{port}/"
+      current_os = Neruda::Utils.current_os
+      if current_os == 'windows'
+        system 'start', uri
+      elsif current_os == 'apple'
+        system 'open', uri
+      else
+        system 'gio', 'open', uri
+      end
+    end
     @rake.invoke_task('site:preview')
   end
 
   def pablo_open
-    filename = ARGV[0] || new_file_name
+    filename = new_file_name(ARGV[0])
     FileUtils.mkdir_p File.dirname(filename)
     o = Neruda::OrgFile.new(filename, @options)
     o.write unless File.exist? filename
-
     editor = ENV['EDITOR'] || ENV['VISUAL'] || 'emacs'
     cmd = [editor, filename]
     cmd.insert(1, '+6') if editor.match?(/^emacs/)
     system(*cmd)
   end
+  alias_method :pablo_edit, :pablo_open
+
+  def pablo_publish
+    @rake.invoke_task('sync:push')
+  end
 
   def pablo_help(command = 'basic', error = false)
     warn R18n.t.pablo.error.no_command if error
-    command = 'basic' unless Neruda::Utils::PABLO_COMMANDS.include?(command)
-    cmd_opt = Neruda::Utils::PABLO_COMMANDS[command]
+    cmd = Neruda::Utils.resolve_possible_alias(command)
+    cmd_opt = Neruda::Utils::PABLO_COMMANDS[cmd]
     label = cmd_opt[:label] || command
     warn "Usage: pablo #{label} [options]\n\n"
     warn cmd_opt[:desc] + "\n\n" if cmd_opt.has_key?(:desc)
-    warn "Options\n#{Neruda::Utils.summarize_command(command)}\n"
-    warn "Commands\n#{Neruda::Utils.list_commands}\n" if command == 'basic'
+    warn "Options\n#{Neruda::Utils.summarize_command(cmd)}\n"
+    warn "Commands\n#{Neruda::Utils.list_commands}\n" if cmd == 'basic'
     exit 1 if error
     exit
   end
 
   private
 
-  def new_file_name
-    title = @options[:title]
+  def new_file_name(title)
+    title ||= @options[:title]
     title = 'new' if title.nil? || title == ''
     filename = Neruda::OrgFile.slug title
     return "#{filename}.org" unless @options[:directory]
@@ -112,14 +129,14 @@ class Pablo
   end
 end
 
-params = {}
-optparser = OptionParser.new do |opts|
-  opts.version = Neruda::VERSION
-  Neruda::Utils::PABLO_OPTIONS.each do |k, opt|
-    short, long = Neruda::Utils.decorate_option(k)
-    opts.send(opt[:meth] || :on, short, long, opt[:desc])
-  end
+optparser = OptionParser.new
+optparser.version = Neruda::VERSION
+
+Neruda::Utils::PABLO_OPTIONS.each do |k, opt|
+  optparser.send(opt[:meth] || :on, *Neruda::Utils.decorate_option(k))
 end
+
+params = {}
 optparser.parse!(into: params)
 
 if params[:version]
@@ -133,8 +150,11 @@ if ARGV[0] == 'help'
 end
 pablo = Pablo.new(params)
 command = "pablo_#{ARGV[0]}".to_sym
-err = command.nil? || !pablo.respond_to?(command)
-pablo.pablo_help(ARGV[0], err) if err || params[:help]
+cmd_err = !pablo.respond_to?(command)
+if params[:help] || cmd_err
+  cmd_err = false if params[:help] && !ARGV[0]
+  pablo.pablo_help(ARGV[0], cmd_err)
+end
 ARGV.shift
 
 init_cmds = ['pablo_init', 'pablo_config']

@@ -1,0 +1,101 @@
+#+title: Neruda config.yml file
+#+author: Étienne Deparis
+#+lang: en
+#+description: Glossary of all possible configuration options for Neruda
+
+This file explain all possible configuration options for Neruda, which
+may be put in file named ~config.yml~ at the root of your static website
+project. The options are listed in alphabetical order. However, they can
+be put in any order in the ~config.yml~ file.
+
+* ~author~
+
+The ~author~ option stores the default author name of your org
+files. This value is used when you create a new file. *It is not used by
+the regular org mode publishing process*. You must be sure that your org
+files contains an ~#+author:~ metadata field before publishing them.
+
+This value is used in the generation of the blog index page and the main
+atom feed.
+
+* <<sec:blog_path>> ~blog_path~
+
+The ~blog_path~ options store the folder name *inside* the ~src~ folder,
+which will contains org document to be specifically indexed to produce a
+blog-like website.
+
+Neruda will introspect the org documents inside this folder in order to
+find keywords (declared with the ~#+keywords:~ header) and produce as
+many new time-sorted indexes for these keywords, plus a specific index
+page at the root of this folder.
+
+The default value is ~blog~.
+
+* <<sec:blog_pattern>> ~blog_pattern~
+
+The ~blog_pattern~ option stores a [[https://en.wikipedia.org/wiki/Glob_(programming)][glob pattern]] to help Neruda to find
+the documents you want to index under the [[sec:blog_path][~blog_path~]] folder. It may be
+handy to only selecte precisely some files. The default value is
+~**/*.org~, which means absolutely all org documents (under the
+~blog_path~).
+
+See also the [[sec:exclude_pattern][~exclude_pattern~ section]].
+
+* ~domain~
+
+The domain name pointing to where your static website is expected to be
+hosted. This value is used to generate absolute path to your files on
+your expected host name (for example in the Atom feeds). Its value is
+expected to *not* end by a slash. That is to say ~https://example.com~
+is a *valid* value, while ~https://example.com/~ is not. Its default
+value is an empty string.
+
+By default, your static website is expected to be hosted at the root of
+your domain name (like ~https://example.com/index.html~). If it is not
+the case and your neruda static website is hosted in a sub directory of
+your main website, you must add this sub folder to the ~domain~
+value. Thus, ~https://example.com/example~ or
+~https://example.com/complex/example~ are *valid* values too, while
+~https://example.com/example/~ or ~https://example.com/complex/example/~
+are not.
+
+* <<sec:exclude_pattern>> ~exclude_pattern~
+
+The ~exclude_pattern~ option stores a [[https://en.wikipedia.org/wiki/Regular_expression][regular expression]] to help Neruda
+to find precisely which files you want to index under the [[sec:blog_path][~blog_path~]]
+folder. It may be handy to remove some unrelated data files, for example
+with a value like ~comments\.org$~. This filter is executed *after*
+files have been selected by the [[sec:blog_pattern][~blog_pattern~]] and *matching* files are
+excluded.
+
+There is no default value (thus nothing match and thus all org files
+matched by the ~blog_pattern~ option are indexed).
+
+See also the [[sec:blog_pattern][~blog_pattern~ section]].
+
+* ~lang~
+
+The main locale your website will be written in. Its value must comply
+with the [[https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes][ISO 639-1]] standard.
+
+* ~public_folder~
+
+The ~public_folder~ option stores the path to the folder, which will
+contains the generated files, ready for publication. It's default value
+is ~public_html~ (at the root of your project).
+
+* ~remote~
+
+The ~remote~ option contains an /rsync/ like destination string, which
+will be used to published your website when using the ~sync:push~ /rake/
+task. For exemple ~user@domain:/var/www/mywebsite/~
+
+* ~title~
+
+The ~title~ option stores the default title of your org files. This value
+is used when you create a new file. *It is not used by the regular org
+mode publishing process*. You must be sure that your org files contains
+an ~#+title:~ metadata field before publishing them.
+
+This value is used in the generation of the blog index page and the main
+atom feed.

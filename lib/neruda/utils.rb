@@ -41,11 +41,16 @@ module Neruda
       'init' => { opts: ['-a', '-l', '-t', '-v', '-h'],
                   desc: 'Initialize your Neruda instance ' \
                         '(you just need to do it once).' },
+      'config' => { alias: 'init' },
       'preview' => { opts: ['-h'],
                      desc: 'Start a test webserver to preview ' \
                            'your website on http://127.0.0.1:5000' },
       'open' => { opts: ['-a', '-l', '-t', '-d', '-p', '-v', '-h'],
                   desc: 'Open or create an org file for edition.' },
+      'edit' => { alias: 'open' },
+      'publish' => { opts: ['-h'],
+                     desc: 'Push local changes to your public ' \
+                           'server online.' },
       'help' => { opts: ['-h'], desc: 'Alias for the -h switch.' },
       'basic' => { opts: ['-h', '-V'], label: '<command>' }
     }.freeze
@@ -95,8 +100,8 @@ module Neruda
         opt = Neruda::Utils::PABLO_OPTIONS[short]
         long = "--#{opt[:long]}"
         return [short, long] if opt[:boolean]
-        key = ' ' + (opt[:keyword] || opt[:long].upcase)
-        [short + key, long + key]
+        key = opt[:keyword] || opt[:long].upcase
+        [short + key, long + ' ' + key]
       end
 
       # Returns the ~pablo~ help summary for a given command.
@@ -124,6 +129,29 @@ module Neruda
           lines += "    #{cmd.ljust(10)} #{opt[:desc]}\n"
         end
         lines
+      end
+
+      # Returns the real command name for a given command, which may be
+      #   an alias.
+      #
+      # @param command [String] the command to resolve
+      # @return [String]
+      def resolve_possible_alias(command)
+        return 'basic' unless Neruda::Utils::PABLO_COMMANDS.include?(command)
+        cmd_opt = Neruda::Utils::PABLO_COMMANDS[command]
+        return cmd_opt[:alias] if cmd_opt.has_key?(:alias)
+        command
+      end
+
+      # Try to discover the current host operating system.
+      #
+      # @return [String] either apple, windows or linux (default)
+      def current_os
+        if ENV['OS'] == 'Windows_NT' || RUBY_PLATFORM =~ /cygwin/
+          return 'windows'
+        end
+        return 'apple' if RUBY_PLATFORM =~ /darwin/
+        'linux'
       end
     end
   end

@@ -7,10 +7,11 @@
 
 * What's for?
 
+#+attr_html: :style width:150px;float:right;margin-top:-4.5em;margin-left:2em;
+[[file:themes/default/assets/Firma_Pablo_Neruda.svg]]
+
 Neruda is a static website generator made for [[https://orgmode.org][org files]]. It improves the
 default org mode HTML exporting/publishing routine.
-
-See [[https://deparis.io/neruda/][the official website]] for more information.
 
 * Features
 
@@ -40,3 +41,12 @@ Now, you're ready to create your first Neruda website.
 #+begin_src shell
 pablo init -t "My first neruda website"
 #+end_src
+
+* Going further
+
+All the Neruda configuration is stored in one [[https://en.wikipedia.org/wiki/YAML][YAML]] file named
+~config.yml~ and stored at the root of your project. If none exists, a
+default one will be created the first time you run any ~pablo~ command.
+
+You should read the [[./CONFIG.org][config file documentation]] to discover its various
+options.

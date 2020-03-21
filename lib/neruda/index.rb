@@ -49,7 +49,12 @@ module Neruda
 
     def sort_by(kind)
       if [:name, :weight].include?(kind)
-        return sort_tags_by_name_and_weight["by_#{kind}".to_sym]
+        tags_sorted = sort_tags_by_name_and_weight["by_#{kind}".to_sym]
+        # Reverse in order to have most important or A near next prompt
+        # and avoid to scroll to find the beginning of the list.
+        return tags_sorted.map do |k|
+          @tags_names[k] + " (#{@index[k].length})"
+        end.reverse
       end
       raise ArgumentError, "#{kind} not in [:name, :weight]"
     end
