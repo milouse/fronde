@@ -31,6 +31,7 @@ Gem::Specification.new do |s|
                    'lib/tasks/org.rake',
                    'lib/tasks/site.rake',
                    'lib/tasks/sync.rake',
+                   'lib/tasks/tags.rake',
                    # Translations
                    'locales/en.yml',
                    'locales/fr.yml',
