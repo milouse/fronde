@@ -70,9 +70,9 @@ module Neruda
       command = emacs_command arguments
       if @options[:verbose]
         warn command
-        return system(command)
+        return system(command, exception: true)
       end
-      system command, out: '/dev/null', err: '/dev/null'
+      system command, out: '/dev/null', err: '/dev/null', exception: true
     end
   end
 end

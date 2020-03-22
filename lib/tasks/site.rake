@@ -28,7 +28,12 @@ namespace :site do
     build_html = Thread.new do
       Neruda::OrgFile.new(nil, verbose: Rake::FileUtilsExt.verbose_flag).publish
     end
-    Neruda::Utils.throbber(build_html, 'Publishing:')
+    begin
+      Neruda::Utils.throbber(build_html, 'Publishing:')
+    rescue RuntimeError
+      warn 'Aborting'
+      next
+    end
     customize_html = Thread.new do
       pubfolder = Neruda::Config.settings['public_folder']
       Dir["#{pubfolder}/**/*.html"].each do |f|
@@ -46,8 +51,15 @@ namespace :site do
         next
       end
       verbose = Rake::FileUtilsExt.verbose_flag
-      o = Neruda::OrgFile.new(args[:source], verbose: verbose)
-      o.publish
+      o = Thread.new do
+        Neruda::OrgFile.new(args[:source], verbose: verbose).publish
+      end
+      begin
+        Neruda::Utils.throbber(o, 'Publishing:')
+      rescue RuntimeError
+        warn 'Aborting'
+        next
+      end
       target = Neruda::OrgFile.target_for_source(args[:source])
       warn "Customizing file #{target}" if verbose
       Neruda::Templater.customize_output(target, o)

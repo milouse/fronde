@@ -71,17 +71,19 @@ module Neruda
       # @param message [String] the message to display before the throbber
       # @return [void]
       def throbber(thread, message)
-        model = Neruda::Config.settings['throbber'] || 'default'
-        model = 'default' unless Neruda::Utils::THROBBER_FRAMES.has_key?(model)
-        frames = Neruda::Utils::THROBBER_FRAMES[model]
-        current = 0
-        while thread.alive?
-          sleep 0.1
-          print "#{message} #{frames[current % frames.length]}\r"
-          current += 1
+        frames = select_throbber_frames
+        begin
+          run_and_decorate_thread thread, message, frames
+        rescue RuntimeError => e
+          done = Rainbow('An error occured.').bold.red + "\n"
+          done += Rainbow('To see it, run again your command with more ' \
+                          'verbosity, i.e. pablo build -v').bold
+          warn "#{message} #{done}"
+          raise e
+        else
+          done = Rainbow('done'.ljust(frames[0].length)).green
+          puts "#{message} #{done}"
         end
-        done = Rainbow('done'.ljust(frames[0].length)).green
-        puts "#{message} #{done}"
       end
 
       # Returns the short and long options specification for a given
@@ -152,6 +154,24 @@ module Neruda
         end
         return 'apple' if RUBY_PLATFORM =~ /darwin/
         'linux'
+      end
+
+      private
+
+      def select_throbber_frames
+        model = Neruda::Config.settings['throbber'] || 'default'
+        model = 'default' unless Neruda::Utils::THROBBER_FRAMES.has_key?(model)
+        Neruda::Utils::THROBBER_FRAMES[model]
+      end
+
+      def run_and_decorate_thread(thread, message, frames)
+        thread.abort_on_exception = true
+        current = 0
+        while thread.alive?
+          sleep 0.1
+          print "#{message} #{frames[current % frames.length]}\r"
+          current += 1
+        end
       end
     end
   end
