@@ -29,7 +29,7 @@ namespace :site do
       Neruda::OrgFile.new(nil, verbose: Rake::FileUtilsExt.verbose_flag).publish
     end
     begin
-      Neruda::Utils.throbber(build_html, 'Publishing:')
+      Neruda::Utils.throbber(build_html, 'Building:')
     rescue RuntimeError
       warn 'Aborting'
       next
@@ -55,7 +55,7 @@ namespace :site do
         Neruda::OrgFile.new(args[:source], verbose: verbose).publish
       end
       begin
-        Neruda::Utils.throbber(o, 'Publishing:')
+        Neruda::Utils.throbber(o, 'Building:')
       rescue RuntimeError
         warn 'Aborting'
         next

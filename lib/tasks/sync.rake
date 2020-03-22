@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'neruda/config'
+require 'neruda/utils'
 
 def rsync_command(verbose, test = nil)
   rsync_command = Neruda::Config.settings['rsync']
@@ -24,7 +25,10 @@ namespace :sync do
       next
     end
     public_folder = Neruda::Config.settings['public_folder']
-    sh [rsync_command(Rake::FileUtilsExt.verbose_flag, args[:test?]),
-        "#{public_folder}/", remote_path].join(' ')
+    publish_thread = Thread.new do
+      sh [rsync_command(Rake::FileUtilsExt.verbose_flag, args[:test?]),
+          "#{public_folder}/", remote_path].join(' ')
+    end
+    Neruda::Utils.throbber(publish_thread, 'Publishing:')
   end
 end
