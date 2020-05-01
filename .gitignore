@@ -1,6 +1,6 @@
 .byebug_history
 .ignore
-.ruby-gemset
+.ruby-*
 neruda-*.gem
 doc
 coverage
