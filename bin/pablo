@@ -57,8 +57,7 @@ module PabloCommands
     o = Neruda::OrgFile.new(filename, @options)
     o.write unless File.exist? filename
     editor = ENV['EDITOR'] || ENV['VISUAL'] || 'emacs'
-    cmd = [editor, filename]
-    cmd.insert(1, '+6') if editor.match?(/^emacs/)
+    cmd = [editor, '+6', filename]
     system(*cmd)
   end
   alias_method :pablo_edit, :pablo_open
