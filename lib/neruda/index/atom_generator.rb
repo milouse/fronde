@@ -55,7 +55,7 @@ module Neruda
         <updated>#{upddate}</updated>
         <author><name>#{Neruda::Config.settings['author'] || ''}</name></author>
         <id>urn:md5:#{Digest::MD5.hexdigest(domain)}</id>
-        <generator uri="https://fossil.deparis.io/neruda">Neruda</generator>
+        <generator uri="https://git.umaneti.net/neruda/about/">Neruda</generator>
       ENDATOM
     end
 

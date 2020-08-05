@@ -14,5 +14,5 @@ neruda:
   org:
     postamble:
       written_by: Écrit par %a
-      with_emacs: avec %c et publié avec <a href="https://deparis.io/neruda">Neruda</a>
+      with_emacs: 'avec %c et publié avec <a href="https://git.umaneti.net/neruda/about/">Neruda</a>'
       last_modification: dernière modification le %C

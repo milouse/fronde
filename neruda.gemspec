@@ -42,7 +42,7 @@ Gem::Specification.new do |s|
                    # Others
                    'LICENSE']
   s.executables = ['pablo']
-  s.homepage    = 'https://git.deparis.io/neruda/'
+  s.homepage    = 'https://git.umaneti.net/neruda/about/'
   s.license     = 'WTFPL'
 
   s.rdoc_options << '-m' << 'org'
