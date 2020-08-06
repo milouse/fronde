@@ -18,7 +18,10 @@ files contains an ~#+author:~ metadata field before publishing them.
 This value is used in the generation of the blog index page and the main
 atom feed.
 
-* <<sec:blog_path>> ~blog_path~
+* ~blog_path~
+:PROPERTIES:
+:CUSTOM_ID: sec-blog_path
+:END:
 
 The ~blog_path~ options store the folder name *inside* the ~src~ folder,
 which will contains org document to be specifically indexed to produce a
@@ -31,15 +34,18 @@ page at the root of this folder.
 
 The default value is ~blog~.
 
-* <<sec:blog_pattern>> ~blog_pattern~
+* ~blog_pattern~
+:PROPERTIES:
+:CUSTOM_ID: sec-blog_pattern
+:END:
 
 The ~blog_pattern~ option stores a [[https://en.wikipedia.org/wiki/Glob_(programming)][glob pattern]] to help Neruda to find
-the documents you want to index under the [[sec:blog_path][~blog_path~]] folder. It may be
+the documents you want to index under the [[#sec-blog_path][~blog_path~]] folder. It may be
 handy to only selecte precisely some files. The default value is
 ~**/*.org~, which means absolutely all org documents (under the
 ~blog_path~).
 
-See also the [[sec:exclude_pattern][~exclude_pattern~ section]].
+See also the [[#sec-exclude_pattern][~exclude_pattern~ section]].
 
 * ~domain~
 
@@ -59,19 +65,22 @@ value. Thus, ~https://example.com/example~ or
 ~https://example.com/example/~ or ~https://example.com/complex/example/~
 are not.
 
-* <<sec:exclude_pattern>> ~exclude_pattern~
+* ~exclude_pattern~
+:PROPERTIES:
+:CUSTOM_ID: sec-exclude_pattern
+:END:
 
 The ~exclude_pattern~ option stores a [[https://en.wikipedia.org/wiki/Regular_expression][regular expression]] to help Neruda
-to find precisely which files you want to index under the [[sec:blog_path][~blog_path~]]
+to find precisely which files you want to index under the [[#sec-blog_path][~blog_path~]]
 folder. It may be handy to remove some unrelated data files, for example
 with a value like ~comments\.org$~. This filter is executed *after*
-files have been selected by the [[sec:blog_pattern][~blog_pattern~]] and *matching* files are
+files have been selected by the [[#sec-blog_pattern][~blog_pattern~]] and *matching* files are
 excluded.
 
 There is no default value (thus nothing match and thus all org files
 matched by the ~blog_pattern~ option are indexed).
 
-See also the [[sec:blog_pattern][~blog_pattern~ section]].
+See also the [[#sec-blog_pattern][~blog_pattern~ section]].
 
 * ~lang~
 
