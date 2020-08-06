@@ -80,8 +80,12 @@ module Neruda
         @config.freeze
       end
 
+      def extract_lang_from_env(default)
+        (ENV['LANG'] || default).split('_', 2).first
+      end
+
       def add_default_settings
-        @config['lang'] ||= 'en'
+        @config['lang'] ||= extract_lang_from_env 'en'
         @config['author'] ||= (ENV['USER'] || '')
         @config['domain'] ||= ''
         @config['public_folder'] ||= 'public_html'
