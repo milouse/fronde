@@ -19,7 +19,7 @@ module Neruda # rubocop:disable Style/Documentation
     private
 
     def local_path(requested_path)
-      routes = Neruda::Config.settings['routes'] || {}
+      routes = Neruda::Config.settings.dig('preview', 'routes') || {}
       return routes[requested_path] if routes.keys.include? requested_path
       local_path = Neruda::Config.settings['public_folder'] + requested_path
       if File.directory? local_path
@@ -43,7 +43,7 @@ module Neruda # rubocop:disable Style/Documentation
     def start_preview
       # Inspired by ruby un.rb library, which allows normally to start a
       # webrick server in one line: ruby -run -e httpd public_html -p 5000
-      port = Neruda::Config.settings['server_port'] || 5000
+      port = Neruda::Config.settings.dig('preview', 'server_port') || 5000
       s = WEBrick::HTTPServer.new(Port: port)
       s.mount '/', Neruda::PreviewServlet
       ['TERM', 'QUIT', 'INT'].each { |sig| trap(sig, proc { s.shutdown }) }
