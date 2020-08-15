@@ -63,8 +63,7 @@ module Neruda
 
     def sources_list(file_list)
       return file_list unless file_list.nil?
-      Dir.glob(Neruda::Config.settings['blog_pattern'],
-               base: "src/#{@blog_path}")
+      Dir.glob('**/*.org', base: "src/#{@blog_path}")
     end
 
     def filter_and_prefix_sources!

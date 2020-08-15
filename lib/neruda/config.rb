@@ -90,8 +90,6 @@ module Neruda
         @config['domain'] ||= ''
         @config['public_folder'] ||= 'public_html'
         @config['templates'] ||= []
-        return if @config['blog_path'].nil?
-        @config['blog_pattern'] ||= '**/*.org'
       end
     end
   end

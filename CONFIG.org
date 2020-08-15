@@ -34,19 +34,6 @@ page at the root of this folder.
 
 The default value is ~blog~.
 
-* ~blog_pattern~
-:PROPERTIES:
-:CUSTOM_ID: sec-blog_pattern
-:END:
-
-The ~blog_pattern~ option stores a [[https://en.wikipedia.org/wiki/Glob_(programming)][glob pattern]] to help Neruda to find
-the documents you want to index under the [[#sec-blog_path][~blog_path~]] folder. It may be
-handy to only selecte precisely some files. The default value is
-~**/*.org~, which means absolutely all org documents (under the
-~blog_path~).
-
-See also the [[#sec-exclude_pattern][~exclude_pattern~ section]].
-
 * ~domain~
 
 The domain name pointing to where your static website is expected to be
