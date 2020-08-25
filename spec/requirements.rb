@@ -10,6 +10,9 @@ R18n::Filters.on(:named_variables)
 $LOAD_PATH.unshift('./lib')
 
 SimpleCov.start do
+  # Activate new covering precision
+  enable_coverage :branch
+
   # Remove dev only tools from coverage check
   add_filter ['lib/tasks/sync.rake', 'lib/tasks/doc.rake']
   # Sort coverage results into usefull groups
