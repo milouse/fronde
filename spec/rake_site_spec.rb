@@ -73,6 +73,15 @@ describe 'With a testing website' do
       expect(File.exist?('public_html/tutu.html')).to be(true)
     end
 
+    it 'should build one specific file even in verbose mode', rake: true do
+      o = Neruda::OrgFile.new('src/tutu.org', title: 'Tutu test')
+      o.write
+      Rake.verbose(true)
+      @rake.invoke_task('site:build:one[src/tutu.org]')
+      expect(File.exist?('public_html/index.html')).to be(false)
+      expect(File.exist?('public_html/tutu.html')).to be(true)
+    end
+
     it 'should return an error if no file is given in build:one', rake: true do
       expect { @rake.invoke_task('site:build:one') }.to \
         output("No source file given\n").to_stderr
