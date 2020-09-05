@@ -11,6 +11,10 @@ module Neruda
     # @return [String] the new x.x.x version string of org mode
     def org_last_version
       return @org_version if @org_version
+      if File.exist?('__last_org_version__')
+        @org_version = IO.read('__last_org_version__')
+        return @org_version
+      end
       index = open('https://orgmode.org/index.html', 'r').read
       last_ver = index.match(/https:\/\/orgmode\.org\/org-([0-9.]+)\.tar\.gz/)
       # :nocov:
@@ -18,6 +22,7 @@ module Neruda
         warn 'Org last version not found'
         return nil
       end
+      IO.write('__last_org_version__', last_ver[1])
       # :nocov:
       @org_version = last_ver[1]
     end

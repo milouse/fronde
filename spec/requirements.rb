@@ -75,6 +75,21 @@ def init_rake_and_install_org
   Rake.verbose(false)
   rake.options.build_all = true
   rake.tasks.each(&:reenable)
+  tarball = File.expand_path(
+    "../org-#{Neruda::Config.org_last_version}.tar.gz",
+    __dir__
+  )
+  FileUtils.cp tarball, '.'
   rake.invoke_task('org:install')
   rake
 end
+
+def download_org_once
+  tarball = "org-#{Neruda::Config.org_last_version}.tar.gz"
+  return if File.exist?(tarball)
+  curl = ['curl', '-s', '--progress-bar', '-O',
+          "https://orgmode.org/#{tarball}"]
+  system curl.join(' ')
+end
+
+download_org_once
