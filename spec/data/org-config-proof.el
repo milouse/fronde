@@ -7,7 +7,7 @@
 (setq neruda/current-work-dir "__TEST_DIR__"
       user-mail-address ""
       user-full-name "Tata"
-      org-html-metadata-timestamp-format "%A %-d of %B, %Y at %H:%M"
+      org-html-metadata-timestamp-format "%A %-d of %B, %Y at %R"
       org-publish-project-alist
       `(("org"
          :base-directory "__TEST_DIR__/src"
