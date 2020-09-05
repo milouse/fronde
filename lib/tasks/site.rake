@@ -68,11 +68,9 @@ namespace :site do
     end
   end
 
-  # :nocov:
   desc 'Start a test server'
   task :preview do
     require 'neruda/preview'
     Neruda.start_preview
   end
-  # :nocov:
 end

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'rake'
+require 'open-uri'
 
 def write_base_files
   org_content = <<~ORG
@@ -28,6 +29,7 @@ end
 
 describe 'With a testing website' do
   before(:all) do
+    ENV['LANG'] = 'en'
     init_testing_website
     @rake = init_rake_and_install_org
   end
@@ -74,6 +76,29 @@ describe 'With a testing website' do
     it 'should return an error if no file is given in build:one', rake: true do
       expect { @rake.invoke_task('site:build:one') }.to \
         output("No source file given\n").to_stderr
+    end
+
+    describe 'trying preview mode' do
+      before(:each) do
+        @now_str = DateTime.now.strftime('%A %-d of %B, %Y at %R')
+        @rake.invoke_task('site:build')
+        @webrick_app = Thread.new do
+          @rake.invoke_task('site:preview')
+        end
+        sleep 1 # Necessary to let webrick start
+      end
+
+      after(:each) do
+        @webrick_app.exit # Be sure to kill test server
+        @webrick_app.join # Be patient before quitting example
+      end
+
+      it 'should be viewable with preview', rake: true do
+        home_page = open('http://localhost:5000/index.html', 'r').read
+        proof = File.expand_path('data/index_proof.html', __dir__)
+        proof_content = IO.read(proof).gsub(/__PUB_DATE__/, @now_str)
+        expect(home_page).to eq(proof_content)
+      end
     end
   end
 
