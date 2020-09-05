@@ -76,6 +76,7 @@ describe 'Without a working file' do
       #+author: #{o.author}
       #+language: en
 
+
     CONTENT
     expect(File.exist?('spec/data/__test__.org')).to be(true)
     expect(IO.read('spec/data/__test__.org')).to eq(empty_content)

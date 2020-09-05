@@ -254,12 +254,14 @@ module Neruda
       @keywords = []
       @lang = @options[:lang] || Neruda::Config.settings['lang']
       @excerpt = ''
-      @content = @options[:content] || <<~ORG
+      body = @options[:content] || ''
+      @content = @options[:raw_content] || <<~ORG
         #+title: #{@title}
         #+date: <#{@date.strftime('%Y-%m-%d %a. %H:%M:%S')}>
         #+author: #{@author}
         #+language: #{@lang}
 
+        #{body}
       ORG
     end
   end
