@@ -51,18 +51,20 @@ namespace :site do
         next
       end
       verbose = Rake::FileUtilsExt.verbose_flag
-      o = Thread.new do
-        Neruda::OrgFile.new(args[:source], verbose: verbose).publish
+      build_html = Thread.new do
+        o = Neruda::OrgFile.new(args[:source], verbose: verbose)
+        Thread.current[:org_file] = o
+        o.publish
       end
       begin
-        Neruda::Utils.throbber(o, 'Building:')
+        Neruda::Utils.throbber(build_html, 'Building:')
       rescue RuntimeError
         warn 'Aborting'
         next
       end
       target = Neruda::OrgFile.target_for_source(args[:source])
       warn "Customizing file #{target}" if verbose
-      Neruda::Templater.customize_output(target, o)
+      Neruda::Templater.customize_output(target, build_html[:org_file])
     end
   end
 
