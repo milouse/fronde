@@ -23,6 +23,8 @@ end
 require 'neruda/org_file'
 require 'neruda/utils'
 
+ENV['LANG'] = 'en'
+
 # rubocop:disable Metrics/MethodLength
 def init_testing_website
   FileUtils.mkdir_p 'spec/data/website_testing'

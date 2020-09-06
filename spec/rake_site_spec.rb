@@ -29,7 +29,6 @@ end
 
 describe 'With a testing website' do
   before(:all) do
-    ENV['LANG'] = 'en'
     init_testing_website
     @rake = init_rake_and_install_org
   end

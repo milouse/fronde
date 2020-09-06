@@ -73,10 +73,6 @@ SAMPLE_ATOM = <<~ATOM
 ATOM
 
 describe 'With blog settings' do
-  before(:all) do
-    ENV['LANG'] = 'en'
-  end
-
   describe 'with working org files' do
     before(:each) do
       Neruda::Config.load_test('title' => 'Blog',
