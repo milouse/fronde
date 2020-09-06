@@ -7,8 +7,6 @@ require 'r18n-core'
 R18n.set('en', File.expand_path('../locales', __dir__))
 R18n::Filters.on(:named_variables)
 
-$LOAD_PATH.unshift('./lib')
-
 SimpleCov.start do
   # Activate new covering precision
   enable_coverage :branch
