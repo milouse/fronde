@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'rake'
-require 'open-uri'
 
 describe 'With working org files' do
   before(:all) do
