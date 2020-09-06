@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'open-uri'
+
 # Neruda::Config is required by Neruda::Utils
 require 'neruda/utils'
 
@@ -7,19 +9,12 @@ namespace :org do
   desc 'Download last version of org-mode'
   task :download do
     verbose = Rake::FileUtilsExt.verbose_flag
-    next if Neruda::Config.org_last_version.nil?
-    org_version = "org-#{Neruda::Config.org_last_version}"
-    tarball = "#{org_version}.tar.gz"
-    next if File.exist?(tarball)
-    curl = ['curl', '--progress-bar', '-O',
-            "https://orgmode.org/#{tarball}"]
-    curl[1] = '-s' unless verbose
     download = Thread.new do
-      sh curl.join(' ')
+      Thread.current[:org_version] = Neruda::Utils.download_org
     end
     if verbose
       download.join
-      warn "#{org_version} has been downloaded"
+      warn "org-#{download[:org_version]} has been downloaded"
     else
       Neruda::Utils.throbber(download, 'Downloading org mode:')
     end
@@ -57,10 +52,13 @@ namespace :org do
 
   file 'htmlize.el' do
     verbose = Rake::FileUtilsExt.verbose_flag
-    curl = ['curl', '--progress-bar', '-O',
-            'https://raw.githubusercontent.com/hniksic/emacs-htmlize/master/htmlize.el']
-    curl[1] = '-s' unless verbose
-    build = Thread.new { sh curl.join(' ') }
+    build = Thread.new do
+      htmlize = open(
+        'https://raw.githubusercontent.com/hniksic/emacs-htmlize/master/htmlize.el',
+        'r'
+      ).read
+      IO.write 'htmlize.el', htmlize
+    end
     if verbose
       build.join
       warn 'htmlize.el has been locally installed'

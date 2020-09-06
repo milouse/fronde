@@ -23,6 +23,7 @@ end
 
 # The following requires other components automatically
 require 'neruda/org_file'
+require 'neruda/utils'
 
 # rubocop:disable Metrics/MethodLength
 def init_testing_website
@@ -84,12 +85,4 @@ def init_rake_and_install_org
   rake
 end
 
-def download_org_once
-  tarball = "org-#{Neruda::Config.org_last_version}.tar.gz"
-  return if File.exist?(tarball)
-  curl = ['curl', '-s', '--progress-bar', '-O',
-          "https://orgmode.org/#{tarball}"]
-  system curl.join(' ')
-end
-
-download_org_once
+Neruda::Utils.download_org

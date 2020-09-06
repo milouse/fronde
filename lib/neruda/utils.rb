@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
+require 'uri'
 require 'rainbow'
+require 'net/http'
 require 'r18n-core'
 require 'neruda/config'
 
@@ -154,6 +156,27 @@ module Neruda
         end
         return 'apple' if RUBY_PLATFORM =~ /darwin/
         'linux'
+      end
+
+      # Download latest org-mode tarball.
+      #
+      # @return [String] the downloaded org-mode version
+      def download_org
+        return nil if Neruda::Config.org_last_version.nil?
+        tarball = "org-#{Neruda::Config.org_last_version}.tar.gz"
+        return Neruda::Config.org_last_version if File.exist?(tarball)
+        uri = URI("https://orgmode.org/#{tarball}")
+        Net::HTTP.start(uri.host, uri.port, :use_ssl => true) do |http|
+          request = Net::HTTP::Get.new uri
+          http.request(request) do |response|
+            open(tarball, 'w') do |io|
+              response.read_body do |chunk|
+                io.write chunk
+              end
+            end
+          end
+        end
+        Neruda::Config.org_last_version
       end
 
       private
