@@ -53,8 +53,17 @@ module Neruda
       # @param new_config [Hash] the settings to save
       # @return [Hash] the new settings after save
       def save(new_config)
+        # Do not save obvious default config values. We'll always try to
+        # save author and lang as they default on system variables,
+        # which may be different from a system to another. Thus it may
+        # be confusing if one use neruda on two different computer and
+        # these params always change.
+        new_config.delete_if do |k, v|
+          ['domain', 'public_folder', 'templates'].include?(k) \
+          && v == default_settings[k]
+        end
         IO.write 'config.yml', new_config.to_yaml
-        @config = new_config.freeze
+        load_settings # Reload config, taking default settings into account
       end
 
       # Load the given settings as if they comes from the ~config.yml~ file.
@@ -66,30 +75,33 @@ module Neruda
       # @param config [Hash] the settings to artificially load
       # @return [Hash] the new settings
       def load_test(config)
-        @config = config
-        add_default_settings
+        @config = default_settings.merge config
       end
 
       private
 
       def load_settings
-        @config = {}
-        conf = 'config.yml'
-        @config = YAML.load_file(conf) if File.exist? conf
-        add_default_settings
-        @config.freeze
+        conf_file = 'config.yml'
+        if File.exist? conf_file
+          @config = default_settings.merge(YAML.load_file(conf_file)).freeze
+        else
+          @config = default_settings
+        end
       end
 
       def extract_lang_from_env(default)
         (ENV['LANG'] || default).split('_', 2).first
       end
 
-      def add_default_settings
-        @config['lang'] ||= extract_lang_from_env 'en'
-        @config['author'] ||= (ENV['USER'] || '')
-        @config['domain'] ||= ''
-        @config['public_folder'] ||= 'public_html'
-        @config['templates'] ||= []
+      def default_settings
+        return @default_settings if @default_settings
+        @default_settings = {
+          'lang' => extract_lang_from_env('en'),
+          'author' => (ENV['USER'] || ''),
+          'domain' => '',
+          'public_folder' => 'public_html',
+          'templates' => []
+        }.freeze
       end
     end
   end
