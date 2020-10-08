@@ -37,6 +37,12 @@ describe 'With working org files' do
     expect(o.datestring(:short)).to eq('2019-07-25')
     expect(o.format('%i - (%t)')).to eq('2019-07-25 - (Fourth test)')
   end
+
+  it 'should find a subtitle', core: true do
+    o = Neruda::OrgFile.new('spec/data/content.org')
+    expect(o.title).to eq('My first blog post?')
+    expect(o.subtitle).to eq('What to do with that')
+  end
 end
 # rubocop:enable Style/FormatStringToken
 

@@ -1,4 +1,5 @@
 #+title: My first blog post?
+#+subtitle: What to do with that
 #+date: <2019-06-13 jeu.>
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec aliquet

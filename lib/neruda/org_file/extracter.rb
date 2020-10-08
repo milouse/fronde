@@ -10,6 +10,7 @@ module Neruda
     def extract_data
       @content = IO.read @file
       @title = extract_title
+      @subtitle = extract_subtitle
       @date = extract_date
       @author = extract_author
       @keywords = extract_keywords
@@ -37,6 +38,12 @@ module Neruda
         project_relative_path = @file.sub(/^#{Dir.pwd}\//, '')
         return project_relative_path
       end
+      m[1].strip
+    end
+
+    def extract_subtitle
+      m = /^#\+subtitle:(.+)$/i.match(@content)
+      return '' if m.nil?
       m[1].strip
     end
 

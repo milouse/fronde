@@ -20,6 +20,10 @@ module Neruda
     #   the ~#+title:~ header.
     attr_reader :title
 
+    # @return [String] the subtitle of the current org document, taken
+    #   from the ~#+subtitle:~ header.
+    attr_reader :subtitle
+
     # @return [DateTime] the date and time of the current org document,
     #   taken from the ~#+date:~ header.
     attr_reader :date
@@ -213,6 +217,7 @@ module Neruda
     # - %n :: the Neruda name and version
     # - %N :: the Neruda name and version with a link to the project
     #         home on the name
+    # - %s :: the subtitle of the document
     # - %t :: the title of the document
     # - %u :: the web path to the related published HTML document
     # - %x :: the raw description (eXcerpt)
@@ -239,6 +244,7 @@ module Neruda
             .gsub('%L', (Neruda::Config.settings['license'] || '').gsub(/\s+/, ' ').strip)
             .gsub('%n', "Neruda #{Neruda::VERSION}")
             .gsub('%N', "<a href=\"https://git.umaneti.net/neruda/about/\">Neruda</a> #{Neruda::VERSION}")
+            .gsub('%s', @subtitle)
             .gsub('%t', @title)
             .gsub('%u', @html_file || '')
             .gsub('%x', @excerpt)
@@ -272,6 +278,7 @@ module Neruda
 
     def init_empty_file
       @title = @options[:title] || ''
+      @subtitle = ''
       @date = DateTime.now
       @notime = false
       @author = @options[:author] || Neruda::Config.settings['author']
