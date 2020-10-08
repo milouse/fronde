@@ -32,7 +32,11 @@ module Neruda
 
     def extract_title
       m = /^#\+title:(.+)$/i.match(@content)
-      return @file if m.nil?
+      if m.nil?
+        # Avoid to leak absolute path
+        project_relative_path = @file.sub(/^#{Dir.pwd}\//, '')
+        return project_relative_path
+      end
       m[1].strip
     end
 

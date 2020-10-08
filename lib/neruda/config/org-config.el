@@ -11,7 +11,7 @@
       org-publish-project-alist
       `(__ALL_PROJECTS__
         __THEME_CONFIG__
-        ("website" :components (__ALL_PROJECTS_NAMES__ "theme"))))
+        ("website" :components (__ALL_PROJECTS_NAMES__))))
 
 ;; Load neruda lib
 (load-file (expand-file-name "ox-neruda.el" "__NERUDA_DIR__"))

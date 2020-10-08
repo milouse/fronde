@@ -16,35 +16,32 @@ module Neruda
     include Neruda::IndexAtomGenerator
     include Neruda::IndexOrgGenerator
 
-    def initialize(file_list = nil)
-      @blog_path = Neruda::Config.settings['blog_path']
+    def initialize
       @pubdir = Neruda::Config.settings['public_folder']
       @index = { 'index' => [] }
+      @projects = {}
       @tags_names = {}
       @date = DateTime.now
-      if @blog_path.nil?
-        @sources = []
-      else
-        @sources = sources_list(file_list)
-        filter_and_prefix_sources!
-        @sources.each { |f| add_to_indexes(Neruda::OrgFile.new(f)) }
-        sort!
-      end
+      feed
+      sort!
     end
 
     def entries
-      @index.keys
+      @index.keys.reject { |k| k == 'index' }
     end
 
-    def write_all(verbose = true)
-      @index.keys.each do |k|
+    def empty?
+      @index['index'].empty?
+    end
+
+    def write_all(verbose: true)
+      @index.each_key do |k|
         write_org(k)
         warn "Generated index file for #{k}" if verbose
         write_atom(k)
         warn "Generated atom feed for #{k}" if verbose
       end
-      write_org_lists
-      warn 'Generated all tags index' if verbose
+      write_all_blog_home(verbose)
     end
 
     def sort_by(kind)
@@ -61,34 +58,36 @@ module Neruda
 
     private
 
-    def sources_list(file_list)
-      return file_list unless file_list.nil?
-      Dir.glob('**/*.org', base: "src/#{@blog_path}")
+    def feed
+      Neruda::Config.sources.each do |project|
+        next unless project['is_blog']
+        if project['recursive']
+          file_pattern = '**/*.org'
+        else
+          file_pattern = '*.org'
+        end
+        Dir.glob(file_pattern, base: project['path']).map do |s|
+          org_file = File.join(project['path'], s)
+          add_to_indexes(
+            Neruda::OrgFile.new(org_file, project: project)
+          )
+        end
+      end
     end
 
-    def filter_and_prefix_sources!
-      exclude = Neruda::Config.settings['exclude_pattern']
-      sources = []
-      @sources.each do |f|
-        next if f == 'index.org'
-        if File.exist?(f)
-          file_path = f
-        else
-          file_path = "src/#{@blog_path}/#{f}"
-          next unless File.exist?(file_path)
-        end
-        next if exclude && file_path.match(exclude)
-        sources << file_path
-      end
-      @sources = sources
+    def add_to_project_index(article)
+      project = article.project
+      @projects[project['name']] ||= []
+      @projects[project['name']] << article
     end
 
     def add_to_indexes(article)
       @index['index'] << article
+      add_to_project_index article
       article.keywords.each do |k|
         slug = Neruda::OrgFile.slug k
         @tags_names[slug] = k # Overwrite is permitted
-        @index[slug] = [] unless @index.has_key?(slug)
+        @index[slug] ||= []
         @index[slug] << article
       end
     end
@@ -97,16 +96,27 @@ module Neruda
       @index.each do |k, i|
         @index[k] = i.sort { |a, b| b.timekey <=> a.timekey }
       end
+      @projects.each do |k, i|
+        @projects[k] = i.sort { |a, b| b.timekey <=> a.timekey }
+      end
     end
 
     def sort_tags_by_name_and_weight
       tags_sorted = {}
-      all_keys = @index.keys.reject { |k| k == 'index' }
+      all_keys = entries
       tags_sorted[:by_name] = all_keys.sort
       tags_sorted[:by_weight] = all_keys.sort do |a, b|
         @index[b].length <=> @index[a].length
       end
       tags_sorted
+    end
+
+    def save?
+      return true unless empty?
+      Neruda::Config.sources.each do |project|
+        return true if project['is_blog'] && Dir.exist?(project['path'])
+      end
+      false
     end
   end
 end

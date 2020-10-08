@@ -10,7 +10,8 @@ namespace :org do
   task :download do
     verbose = Rake::FileUtilsExt.verbose_flag
     download = Thread.new do
-      Thread.current[:org_version] = Neruda::Utils.download_org
+      Thread.current[:org_version] = Neruda::Config.org_last_version
+      Neruda::Utils.download_org
     end
     if verbose
       download.join
@@ -25,14 +26,13 @@ namespace :org do
     verbose = Rake::FileUtilsExt.verbose_flag
     org_version = "org-#{Neruda::Config.org_last_version}"
     next if Dir.exist?("#{org_version}/lisp")
-    tarball = "#{org_version}.tar.gz"
-    next unless File.exist?(tarball)
     make = ['make', '-C', org_version]
     unless verbose
       make << '-s'
       make << 'EMACSQ="emacs -Q --eval \'(setq inhibit-message t)\'"'
     end
     build = Thread.new do
+      tarball = "tmp/#{org_version}.tar.gz"
       sh "tar xzf #{tarball}"
       File.unlink tarball
       sh((make + ['compile']).join(' '))
@@ -53,10 +53,9 @@ namespace :org do
   file 'htmlize.el' do
     verbose = Rake::FileUtilsExt.verbose_flag
     build = Thread.new do
-      htmlize = open(
-        'https://raw.githubusercontent.com/hniksic/emacs-htmlize/master/htmlize.el',
-        'r'
-      ).read
+      htmlize = URI(
+        'https://raw.githubusercontent.com/hniksic/emacs-htmlize/master/htmlize.el'
+      ).open.read
       IO.write 'htmlize.el', htmlize
     end
     if verbose
@@ -68,7 +67,6 @@ namespace :org do
   end
 
   file 'org-config.el' => 'htmlize.el' do
-    next if Neruda::Config.org_last_version.nil?
     Neruda::Config.write_org_lisp_config
   end
 
@@ -79,6 +77,8 @@ namespace :org do
   desc 'Install org'
   task install: ['org:compile', 'org-config.el', '.dir-locals.el'] do
     mkdir_p "#{Neruda::Config.settings['public_folder']}/assets"
-    mkdir_p 'src'
+    Neruda::Config.sources.each do |s|
+      mkdir_p s['path'] unless Dir.exist? s['path']
+    end
   end
 end

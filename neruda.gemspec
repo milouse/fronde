@@ -16,6 +16,7 @@ Gem::Specification.new do |s|
                    'lib/neruda/config/lisp_config.rb',
                    'lib/neruda/config/org-config.el',
                    'lib/neruda/config/ox-neruda.el',
+                   'lib/neruda/emacs.rb',
                    'lib/neruda/index.rb',
                    'lib/neruda/index/atom_generator.rb',
                    'lib/neruda/index/org_generator.rb',

@@ -40,6 +40,10 @@ module Neruda
     #   taken from the ~#+keywords:~ header.
     attr_reader :keywords
 
+    # @return [String] the description of this org document, taken from
+    #   the ~#+description:~ header.
+    attr_reader :excerpt
+
     # The locale of the current org document, taken from the
     #   ~#+language:~ header.
     #
@@ -61,9 +65,8 @@ module Neruda
     #   settings and the above {#html_file @html_file} attribute.
     attr_reader :url
 
-    # @return [String] the description of this org document, taken from
-    #   the ~#+description:~ header.
-    attr_reader :excerpt
+    # @return [String] the project owning this document.
+    attr_reader :project
 
     extend Neruda::OrgFileClassMethods
 
@@ -104,13 +107,17 @@ module Neruda
     # @option opts [Boolean] verbose (false) if the
     #   {Neruda::OrgFileHtmlizer#publish publish} method should output
     #   emacs process messages
+    # @option opts [String] project the project owning this file
+    #   must be stored
     # @return [Neruda::OrgFile] the new instance of Neruda::OrgFile
     def initialize(file_name, opts = {})
       file_name = nil if file_name == ''
       @file = file_name
-      @html_file = Neruda::OrgFile.html_file @file
-      @url = Neruda::OrgFile.html_file_with_domain @file
+      @html_file = nil
+      @url = nil
+      @project = opts.delete :project
       @options = opts
+      build_html_file_and_url
       if @file && File.exist?(@file)
         extract_data
       else
@@ -166,7 +173,7 @@ module Neruda
     # @param year [Boolean] wether or not the ~:full~ format must
     #   contain the year
     # @return [String] the document DateTime string representation
-    def datestring(dateformat = :full, year = true)
+    def datestring(dateformat = :full, year: true)
       return '' if @date.nil?
       return R18n.l @date.to_date if dateformat == :short
       return @date.rfc3339 if dateformat == :rfc3339
@@ -226,7 +233,7 @@ module Neruda
             .gsub('%l', @lang)
             .gsub('%L', license.gsub(/\s+/, ' ').strip)
             .gsub('%t', @title)
-            .gsub('%u', @html_file)
+            .gsub('%u', @html_file || '')
             .gsub('%x', @excerpt)
             .gsub('%X', "<p>#{@excerpt}</p>")
     end
@@ -245,6 +252,14 @@ module Neruda
     end
 
     private
+
+    def build_html_file_and_url
+      return if @file.nil?
+      @html_file = Neruda::OrgFile.target_for_source(
+        @file, @project, with_public_folder: false
+      )
+      @url = "#{Neruda::Config.settings['domain']}/#{@html_file}"
+    end
 
     def init_empty_file
       @title = @options[:title] || ''

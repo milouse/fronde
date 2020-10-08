@@ -7,8 +7,8 @@ require 'r18n-core'
 require 'neruda/utils'
 require 'neruda/version'
 
-R18n.set(Neruda::Config.settings['lang'],
-         File.expand_path('../locales', __dir__))
+R18n.default_places = File.expand_path('../locales', __dir__)
+R18n.set Neruda::Config.settings['lang']
 
 # Pablo commands
 module PabloCommands
@@ -20,8 +20,8 @@ module PabloCommands
     Neruda::Config.save(Neruda::Config.settings.merge(cnf))
     @rake.options.build_all = true
     @rake.invoke_task('org:install')
-    o = Neruda::OrgFile.new('src/index.org', @options)
-    o.write unless File.exist? 'src/index.org'
+    return if File.exist? 'src/index.org'
+    Neruda::OrgFile.new('src/index.org', @options).write
   end
   alias_method :pablo_config, :pablo_init
 
@@ -40,9 +40,10 @@ module PabloCommands
       port = Neruda::Config.settings.dig('preview', 'server_port') || 5000
       uri = "http://127.0.0.1:#{port}/"
       current_os = Neruda::Utils.current_os
-      if current_os == 'windows'
+      case current_os
+      when 'windows'
         system 'start', uri
-      elsif current_os == 'apple'
+      when 'apple'
         system 'open', uri
       else
         system 'gio', 'open', uri
@@ -66,14 +67,14 @@ module PabloCommands
     @rake.invoke_task('sync:push')
   end
 
-  def pablo_help(command = 'basic', error = false)
+  def pablo_help(command = 'basic', error: false)
     warn R18n.t.pablo.error.no_command if error
     cmd = Neruda::Utils.resolve_possible_alias(command)
     cmd_opt = Neruda::Utils::PABLO_COMMANDS[cmd]
     label = cmd_opt[:label] || command
-    warn R18n.t.pablo.usage(label) + "\n\n"
+    warn format("%<label>s\n\n", label: R18n.t.pablo.usage(label))
     if R18n.t.pablo.commands[cmd].translated?
-      warn R18n.t.pablo.commands[cmd] + "\n\n"
+      warn format("%<label>s\n\n", label: R18n.t.pablo.commands[cmd])
     end
     warn help_command_body(cmd).join("\n")
     exit 1 if error
@@ -130,8 +131,8 @@ class Pablo
       require 'r18n-core'
 
       neruda_spec = Gem::Specification.find_by_name 'neruda'
-      R18n.set(Neruda::Config.settings['lang'] || 'en',
-               "\#{neruda_spec.gem_dir}/locales")
+      R18n.default_places = "\#{neruda_spec.gem_dir}/locales"
+      R18n.set(Neruda::Config.settings['lang'] || 'en')
       R18n::Filters.on(:named_variables)
 
       Dir.glob("\#{neruda_spec.gem_dir}/lib/tasks/*.rake").each { |r| import r }
@@ -166,10 +167,10 @@ command = "pablo_#{ARGV[0]}".to_sym
 cmd_err = !pablo.respond_to?(command)
 if params[:help] || cmd_err
   cmd_err = false if params[:help] && !ARGV[0]
-  pablo.pablo_help(ARGV[0], cmd_err)
+  pablo.pablo_help(ARGV[0], error: cmd_err)
 end
 ARGV.shift
 
-init_cmds = ['pablo_init', 'pablo_config']
+init_cmds = [:pablo_init, :pablo_config]
 pablo.pablo_init unless File.exist?('config.yml') || init_cmds.include?(command)
 pablo.send command

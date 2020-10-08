@@ -23,7 +23,9 @@ module Neruda # rubocop:disable Style/Documentation
       return routes[requested_path] if routes.keys.include? requested_path
       local_path = Neruda::Config.settings['public_folder'] + requested_path
       if File.directory? local_path
-        local_path = local_path.delete_suffix('/') + '/index.html'
+        local_path = format(
+          '%<path>s/index.html', path: local_path.delete_suffix('/')
+        )
       end
       return local_path if File.exist? local_path
       raise WEBrick::HTTPStatus::NotFound, 'Not found.'
@@ -34,8 +36,8 @@ module Neruda # rubocop:disable Style/Documentation
       return body unless local_path.match?(/\.(?:ht|x)ml$/)
       domain = Neruda::Config.settings['domain']
       return body if domain == ''
-      body.gsub(/"file:\/\//, '"' + local_host)
-          .gsub(/"#{domain}/, '"' + local_host)
+      body.gsub(/"file:\/\//, format('"%<host>s', host: local_host))
+          .gsub(/"#{domain}/, format('"%<host>s', host: local_host))
     end
   end
 

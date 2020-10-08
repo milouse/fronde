@@ -46,4 +46,42 @@ describe 'With theoritical pablo arguments' do
     ].join
     expect(Neruda::Utils.list_commands).to eq(basic_cmd)
   end
+
+  it 'should resolve alias' do
+    expect(Neruda::Utils.resolve_possible_alias('init')).to eq('init')
+    expect(Neruda::Utils.resolve_possible_alias('config')).to eq('init')
+    expect(Neruda::Utils.resolve_possible_alias('build')).to eq('build')
+    expect(Neruda::Utils.resolve_possible_alias('edit')).to eq('open')
+    expect(Neruda::Utils.resolve_possible_alias('wrong')).to eq('basic')
+  end
+
+  describe 'with config' do
+    after(:each) do
+      Neruda::Config.load_test({})
+    end
+
+    it 'should select the right throbber' do
+      Neruda::Config.load_test({})
+      frames = Neruda::Utils.send(:select_throbber_frames)
+      expect(frames).to(
+        eq(['⠁ ⠂ ⠄ ⡀ ⠄ ⠂ ⠁', '⠂ ⠁ ⠂ ⠄ ⡀ ⠄ ⠂', '⠄ ⠂ ⠁ ⠂ ⠄ ⡀ ⠄',
+            '⡀ ⠄ ⠂ ⠁ ⠂ ⠄ ⡀', '⠄ ⡀ ⠄ ⠂ ⠁ ⠂ ⠄', '⠂ ⠄ ⡀ ⠄ ⠂ ⠁ ⠂'])
+      )
+      Neruda::Config.load_test('throbber' => 'default')
+      frames = Neruda::Utils.send(:select_throbber_frames)
+      expect(frames).to(
+        eq(['⠁ ⠂ ⠄ ⡀ ⠄ ⠂ ⠁', '⠂ ⠁ ⠂ ⠄ ⡀ ⠄ ⠂', '⠄ ⠂ ⠁ ⠂ ⠄ ⡀ ⠄',
+            '⡀ ⠄ ⠂ ⠁ ⠂ ⠄ ⡀', '⠄ ⡀ ⠄ ⠂ ⠁ ⠂ ⠄', '⠂ ⠄ ⡀ ⠄ ⠂ ⠁ ⠂'])
+      )
+      Neruda::Config.load_test('throbber' => 'wrong')
+      frames = Neruda::Utils.send(:select_throbber_frames)
+      expect(frames).to(
+        eq(['⠁ ⠂ ⠄ ⡀ ⠄ ⠂ ⠁', '⠂ ⠁ ⠂ ⠄ ⡀ ⠄ ⠂', '⠄ ⠂ ⠁ ⠂ ⠄ ⡀ ⠄',
+            '⡀ ⠄ ⠂ ⠁ ⠂ ⠄ ⡀', '⠄ ⡀ ⠄ ⠂ ⠁ ⠂ ⠄', '⠂ ⠄ ⡀ ⠄ ⠂ ⠁ ⠂'])
+      )
+      Neruda::Config.load_test('throbber' => 'basic')
+      frames = Neruda::Utils.send(:select_throbber_frames)
+      expect(frames).to eq('-\|/')
+    end
+  end
 end

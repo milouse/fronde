@@ -59,7 +59,7 @@ module Neruda
         # be confusing if one use neruda on two different computer and
         # these params always change.
         new_config.delete_if do |k, v|
-          ['domain', 'public_folder', 'templates'].include?(k) \
+          ['domain', 'public_folder', 'templates', 'theme'].include?(k) \
           && v == default_settings[k]
         end
         IO.write 'config.yml', new_config.to_yaml
@@ -75,12 +75,25 @@ module Neruda
       # @param config [Hash] the settings to artificially load
       # @return [Hash] the new settings
       def load_test(config)
+        @sources = nil # Reset sources
         @config = default_settings.merge config
+      end
+
+      # Return the qualified projects sources list.
+      #
+      # @return [Array] the fully qualified projects sources list
+      def sources
+        return @sources if @sources
+        default_sources = [{ 'path' => 'src', 'target' => '.' }]
+        @sources = (settings['sources'] || default_sources).map do |s|
+          build_source(s)
+        end.compact
       end
 
       private
 
       def load_settings
+        @sources = nil
         conf_file = 'config.yml'
         if File.exist? conf_file
           @config = default_settings.merge(YAML.load_file(conf_file)).freeze
@@ -96,12 +109,28 @@ module Neruda
       def default_settings
         return @default_settings if @default_settings
         @default_settings = {
-          'lang' => extract_lang_from_env('en'),
           'author' => (ENV['USER'] || ''),
           'domain' => '',
+          'lang' => extract_lang_from_env('en'),
           'public_folder' => 'public_html',
-          'templates' => []
+          'templates' => [],
+          'theme' => 'default'
         }.freeze
+      end
+
+      def build_source(seed)
+        opts = { 'recursive' => true, 'is_blog' => false }
+        case seed
+        when String
+          opts['path'] = seed
+        when Hash
+          opts.merge! seed
+        end
+        return nil unless opts.has_key?('path')
+        opts['path'] = File.expand_path(opts['path'])
+        opts['name'] ||= File.basename(opts['path']).sub(/^\./, '')
+        opts['target'] ||= opts['name']
+        opts
       end
     end
   end

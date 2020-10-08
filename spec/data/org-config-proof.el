@@ -12,7 +12,7 @@
       `(("org"
          :base-directory "__TEST_DIR__/src"
          :base-extension "org"
-         :recursive t
+         :recursive nil
          :exclude "tata\.org"
          :publishing-directory "__TEST_DIR__/public_html"
          :publishing-function org-html-publish-to-html
@@ -25,8 +25,26 @@
         ("org-assets"
          :base-directory "__TEST_DIR__/src"
          :base-extension "jpg\\|gif\\|png\\|svg\\|pdf"
-         :recursive t
+         :recursive nil
          :publishing-directory "__TEST_DIR__/public_html"
+         :publishing-function org-publish-attachment)
+        ("news"
+         :base-directory "__TEST_DIR__/src/news"
+         :base-extension "org"
+         :recursive t
+         :publishing-directory "__TEST_DIR__/public_html/news"
+         :publishing-function org-html-publish-to-html
+         :section-numbers nil
+         :with-toc nil
+         :html-head "<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\" href=\"style.css\"/>"
+         :html-postamble "<footer>Published by Neruda.</footer>"
+         :html-head-include-default-style nil
+         :html-head-include-scripts nil)
+        ("news-assets"
+         :base-directory "__TEST_DIR__/src/news"
+         :base-extension "jpg\\|gif\\|png\\|svg\\|pdf"
+         :recursive t
+         :publishing-directory "__TEST_DIR__/public_html/news"
          :publishing-function org-publish-attachment)
         ("test"
          :base-directory "__TEST_DIR__/titi/test"
@@ -65,13 +83,13 @@
          :recursive t
          :publishing-directory "__TEST_DIR__/public_html/tata"
          :publishing-function org-publish-attachment)
-        ("theme"
+        ("theme-default"
          :base-directory "__BASE_DIR__/themes/default"
          :base-extension "jpg\\|gif\\|png\\|js\\|css\\|otf\\|ttf\\|woff2?"
          :recursive t
-         :publishing-directory "__TEST_DIR__/public_html/assets"
+         :publishing-directory "__TEST_DIR__/public_html/assets/default"
          :publishing-function org-publish-attachment)
-        ("website" :components ("org" "org-assets" "test" "test-assets" "tata" "tata-assets" "theme"))))
+        ("website" :components ("org" "org-assets" "news" "news-assets" "test" "test-assets" "tata" "tata-assets" "theme-default"))))
 
 ;; Load neruda lib
 (load-file (expand-file-name "ox-neruda.el" "__BASE_DIR__/lib/neruda/config"))

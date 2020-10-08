@@ -72,6 +72,7 @@ org timestamps and id locations).")
       make-backup-files nil
       enable-local-variables :all
       org-confirm-babel-evaluate nil
+      org-export-with-broken-links t
       org-html-doctype "html5"
       org-html-html5-fancy t
       org-html-htmlize-output-type 'css

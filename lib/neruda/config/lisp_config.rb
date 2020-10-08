@@ -11,18 +11,19 @@ module Neruda
     # @return [String] the new x.x.x version string of org mode
     def org_last_version
       return @org_version if @org_version
-      if File.exist?('__last_org_version__')
-        @org_version = IO.read('__last_org_version__')
+      if File.exist?('tmp/__last_org_version__')
+        @org_version = IO.read('tmp/__last_org_version__')
         return @org_version
       end
-      index = open('https://orgmode.org/index.html', 'r').read
+      index = URI('https://orgmode.org/index.html').open.read
       last_ver = index.match(/https:\/\/orgmode\.org\/org-([0-9.]+)\.tar\.gz/)
       # :nocov:
       if last_ver.nil?
         warn 'Org last version not found'
         return nil
       end
-      IO.write('__last_org_version__', last_ver[1])
+      FileUtils.mkdir_p 'tmp'
+      IO.write('tmp/__last_org_version__', last_ver[1])
       # :nocov:
       @org_version = last_ver[1]
     end
@@ -35,15 +36,15 @@ module Neruda
     #
     # @return [Integer] the length written (as returned by the
     #   underlying ~IO.write~ method call)
-    def write_org_lisp_config
-      projects = org_generate_projects
+    def write_org_lisp_config(with_tags: false)
+      projects = org_generate_projects(with_tags: with_tags)
       workdir = Dir.pwd
       content = IO.read(File.expand_path('./org-config.el', __dir__))
                   .gsub('__WORK_DIR__', workdir)
                   .gsub('__NERUDA_DIR__', __dir__)
                   .gsub('__ORG_VER__', org_last_version)
-                  .gsub('__ALL_PROJECTS__', all_projects(projects).strip)
-                  .gsub('__THEME_CONFIG__', org_theme_config.strip)
+                  .gsub('__ALL_PROJECTS__', all_projects(projects))
+                  .gsub('__THEME_CONFIG__', org_default_theme_config)
                   .gsub('__ALL_PROJECTS_NAMES__', project_names(projects))
                   .gsub('__LONG_DATE_FMT__', r18n_full_datetime_format)
                   .gsub('__AUTHOR_EMAIL__', settings['author_email'] || '')
@@ -81,67 +82,120 @@ module Neruda
       )
     end
 
+    def ruby_to_lisp_boolean(value)
+      return 't' if value == true
+      'nil'
+    end
+
     def project_names(projects)
-      projects.keys.map { |p| ["\"#{p}\"", "\"#{p}-assets\""] }
-              .flatten.join(' ')
+      names = projects.keys.map do |p|
+        ["\"#{p}\"", "\"#{p}-assets\""]
+      end.flatten
+      names << "\"theme-#{settings['theme']}\""
+      sources.each do |s|
+        next unless s['theme'] && s['theme'] != settings['theme']
+        theme = "\"theme-#{s['theme']}\""
+        next if names.include? theme
+        names << theme
+      end
+      names.join(' ')
     end
 
     def all_projects(projects)
       projects.values.join("\n").strip
-              .gsub(/\n\n/, "\n")
+              .gsub(/\n\s*\n/, "\n")
               .gsub(/\n/, "\n        ")
     end
 
-    def org_project(project_name, opts)
-      orgtpl = opts['org_headers']
-      base_directory = File.expand_path(opts['path'])
+    # Return the full path to the publication path of a given project
+    #   configuration.
+    #
+    # @param project [Hash] a project configuration (as extracted from
+    #   the ~sources~ key)
+    # @return [String] the full path to the target dir of this project
+    def publication_path(project)
       publish_in = [Dir.pwd, settings['public_folder']]
-      publish_in << project_name unless project_name == 'neruda'
-      publish_in = publish_in.join('/')
-      recline = [opts['recursive'] || 't']
-      default_ex_ptrn = settings['exclude_pattern']
+      publish_in << project['target'] unless project['target'] == '.'
+      publish_in.join('/')
+    end
+
+    def org_project(project_name, opts)
+      publish_in = publication_path(opts)
+      other_lines = [
+        format(':recursive %<value>s',
+               value: ruby_to_lisp_boolean(opts['recursive']))
+      ]
       if opts['exclude']
-        recline << ":exclude \"#{opts['exclude']}\""
-      elsif project_name == 'neruda' && default_ex_ptrn
-        recline << ":exclude \"#{default_ex_ptrn}\""
+        other_lines << format(':exclude "%<value>s"',
+                              value: opts['exclude'])
       end
+      themeconf = org_theme_config(opts['theme']) || ''
       <<~ORGPROJECT
         ("#{project_name}"
-         :base-directory "#{base_directory}"
+         :base-directory "#{opts['path']}"
          :base-extension "org"
-         :recursive #{recline.join("\n ")}
+         #{other_lines.join("\n ")}
          :publishing-directory "#{publish_in}"
          :publishing-function org-html-publish-to-html
          :section-numbers nil
          :with-toc nil
-         #{orgtpl})
+         #{opts['org_headers']})
         ("#{project_name}-assets"
-         :base-directory "#{base_directory}"
+         :base-directory "#{opts['path']}"
          :base-extension "jpg\\\\\\|gif\\\\\\|png\\\\\\|svg\\\\\\|pdf"
-         :recursive #{recline[0]}
+         #{other_lines[0]}
          :publishing-directory "#{publish_in}"
          :publishing-function org-publish-attachment)
+        #{themeconf}
       ORGPROJECT
     end
 
-    def org_default_theme_options
-      postamble = <<~POSTAMBLE
+    def org_default_postamble
+      <<~POSTAMBLE
         <p><span class="author">#{R18n.t.neruda.org.postamble.written_by}</span>
         #{R18n.t.neruda.org.postamble.with_emacs}</p>
         <p class="date">#{R18n.t.neruda.org.postamble.last_modification}</p>
         <p class="validation">%v</p>
       POSTAMBLE
-      { 'html-head' => build_html_head.strip,
-        'html-postamble' => postamble.strip,
+    end
+
+    def org_default_html_head
+      <<~HTMLHEAD
+        <link rel="stylesheet" type="text/css" media="screen"
+              href="__DOMAIN__/assets/__THEME__/css/style.css">
+        <link rel="stylesheet" type="text/css" media="screen"
+              href="__DOMAIN__/assets/__THEME__/css/htmlize.css">
+        __ATOM_FEED__
+      HTMLHEAD
+    end
+
+    def org_default_html_options
+      { 'html-head' => org_default_html_head,
+        'html-postamble' => org_default_postamble,
         'html-head-include-default-style' => 't',
         'html-head-include-scripts' => 'nil' }
     end
 
-    def org_templates
-      orgtplopts = org_default_theme_options.merge
-      orgtplopts.merge!(settings['org-html'] || {})
+    def expand_vars_in_html_head(head, project)
+      curtheme = project['theme'] || settings['theme']
+      # Head may be frozen when coming from settings
+      head = head.gsub('__THEME__', curtheme)
+                 .gsub('__DOMAIN__', settings['domain'])
+      return head.gsub('__ATOM_FEED__', '') unless project['is_blog']
+      atomfeed = <<~ATOMFEED
+        <link rel="alternate" type="application/atom+xml" title="Atom 1.0"
+              href="#{settings['domain']}/feeds/index.xml" />
+      ATOMFEED
+      head.gsub('__ATOM_FEED__', atomfeed)
+    end
+
+    def build_project_org_headers(project)
+      orgtplopts = org_default_html_options.merge(
+        settings['org-html'] || {}, project['org-html'] || {}
+      )
       orgtpl = []
       orgtplopts.each do |k, v|
+        v = expand_vars_in_html_head(v, project) if k == 'html-head'
         val = v.strip.gsub(/"/, '\"')
         if ['t', 'nil', '1'].include? val
           orgtpl << ":#{k} #{val}"
@@ -152,62 +206,47 @@ module Neruda
       orgtpl.join("\n ")
     end
 
-    def org_external_projects_opts(seed, orgtpl)
-      opts = { 'org_headers' => orgtpl }
-      if seed.is_a? String
-        opts['path'] = seed
-      elsif seed.is_a? Hash
-        opts.merge! seed
+    def org_generate_projects(with_tags: false)
+      projects = {}
+      projects_sources = sources
+      if with_tags
+        tags_conf = build_source('tags')
+        tags_conf['recursive'] = false
+        projects_sources << tags_conf
       end
-      opts
-    end
-
-    def org_generate_projects
-      orgtpl = org_templates
-      default_project = org_project(
-        'neruda', 'org_headers' => orgtpl, 'path' => './src'
-      )
-      projects = { 'neruda' => default_project }
-      settings['external_sources']&.each do |s|
-        opts = org_external_projects_opts(s, orgtpl)
-        next unless opts.has_key?('path')
-        pname = File.basename(opts['path']).sub(/^\./, '')
-        projects[pname] = org_project(pname, opts)
+      projects_sources.each do |opts|
+        opts['org_headers'] = build_project_org_headers(opts)
+        projects[opts['name']] = org_project(opts['name'], opts)
       end
       projects
     end
 
-    def org_theme_config
-      curtheme = settings['theme'] || 'default'
+    def org_default_theme_config
+      org_theme_config(settings['theme']).split("\n").map do |line|
+        if line[0] == '('
+          line
+        else
+          "        #{line}"
+        end
+      end.join("\n")
+    end
+
+    def org_theme_config(theme)
+      return nil if theme.nil?
       workdir = Dir.pwd
-      if curtheme == 'default'
+      if theme == 'default'
         sourcedir = File.expand_path('../../../', __dir__)
       else
         sourcedir = workdir
       end
       <<~THEMECONFIG
-        ("theme"
-                 :base-directory "#{sourcedir}/themes/#{curtheme}"
-                 :base-extension "jpg\\\\\\|gif\\\\\\|png\\\\\\|js\\\\\\|css\\\\\\|otf\\\\\\|ttf\\\\\\|woff2?"
-                 :recursive t
-                 :publishing-directory "#{workdir}/#{settings['public_folder']}/assets"
-                 :publishing-function org-publish-attachment)
+        ("theme-#{theme}"
+         :base-directory "#{sourcedir}/themes/#{theme}"
+         :base-extension "jpg\\\\\\|gif\\\\\\|png\\\\\\|js\\\\\\|css\\\\\\|otf\\\\\\|ttf\\\\\\|woff2?"
+         :recursive t
+         :publishing-directory "#{workdir}/#{settings['public_folder']}/assets/#{theme}"
+         :publishing-function org-publish-attachment)
       THEMECONFIG
-    end
-
-    def build_html_head
-      stylesheet = <<~CSS
-        <link rel="stylesheet" type="text/css" media="screen"
-              href="#{settings['domain']}/assets/css/style.css">
-        <link rel="stylesheet" type="text/css" media="screen"
-              href="#{settings['domain']}/assets/css/htmlize.css">
-      CSS
-      return stylesheet if settings['blog_path'].nil?
-      <<~ATOM
-        #{stylesheet.strip}
-        <link rel="alternate" type="application/atom+xml" title="Atom 1.0"
-              href="#{settings['domain']}/feeds/index.xml" />
-      ATOM
     end
   end
 end

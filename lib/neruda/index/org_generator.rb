@@ -4,73 +4,96 @@ module Neruda
   # Embeds methods responsible for generating an org file for a given
   #   index.
   module IndexOrgGenerator
-    def to_org(index_name = 'index')
-      content = [org_header(index_name).strip]
-      last_year = nil
-      @index[index_name].each do |article|
-        year = article.timekey.slice(0, 4)
-        if year != last_year
-          content << ''
-          content << org_title(year)
-          last_year = year
-        end
-        content << org_entry(article)
-      end
-      content.join("\n")
+    def to_org(index_name = 'index', is_project: false)
+      return project_home_page(index_name) if is_project
+      return all_tags_index if index_name == 'index'
+      [org_header(index_name),
+       org_articles(@index[index_name])].join("\n")
     end
     alias_method :to_s, :to_org
 
     def write_org(index_name)
-      return 0 if @blog_path.nil?
-      FileUtils.mkdir_p 'src/tags' unless index_name == 'index'
-      src = index_source_path(index_name)
-      IO.write(src, to_org(index_name))
-    end
-
-    def write_org_lists
-      return 0 if @blog_path.nil?
-      domain = Neruda::Config.settings['domain']
-      content = [org_header(R18n.t.neruda.index.all_tags)]
-      sort_tags_by_name_and_weight.each do |t, tags|
-        content << ''
-        content << org_title(R18n.t.neruda.index.send(t), 'index-tags')
-        tags.each do |k|
-          title = @tags_names[k] || k
-          link = "[[#{domain}/tags/#{k}.html][#{title}]]"
-          content << "- #{link} (#{@index[k].length})"
-        end
-      end
-      FileUtils.mkdir_p 'src/tags'
-      src = 'src/tags/index.org'
-      IO.write(src, content.join("\n"))
+      return unless save?
+      slug = Neruda::OrgFile.slug index_name
+      FileUtils.mkdir 'tags' unless Dir.exist? 'tags'
+      content = to_org index_name
+      orgdest = "tags/#{slug}.org"
+      IO.write(orgdest, content)
     end
 
     private
 
-    def index_source_path(index_name)
-      slug = Neruda::OrgFile.slug index_name
-      src = ['src', 'tags', "#{slug}.org"]
-      src[1] = @blog_path if slug == 'index'
-      src.join('/')
+    def project_home_page(project_name)
+      content = [org_header(project_name, is_tag: false)]
+      if @projects[project_name]&.any?
+        content += org_articles(@projects[project_name])
+      end
+      content.join("\n")
     end
 
-    def org_header(title = nil)
-      if title.nil? || title == 'index'
-        title = Neruda::Config.settings['title']
-      elsif @tags_names.has_key?(title)
-        title = @tags_names[title]
+    def write_all_blog_home(verbose)
+      Neruda::Config.sources.each do |project|
+        next unless project['is_blog']
+        next unless Dir.exist?(project['path'])
+        warn "Generated blog home for #{project['name']}" if verbose
+        orgdest = format('%<root>s/index.org', root: project['path'])
+        IO.write(orgdest, to_org(project['name'], is_project: true))
       end
-      <<~HEADER
+    end
+
+    def all_tags_index
+      content = [
+        org_header(R18n.t.neruda.index.all_tags, is_tag: false)
+      ]
+      sort_tags_by_name_and_weight.each do |t, tags|
+        content << ''
+        content << org_title(R18n.t.neruda.index.send(t), 'index-tags')
+        next if tags.empty?
+        tags.each do |k|
+          content << "- #{tag_published_url(k)} (#{@index[k].length})"
+        end
+      end
+      content.join("\n")
+    end
+
+    def tag_published_url(tag_name)
+      domain = Neruda::Config.settings['domain']
+      title = @tags_names[tag_name]
+      tag_link = "#{domain}/tags/#{tag_name}.html"
+      "[[#{tag_link}][#{title}]]"
+    end
+
+    def org_header(title = nil, is_tag: true)
+      if is_tag
+        title = @tags_names[title]
+      elsif title.nil? || title == 'index'
+        title = Neruda::Config.settings['title']
+      end
+      head = <<~HEADER
         #+title: #{title}
         #+author: #{Neruda::Config.settings['author']}
         #+language: #{Neruda::Config.settings['lang']}
       HEADER
+      head.strip
+    end
+
+    def org_articles(articles_list)
+      last_year = nil
+      articles_list.map do |article|
+        year_title = ''
+        year = article.timekey.slice(0, 4)
+        if year != last_year
+          year_title = format("\n%<title>s\n", title: org_title(year))
+          last_year = year
+        end
+        year_title + org_entry(article)
+      end
     end
 
     def org_entry(article)
-      line = "- *[[..#{article.html_file}][#{article.title}]]*"
+      line = "- *[[#{article.url}][#{article.title}]]*"
       if article.date
-        art_date = article.datestring(:full, false)
+        art_date = article.datestring(:full, year: false)
         published = R18n.t.neruda.index.published_on art_date
         line += " / #{published}"
       end

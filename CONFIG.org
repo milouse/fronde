@@ -2,6 +2,7 @@
 #+author: Étienne Deparis
 #+lang: en
 #+description: Glossary of all possible configuration options for Neruda
+#+options: ^:{}
 
 This file explain all possible configuration options for Neruda, which
 may be put in file named ~config.yml~ at the root of your static website
@@ -17,22 +18,6 @@ files contains an ~#+author:~ metadata field before publishing them.
 
 This value is used in the generation of the blog index page and the main
 atom feed.
-
-* ~blog_path~
-:PROPERTIES:
-:CUSTOM_ID: sec-blog_path
-:END:
-
-The ~blog_path~ options store the folder name *inside* the ~src~ folder,
-which will contains org document to be specifically indexed to produce a
-blog-like website.
-
-Neruda will introspect the org documents inside this folder in order to
-find keywords (declared with the ~#+keywords:~ header) and produce as
-many new time-sorted indexes for these keywords, plus a specific index
-page at the root of this folder.
-
-The default value is ~blog~.
 
 * ~domain~
 
@@ -51,23 +36,6 @@ value. Thus, ~https://example.com/example~ or
 ~https://example.com/complex/example~ are *valid* values too, while
 ~https://example.com/example/~ or ~https://example.com/complex/example/~
 are not.
-
-* ~exclude_pattern~
-:PROPERTIES:
-:CUSTOM_ID: sec-exclude_pattern
-:END:
-
-The ~exclude_pattern~ option stores a [[https://en.wikipedia.org/wiki/Regular_expression][regular expression]] to help Neruda
-to find precisely which files you want to index under the [[#sec-blog_path][~blog_path~]]
-folder. It may be handy to remove some unrelated data files, for example
-with a value like ~comments\.org$~. This filter is executed *after*
-files have been selected by the [[#sec-blog_pattern][~blog_pattern~]] and *matching* files are
-excluded.
-
-There is no default value (thus nothing match and thus all org files
-matched by the ~blog_pattern~ option are indexed).
-
-See also the [[#sec-blog_pattern][~blog_pattern~ section]].
 
 * ~lang~
 
@@ -95,3 +63,29 @@ an ~#+title:~ metadata field before publishing them.
 
 This value is used in the generation of the blog index page and the main
 atom feed.
+
+* ~sources~
+
+The ~sources~ option stores an array of all source folders, where your
+org files to be published are. This allow you to gather various
+different places (even at some absolute path in your computer) in your
+website.
+
+Each source listed in that array is an object, which must use the
+following keys:
+
+- path :: [string] path to the folder containing the file to exports
+- name :: [string, optional] key used to generate the org-mode project name.
+  Defaults to the last dirname of the path value.
+- recursive :: [boolean, optional] wether the path should be exported
+  recursively. Defaults to True
+- exclude :: [string, optional] Regexp of files to not export for this
+  projects. Default to nothing (no files to exclude).
+- target :: [string, optional] Path where to put the exported files,
+  relative to the ~public_folder~ folder. Default to the project name at
+  the root of the ~public_folder~ folder.
+- is_blog :: [boolean, optional] Whether this project should be
+  considered as a blog and thus, serves as source to generate blog
+  index, tags indexes and atom feeds.
+- theme :: [string, optional] Theme name to use for this
+  project. Defaults to “default”.

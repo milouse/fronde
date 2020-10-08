@@ -19,6 +19,9 @@ pablo:
     help: Display help for a command and exit.
     version: Display Neruda version and exit.
 neruda:
+  error:
+    label: An error occured.
+    explanation: To see it, run again your command with more verbosity, i.e. pablo build -v
   index:
     unsorted: Unsorted
     published_on: Published on %1
