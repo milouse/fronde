@@ -136,7 +136,7 @@ describe 'With a blog config file' do
       <link rel=\\\"stylesheet\\\" type=\\\"text/css\\\" media=\\\"screen\\\"
             href=\\\"/assets/default/css/htmlize.css\\\">"
        :html-postamble "<p><span class=\\\"author\\\">Written by %a</span>
-      with %c, and published with <a href=\\\"https://git.umaneti.net/neruda/about/\\\">Neruda</a></p>
+      with %c, and published with %N</p>
       <p class=\\\"date\\\">Last modification on %C</p>
       <p class=\\\"validation\\\">%v</p>"
        :html-head-include-default-style t
@@ -156,7 +156,7 @@ describe 'With a blog config file' do
       <link rel=\\\"stylesheet\\\" type=\\\"text/css\\\" media=\\\"screen\\\"
             href=\\\"https://test.com/assets/default/css/htmlize.css\\\">"
        :html-postamble "<p><span class=\\\"author\\\">Written by %a</span>
-      with %c, and published with <a href=\\\"https://git.umaneti.net/neruda/about/\\\">Neruda</a></p>
+      with %c, and published with %N</p>
       <p class=\\\"date\\\">Last modification on %C</p>
       <p class=\\\"validation\\\">%v</p>"
        :html-head-include-default-style t
@@ -172,7 +172,7 @@ describe 'With a blog config file' do
       <link rel=\\\"alternate\\\" type=\\\"application/atom+xml\\\" title=\\\"Atom 1.0\\\"
             href=\\\"https://test.com/feeds/index.xml\\\" />"
        :html-postamble "<p><span class=\\\"author\\\">Written by %a</span>
-      with %c, and published with <a href=\\\"https://git.umaneti.net/neruda/about/\\\">Neruda</a></p>
+      with %c, and published with %N</p>
       <p class=\\\"date\\\">Last modification on %C</p>
       <p class=\\\"validation\\\">%v</p>"
        :html-head-include-default-style t
@@ -199,7 +199,7 @@ describe 'With a blog config file' do
       <link rel=\\\"stylesheet\\\" type=\\\"text/css\\\" media=\\\"screen\\\"
             href=\\\"https://test.com/assets/default/css/htmlize.css\\\">"
        :html-postamble "<p><span class=\\\"author\\\">Written by %a</span>
-      with %c, and published with <a href=\\\"https://git.umaneti.net/neruda/about/\\\">Neruda</a></p>
+      with %c, and published with %N</p>
       <p class=\\\"date\\\">Last modification on %C</p>
       <p class=\\\"validation\\\">%v</p>"
        :html-head-include-default-style t
@@ -228,7 +228,7 @@ describe 'With a blog config file' do
       <link rel=\\\"alternate\\\" type=\\\"application/atom+xml\\\" title=\\\"Atom 1.0\\\"
             href=\\\"https://test.com/feeds/index.xml\\\" />"
        :html-postamble "<p><span class=\\\"author\\\">Written by %a</span>
-      with %c, and published with <a href=\\\"https://git.umaneti.net/neruda/about/\\\">Neruda</a></p>
+      with %c, and published with %N</p>
       <p class=\\\"date\\\">Last modification on %C</p>
       <p class=\\\"validation\\\">%v</p>"
        :html-head-include-default-style t

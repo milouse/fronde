@@ -7,6 +7,7 @@ require 'neruda/org_file/htmlizer'
 require 'neruda/org_file/extracter'
 require 'neruda/org_file/class_methods'
 require 'neruda/index'
+require 'neruda/version'
 
 module Neruda
   # Handles org files.
@@ -209,6 +210,9 @@ module Neruda
     # - %l :: the lang of the document
     # - %L :: the license information, taken from the
     #         {Neruda::Config#settings}
+    # - %n :: the Neruda name and version
+    # - %N :: the Neruda name and version with a link to the project
+    #         home on the name
     # - %t :: the title of the document
     # - %u :: the web path to the related published HTML document
     # - %x :: the raw description (eXcerpt)
@@ -220,8 +224,9 @@ module Neruda
     #     => "Article written by Alice Smith the Wednesday 3rd July"
     #
     # @return [String] the given ~string~ after replacement occurs
+    # rubocop:disable Metrics/MethodLength
+    # rubocop:disable Layout/LineLength
     def format(string)
-      license = Neruda::Config.settings['license'] || ''
       string.gsub('%a', @author)
             .gsub('%A', author_to_html)
             .gsub('%d', date_to_html(:short))
@@ -231,12 +236,16 @@ module Neruda
             .gsub('%k', @keywords.join(', '))
             .gsub('%K', keywords_to_html)
             .gsub('%l', @lang)
-            .gsub('%L', license.gsub(/\s+/, ' ').strip)
+            .gsub('%L', (Neruda::Config.settings['license'] || '').gsub(/\s+/, ' ').strip)
+            .gsub('%n', "Neruda #{Neruda::VERSION}")
+            .gsub('%N', "<a href=\"https://git.umaneti.net/neruda/about/\">Neruda</a> #{Neruda::VERSION}")
             .gsub('%t', @title)
             .gsub('%u', @html_file || '')
             .gsub('%x', @excerpt)
             .gsub('%X', "<p>#{@excerpt}</p>")
     end
+    # rubocop:enable Layout/LineLength
+    # rubocop:enable Metrics/MethodLength
 
     # Writes the current OrgFile content to the underlying file.
     #
