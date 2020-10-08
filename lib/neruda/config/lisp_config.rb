@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'open-uri'
+require 'neruda/version'
 
 module Neruda
   # This module contains utilitary methods to ease ~org-config.el~
@@ -40,6 +41,7 @@ module Neruda
       projects = org_generate_projects(with_tags: with_tags)
       workdir = Dir.pwd
       content = IO.read(File.expand_path('./org-config.el', __dir__))
+                  .gsub('__VERSION__', Neruda::VERSION)
                   .gsub('__WORK_DIR__', workdir)
                   .gsub('__NERUDA_DIR__', __dir__)
                   .gsub('__ORG_VER__', org_last_version)

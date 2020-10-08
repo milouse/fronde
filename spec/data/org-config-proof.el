@@ -4,7 +4,8 @@
 (load-file (expand-file-name "htmlize.el" "__TEST_DIR__"))
 
 ;; Current project options
-(setq neruda/current-work-dir "__TEST_DIR__"
+(setq neruda/version "__VERSION__"
+      neruda/current-work-dir "__TEST_DIR__"
       user-mail-address ""
       user-full-name "Tata"
       org-html-metadata-timestamp-format "%A %-d of %B, %Y at %R"
