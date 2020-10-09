@@ -13,7 +13,7 @@ be put in any order in the ~config.yml~ file.
 
 The ~author~ option stores the default author name of your org
 files. This value is used when you create a new file. *It is not used by
-the regular org mode publishing process*. You must be sure that your org
+the regular Org mode publishing process*. You must be sure that your org
 files contains an ~#+author:~ metadata field before publishing them.
 
 This value is used in the generation of the blog index page and the main
@@ -75,7 +75,7 @@ Each source listed in that array is an object, which must use the
 following keys:
 
 - path :: [string] path to the folder containing the file to exports
-- name :: [string, optional] key used to generate the org-mode project name.
+- name :: [string, optional] key used to generate the Org project name.
   Defaults to the last dirname of the path value.
 - recursive :: [boolean, optional] wether the path should be exported
   recursively. Defaults to True

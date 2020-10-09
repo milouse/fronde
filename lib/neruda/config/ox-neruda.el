@@ -40,7 +40,7 @@
   "Location of the current neruda website base directory.")
 
 (defvar neruda/org-temp-dir nil
-  "Location of the local org-mode temporary directory (where to place
+  "Location of the local Org temporary directory (where to place
 org timestamps and id locations).")
 
 (defun neruda/org-html-format-spec (upstream info)

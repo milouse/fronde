@@ -104,9 +104,9 @@ module Neruda
     #     o.title
     #     => "New file"
     #
-    # @param file_name [String] path to the corresponding org mode file
-    # @param opts [Hash] optional data to initialize new org file
-    # @option opts [String] title ('') the title of the new org file
+    # @param file_name [String] path to the corresponding Org file
+    # @param opts [Hash] optional data to initialize new Org file
+    # @option opts [String] title ('') the title of the new Org file
     # @option opts [String] author (system user or '') the author of the
     #   document
     # @option opts [Boolean] verbose (false) if the

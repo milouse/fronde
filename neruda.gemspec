@@ -5,10 +5,10 @@ require './lib/neruda/version'
 Gem::Specification.new do |s|
   s.name        = 'neruda'
   s.version     = Neruda::VERSION
-  s.summary     = 'A simplistic way to create an org-mode static website.'
+  s.summary     = 'A simplistic way to create an Org static website.'
   s.description = <<~DESC
-    An opinionated org-mode static website generator.
-    Write your org files, we take care of the rest.
+    An opinionated Org static website generator.
+    Write your org-mode files, we take care of the rest.
   DESC
   s.authors     = ['Étienne Deparis']
   s.email       = 'etienne@depar.is'

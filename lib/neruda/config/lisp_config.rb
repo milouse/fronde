@@ -7,9 +7,9 @@ module Neruda
   # This module contains utilitary methods to ease ~org-config.el~
   # file generation
   module LispConfig
-    # Fetch and return the last published version of org mode.
+    # Fetch and return the last published version of Org.
     #
-    # @return [String] the new x.x.x version string of org mode
+    # @return [String] the new x.x.x version string of Org
     def org_last_version
       return @org_version if @org_version
       if File.exist?('tmp/__last_org_version__')
@@ -29,7 +29,7 @@ module Neruda
       @org_version = last_ver[1]
     end
 
-    # Generate emacs lisp configuration file for org mode and write it.
+    # Generate emacs lisp configuration file for Org and write it.
     #
     # This method saves the generated configuration in the file
     # ~org-config.el~ at the root of your project, overwriting it if it
@@ -57,8 +57,8 @@ module Neruda
     # Generate emacs directory variables file.
     #
     # This method generate the file ~.dir-locals.el~, which is
-    # responsible to load neruda org mode settings when visiting an
-    # org file of this neruda instance.
+    # responsible to load neruda Org settings when visiting an Org file
+    # of this neruda instance.
     #
     # @return [Integer] the length written (as returned by the
     #   underlying ~IO.write~ method call)

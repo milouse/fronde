@@ -6,7 +6,7 @@ require 'open-uri'
 require 'neruda/utils'
 
 namespace :org do
-  desc 'Download last version of org-mode'
+  desc 'Download last version of Org'
   task :download do
     verbose = Rake::FileUtilsExt.verbose_flag
     download = Thread.new do
@@ -15,13 +15,13 @@ namespace :org do
     end
     if verbose
       download.join
-      warn "org-#{download[:org_version]} has been downloaded"
+      warn "Org version #{download[:org_version]} has been downloaded"
     else
-      Neruda::Utils.throbber(download, 'Downloading org mode:')
+      Neruda::Utils.throbber(download, 'Downloading Org:')
     end
   end
 
-  desc 'Compile org-mode'
+  desc 'Compile Org'
   task compile: ['org:download'] do
     verbose = Rake::FileUtilsExt.verbose_flag
     org_version = "org-#{Neruda::Config.org_last_version}"
@@ -46,7 +46,7 @@ namespace :org do
       build.join
       warn "#{org_version} has been locally installed"
     else
-      Neruda::Utils.throbber(build, 'Installing org mode:')
+      Neruda::Utils.throbber(build, 'Installing Org:')
     end
   end
 
