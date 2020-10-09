@@ -37,9 +37,11 @@ Gem::Specification.new do |s|
                    'locales/en.yml',
                    'locales/fr.yml',
                    # Default theme
+                   'themes/default/css/htmlize.css',
                    'themes/default/css/style.css',
-                   'themes/default/fonts/Yanone_Kaffeesatz_400.woff',
-                   'themes/default/fonts/Yanone_Kaffeesatz_400.woff2',
+                   'themes/default/img/bottom.png',
+                   'themes/default/img/tic.png',
+                   'themes/default/img/top.png',
                    # Others
                    'LICENSE']
   s.executables = ['pablo']
