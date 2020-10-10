@@ -57,8 +57,7 @@ module PabloCommands
     o = Neruda::OrgFile.new(filename, @options)
     o.write unless File.exist? filename
     editor = ENV['EDITOR'] || ENV['VISUAL'] || 'emacs'
-    cmd = [editor, filename]
-    cmd.insert(1, '+6') if editor.match?(/^emacs/)
+    cmd = [editor, '+6', filename]
     system(*cmd)
   end
   alias_method :pablo_edit, :pablo_open
@@ -72,10 +71,11 @@ module PabloCommands
     cmd = Neruda::Utils.resolve_possible_alias(command)
     cmd_opt = Neruda::Utils::PABLO_COMMANDS[cmd]
     label = cmd_opt[:label] || command
-    warn "Usage: pablo #{label} [options]\n\n"
-    warn cmd_opt[:desc] + "\n\n" if cmd_opt.has_key?(:desc)
-    warn "Options\n#{Neruda::Utils.summarize_command(cmd)}\n"
-    warn "Commands\n#{Neruda::Utils.list_commands}\n" if cmd == 'basic'
+    warn R18n.t.pablo.usage(label) + "\n\n"
+    if R18n.t.pablo.commands[cmd].translated?
+      warn R18n.t.pablo.commands[cmd] + "\n\n"
+    end
+    warn help_command_body(cmd).join("\n")
     exit 1 if error
     exit
   end
@@ -88,6 +88,19 @@ module PabloCommands
     filename = Neruda::OrgFile.slug title
     return "#{filename}.org" unless @options[:directory]
     "#{filename}/index.org"
+  end
+
+  def help_command_body(command)
+    body = [
+      R18n.t.pablo.options.cmd_title,
+      Neruda::Utils.summarize_command(command)
+    ]
+    return body unless command == 'basic'
+    body + [
+      '',
+      R18n.t.pablo.commands.cmd_title,
+      Neruda::Utils.list_commands
+    ]
   end
 end
 

@@ -2,19 +2,19 @@
 
 source 'https://rubygems.org'
 
-ruby '>= 2.5'
+ruby '>= 2.6'
 gem 'nokogiri', '~> 1.10'
-gem 'r18n-core', '~> 3.2'
+gem 'r18n-core', '~> 4.0'
 gem 'rainbow', '~> 3.0'
-gem 'rake', '~> 12.3'
+gem 'rake', '~> 13.0'
 
 group :development do
-  gem 'byebug'
-  gem 'org-ruby'
-  gem 'pry'
-  gem 'pry-doc'
-  gem 'rspec'
-  gem 'rubocop'
-  gem 'simplecov'
-  gem 'yard'
+  gem 'byebug', '~> 11.1'
+  gem 'org-ruby', '~> 0.9'
+  gem 'pry', '~> 0.13'
+  gem 'pry-doc', '~> 1.1'
+  gem 'rspec', '~> 3.9'
+  gem 'rubocop', '~> 0.90'
+  gem 'simplecov', '~> 0.19'
+  gem 'yard', '~> 0.9'
 end

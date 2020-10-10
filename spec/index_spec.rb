@@ -36,7 +36,7 @@ SAMPLE_ATOM = <<~ATOM
   <updated>%s</updated>
   <author><name>Test</name></author>
   <id>urn:md5:75d53866bcb20465b3287cf237234464</id>
-  <generator uri="https://fossil.deparis.io/neruda">Neruda</generator>
+  <generator uri="https://git.umaneti.net/neruda/about/">Neruda</generator>
 
   <entry>
     <title>My third article</title>
@@ -73,6 +73,10 @@ SAMPLE_ATOM = <<~ATOM
 ATOM
 
 describe 'With blog settings' do
+  before(:all) do
+    ENV['LANG'] = 'en'
+  end
+
   describe 'with working org files' do
     before(:each) do
       Neruda::Config.load_test('title' => 'Blog',
@@ -194,7 +198,7 @@ describe 'Without blog settings' do
         <updated>%s</updated>
         <author><name>Test</name></author>
         <id>urn:md5:75d53866bcb20465b3287cf237234464</id>
-        <generator uri="https://fossil.deparis.io/neruda">Neruda</generator>
+        <generator uri="https://git.umaneti.net/neruda/about/">Neruda</generator>
         </feed>
       EMPTY_ATOM
       expect(@index.to_atom).to eq(empty_atom.strip % @index.date.rfc3339)

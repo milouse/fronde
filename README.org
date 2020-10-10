@@ -15,13 +15,13 @@ default org mode HTML exporting/publishing routine.
 
 * Features
 
-- Inherit all [[https://orgmode.org][org mode features]] (tables, syntax highlighting,
+- Inherits all [[https://orgmode.org][org mode features]] (tables, syntax highlighting,
   code blocks evaluation, multiple languages support…)
-- Do not require any emacs lisp knowledge
-- Do not require any server-side code, nor databases
-- Allow fine customization of generated html files
-- Switch easily between various themes
-- Native tags and [[https://en.wikipedia.org/wiki/Atom_(Web_standard)][ATOM feeds]] support
+- Does not require any emacs lisp knowledge
+- Does not require any server-side code, nor databases
+- Allows fine customization of generated html files
+- Allows easy switch between various themes
+- Supports tags and [[https://en.wikipedia.org/wiki/Atom_(Web_standard)][ATOM feeds]]
 
 * How to install it
 

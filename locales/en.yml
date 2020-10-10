@@ -2,6 +2,22 @@
 pablo:
   error:
     no_command: 'ERROR: no command or unknown command given.'
+  usage: 'Usage: pablo %1 [options]'
+  commands:
+    cmd_title: Commands
+    alias: Alias for %1.
+    init: Initialize your Neruda instance (you just need to do it once).
+    preview: 'Start a test web server to preview your website on http://127.0.0.1:5000'
+    open: Open or create an org file.
+    build: Compile your org files to HTML.
+    publish: Push local changes to your public web server.
+    help: Alias for the -h switch.
+  options:
+    cmd_title: Options
+    path: Path to the new file.
+    directory: Wrap the new org file in this named folder.
+    help: Display help for a command and exit.
+    version: Display Neruda version and exit.
 neruda:
   index:
     unsorted: Unsorted
@@ -14,5 +30,5 @@ neruda:
   org:
     postamble:
       written_by: Written by %a
-      with_emacs: with %c, and published with <a href="https://deparis.io/neruda">Neruda</a>
+      with_emacs: 'with %c, and published with <a href="https://git.umaneti.net/neruda/about/">Neruda</a>'
       last_modification: Last modification on %C

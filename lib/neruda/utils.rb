@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'rainbow'
+require 'r18n-core'
 require 'neruda/config'
 
 module Neruda
@@ -25,33 +26,24 @@ module Neruda
       '-a' => { long: 'author' },
       '-l' => { long: 'lang', keyword: 'LOCALE' },
       '-t' => { long: 'title' },
-      '-p' => { long: 'path', desc: 'Path to the new file' },
-      '-d' => { long: 'directory', boolean: true,
-                desc: 'Wrap the new org file in a named folder' },
+      '-p' => { long: 'path' },
+      '-d' => { long: 'directory', boolean: true },
       '-v' => { long: 'verbose', boolean: true, meth: :on_tail },
-      '-h' => { long: 'help', boolean: true, meth: :on_tail,
-                desc: 'Display help for a command and exit' },
-      '-V' => { long: 'version', boolean: true, meth: :on_tail,
-                desc: 'Display Neruda version and exit' }
+      '-h' => { long: 'help', boolean: true, meth: :on_tail },
+      '-V' => { long: 'version', boolean: true, meth: :on_tail }
     }.freeze
 
     # @return [Hash] the possible ~pablo~ subcommands and their
     #   configuration
     PABLO_COMMANDS = {
-      'init' => { opts: ['-a', '-l', '-t', '-v', '-h'],
-                  desc: 'Initialize your Neruda instance ' \
-                        '(you just need to do it once).' },
+      'init' => { opts: ['-a', '-l', '-t', '-v', '-h'] },
       'config' => { alias: 'init' },
-      'preview' => { opts: ['-h'],
-                     desc: 'Start a test webserver to preview ' \
-                           'your website on http://127.0.0.1:5000' },
-      'open' => { opts: ['-a', '-l', '-t', '-d', '-p', '-v', '-h'],
-                  desc: 'Open or create an org file for edition.' },
+      'preview' => { opts: ['-h'] },
+      'open' => { opts: ['-a', '-l', '-t', '-d', '-p', '-v', '-h'] },
       'edit' => { alias: 'open' },
-      'publish' => { opts: ['-h'],
-                     desc: 'Push local changes to your public ' \
-                           'server online.' },
-      'help' => { opts: ['-h'], desc: 'Alias for the -h switch.' },
+      'build' => { opts: ['-h'] },
+      'publish' => { opts: ['-h'] },
+      'help' => { opts: ['-h'] },
       'basic' => { opts: ['-h', '-V'], label: '<command>' }
     }.freeze
 
@@ -115,22 +107,30 @@ module Neruda
         Neruda::Utils::PABLO_COMMANDS[command][:opts].map do |k|
           short, long = Neruda::Utils.decorate_option(k)
           opt = Neruda::Utils::PABLO_OPTIONS[k]
-          line = '    ' + [short, long].join(', ')
-          line = line.ljust(34) + " #{opt[:desc]}" if opt.has_key?(:desc)
-          line + "\n"
-        end.join
+          line = [('    ' + [short, long].join(', ')).ljust(30)]
+          if R18n.t.pablo.options[opt[:long]].translated?
+            line << R18n.t.pablo.options[opt[:long]]
+          end
+          line.join(' ')
+        end.join("\n")
       end
 
       # Returns a formatted list of available commands for ~pablo~.
       #
       # @return [String]
       def list_commands
-        lines = ''
+        lines = []
         Neruda::Utils::PABLO_COMMANDS.each do |cmd, opt|
           next if cmd == 'basic'
-          lines += "    #{cmd.ljust(10)} #{opt[:desc]}\n"
+          line = ['   ', cmd.ljust(10)]
+          if opt.has_key? :alias
+            line << R18n.t.pablo.commands.alias(opt[:alias])
+          elsif R18n.t.pablo.commands[cmd].translated?
+            line << R18n.t.pablo.commands[cmd]
+          end
+          lines << line.join(' ')
         end
-        lines
+        lines.join("\n")
       end
 
       # Returns the real command name for a given command, which may be

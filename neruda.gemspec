@@ -42,24 +42,24 @@ Gem::Specification.new do |s|
                    # Others
                    'LICENSE']
   s.executables = ['pablo']
-  s.homepage    = 'https://git.deparis.io/neruda/'
+  s.homepage    = 'https://git.umaneti.net/neruda/about/'
   s.license     = 'WTFPL'
 
   s.rdoc_options << '-m' << 'org'
   s.extra_rdoc_files = ['LICENSE']
 
-  s.required_ruby_version = '>= 2.5'
+  s.required_ruby_version = '>= 2.6'
   s.add_runtime_dependency 'nokogiri', '~> 1.10'
-  s.add_runtime_dependency 'r18n-core', '~> 3.2'
+  s.add_runtime_dependency 'r18n-core', '~> 4.0'
   s.add_runtime_dependency 'rainbow', '~> 3.0'
-  s.add_runtime_dependency 'rake', '~> 12.3'
+  s.add_runtime_dependency 'rake', '~> 13.0'
 
-  s.add_development_dependency 'byebug', '~> 11.0'
+  s.add_development_dependency 'byebug', '~> 11.1'
   s.add_development_dependency 'org-ruby', '~> 0.9'
-  s.add_development_dependency 'pry', '~> 0.12'
-  s.add_development_dependency 'pry-doc', '~> 1.0'
-  s.add_development_dependency 'rspec', '~> 3.8'
-  s.add_development_dependency 'rubocop', '~> 0.70'
-  s.add_development_dependency 'simplecov', '~> 0.16'
+  s.add_development_dependency 'pry', '~> 0.13'
+  s.add_development_dependency 'pry-doc', '~> 1.1'
+  s.add_development_dependency 'rspec', '~> 3.9'
+  s.add_development_dependency 'rubocop', '~> 0.90'
+  s.add_development_dependency 'simplecov', '~> 0.19'
   s.add_development_dependency 'yard', '~> 0.9'
 end
