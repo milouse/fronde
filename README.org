@@ -8,7 +8,7 @@
 * What's for?
 
 #+attr_html: :style width:150px;float:right;margin-top:-4.5em;margin-left:2em;
-[[file:themes/default/img/Firma_Pablo_Neruda.svg]]
+[[file:./Firma_Pablo_Neruda.png]]
 
 Neruda is a static website generator made for [[https://orgmode.org][Org files]]. It improves the
 default Org HTML exporting/publishing routine.
