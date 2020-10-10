@@ -7,6 +7,7 @@ require 'neruda/org_file/htmlizer'
 require 'neruda/org_file/extracter'
 require 'neruda/org_file/class_methods'
 require 'neruda/index'
+require 'neruda/version'
 
 module Neruda
   # Handles org files.
@@ -18,6 +19,10 @@ module Neruda
     # @return [String] the title of the current org document, taken from
     #   the ~#+title:~ header.
     attr_reader :title
+
+    # @return [String] the subtitle of the current org document, taken
+    #   from the ~#+subtitle:~ header.
+    attr_reader :subtitle
 
     # @return [DateTime] the date and time of the current org document,
     #   taken from the ~#+date:~ header.
@@ -40,6 +45,10 @@ module Neruda
     #   taken from the ~#+keywords:~ header.
     attr_reader :keywords
 
+    # @return [String] the description of this org document, taken from
+    #   the ~#+description:~ header.
+    attr_reader :excerpt
+
     # The locale of the current org document, taken from the
     #   ~#+language:~ header.
     #
@@ -61,9 +70,8 @@ module Neruda
     #   settings and the above {#html_file @html_file} attribute.
     attr_reader :url
 
-    # @return [String] the description of this org document, taken from
-    #   the ~#+description:~ header.
-    attr_reader :excerpt
+    # @return [String] the project owning this document.
+    attr_reader :project
 
     extend Neruda::OrgFileClassMethods
 
@@ -96,21 +104,25 @@ module Neruda
     #     o.title
     #     => "New file"
     #
-    # @param file_name [String] path to the corresponding org mode file
-    # @param opts [Hash] optional data to initialize new org file
-    # @option opts [String] title ('') the title of the new org file
+    # @param file_name [String] path to the corresponding Org file
+    # @param opts [Hash] optional data to initialize new Org file
+    # @option opts [String] title ('') the title of the new Org file
     # @option opts [String] author (system user or '') the author of the
     #   document
     # @option opts [Boolean] verbose (false) if the
     #   {Neruda::OrgFileHtmlizer#publish publish} method should output
     #   emacs process messages
+    # @option opts [String] project the project owning this file
+    #   must be stored
     # @return [Neruda::OrgFile] the new instance of Neruda::OrgFile
     def initialize(file_name, opts = {})
       file_name = nil if file_name == ''
       @file = file_name
-      @html_file = Neruda::OrgFile.html_file @file
-      @url = Neruda::OrgFile.html_file_with_domain @file
+      @html_file = nil
+      @url = nil
+      @project = opts.delete :project
       @options = opts
+      build_html_file_and_url
       if @file && File.exist?(@file)
         extract_data
       else
@@ -166,7 +178,7 @@ module Neruda
     # @param year [Boolean] wether or not the ~:full~ format must
     #   contain the year
     # @return [String] the document DateTime string representation
-    def datestring(dateformat = :full, year = true)
+    def datestring(dateformat = :full, year: true)
       return '' if @date.nil?
       return R18n.l @date.to_date if dateformat == :short
       return @date.rfc3339 if dateformat == :rfc3339
@@ -202,6 +214,10 @@ module Neruda
     # - %l :: the lang of the document
     # - %L :: the license information, taken from the
     #         {Neruda::Config#settings}
+    # - %n :: the Neruda name and version
+    # - %N :: the Neruda name and version with a link to the project
+    #         home on the name
+    # - %s :: the subtitle of the document
     # - %t :: the title of the document
     # - %u :: the web path to the related published HTML document
     # - %x :: the raw description (eXcerpt)
@@ -213,8 +229,9 @@ module Neruda
     #     => "Article written by Alice Smith the Wednesday 3rd July"
     #
     # @return [String] the given ~string~ after replacement occurs
+    # rubocop:disable Metrics/MethodLength
+    # rubocop:disable Layout/LineLength
     def format(string)
-      license = Neruda::Config.settings['license'] || ''
       string.gsub('%a', @author)
             .gsub('%A', author_to_html)
             .gsub('%d', date_to_html(:short))
@@ -224,12 +241,17 @@ module Neruda
             .gsub('%k', @keywords.join(', '))
             .gsub('%K', keywords_to_html)
             .gsub('%l', @lang)
-            .gsub('%L', license.gsub(/\s+/, ' ').strip)
+            .gsub('%L', (Neruda::Config.settings['license'] || '').gsub(/\s+/, ' ').strip)
+            .gsub('%n', "Neruda #{Neruda::VERSION}")
+            .gsub('%N', "<a href=\"https://git.umaneti.net/neruda/about/\">Neruda</a> #{Neruda::VERSION}")
+            .gsub('%s', @subtitle)
             .gsub('%t', @title)
-            .gsub('%u', @html_file)
+            .gsub('%u', @html_file || '')
             .gsub('%x', @excerpt)
             .gsub('%X', "<p>#{@excerpt}</p>")
     end
+    # rubocop:enable Layout/LineLength
+    # rubocop:enable Metrics/MethodLength
 
     # Writes the current OrgFile content to the underlying file.
     #
@@ -246,20 +268,31 @@ module Neruda
 
     private
 
+    def build_html_file_and_url
+      return if @file.nil?
+      @html_file = Neruda::OrgFile.target_for_source(
+        @file, @project, with_public_folder: false
+      )
+      @url = "#{Neruda::Config.settings['domain']}/#{@html_file}"
+    end
+
     def init_empty_file
       @title = @options[:title] || ''
+      @subtitle = ''
       @date = DateTime.now
       @notime = false
       @author = @options[:author] || Neruda::Config.settings['author']
       @keywords = []
       @lang = @options[:lang] || Neruda::Config.settings['lang']
       @excerpt = ''
-      @content = @options[:content] || <<~ORG
+      body = @options[:content] || ''
+      @content = @options[:raw_content] || <<~ORG
         #+title: #{@title}
         #+date: <#{@date.strftime('%Y-%m-%d %a. %H:%M:%S')}>
         #+author: #{@author}
         #+language: #{@lang}
 
+        #{body}
       ORG
     end
   end

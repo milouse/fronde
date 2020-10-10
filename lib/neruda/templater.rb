@@ -99,9 +99,10 @@ module Neruda
     end
 
     def insert_new_node_at(elem, content)
-      if @position == 'before'
+      case @position
+      when 'before'
         elem.add_previous_sibling content
-      elsif @position == 'replace'
+      when 'replace'
         elem.replace content
       else
         elem.add_next_sibling content

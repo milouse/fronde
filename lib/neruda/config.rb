@@ -53,8 +53,17 @@ module Neruda
       # @param new_config [Hash] the settings to save
       # @return [Hash] the new settings after save
       def save(new_config)
+        # Do not save obvious default config values. We'll always try to
+        # save author and lang as they default on system variables,
+        # which may be different from a system to another. Thus it may
+        # be confusing if one use neruda on two different computer and
+        # these params always change.
+        new_config.delete_if do |k, v|
+          ['domain', 'public_folder', 'templates', 'theme'].include?(k) \
+          && v == default_settings[k]
+        end
         IO.write 'config.yml', new_config.to_yaml
-        @config = new_config.freeze
+        load_settings # Reload config, taking default settings into account
       end
 
       # Load the given settings as if they comes from the ~config.yml~ file.
@@ -66,32 +75,62 @@ module Neruda
       # @param config [Hash] the settings to artificially load
       # @return [Hash] the new settings
       def load_test(config)
-        @config = config
-        add_default_settings
+        @sources = nil # Reset sources
+        @config = default_settings.merge config
+      end
+
+      # Return the qualified projects sources list.
+      #
+      # @return [Array] the fully qualified projects sources list
+      def sources
+        return @sources if @sources
+        default_sources = [{ 'path' => 'src', 'target' => '.' }]
+        @sources = (settings['sources'] || default_sources).map do |s|
+          build_source(s)
+        end.compact
       end
 
       private
 
       def load_settings
-        @config = {}
-        conf = 'config.yml'
-        @config = YAML.load_file(conf) if File.exist? conf
-        add_default_settings
-        @config.freeze
+        @sources = nil
+        conf_file = 'config.yml'
+        if File.exist? conf_file
+          @config = default_settings.merge(YAML.load_file(conf_file)).freeze
+        else
+          @config = default_settings
+        end
       end
 
       def extract_lang_from_env(default)
         (ENV['LANG'] || default).split('_', 2).first
       end
 
-      def add_default_settings
-        @config['lang'] ||= extract_lang_from_env 'en'
-        @config['author'] ||= (ENV['USER'] || '')
-        @config['domain'] ||= ''
-        @config['public_folder'] ||= 'public_html'
-        @config['templates'] ||= []
-        return if @config['blog_path'].nil?
-        @config['blog_pattern'] ||= '**/*.org'
+      def default_settings
+        return @default_settings if @default_settings
+        @default_settings = {
+          'author' => (ENV['USER'] || ''),
+          'domain' => '',
+          'lang' => extract_lang_from_env('en'),
+          'public_folder' => 'public_html',
+          'templates' => [],
+          'theme' => 'default'
+        }.freeze
+      end
+
+      def build_source(seed)
+        opts = { 'recursive' => true, 'is_blog' => false }
+        case seed
+        when String
+          opts['path'] = seed
+        when Hash
+          opts.merge! seed
+        end
+        return nil unless opts.has_key?('path')
+        opts['path'] = File.expand_path(opts['path'])
+        opts['name'] ||= File.basename(opts['path']).sub(/^\./, '')
+        opts['target'] ||= opts['name']
+        opts
       end
     end
   end

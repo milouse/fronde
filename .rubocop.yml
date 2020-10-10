@@ -1,5 +1,6 @@
 ---
 AllCops:
+  NewCops: enable
   TargetRubyVersion: 2.6
 
 Layout:
@@ -31,6 +32,9 @@ Metrics/MethodLength:
 
 Metrics/ModuleLength:
   Max: 120
+  Exclude:
+  - lib/neruda/config/lisp_config.rb
+  - lib/neruda/utils.rb
 
 Metrics/PerceivedComplexity:
   Max: 10

@@ -19,6 +19,9 @@ pablo:
     help: Display help for a command and exit.
     version: Display Neruda version and exit.
 neruda:
+  error:
+    label: An error occured.
+    explanation: To see it, run again your command with more verbosity, i.e. pablo build -v
   index:
     unsorted: Unsorted
     published_on: Published on %1
@@ -30,5 +33,5 @@ neruda:
   org:
     postamble:
       written_by: Written by %a
-      with_emacs: 'with %c, and published with <a href="https://git.umaneti.net/neruda/about/">Neruda</a>'
+      with_emacs: 'with %c, and published with %N'
       last_modification: Last modification on %C

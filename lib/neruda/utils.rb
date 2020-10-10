@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
+require 'uri'
 require 'rainbow'
+require 'net/http'
 require 'r18n-core'
 require 'neruda/config'
 
@@ -67,10 +69,7 @@ module Neruda
         begin
           run_and_decorate_thread thread, message, frames
         rescue RuntimeError => e
-          done = Rainbow('An error occured.').bold.red + "\n"
-          done += Rainbow('To see it, run again your command with more ' \
-                          'verbosity, i.e. pablo build -v').bold
-          warn "#{message} #{done}"
+          throbber_error message
           raise e
         else
           done = Rainbow('done'.ljust(frames[0].length)).green
@@ -95,7 +94,7 @@ module Neruda
         long = "--#{opt[:long]}"
         return [short, long] if opt[:boolean]
         key = opt[:keyword] || opt[:long].upcase
-        [short + key, long + ' ' + key]
+        [short + key, format('%<long>s %<key>s', long: long, key: key)]
       end
 
       # Returns the ~pablo~ help summary for a given command.
@@ -107,7 +106,8 @@ module Neruda
         Neruda::Utils::PABLO_COMMANDS[command][:opts].map do |k|
           short, long = Neruda::Utils.decorate_option(k)
           opt = Neruda::Utils::PABLO_OPTIONS[k]
-          line = [('    ' + [short, long].join(', ')).ljust(30)]
+          label = [short, long].join(', ')
+          line = [format('    %<opt>s', opt: label).ljust(30)]
           if R18n.t.pablo.options[opt[:long]].translated?
             line << R18n.t.pablo.options[opt[:long]]
           end
@@ -125,7 +125,7 @@ module Neruda
           line = ['   ', cmd.ljust(10)]
           if opt.has_key? :alias
             line << R18n.t.pablo.commands.alias(opt[:alias])
-          elsif R18n.t.pablo.commands[cmd].translated?
+          else
             line << R18n.t.pablo.commands[cmd]
           end
           lines << line.join(' ')
@@ -148,6 +148,7 @@ module Neruda
       # Try to discover the current host operating system.
       #
       # @return [String] either apple, windows or linux (default)
+      # :nocov:
       def current_os
         if ENV['OS'] == 'Windows_NT' || RUBY_PLATFORM =~ /cygwin/
           return 'windows'
@@ -155,8 +156,41 @@ module Neruda
         return 'apple' if RUBY_PLATFORM =~ /darwin/
         'linux'
       end
+      # :nocov:
+
+      # Download latest org-mode tarball.
+      #
+      # @return [String] the downloaded org-mode version
+      def download_org
+        # :nocov:
+        return if Neruda::Config.org_last_version.nil?
+        # :nocov:
+        tarball = "org-#{Neruda::Config.org_last_version}.tar.gz"
+        dest_file = "tmp/#{tarball}"
+        return if File.exist?(dest_file)
+        uri = URI("https://orgmode.org/#{tarball}")
+        # Will crash on purpose if anything goes wrong
+        Net::HTTP.start(uri.host, uri.port, :use_ssl => true) do |http|
+          http.request(Net::HTTP::Get.new(uri)) do |response|
+            File.open(dest_file, 'w') do |io|
+              response.read_body { |chunk| io.write chunk }
+            end
+          end
+        end
+      end
 
       private
+
+      def throbber_error(message)
+        warn(
+          format(
+            "%<message>s %<label>s\n%<explanation>s",
+            message: message,
+            label: Rainbow(R18n.t.neruda.error.label).bold.red,
+            explanation: Rainbow(R18n.t.neruda.error.explanation).bold
+          )
+        )
+      end
 
       def select_throbber_frames
         model = Neruda::Config.settings['throbber'] || 'default'

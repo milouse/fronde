@@ -19,6 +19,9 @@ pablo:
     help: Affiche l'aide pour une commande et quitte.
     version: Affiche la version de Neruda et quitte.
 neruda:
+  error:
+    label: Une erreur est survenue
+    explanation: Pour voir le détail, lancez de nouveau la commande avec plus de verbosité, par exemple pablo build -v
   index:
     unsorted: Non triés
     published_on: Publié le %1
@@ -30,5 +33,5 @@ neruda:
   org:
     postamble:
       written_by: Écrit par %a
-      with_emacs: 'avec %c et publié avec <a href="https://git.umaneti.net/neruda/about/">Neruda</a>'
+      with_emacs: 'avec %c et publié avec %N'
       last_modification: dernière modification le %C

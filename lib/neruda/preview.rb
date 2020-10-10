@@ -19,11 +19,13 @@ module Neruda # rubocop:disable Style/Documentation
     private
 
     def local_path(requested_path)
-      routes = Neruda::Config.settings['routes'] || {}
+      routes = Neruda::Config.settings.dig('preview', 'routes') || {}
       return routes[requested_path] if routes.keys.include? requested_path
       local_path = Neruda::Config.settings['public_folder'] + requested_path
       if File.directory? local_path
-        local_path = local_path.delete_suffix('/') + '/index.html'
+        local_path = format(
+          '%<path>s/index.html', path: local_path.delete_suffix('/')
+        )
       end
       return local_path if File.exist? local_path
       raise WEBrick::HTTPStatus::NotFound, 'Not found.'
@@ -34,8 +36,8 @@ module Neruda # rubocop:disable Style/Documentation
       return body unless local_path.match?(/\.(?:ht|x)ml$/)
       domain = Neruda::Config.settings['domain']
       return body if domain == ''
-      body.gsub(/"file:\/\//, '"' + local_host)
-          .gsub(/"#{domain}/, '"' + local_host)
+      body.gsub(/"file:\/\//, format('"%<host>s', host: local_host))
+          .gsub(/"#{domain}/, format('"%<host>s', host: local_host))
     end
   end
 
@@ -43,7 +45,7 @@ module Neruda # rubocop:disable Style/Documentation
     def start_preview
       # Inspired by ruby un.rb library, which allows normally to start a
       # webrick server in one line: ruby -run -e httpd public_html -p 5000
-      port = Neruda::Config.settings['server_port'] || 5000
+      port = Neruda::Config.settings.dig('preview', 'server_port') || 5000
       s = WEBrick::HTTPServer.new(Port: port)
       s.mount '/', Neruda::PreviewServlet
       ['TERM', 'QUIT', 'INT'].each { |sig| trap(sig, proc { s.shutdown }) }

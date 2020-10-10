@@ -11,11 +11,11 @@ module Neruda
       @index[index_name][0...10].each do |article|
         content << atom_entry(article)
       end
-      content.join("\n") + '</feed>'
+      format '%<content>s</feed>', content: content.join("\n")
     end
 
     def write_atom(index_name)
-      return 0 if @blog_path.nil?
+      return unless save?
       slug = Neruda::OrgFile.slug index_name
       FileUtils.mkdir_p "#{@pubdir}/feeds"
       atomdest = "#{@pubdir}/feeds/#{slug}.xml"
@@ -31,17 +31,17 @@ module Neruda
     def atom_header(title)
       domain = Neruda::Config.settings['domain']
       upddate = @date.rfc3339
-      slug = Neruda::OrgFile.slug(title)
-      tagurl = "#{domain}/tags/#{slug}.html"
       if title == 'index'
-        if Neruda::Config.settings['title']
-          title = Neruda::Config.settings['title']
-        end
-        tagurl = "#{domain}/#{@blog_path}"
-      elsif @tags_names.has_key?(title)
+        slug = 'index'
+        tagurl = domain
+        title = Neruda::Config.settings['title'] || \
+                R18n.t.neruda.index.all_tags
+      else
+        slug = Neruda::OrgFile.slug(title)
+        tagurl = "#{domain}/tags/#{slug}.html"
         title = @tags_names[title]
       end
-      title_esc = CGI.escapeHTML(title)
+      title = CGI.escapeHTML(title)
       <<~ENDATOM
         <?xml version="1.0" encoding="utf-8"?>
         <feed xmlns="http://www.w3.org/2005/Atom"
@@ -49,9 +49,9 @@ module Neruda
               xmlns:wfw="http://wellformedweb.org/CommentAPI/"
               xml:lang="#{Neruda::Config.settings['lang']}">
 
-        <title>#{title_esc}</title>
+        <title>#{title}</title>
         <link href="#{domain}/feeds/#{slug}.xml" rel="self" type="application/atom+xml"/>
-        <link href="#{tagurl}" rel="alternate" type="text/html" title="#{title_esc}"/>
+        <link href="#{tagurl}" rel="alternate" type="text/html" title="#{title}"/>
         <updated>#{upddate}</updated>
         <author><name>#{Neruda::Config.settings['author'] || ''}</name></author>
         <id>urn:md5:#{Digest::MD5.hexdigest(domain)}</id>
@@ -69,12 +69,12 @@ module Neruda
         "<dc:subject>#{CGI.escapeHTML(k)}</dc:subject>"
       end.join
       keywords += "\n  " if keywords != ''
-      title_esc = CGI.escapeHTML(article.title)
+      title = CGI.escapeHTML(article.title)
       <<~ENDENTRY
         <entry>
-          <title>#{title_esc}</title>
+          <title>#{title}</title>
           <link href="#{article.url}" rel="alternate" type="text/html"
-                title="#{title_esc}"/>
+                title="#{title}"/>
           <id>urn:md5:#{Digest::MD5.hexdigest(article.timekey)}</id>
           <published>#{article.datestring(:rfc3339)}</published>
           <author><name>#{CGI.escapeHTML(article.author)}</name></author>

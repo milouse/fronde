@@ -5,10 +5,10 @@ require './lib/neruda/version'
 Gem::Specification.new do |s|
   s.name        = 'neruda'
   s.version     = Neruda::VERSION
-  s.summary     = 'A simplistic way to create an org-mode static website.'
+  s.summary     = 'A simplistic way to create an Org static website.'
   s.description = <<~DESC
-    An opinionated org-mode static website generator.
-    Write your org files, we take care of the rest.
+    An opinionated Org static website generator.
+    Write your org-mode files, we take care of the rest.
   DESC
   s.authors     = ['Étienne Deparis']
   s.email       = 'etienne@depar.is'
@@ -16,6 +16,7 @@ Gem::Specification.new do |s|
                    'lib/neruda/config/lisp_config.rb',
                    'lib/neruda/config/org-config.el',
                    'lib/neruda/config/ox-neruda.el',
+                   'lib/neruda/emacs.rb',
                    'lib/neruda/index.rb',
                    'lib/neruda/index/atom_generator.rb',
                    'lib/neruda/index/org_generator.rb',
@@ -36,9 +37,11 @@ Gem::Specification.new do |s|
                    'locales/en.yml',
                    'locales/fr.yml',
                    # Default theme
+                   'themes/default/css/htmlize.css',
                    'themes/default/css/style.css',
-                   'themes/default/fonts/Yanone_Kaffeesatz_400.woff',
-                   'themes/default/fonts/Yanone_Kaffeesatz_400.woff2',
+                   'themes/default/img/bottom.png',
+                   'themes/default/img/tic.png',
+                   'themes/default/img/top.png',
                    # Others
                    'LICENSE']
   s.executables = ['pablo']

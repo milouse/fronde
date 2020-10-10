@@ -3,33 +3,50 @@
 module Neruda
   # This module holds class methods for the {Neruda::OrgFile} class.
   module OrgFileClassMethods
-    def html_file(file_name)
-      return nil if file_name.nil?
-      path = Neruda::OrgFile.target_for_source(file_name)
-      pubfolder = Neruda::Config.settings['public_folder']
-      path.sub(/^#{pubfolder}\//, '/')
-    end
-
-    def html_file_with_domain(file_name)
-      return nil if file_name.nil?
-      Neruda::Config.settings['domain'] + html_file(file_name)
-    end
-
     def source_for_target(file_name)
       # file_name may be frozen...
       src = file_name.sub(/\.html$/, '.org')
       pubfolder = Neruda::Config.settings['public_folder']
-      src.sub(/^#{pubfolder}\//, 'src/')
+      src.sub!(/^#{pubfolder}\//, '')
+      # Look for match in each possible sources. The first found wins.
+      Neruda::Config.sources.each do |project|
+        if project['target'] == '.'
+          origin = File.join(project['path'], src)
+        else
+          origin = File.join(
+            project['path'], src.sub(/^#{project['target']}\//, '')
+          )
+        end
+        return origin if File.exist?(origin)
+      end
+      nil
     end
 
-    def target_for_source(file_name)
+    def target_for_source(file_name, project, with_public_folder: true)
+      return nil if file_name.nil?
       # file_name may be frozen...
-      target = file_name.sub(/\.org$/, '.html')
+      target = file_name.sub(/\.org$/, '.html').sub(/^#{Dir.pwd}\//, '')
+      if project.nil?
+        subfolder = File.basename(File.dirname(target))
+        target = File.basename(target)
+        target = "#{subfolder}/#{target}" if subfolder != '.'
+      else
+        project_relative_path = project['path'].sub(/^#{Dir.pwd}\//, '')
+        target.sub!(/^#{project_relative_path}\//, '')
+        target = "#{project['target']}/#{target}" if project['target'] != '.'
+      end
+      return target unless with_public_folder
       pubfolder = Neruda::Config.settings['public_folder']
-      return target.sub(/^src\//, "#{pubfolder}/") if /^src\//.match?(target)
-      subfolder = File.basename(File.dirname(target))
-      leaf = File.basename(target)
-      "#{pubfolder}/#{subfolder}/#{leaf}"
+      "#{pubfolder}/#{target}"
+    end
+
+    def project_for_source(file_name)
+      # Look for match in each possible sources. The first found wins.
+      Neruda::Config.sources.each do |project|
+        project_relative_path = project['path'].sub(/^#{Dir.pwd}\//, '')
+        return project if file_name =~ /^#{project_relative_path}\//
+      end
+      nil
     end
 
     def slug(title)

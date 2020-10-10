@@ -33,12 +33,37 @@
 
 ;;; Function Declarations
 
+(defvar neruda/version ""
+  "Version of the current neruda installation")
+
 (defvar neruda/current-work-dir nil
   "Location of the current neruda website base directory.")
 
 (defvar neruda/org-temp-dir nil
-  "Location of the local org-mode temporary directory (where to place
+  "Location of the local Org temporary directory (where to place
 org timestamps and id locations).")
+
+(defun neruda/org-html-format-spec (upstream info)
+  "Return format specification for preamble and postamble.
+INFO is a plist used as a communication channel."
+  (let ((output (funcall upstream info)))
+    (push `(?A . ,(format "<span class=\"author\">%s</span>"
+                    (org-export-data (plist-get info :author) info)))
+      output)
+    (push `(?k . ,(org-export-data (plist-get info :keywords) info)) output)
+    (push `(?K . ,(format "<ul class=\"keywords-list\">%s</ul>"
+                    (mapconcat
+	                    (lambda (k) (format "<li class=\"keyword\">%s</li>" k))
+	                    (split-string (or (plist-get info :keywords) "")  ",+ *")
+	                    "\n")))
+      output)
+    (push `(?l . ,(org-export-data (plist-get info :language) info)) output)
+    (push `(?n . ,(format "Neruda %s" neruda/version)) output)
+    (push `(?N . ,(format "<a href=\"https://git.umaneti.net/neruda/about/\">Neruda</a> %s" neruda/version)) output)
+    (push `(?x . ,(org-export-data (plist-get info :description) info)) output)
+    (push `(?X . ,(format "<p>%s</p>"
+                    (org-export-data (plist-get info :description) info)))
+      output)))
 
 (defun neruda/org-i18n-export (link description format)
   "Export a i18n link"
@@ -72,6 +97,7 @@ org timestamps and id locations).")
       make-backup-files nil
       enable-local-variables :all
       org-confirm-babel-evaluate nil
+      org-export-with-broken-links t
       org-html-doctype "html5"
       org-html-html5-fancy t
       org-html-htmlize-output-type 'css
@@ -81,7 +107,7 @@ org timestamps and id locations).")
                                     (strike-through . "<del>%s</del>")
                                     (underline . "<span class=\"underline\">%s</span>")
                                     (verbatim . "<code>%s</code>")))
-
+(advice-add 'org-html-format-spec :around #'neruda/org-html-format-spec)
 
 (provide 'ox-neruda)
 

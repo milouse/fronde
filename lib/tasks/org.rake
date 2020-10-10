@@ -1,26 +1,38 @@
 # frozen_string_literal: true
 
+require 'open-uri'
+
 # Neruda::Config is required by Neruda::Utils
 require 'neruda/utils'
 
 namespace :org do
-  desc 'Download last version of org-mode'
+  desc 'Download last version of Org'
   task :download do
     verbose = Rake::FileUtilsExt.verbose_flag
+    download = Thread.new do
+      Thread.current[:org_version] = Neruda::Config.org_last_version
+      Neruda::Utils.download_org
+    end
+    if verbose
+      download.join
+      warn "Org version #{download[:org_version]} has been downloaded"
+    else
+      Neruda::Utils.throbber(download, 'Downloading Org:')
+    end
+  end
+
+  desc 'Compile Org'
+  task compile: ['org:download'] do
+    verbose = Rake::FileUtilsExt.verbose_flag
     org_version = "org-#{Neruda::Config.org_last_version}"
-    next if Neruda::Config.org_last_version.nil?
     next if Dir.exist?("#{org_version}/lisp")
-    tarball = "#{org_version}.tar.gz"
-    curl = ['curl', '--progress-bar', '-O',
-            "https://orgmode.org/#{tarball}"]
     make = ['make', '-C', org_version]
     unless verbose
-      curl[1] = '-s'
       make << '-s'
       make << 'EMACSQ="emacs -Q --eval \'(setq inhibit-message t)\'"'
     end
     build = Thread.new do
-      sh curl.join(' ')
+      tarball = "tmp/#{org_version}.tar.gz"
       sh "tar xzf #{tarball}"
       File.unlink tarball
       sh((make + ['compile']).join(' '))
@@ -34,16 +46,18 @@ namespace :org do
       build.join
       warn "#{org_version} has been locally installed"
     else
-      Neruda::Utils.throbber(build, 'Installing org mode:')
+      Neruda::Utils.throbber(build, 'Installing Org:')
     end
   end
 
   file 'htmlize.el' do
     verbose = Rake::FileUtilsExt.verbose_flag
-    curl = ['curl', '--progress-bar', '-O',
-            'https://raw.githubusercontent.com/hniksic/emacs-htmlize/master/htmlize.el']
-    curl[1] = '-s' unless verbose
-    build = Thread.new { sh curl.join(' ') }
+    build = Thread.new do
+      htmlize = URI(
+        'https://raw.githubusercontent.com/hniksic/emacs-htmlize/master/htmlize.el'
+      ).open.read
+      IO.write 'htmlize.el', htmlize
+    end
     if verbose
       build.join
       warn 'htmlize.el has been locally installed'
@@ -53,7 +67,6 @@ namespace :org do
   end
 
   file 'org-config.el' => 'htmlize.el' do
-    next if Neruda::Config.org_last_version.nil?
     Neruda::Config.write_org_lisp_config
   end
 
@@ -62,8 +75,10 @@ namespace :org do
   end
 
   desc 'Install org'
-  task install: ['org:download', 'org-config.el', '.dir-locals.el'] do
+  task install: ['org:compile', 'org-config.el', '.dir-locals.el'] do
     mkdir_p "#{Neruda::Config.settings['public_folder']}/assets"
-    mkdir_p 'src'
+    Neruda::Config.sources.each do |s|
+      mkdir_p s['path'] unless Dir.exist? s['path']
+    end
   end
 end

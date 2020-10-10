@@ -1,10 +1,14 @@
 # frozen_string_literal: true
 
-require 'yard'
+begin
+  require 'yard'
+  require 'rspec/core/rake_task'
 
-$LOAD_PATH.unshift('./lib')
-import './lib/tasks/org.rake'
+  RSpec::Core::RakeTask.new(:spec)
 
-YARD::Rake::YardocTask.new do |t|
-  t.options = ['-m', 'org', '--no-progress']
+  YARD::Rake::YardocTask.new do |t|
+    t.options = ['-m', 'org', '--no-progress']
+  end
+rescue LoadError
+  warn 'You are not using the development bundle.'
 end

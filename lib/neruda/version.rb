@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
 module Neruda
-  VERSION = '0.1.4'
+  # @return [String] the version number of the current Neruda release.
+  VERSION = '0.2.0'
 end

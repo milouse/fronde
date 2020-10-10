@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'neruda/emacs'
 require 'neruda/index'
 require 'neruda/utils'
 require 'neruda/org_file'
@@ -8,9 +9,6 @@ require 'neruda/templater'
 namespace :site do
   desc 'Generates all index files'
   task :index do
-    blog_path = Neruda::Config.settings['blog_path']
-    next if blog_path.nil?
-    next unless Dir.exist?("src/#{blog_path}")
     index = Neruda::Index.new
     verbose = Rake::FileUtilsExt.verbose_flag
     if verbose
@@ -18,22 +16,27 @@ namespace :site do
       next
     end
     build = Thread.new do
-      index.write_all(false)
+      index.write_all(verbose: false)
     end
     Neruda::Utils.throbber(build, 'Generating indexes:')
+    next if index.empty?
+    Neruda::Config.write_org_lisp_config(with_tags: true)
   end
 
   desc 'Convert all org files'
   task build: :index do
     build_html = Thread.new do
-      Neruda::OrgFile.new(nil, verbose: Rake::FileUtilsExt.verbose_flag).publish
+      Neruda::Emacs.new(verbose: Rake::FileUtilsExt.verbose_flag).publish
+      # TODO: Find a way to publish the virtual tag project
     end
     begin
       Neruda::Utils.throbber(build_html, 'Building:')
+    # :nocov:
     rescue RuntimeError
       warn 'Aborting'
       next
     end
+    # :nocov:
     customize_html = Thread.new do
       pubfolder = Neruda::Config.settings['public_folder']
       Dir["#{pubfolder}/**/*.html"].each do |f|
@@ -51,26 +54,33 @@ namespace :site do
         next
       end
       verbose = Rake::FileUtilsExt.verbose_flag
-      o = Thread.new do
-        Neruda::OrgFile.new(args[:source], verbose: verbose).publish
+      project = Neruda::OrgFile.project_for_source(args[:source])
+      if project.nil?
+        warn "No project found for #{args['source']}"
+        next
+      end
+      build_html = Thread.new do
+        o = Neruda::OrgFile.new(
+          args[:source], project: project, verbose: verbose
+        )
+        Thread.current[:org_file] = o
+        o.publish
       end
       begin
-        Neruda::Utils.throbber(o, 'Building:')
+        Neruda::Utils.throbber(build_html, 'Building:')
       rescue RuntimeError
         warn 'Aborting'
         next
       end
-      target = Neruda::OrgFile.target_for_source(args[:source])
+      target = Neruda::OrgFile.target_for_source(args[:source], project)
       warn "Customizing file #{target}" if verbose
-      Neruda::Templater.customize_output(target, o)
+      Neruda::Templater.customize_output(target, build_html[:org_file])
     end
   end
 
-  # :nocov:
   desc 'Start a test server'
   task :preview do
     require 'neruda/preview'
     Neruda.start_preview
   end
-  # :nocov:
 end
