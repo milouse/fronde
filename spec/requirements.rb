@@ -80,6 +80,24 @@ def init_testing_website
 end
 # rubocop:enable Metrics/MethodLength
 
+def copy_org_tarball_to_fake_tmp
+  tarball = File.expand_path(
+    "../tmp/org-#{Neruda::Config.org_last_version}.tar.gz",
+    __dir__
+  )
+  FileUtils.mkdir 'tmp'
+  FileUtils.cp tarball, 'tmp'
+end
+
+def rake(verbose: false)
+  rake = Rake.application
+  rake.raw_load_rakefile
+  Rake.verbose(verbose)
+  rake.options.build_all = true
+  rake.tasks.each(&:reenable)
+  rake
+end
+
 RSpec.configure do |config|
   config.before(:suite) do
     Neruda::Utils.download_org

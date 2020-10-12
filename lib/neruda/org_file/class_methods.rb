@@ -44,13 +44,13 @@ module Neruda
       # Look for match in each possible sources. The first found wins.
       Neruda::Config.sources.each do |project|
         project_relative_path = project['path'].sub(/^#{Dir.pwd}\//, '')
-        return project if file_name =~ /^#{project_relative_path}\//
+        return project if file_name.match?(/^#{project_relative_path}\//)
       end
       nil
     end
 
     def slug(title)
-      title.downcase.gsub(' ', '-')
+      title.downcase.tr(' ', '-')
            .encode('ascii', fallback: ->(k) { translit(k) })
            .gsub(/[^\w-]/, '').gsub(/-$/, '')
     end

@@ -196,10 +196,11 @@ module Neruda
         settings['org-html'] || {}, project['org-html'] || {}
       )
       orgtpl = []
+      truthy_val = ['t', 'nil', '1'].freeze
       orgtplopts.each do |k, v|
         v = expand_vars_in_html_head(v, project) if k == 'html-head'
         val = v.strip.gsub(/"/, '\"')
-        if ['t', 'nil', '1'].include? val
+        if truthy_val.include? val
           orgtpl << ":#{k} #{val}"
         else
           orgtpl << ":#{k} \"#{val}\""

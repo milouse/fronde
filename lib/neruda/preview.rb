@@ -20,7 +20,7 @@ module Neruda # rubocop:disable Style/Documentation
 
     def local_path(requested_path)
       routes = Neruda::Config.settings.dig('preview', 'routes') || {}
-      return routes[requested_path] if routes.keys.include? requested_path
+      return routes[requested_path] if routes.has_key? requested_path
       local_path = Neruda::Config.settings['public_folder'] + requested_path
       if File.directory? local_path
         local_path = format(

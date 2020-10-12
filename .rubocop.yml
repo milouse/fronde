@@ -11,23 +11,23 @@ Layout:
   Severity: warning
 
 Layout/EmptyLineAfterGuardClause:
-  Enabled: false
+  Enabled: no
 
 Layout/LineLength:
   Max: 80
   Exclude:
-  - spec/*
+  - spec/**/*
 
 Metrics:
   Severity: warning
 
 Metrics/AbcSize:
-  Enabled: false
+  Enabled: no
 
 Metrics/BlockLength:
   Max: 30
   Exclude:
-  - spec/*
+  - spec/**/*
   - lib/tasks/*
   - neruda.gemspec
 
@@ -46,6 +46,15 @@ Metrics/PerceivedComplexity:
 Metrics/CyclomaticComplexity:
   Max: 10
 
+RSpec/ExampleLength:
+  Enabled: no
+
+RSpec/MultipleExpectations:
+  Enabled: no
+
+RSpec/NestedGroups:
+  Max: 4
+
 Style/Alias:
   EnforcedStyle: prefer_alias_method
 
@@ -60,7 +69,7 @@ Style/PreferredHashMethods:
 
 Style/RegexpLiteral:
   EnforcedStyle: slashes
-  AllowInnerSlashes: true
+  AllowInnerSlashes: yes
 
 Style/SymbolArray:
   EnforcedStyle: brackets

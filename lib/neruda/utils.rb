@@ -150,10 +150,10 @@ module Neruda
       # @return [String] either apple, windows or linux (default)
       # :nocov:
       def current_os
-        if ENV['OS'] == 'Windows_NT' || RUBY_PLATFORM =~ /cygwin/
+        if ENV['OS'] == 'Windows_NT' || RUBY_PLATFORM.include?('cygwin')
           return 'windows'
         end
-        return 'apple' if RUBY_PLATFORM =~ /darwin/
+        return 'apple' if RUBY_PLATFORM.include?('darwin')
         'linux'
       end
       # :nocov:
