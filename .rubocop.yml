@@ -3,6 +3,10 @@ AllCops:
   NewCops: enable
   TargetRubyVersion: 2.6
 
+require:
+- rubocop-performance
+- rubocop-rspec
+
 Layout:
   Severity: warning
 

@@ -14,7 +14,9 @@ group :development do
   gem 'pry', '~> 0.13'
   gem 'pry-doc', '~> 1.1'
   gem 'rspec', '~> 3.9'
-  gem 'rubocop', '~> 0.90'
+  gem 'rubocop', '~> 0.93'
+  gem 'rubocop-performance', '~> 1.8'
+  gem 'rubocop-rspec', '~> 1.43'
   gem 'simplecov', '~> 0.19'
   gem 'yard', '~> 0.9'
 end
