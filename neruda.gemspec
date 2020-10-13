@@ -36,12 +36,6 @@ Gem::Specification.new do |s|
                    # Translations
                    'locales/en.yml',
                    'locales/fr.yml',
-                   # Default theme
-                   'themes/default/css/htmlize.css',
-                   'themes/default/css/style.css',
-                   'themes/default/img/bottom.png',
-                   'themes/default/img/tic.png',
-                   'themes/default/img/top.png',
                    # Others
                    'LICENSE']
   s.executables = ['pablo']

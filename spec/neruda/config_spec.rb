@@ -122,16 +122,13 @@ describe Neruda::Config do
       projects = described_class.sources
       headers = described_class.send(:build_project_org_headers, projects[0])
       head = <<~HEAD
-        :html-head "<link rel=\\\"stylesheet\\\" type=\\\"text/css\\\" media=\\\"screen\\\"
-              href=\\\"/assets/default/css/style.css\\\">
-        <link rel=\\\"stylesheet\\\" type=\\\"text/css\\\" media=\\\"screen\\\"
-              href=\\\"/assets/default/css/htmlize.css\\\">"
+        :html-head ""
          :html-postamble "<p><span class=\\\"author\\\">Written by %a</span>
         with %c, and published with %N</p>
         <p class=\\\"date\\\">Last modification on %C</p>
         <p class=\\\"validation\\\">%v</p>"
          :html-head-include-default-style t
-         :html-head-include-scripts nil
+         :html-head-include-scripts t
       HEAD
       expect(headers).to eq(head.strip)
     end
@@ -142,16 +139,13 @@ describe Neruda::Config do
       projects = described_class.sources
       headers = described_class.send(:build_project_org_headers, projects[0])
       head = <<~HEAD
-        :html-head "<link rel=\\\"stylesheet\\\" type=\\\"text/css\\\" media=\\\"screen\\\"
-              href=\\\"https://test.com/assets/default/css/style.css\\\">
-        <link rel=\\\"stylesheet\\\" type=\\\"text/css\\\" media=\\\"screen\\\"
-              href=\\\"https://test.com/assets/default/css/htmlize.css\\\">"
+        :html-head ""
          :html-postamble "<p><span class=\\\"author\\\">Written by %a</span>
         with %c, and published with %N</p>
         <p class=\\\"date\\\">Last modification on %C</p>
         <p class=\\\"validation\\\">%v</p>"
          :html-head-include-default-style t
-         :html-head-include-scripts nil
+         :html-head-include-scripts t
       HEAD
       expect(headers).to eq(head.strip)
       headers = described_class.send(:build_project_org_headers, projects[1])
@@ -166,7 +160,7 @@ describe Neruda::Config do
         with %c, and published with %N</p>
         <p class=\\\"date\\\">Last modification on %C</p>
         <p class=\\\"validation\\\">%v</p>"
-         :html-head-include-default-style t
+         :html-head-include-default-style nil
          :html-head-include-scripts nil
       HEAD
       expect(headers).to eq(head.strip)
@@ -185,16 +179,13 @@ describe Neruda::Config do
          :publishing-function org-html-publish-to-html
          :section-numbers nil
          :with-toc nil
-         :html-head "<link rel=\\\"stylesheet\\\" type=\\\"text/css\\\" media=\\\"screen\\\"
-              href=\\\"https://test.com/assets/default/css/style.css\\\">
-        <link rel=\\\"stylesheet\\\" type=\\\"text/css\\\" media=\\\"screen\\\"
-              href=\\\"https://test.com/assets/default/css/htmlize.css\\\">"
+         :html-head ""
          :html-postamble "<p><span class=\\\"author\\\">Written by %a</span>
         with %c, and published with %N</p>
         <p class=\\\"date\\\">Last modification on %C</p>
         <p class=\\\"validation\\\">%v</p>"
          :html-head-include-default-style t
-         :html-head-include-scripts nil)
+         :html-head-include-scripts t)
         ("src-assets"
          :base-directory "#{Dir.pwd}/src"
          :base-extension "jpg\\\\\\|gif\\\\\\|png\\\\\\|svg\\\\\\|pdf"
@@ -222,7 +213,7 @@ describe Neruda::Config do
         with %c, and published with %N</p>
         <p class=\\\"date\\\">Last modification on %C</p>
         <p class=\\\"validation\\\">%v</p>"
-         :html-head-include-default-style t
+         :html-head-include-default-style nil
          :html-head-include-scripts nil)
         ("news-assets"
          :base-directory "#{Dir.pwd}/news"
@@ -249,7 +240,7 @@ describe Neruda::Config do
       described_class.send(:load_settings)
       projects = described_class.send(:org_generate_projects)
       expect(described_class.send(:project_names, projects)).to(
-        eq('"src" "src-assets" "news" "news-assets" "other" "other-assets" "theme-default" "theme-my-theme"')
+        eq('"src" "src-assets" "news" "news-assets" "other" "other-assets" "theme-my-theme"')
       )
     end
   end

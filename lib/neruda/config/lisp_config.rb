@@ -93,7 +93,9 @@ module Neruda
       names = projects.keys.map do |p|
         ["\"#{p}\"", "\"#{p}-assets\""]
       end.flatten
-      names << "\"theme-#{settings['theme']}\""
+      unless settings['theme'] == 'default'
+        names << "\"theme-#{settings['theme']}\""
+      end
       sources.each do |s|
         next unless s['theme'] && s['theme'] != settings['theme']
         theme = "\"theme-#{s['theme']}\""
@@ -131,7 +133,7 @@ module Neruda
         other_lines << format(':exclude "%<value>s"',
                               value: opts['exclude'])
       end
-      themeconf = org_theme_config(opts['theme']) || ''
+      themeconf = org_theme_config(opts['theme'])
       <<~ORGPROJECT
         ("#{project_name}"
          :base-directory "#{opts['path']}"
@@ -171,10 +173,17 @@ module Neruda
       HTMLHEAD
     end
 
-    def org_default_html_options
+    def org_default_html_options(project)
+      curtheme = project['theme'] || settings['theme']
+      if curtheme.nil? || curtheme == 'default'
+        return { 'html-head' => '__ATOM_FEED__',
+                 'html-postamble' => org_default_postamble,
+                 'html-head-include-default-style' => 't',
+                 'html-head-include-scripts' => 't' }
+      end
       { 'html-head' => org_default_html_head,
         'html-postamble' => org_default_postamble,
-        'html-head-include-default-style' => 't',
+        'html-head-include-default-style' => 'nil',
         'html-head-include-scripts' => 'nil' }
     end
 
@@ -192,7 +201,7 @@ module Neruda
     end
 
     def build_project_org_headers(project)
-      orgtplopts = org_default_html_options.merge(
+      orgtplopts = org_default_html_options(project).merge(
         settings['org-html'] || {}, project['org-html'] || {}
       )
       orgtpl = []
@@ -225,26 +234,20 @@ module Neruda
     end
 
     def org_default_theme_config
-      org_theme_config(settings['theme']).split("\n").map do |line|
-        if line[0] == '('
-          line
-        else
-          "        #{line}"
-        end
-      end.join("\n")
+      theme_config = org_theme_config(settings['theme'])
+      return theme_config if theme_config == ''
+      output = theme_config.split("\n").map do |line|
+        "        #{line}"
+      end
+      format("\n%<conf>s", conf: output.join("\n"))
     end
 
     def org_theme_config(theme)
-      return nil if theme.nil?
+      return '' if theme.nil? || theme == 'default'
       workdir = Dir.pwd
-      if theme == 'default'
-        sourcedir = File.expand_path('../../../', __dir__)
-      else
-        sourcedir = workdir
-      end
       <<~THEMECONFIG
         ("theme-#{theme}"
-         :base-directory "#{sourcedir}/themes/#{theme}"
+         :base-directory "#{workdir}/themes/#{theme}"
          :base-extension "jpg\\\\\\|gif\\\\\\|png\\\\\\|js\\\\\\|css\\\\\\|otf\\\\\\|ttf\\\\\\|woff2?"
          :recursive t
          :publishing-directory "#{workdir}/#{settings['public_folder']}/assets/#{theme}"

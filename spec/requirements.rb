@@ -51,9 +51,6 @@ def init_testing_website
     author: Tata
     title: This is a website about test
     org-html:
-      html-head-include-default-style: nil
-      html-head: |
-        <link rel="stylesheet" type="text/css" media="screen" href="style.css"/>
       html-postamble: '<footer>Published by Neruda.</footer>'
     sources:
     - name: org

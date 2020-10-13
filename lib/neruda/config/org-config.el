@@ -10,8 +10,7 @@
       user-full-name "__AUTHOR_NAME__"
       org-html-metadata-timestamp-format "__LONG_DATE_FMT__"
       org-publish-project-alist
-      `(__ALL_PROJECTS__
-        __THEME_CONFIG__
+      `(__ALL_PROJECTS____THEME_CONFIG__
         ("website" :components (__ALL_PROJECTS_NAMES__))))
 
 ;; Load neruda lib

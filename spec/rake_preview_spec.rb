@@ -43,9 +43,6 @@ context 'when trying preview mode' do
     proof = File.expand_path('data/index_proof.html', __dir__)
     proof_content = IO.read(proof).gsub(/__PUB_DATE__/, now_str)
     expect(home_page).to eq(proof_content)
-    style = URI('http://localhost:5000/assets/default/css/style.css').open.read
-    proof = File.expand_path('../themes/default/css/style.css', __dir__)
-    expect(style.force_encoding('utf-8')).to eq(IO.read(proof))
   end
 
   it 'serves index', rake: true do
