@@ -27,6 +27,7 @@ module Neruda
     PABLO_OPTIONS = {
       '-a' => { long: 'author' },
       '-d' => { long: 'directory', boolean: true },
+      '-f' => { long: 'force', boolean: true },
       '-h' => { long: 'help', boolean: true, meth: :on_tail },
       '-l' => { long: 'lang', keyword: 'LOCALE' },
       '-p' => { long: 'path' },
@@ -43,7 +44,7 @@ module Neruda
       'preview' => { opts: ['-h'] },
       'open' => { opts: ['-a', '-d', '-h', '-l', '-p', '-t', '-v'] },
       'edit' => { alias: 'open' },
-      'build' => { opts: ['-h'] },
+      'build' => { opts: ['-f', '-h'] },
       'publish' => { opts: ['-h'] },
       'help' => { opts: ['-h'] },
       'basic' => { opts: ['-h', '-V'], label: '<command>' }

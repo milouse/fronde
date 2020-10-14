@@ -57,6 +57,26 @@ context 'with a testing website' do
       expect(File.exist?('public_html/index.html')).to be(true)
     end
 
+    it 'does not build again with successive call', rake: true do
+      rake(verbose: false).invoke_task('site:build')
+      old_content = IO.read('public_html/index.html')
+      old_conf = Neruda::Config.settings.dup
+      old_conf['org-html']['html-postamble'] = '<footer>Modified!</footer>'
+      Neruda::Config.load_test(old_conf)
+      rake(verbose: false).invoke_task('site:build')
+      expect(IO.read('public_html/index.html')).to eql(old_content)
+    end
+
+    it 'builds again when call with force option', rake: true do
+      rake(verbose: false).invoke_task('site:build')
+      old_content = IO.read('public_html/index.html')
+      old_conf = Neruda::Config.settings.dup
+      old_conf['org-html']['html-postamble'] = '<footer>Modified!</footer>'
+      Neruda::Config.load_test(old_conf)
+      rake(verbose: false).invoke_task('site:build[true]')
+      expect(IO.read('public_html/index.html')).not_to eql(old_content)
+    end
+
     it 'builds one specific file', rake: true do
       o = Neruda::OrgFile.new('src/tutu.org', title: 'Tutu test')
       o.write

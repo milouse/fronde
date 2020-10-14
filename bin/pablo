@@ -29,11 +29,13 @@ module PabloCommands
     @rake.options.build_all = true
     # Update org-config.el, if necessary
     @rake.invoke_task('org-config.el')
-    if file.nil?
-      @rake.invoke_task('site:build')
-    else
-      @rake.invoke_task("site:build:one[#{file}]")
+    suffix = ''
+    if !file.nil?
+      suffix = ":one[#{file}]"
+    elsif @options[:force]
+      suffix = '[true]'
     end
+    @rake.invoke_task("site:build#{suffix}")
   end
 
   def pablo_preview
