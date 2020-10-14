@@ -166,7 +166,9 @@ module Neruda
         return if Neruda::Config.org_last_version.nil?
         # :nocov:
         tarball = "org-#{Neruda::Config.org_last_version}.tar.gz"
-        dest_file = "tmp/#{tarball}"
+        # Remove version number in dest file to allow easy rake file
+        # task naming
+        dest_file = 'tmp/org.tar.gz'
         return if File.exist?(dest_file)
         uri = URI("https://orgmode.org/#{tarball}")
         # Will crash on purpose if anything goes wrong

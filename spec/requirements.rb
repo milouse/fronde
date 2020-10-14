@@ -78,10 +78,7 @@ end
 # rubocop:enable Metrics/MethodLength
 
 def copy_org_tarball_to_fake_tmp
-  tarball = File.expand_path(
-    "../tmp/org-#{Neruda::Config.org_last_version}.tar.gz",
-    __dir__
-  )
+  tarball = File.expand_path('../tmp/org.tar.gz', __dir__)
   FileUtils.mkdir 'tmp'
   FileUtils.cp tarball, 'tmp'
 end
