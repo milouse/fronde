@@ -94,6 +94,25 @@ describe Neruda::OrgFile do
       expect(File.exist?('__test__.org')).to be(true)
       expect(IO.read('__test__.org')).to eq(empty_content)
     end
+
+    it 'creates new Org file, even in a new folder', core: true do
+      o = described_class.new(
+        'not/existing/test.org',
+        title: 'My Test', content: 'Lorem ipsum'
+      )
+      o.write
+      expect(File.exist?('not/existing/test.org')).to be(true)
+      date = o.date.strftime('%Y-%m-%d %a. %H:%M:%S')
+      content = <<~CONTENT
+        #+title: My Test
+        #+date: <#{date}>
+        #+author: #{o.author}
+        #+language: en
+
+        Lorem ipsum
+      CONTENT
+      expect(IO.read('not/existing/test.org')).to eq(content)
+    end
   end
 
   context 'with configuration' do
