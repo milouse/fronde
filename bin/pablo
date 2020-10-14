@@ -27,6 +27,8 @@ module PabloCommands
 
   def pablo_build(file = ARGV[0])
     @rake.options.build_all = true
+    # Update org-config.el, if necessary
+    @rake.invoke_task('org-config.el')
     if file.nil?
       @rake.invoke_task('site:build')
     else
