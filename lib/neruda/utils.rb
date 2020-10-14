@@ -26,22 +26,22 @@ module Neruda
     #   configuration
     PABLO_OPTIONS = {
       '-a' => { long: 'author' },
-      '-l' => { long: 'lang', keyword: 'LOCALE' },
-      '-t' => { long: 'title' },
-      '-p' => { long: 'path' },
       '-d' => { long: 'directory', boolean: true },
-      '-v' => { long: 'verbose', boolean: true, meth: :on_tail },
       '-h' => { long: 'help', boolean: true, meth: :on_tail },
+      '-l' => { long: 'lang', keyword: 'LOCALE' },
+      '-p' => { long: 'path' },
+      '-t' => { long: 'title' },
+      '-v' => { long: 'verbose', boolean: true, meth: :on_tail },
       '-V' => { long: 'version', boolean: true, meth: :on_tail }
     }.freeze
 
     # @return [Hash] the possible ~pablo~ subcommands and their
     #   configuration
     PABLO_COMMANDS = {
-      'init' => { opts: ['-a', '-l', '-t', '-v', '-h'] },
+      'init' => { opts: ['-a', '-h', '-l', '-t', '-v'] },
       'config' => { alias: 'init' },
       'preview' => { opts: ['-h'] },
-      'open' => { opts: ['-a', '-l', '-t', '-d', '-p', '-v', '-h'] },
+      'open' => { opts: ['-a', '-d', '-h', '-l', '-p', '-t', '-v'] },
       'edit' => { alias: 'open' },
       'build' => { opts: ['-h'] },
       'publish' => { opts: ['-h'] },

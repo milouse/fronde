@@ -27,12 +27,12 @@ describe Neruda::Utils do
     it 'summarizes open commands' do
       basic_cmd = [
         "    -aAUTHOR, --author AUTHOR \n",
-        "    -lLOCALE, --lang LOCALE   \n",
-        "    -tTITLE, --title TITLE    \n",
         "    -d, --directory            Wrap the new org file in this named folder.\n",
+        "    -h, --help                 Display help for a command and exit.\n",
+        "    -lLOCALE, --lang LOCALE   \n",
         "    -pPATH, --path PATH        Path to the new file.\n",
-        "    -v, --verbose             \n",
-        '    -h, --help                 Display help for a command and exit.'
+        "    -tTITLE, --title TITLE    \n",
+        '    -v, --verbose             '
       ].join
       expect(described_class.summarize_command('open')).to eq(basic_cmd)
     end
