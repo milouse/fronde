@@ -33,7 +33,7 @@ module Neruda # rubocop:disable Style/Documentation
 
     def parse_body(local_path, local_host)
       body = IO.read local_path
-      return body unless local_path.match?(/\.(?:ht|x)ml$/)
+      return body unless local_path.match?(/\.(?:ht|x)ml\z/)
       domain = Neruda::Config.settings['domain']
       return body if domain == ''
       body.gsub(/"file:\/\//, format('"%<host>s', host: local_host))

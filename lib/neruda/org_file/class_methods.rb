@@ -5,7 +5,7 @@ module Neruda
   module OrgFileClassMethods
     def source_for_target(file_name)
       # file_name may be frozen...
-      src = file_name.sub(/\.html$/, '.org')
+      src = file_name.sub(/\.html\z/, '.org')
       pubfolder = Neruda::Config.settings['public_folder']
       src.sub!(/^#{pubfolder}\//, '')
       # Look for match in each possible sources. The first found wins.
@@ -25,7 +25,7 @@ module Neruda
     def target_for_source(file_name, project, with_public_folder: true)
       return nil if file_name.nil?
       # file_name may be frozen...
-      target = file_name.sub(/\.org$/, '.html').sub(/^#{Dir.pwd}\//, '')
+      target = file_name.sub(/\.org\z/, '.html').sub(/^#{Dir.pwd}\//, '')
       if project.nil?
         subfolder = File.basename(File.dirname(target))
         target = File.basename(target)
@@ -52,7 +52,7 @@ module Neruda
     def slug(title)
       title.downcase.tr(' ', '-')
            .encode('ascii', fallback: ->(k) { translit(k) })
-           .gsub(/[^\w-]/, '').gsub(/-$/, '')
+           .gsub(/[^\w-]/, '').delete_suffix('-')
     end
 
     private
