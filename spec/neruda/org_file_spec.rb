@@ -74,11 +74,11 @@ describe Neruda::OrgFile do
     end
 
     it 'returns a new org file structure', core: true do
-      now = DateTime.now
+      now_str = DateTime.now.strftime('%Y-%m-%d %H:%M')
       o = described_class.new('__test__.org', title: 'test')
       expect(o.title).to eq('test')
       o_date_str = o.date.strftime('%Y-%m-%d %H:%M')
-      expect(o_date_str).to eq(now.strftime('%Y-%m-%d %H:%M'))
+      expect(o_date_str).to eq(now_str)
       date = o.date.strftime('%Y-%m-%d %a. %H:%M:%S')
       expect(o.author).not_to be_nil
       expect(o.author).to be_an_instance_of(String)

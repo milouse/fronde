@@ -69,12 +69,11 @@ module Neruda
       elsif title.nil? || title == 'index'
         title = Neruda::Config.settings['title']
       end
-      head = <<~HEADER
+      <<~HEADER.strip
         #+title: #{title}
         #+author: #{Neruda::Config.settings['author']}
         #+language: #{Neruda::Config.settings['lang']}
       HEADER
-      head.strip
     end
 
     def org_articles(articles_list)

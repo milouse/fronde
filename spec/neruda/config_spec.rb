@@ -121,7 +121,7 @@ describe Neruda::Config do
       described_class.send(:load_settings)
       projects = described_class.sources
       headers = described_class.send(:build_project_org_headers, projects[0])
-      head = <<~HEAD
+      head = <<~HEAD.strip
         :html-head ""
          :html-postamble "<p><span class=\\\"author\\\">Written by %a</span>
         with %c, and published with %N</p>
@@ -130,7 +130,7 @@ describe Neruda::Config do
          :html-head-include-default-style t
          :html-head-include-scripts t
       HEAD
-      expect(headers).to eq(head.strip)
+      expect(headers).to eq(head)
     end
 
     it 'exposes correct head header with custom domain' do
@@ -138,7 +138,7 @@ describe Neruda::Config do
       described_class.send(:load_settings)
       projects = described_class.sources
       headers = described_class.send(:build_project_org_headers, projects[0])
-      head = <<~HEAD
+      head = <<~HEAD.strip
         :html-head ""
          :html-postamble "<p><span class=\\\"author\\\">Written by %a</span>
         with %c, and published with %N</p>
@@ -147,9 +147,9 @@ describe Neruda::Config do
          :html-head-include-default-style t
          :html-head-include-scripts t
       HEAD
-      expect(headers).to eq(head.strip)
+      expect(headers).to eq(head)
       headers = described_class.send(:build_project_org_headers, projects[1])
-      head = <<~HEAD
+      head = <<~HEAD.strip
         :html-head "<link rel=\\\"stylesheet\\\" type=\\\"text/css\\\" media=\\\"screen\\\"
               href=\\\"https://test.com/assets/my-theme/css/style.css\\\">
         <link rel=\\\"stylesheet\\\" type=\\\"text/css\\\" media=\\\"screen\\\"
@@ -163,7 +163,7 @@ describe Neruda::Config do
          :html-head-include-default-style nil
          :html-head-include-scripts nil
       HEAD
-      expect(headers).to eq(head.strip)
+      expect(headers).to eq(head)
     end
 
     it 'generates projects' do

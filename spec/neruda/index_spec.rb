@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-SAMPLE_ALL_INDEX = <<~INDEX
+SAMPLE_ALL_INDEX = <<~INDEX.strip
   #+title: All tags
   #+author: Test
   #+language: en
@@ -24,7 +24,7 @@ SAMPLE_ALL_INDEX = <<~INDEX
   - [[http://perdu.com/tags/toto.html][toto]] (1)
 INDEX
 
-SAMPLE_PROJECT_INDEX = <<~BLOG_IDX
+SAMPLE_PROJECT_INDEX = <<~BLOG_IDX.strip
   #+title: writings
   #+author: Test
   #+language: en
@@ -48,7 +48,7 @@ SAMPLE_PROJECT_INDEX = <<~BLOG_IDX
   - *[[http://perdu.com/test1.html][My sweet article]]*
 BLOG_IDX
 
-SAMPLE_NO_REC_INDEX = <<~INDEX
+SAMPLE_NO_REC_INDEX = <<~INDEX.strip
   #+title: All tags
   #+author: Test
   #+language: en
@@ -70,7 +70,7 @@ SAMPLE_NO_REC_INDEX = <<~INDEX
   - [[http://perdu.com/tags/tutu.html][tutu]] (1)
 INDEX
 
-SAMPLE_PROJECT_NO_REC_INDEX = <<~BLOG_IDX
+SAMPLE_PROJECT_NO_REC_INDEX = <<~BLOG_IDX.strip
   #+title: writings
   #+author: Test
   #+language: en
@@ -93,7 +93,7 @@ SAMPLE_PROJECT_NO_REC_INDEX = <<~BLOG_IDX
   - *[[http://perdu.com/test1.html][My sweet article]]*
 BLOG_IDX
 
-SAMPLE_ATOM = <<~ATOM
+SAMPLE_ATOM = <<~ATOM.strip
   <?xml version="1.0" encoding="utf-8"?>
   <feed xmlns="http://www.w3.org/2005/Atom"
         xmlns:dc="http://purl.org/dc/elements/1.1/"
@@ -186,19 +186,19 @@ describe Neruda::Index do
 
         it 'generates a main index', core: true do
           index = described_class.new
-          expect(index.to_s).to eq(SAMPLE_ALL_INDEX.strip)
+          expect(index.to_s).to eq(SAMPLE_ALL_INDEX)
           expect(index.to_s('writings', is_project: true)).to(
-            eq(SAMPLE_PROJECT_INDEX.strip)
+            eq(SAMPLE_PROJECT_INDEX)
           )
         end
 
         it 'generates an atom feed', core: true do
-          now = DateTime.now
+          now_str = DateTime.now.strftime('%Y-%m-%d %H:%M')
           index = described_class.new
           index_date_str = index.date.strftime('%Y-%m-%d %H:%M')
-          expect(index_date_str).to eq(now.strftime('%Y-%m-%d %H:%M'))
+          expect(index_date_str).to eq(now_str)
           expect(index.to_atom).to(
-            eq(format(SAMPLE_ATOM.strip, date: index.date.rfc3339))
+            eq(format(SAMPLE_ATOM, date: index.date.rfc3339))
           )
         end
 
@@ -239,19 +239,19 @@ describe Neruda::Index do
         it 'correctly saves one index', core: true do
           described_class.new.write_org('index')
           expect(File.exist?('tags/index.org')).to be(true)
-          expect(IO.read('tags/index.org')).to eq(SAMPLE_ALL_INDEX.strip)
+          expect(IO.read('tags/index.org')).to eq(SAMPLE_ALL_INDEX)
         end
 
         it 'correctly saves one blog index', core: true do
           described_class.new.send(:write_all_blog_home, false)
           expect(File.exist?('writings/index.org')).to be(true)
-          expect(IO.read('writings/index.org')).to eq(SAMPLE_PROJECT_INDEX.strip)
+          expect(IO.read('writings/index.org')).to eq(SAMPLE_PROJECT_INDEX)
         end
 
         it 'correctly saves one blog index, even verbosely', core: true do
           described_class.new.send(:write_all_blog_home, true)
           expect(File.exist?('writings/index.org')).to be(true)
-          expect(IO.read('writings/index.org')).to eq(SAMPLE_PROJECT_INDEX.strip)
+          expect(IO.read('writings/index.org')).to eq(SAMPLE_PROJECT_INDEX)
         end
 
         it 'correctly saves one atom feed', core: true do
@@ -259,7 +259,7 @@ describe Neruda::Index do
           index.write_atom('index')
           expect(File.exist?('output/feeds/index.xml')).to be(true)
           expect(IO.read('output/feeds/index.xml')).to(
-            eq(format(SAMPLE_ATOM.strip, date: index.date.rfc3339))
+            eq(format(SAMPLE_ATOM, date: index.date.rfc3339))
           )
         end
 
@@ -299,9 +299,9 @@ describe Neruda::Index do
 
         it 'generates a main index', core: true do
           index = described_class.new
-          expect(index.to_s).to eq(SAMPLE_NO_REC_INDEX.strip)
+          expect(index.to_s).to eq(SAMPLE_NO_REC_INDEX)
           expect(index.to_s('writings', is_project: true)).to(
-            eq(SAMPLE_PROJECT_NO_REC_INDEX.strip)
+            eq(SAMPLE_PROJECT_NO_REC_INDEX)
           )
         end
 
@@ -369,22 +369,22 @@ describe Neruda::Index do
           :END:
         INDEX
         expect(index.to_s).to eq(empty_index)
-        empty_project_index = <<~INDEX
+        empty_project_index = <<~INDEX.strip
           #+title: writings
           #+author: Test
           #+language: en
         INDEX
         expect(index.to_s('writings', is_project: true)).to(
-          eq(empty_project_index.strip)
+          eq(empty_project_index)
         )
       end
 
       it 'generates an atom feed', core: true do
-        now = DateTime.now
+        now_str = DateTime.now.strftime('%Y-%m-%d %H:%M')
         index = described_class.new
         index_date_str = index.date.strftime('%Y-%m-%d %H:%M')
-        expect(index_date_str).to eq(now.strftime('%Y-%m-%d %H:%M'))
-        empty_atom = <<~ATOM
+        expect(index_date_str).to eq(now_str)
+        empty_atom = <<~ATOM.strip
           <?xml version="1.0" encoding="utf-8"?>
           <feed xmlns="http://www.w3.org/2005/Atom"
                 xmlns:dc="http://purl.org/dc/elements/1.1/"
@@ -401,7 +401,7 @@ describe Neruda::Index do
           </feed>
         ATOM
         expect(index.to_atom).to(
-          eq(format(empty_atom.strip, date: index.date.rfc3339))
+          eq(format(empty_atom, date: index.date.rfc3339))
         )
       end
 
@@ -432,19 +432,19 @@ describe Neruda::Index do
       it 'correctly saves one blog index', core: true do
         described_class.new.send(:write_all_blog_home, false)
         expect(File.exist?('writings/index.org')).to be(true)
-        empty_project_index = <<~INDEX
+        empty_project_index = <<~INDEX.strip
           #+title: writings
           #+author: Test
           #+language: en
         INDEX
-        expect(IO.read('writings/index.org')).to eq(empty_project_index.strip)
+        expect(IO.read('writings/index.org')).to eq(empty_project_index)
       end
 
       it 'correctly saves one atom feed', core: true do
         index = described_class.new
         index.write_atom('index')
         expect(File.exist?('output/feeds/index.xml')).to be(true)
-        empty_atom = <<~ATOM
+        empty_atom = <<~ATOM.strip
           <?xml version="1.0" encoding="utf-8"?>
           <feed xmlns="http://www.w3.org/2005/Atom"
                 xmlns:dc="http://purl.org/dc/elements/1.1/"
@@ -461,7 +461,7 @@ describe Neruda::Index do
           </feed>
         ATOM
         expect(IO.read('output/feeds/index.xml')).to(
-          eq(format(empty_atom.strip, date: index.date.rfc3339))
+          eq(format(empty_atom, date: index.date.rfc3339))
         )
       end
 
@@ -529,11 +529,11 @@ describe Neruda::Index do
     end
 
     it 'generates an empty atom feed', core: true do
-      now = DateTime.now
+      now_str = DateTime.now.strftime('%Y-%m-%d %H:%M')
       index = described_class.new
       index_date_str = index.date.strftime('%Y-%m-%d %H:%M')
-      expect(index_date_str).to eq(now.strftime('%Y-%m-%d %H:%M'))
-      empty_atom = <<~EMPTY_ATOM
+      expect(index_date_str).to eq(now_str)
+      empty_atom = <<~EMPTY_ATOM.strip
         <?xml version="1.0" encoding="utf-8"?>
         <feed xmlns="http://www.w3.org/2005/Atom"
               xmlns:dc="http://purl.org/dc/elements/1.1/"
@@ -550,7 +550,7 @@ describe Neruda::Index do
         </feed>
       EMPTY_ATOM
       expect(index.to_atom).to(
-        eq(format(empty_atom.strip, date: index.date.rfc3339))
+        eq(format(empty_atom, date: index.date.rfc3339))
       )
     end
 
@@ -624,11 +624,11 @@ describe Neruda::Index do
     end
 
     it 'generates an empty atom feed', core: true do
-      now = DateTime.now
+      now_str = DateTime.now.strftime('%Y-%m-%d %H:%M')
       index = described_class.new
       index_date_str = index.date.strftime('%Y-%m-%d %H:%M')
-      expect(index_date_str).to eq(now.strftime('%Y-%m-%d %H:%M'))
-      empty_atom = <<~EMPTY_ATOM
+      expect(index_date_str).to eq(now_str)
+      empty_atom = <<~EMPTY_ATOM.strip
         <?xml version="1.0" encoding="utf-8"?>
         <feed xmlns="http://www.w3.org/2005/Atom"
               xmlns:dc="http://purl.org/dc/elements/1.1/"
@@ -645,7 +645,7 @@ describe Neruda::Index do
         </feed>
       EMPTY_ATOM
       expect(index.to_atom).to(
-        eq(format(empty_atom.strip, date: index.date.rfc3339))
+        eq(format(empty_atom, date: index.date.rfc3339))
       )
     end
 
