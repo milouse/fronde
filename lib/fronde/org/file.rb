@@ -11,6 +11,7 @@ require 'fileutils'
 require_relative '../config'
 require_relative '../version'
 require_relative '../slug'
+require_relative 'file_epubizer'
 require_relative 'file_extracter'
 
 module Fronde

@@ -57,6 +57,7 @@ Gem::Specification.new do |spec|
     'lib/fronde/index/data/template.xml',
     'lib/fronde/index/org_generator.rb',
     'lib/fronde/index.rb',
+    'lib/fronde/org/file_epubizer.rb',
     'lib/fronde/org/file_extracter.rb',
     'lib/fronde/org/file.rb',
     'lib/fronde/org.rb',
