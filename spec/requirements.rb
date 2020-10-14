@@ -13,7 +13,7 @@ SimpleCov.start do
   enable_coverage :branch
 
   # Remove dev only tools from coverage check
-  add_filter ['lib/tasks/sync.rake', 'lib/tasks/doc.rake']
+  add_filter ['lib/tasks/sync.rake']
   # Sort coverage results into usefull groups
   add_group 'Core libs', 'lib/neruda'
   add_group 'Rake tasks', 'lib/tasks'

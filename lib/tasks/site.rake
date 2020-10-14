@@ -27,7 +27,6 @@ namespace :site do
   task build: :index do
     build_html = Thread.new do
       Neruda::Emacs.new(verbose: Rake::FileUtilsExt.verbose_flag).publish
-      # TODO: Find a way to publish the virtual tag project
     end
     begin
       Neruda::Utils.throbber(build_html, 'Building:')

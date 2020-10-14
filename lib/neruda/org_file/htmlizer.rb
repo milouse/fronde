@@ -7,8 +7,7 @@ module Neruda
   # This module holds HTML formatter methods for the {Neruda::OrgFile}
   # class.
   module OrgFileHtmlizer
-    # Publish the current file or the entire project if
-    #   {Neruda::OrgFile#file @file} is ~nil~.
+    # Publish the current file
     #
     # @return [Boolean, nil] the underlying ~system~ method return value
     def publish
