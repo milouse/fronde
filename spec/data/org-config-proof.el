@@ -19,10 +19,10 @@
          :publishing-function org-html-publish-to-html
          :section-numbers nil
          :with-toc nil
-         :html-head "<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\" href=\"style.css\"/>"
+         :html-head ""
          :html-postamble "<footer>Published by Neruda.</footer>"
-         :html-head-include-default-style nil
-         :html-head-include-scripts nil)
+         :html-head-include-default-style t
+         :html-head-include-scripts t)
         ("org-assets"
          :base-directory "__TEST_DIR__/src"
          :base-extension "jpg\\|gif\\|png\\|svg\\|pdf"
@@ -37,10 +37,11 @@
          :publishing-function org-html-publish-to-html
          :section-numbers nil
          :with-toc nil
-         :html-head "<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\" href=\"style.css\"/>"
+         :html-head "<link rel=\"alternate\" type=\"application/atom+xml\" title=\"Atom 1.0\"
+              href=\"/feeds/index.xml\" />"
          :html-postamble "<footer>Published by Neruda.</footer>"
-         :html-head-include-default-style nil
-         :html-head-include-scripts nil)
+         :html-head-include-default-style t
+         :html-head-include-scripts t)
         ("news-assets"
          :base-directory "__TEST_DIR__/src/news"
          :base-extension "jpg\\|gif\\|png\\|svg\\|pdf"
@@ -56,10 +57,10 @@
          :publishing-function org-html-publish-to-html
          :section-numbers nil
          :with-toc nil
-         :html-head "<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\" href=\"style.css\"/>"
+         :html-head ""
          :html-postamble "<footer>Published by Neruda.</footer>"
-         :html-head-include-default-style nil
-         :html-head-include-scripts nil)
+         :html-head-include-default-style t
+         :html-head-include-scripts t)
         ("test-assets"
          :base-directory "__TEST_DIR__/titi/test"
          :base-extension "jpg\\|gif\\|png\\|svg\\|pdf"
@@ -74,23 +75,17 @@
          :publishing-function org-html-publish-to-html
          :section-numbers nil
          :with-toc nil
-         :html-head "<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\" href=\"style.css\"/>"
+         :html-head ""
          :html-postamble "<footer>Published by Neruda.</footer>"
-         :html-head-include-default-style nil
-         :html-head-include-scripts nil)
+         :html-head-include-default-style t
+         :html-head-include-scripts t)
         ("tata-assets"
          :base-directory "__TEST_DIR__/titi/tutu/tata"
          :base-extension "jpg\\|gif\\|png\\|svg\\|pdf"
          :recursive t
          :publishing-directory "__TEST_DIR__/public_html/tata"
          :publishing-function org-publish-attachment)
-        ("theme-default"
-         :base-directory "__BASE_DIR__/themes/default"
-         :base-extension "jpg\\|gif\\|png\\|js\\|css\\|otf\\|ttf\\|woff2?"
-         :recursive t
-         :publishing-directory "__TEST_DIR__/public_html/assets/default"
-         :publishing-function org-publish-attachment)
-        ("website" :components ("org" "org-assets" "news" "news-assets" "test" "test-assets" "tata" "tata-assets" "theme-default"))))
+        ("website" :components ("org" "org-assets" "news" "news-assets" "test" "test-assets" "tata" "tata-assets"))))
 
 ;; Load neruda lib
 (load-file (expand-file-name "ox-neruda.el" "__BASE_DIR__/lib/neruda/config"))

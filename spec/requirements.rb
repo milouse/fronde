@@ -13,7 +13,7 @@ SimpleCov.start do
   enable_coverage :branch
 
   # Remove dev only tools from coverage check
-  add_filter ['lib/tasks/sync.rake', 'lib/tasks/doc.rake']
+  add_filter ['lib/tasks/sync.rake']
   # Sort coverage results into usefull groups
   add_group 'Core libs', 'lib/neruda'
   add_group 'Rake tasks', 'lib/tasks'
@@ -51,9 +51,6 @@ def init_testing_website
     author: Tata
     title: This is a website about test
     org-html:
-      html-head-include-default-style: nil
-      html-head: |
-        <link rel="stylesheet" type="text/css" media="screen" href="style.css"/>
       html-postamble: '<footer>Published by Neruda.</footer>'
     sources:
     - name: org
@@ -79,6 +76,21 @@ def init_testing_website
   IO.write('config.yml', config)
 end
 # rubocop:enable Metrics/MethodLength
+
+def copy_org_tarball_to_fake_tmp
+  tarball = File.expand_path('../tmp/org.tar.gz', __dir__)
+  FileUtils.mkdir 'tmp'
+  FileUtils.cp tarball, 'tmp'
+end
+
+def rake(verbose: false)
+  rake = Rake.application
+  rake.raw_load_rakefile
+  Rake.verbose(verbose)
+  rake.options.build_all = true
+  rake.tasks.each(&:reenable)
+  rake
+end
 
 RSpec.configure do |config|
   config.before(:suite) do

@@ -26,24 +26,25 @@ module Neruda
     #   configuration
     PABLO_OPTIONS = {
       '-a' => { long: 'author' },
-      '-l' => { long: 'lang', keyword: 'LOCALE' },
-      '-t' => { long: 'title' },
-      '-p' => { long: 'path' },
       '-d' => { long: 'directory', boolean: true },
-      '-v' => { long: 'verbose', boolean: true, meth: :on_tail },
+      '-f' => { long: 'force', boolean: true },
       '-h' => { long: 'help', boolean: true, meth: :on_tail },
+      '-l' => { long: 'lang', keyword: 'LOCALE' },
+      '-p' => { long: 'path' },
+      '-t' => { long: 'title' },
+      '-v' => { long: 'verbose', boolean: true, meth: :on_tail },
       '-V' => { long: 'version', boolean: true, meth: :on_tail }
     }.freeze
 
     # @return [Hash] the possible ~pablo~ subcommands and their
     #   configuration
     PABLO_COMMANDS = {
-      'init' => { opts: ['-a', '-l', '-t', '-v', '-h'] },
+      'init' => { opts: ['-a', '-h', '-l', '-t', '-v'] },
       'config' => { alias: 'init' },
       'preview' => { opts: ['-h'] },
-      'open' => { opts: ['-a', '-l', '-t', '-d', '-p', '-v', '-h'] },
+      'open' => { opts: ['-a', '-d', '-h', '-l', '-p', '-t', '-v'] },
       'edit' => { alias: 'open' },
-      'build' => { opts: ['-h'] },
+      'build' => { opts: ['-f', '-h'] },
       'publish' => { opts: ['-h'] },
       'help' => { opts: ['-h'] },
       'basic' => { opts: ['-h', '-V'], label: '<command>' }
@@ -150,10 +151,10 @@ module Neruda
       # @return [String] either apple, windows or linux (default)
       # :nocov:
       def current_os
-        if ENV['OS'] == 'Windows_NT' || RUBY_PLATFORM =~ /cygwin/
+        if ENV['OS'] == 'Windows_NT' || RUBY_PLATFORM.include?('cygwin')
           return 'windows'
         end
-        return 'apple' if RUBY_PLATFORM =~ /darwin/
+        return 'apple' if RUBY_PLATFORM.include?('darwin')
         'linux'
       end
       # :nocov:
@@ -166,7 +167,9 @@ module Neruda
         return if Neruda::Config.org_last_version.nil?
         # :nocov:
         tarball = "org-#{Neruda::Config.org_last_version}.tar.gz"
-        dest_file = "tmp/#{tarball}"
+        # Remove version number in dest file to allow easy rake file
+        # task naming
+        dest_file = 'tmp/org.tar.gz'
         return if File.exist?(dest_file)
         uri = URI("https://orgmode.org/#{tarball}")
         # Will crash on purpose if anything goes wrong

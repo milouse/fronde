@@ -24,10 +24,11 @@ namespace :site do
   end
 
   desc 'Convert all org files'
-  task build: :index do
+  task :build, [:force?] => [:index] do |_, args|
+    args.with_defaults(:force? => false)
     build_html = Thread.new do
+      rm_r 'tmp/timestamps', force: true if args[:force?]
       Neruda::Emacs.new(verbose: Rake::FileUtilsExt.verbose_flag).publish
-      # TODO: Find a way to publish the virtual tag project
     end
     begin
       Neruda::Utils.throbber(build_html, 'Building:')

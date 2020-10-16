@@ -36,12 +36,6 @@ Gem::Specification.new do |s|
                    # Translations
                    'locales/en.yml',
                    'locales/fr.yml',
-                   # Default theme
-                   'themes/default/css/htmlize.css',
-                   'themes/default/css/style.css',
-                   'themes/default/img/bottom.png',
-                   'themes/default/img/tic.png',
-                   'themes/default/img/top.png',
                    # Others
                    'LICENSE']
   s.executables = ['pablo']
@@ -62,7 +56,9 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'pry', '~> 0.13'
   s.add_development_dependency 'pry-doc', '~> 1.1'
   s.add_development_dependency 'rspec', '~> 3.9'
-  s.add_development_dependency 'rubocop', '~> 0.90'
+  s.add_development_dependency 'rubocop', '~> 0.93'
+  s.add_development_dependency 'rubocop-performance', '~> 1.8'
+  s.add_development_dependency 'rubocop-rspec', '~> 1.43'
   s.add_development_dependency 'simplecov', '~> 0.19'
   s.add_development_dependency 'yard', '~> 0.9'
 end
