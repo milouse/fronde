@@ -38,6 +38,18 @@ SAMPLE_CONFIG_4 = <<~CONF
     theme: my-theme
 CONF
 
+SAMPLE_CONFIG_5 = <<~CONF
+  ---
+  author: Tata
+  title: This is a website with a blog
+  domain: https://test.com
+  theme: my-theme
+  sources:
+  - src
+  - path: news
+    theme: default
+CONF
+
 describe Neruda::Config do
   context 'with a config file' do
     before do
@@ -241,6 +253,15 @@ describe Neruda::Config do
       projects = described_class.send(:org_generate_projects)
       expect(described_class.send(:project_names, projects)).to(
         eq('"src" "src-assets" "news" "news-assets" "other" "other-assets" "theme-my-theme"')
+      )
+    end
+
+    it 'generates projects names list without default' do
+      IO.write('config.yml', SAMPLE_CONFIG_5)
+      described_class.send(:load_settings)
+      projects = described_class.send(:org_generate_projects)
+      expect(described_class.send(:project_names, projects)).to(
+        eq('"src" "src-assets" "news" "news-assets" "theme-my-theme"')
       )
     end
   end
