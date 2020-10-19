@@ -97,7 +97,11 @@ module Neruda
         names << "\"theme-#{settings['theme']}\""
       end
       sources.each do |s|
+        # Default theme defined in settings is already included
         next unless s['theme'] && s['theme'] != settings['theme']
+        # Never include theme named 'default' as it does not rely on any
+        # file to export.
+        next if s['theme'] == 'default'
         theme = "\"theme-#{s['theme']}\""
         next if names.include? theme
         names << theme
