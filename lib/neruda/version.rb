@@ -2,5 +2,5 @@
 
 module Neruda
   # @return [String] the version number of the current Neruda release.
-  VERSION = '0.2.2'
+  VERSION = '0.2.3'
 end
