@@ -24,7 +24,7 @@ namespace :site do
   end
 
   desc 'Convert all org files'
-  task :build, [:force?] => [:index] do |_, args|
+  task :build, [:force?] => ['org-config.el', :index] do |_, args|
     args.with_defaults(:force? => false)
     build_html = Thread.new do
       rm_r 'tmp/timestamps', force: true if args[:force?]
@@ -49,7 +49,7 @@ namespace :site do
 
   namespace :build do
     desc 'Convert one org file'
-    task :one, :source do |_, args|
+    task :one, [:source] => ['org-config.el'] do |_, args|
       if args[:source].nil?
         warn 'No source file given'
         next
