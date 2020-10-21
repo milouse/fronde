@@ -184,6 +184,15 @@ describe Neruda::Index do
           expect(index.empty?).to be(false)
         end
 
+        it 'excludes specified pattern from indexes', core: true do
+          old_conf = Neruda::Config.settings.dup
+          old_conf['sources'][0]['exclude'] = 'test3\.org$'
+          Neruda::Config.load_test(old_conf)
+          index = described_class.new
+          expect(index.entries.length).to eq(1)
+          expect(index.entries.include?('toto')).to be(false)
+        end
+
         it 'generates a main index', core: true do
           index = described_class.new
           expect(index.to_s).to eq(SAMPLE_ALL_INDEX)
