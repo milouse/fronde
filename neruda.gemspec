@@ -42,9 +42,6 @@ Gem::Specification.new do |s|
   s.homepage    = 'https://git.umaneti.net/neruda/about/'
   s.license     = 'WTFPL'
 
-  s.rdoc_options << '-m' << 'org'
-  s.extra_rdoc_files = ['LICENSE']
-
   s.required_ruby_version = '>= 2.6'
   s.add_runtime_dependency 'nokogiri', '~> 1.10'
   s.add_runtime_dependency 'r18n-core', '~> 4.0'

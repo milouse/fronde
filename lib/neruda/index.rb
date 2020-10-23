@@ -68,6 +68,7 @@ module Neruda
         end
         Dir.glob(file_pattern, base: project['path']).map do |s|
           org_file = File.join(project['path'], s)
+          next if exclude_file?(org_file, project)
           add_to_indexes(
             Neruda::OrgFile.new(org_file, project: project)
           )
@@ -109,6 +110,13 @@ module Neruda
         @index[b].length <=> @index[a].length
       end
       tags_sorted
+    end
+
+    def exclude_file?(file_path, project)
+      # Obviously excluding index itself for blogs
+      return true if file_path == File.join(project['path'], 'index.org')
+      return false unless project['exclude']
+      file_path.match? project['exclude']
     end
 
     def save?
