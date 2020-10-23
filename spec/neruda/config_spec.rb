@@ -134,11 +134,13 @@ describe Neruda::Config do
       projects = described_class.sources
       headers = described_class.send(:build_project_org_headers, projects[0])
       head = <<~HEAD.strip
-        :html-head ""
+        :section-numbers nil
+         :with-toc nil
          :html-postamble "<p><span class=\\\"author\\\">Written by %a</span>
         with %c, and published with %N</p>
         <p class=\\\"date\\\">Last modification on %C</p>
         <p class=\\\"validation\\\">%v</p>"
+         :html-head ""
          :html-head-include-default-style t
          :html-head-include-scripts t
       HEAD
@@ -151,27 +153,31 @@ describe Neruda::Config do
       projects = described_class.sources
       headers = described_class.send(:build_project_org_headers, projects[0])
       head = <<~HEAD.strip
-        :html-head ""
+        :section-numbers nil
+         :with-toc nil
          :html-postamble "<p><span class=\\\"author\\\">Written by %a</span>
         with %c, and published with %N</p>
         <p class=\\\"date\\\">Last modification on %C</p>
         <p class=\\\"validation\\\">%v</p>"
+         :html-head ""
          :html-head-include-default-style t
          :html-head-include-scripts t
       HEAD
       expect(headers).to eq(head)
       headers = described_class.send(:build_project_org_headers, projects[1])
       head = <<~HEAD.strip
-        :html-head "<link rel=\\\"stylesheet\\\" type=\\\"text/css\\\" media=\\\"screen\\\"
+        :section-numbers nil
+         :with-toc nil
+         :html-postamble "<p><span class=\\\"author\\\">Written by %a</span>
+        with %c, and published with %N</p>
+        <p class=\\\"date\\\">Last modification on %C</p>
+        <p class=\\\"validation\\\">%v</p>"
+         :html-head "<link rel=\\\"stylesheet\\\" type=\\\"text/css\\\" media=\\\"screen\\\"
               href=\\\"https://test.com/assets/my-theme/css/style.css\\\">
         <link rel=\\\"stylesheet\\\" type=\\\"text/css\\\" media=\\\"screen\\\"
               href=\\\"https://test.com/assets/my-theme/css/htmlize.css\\\">
         <link rel=\\\"alternate\\\" type=\\\"application/atom+xml\\\" title=\\\"Atom 1.0\\\"
               href=\\\"https://test.com/feeds/index.xml\\\" />"
-         :html-postamble "<p><span class=\\\"author\\\">Written by %a</span>
-        with %c, and published with %N</p>
-        <p class=\\\"date\\\">Last modification on %C</p>
-        <p class=\\\"validation\\\">%v</p>"
          :html-head-include-default-style nil
          :html-head-include-scripts nil
       HEAD
@@ -191,11 +197,11 @@ describe Neruda::Config do
          :publishing-function org-html-publish-to-html
          :section-numbers nil
          :with-toc nil
-         :html-head ""
          :html-postamble "<p><span class=\\\"author\\\">Written by %a</span>
         with %c, and published with %N</p>
         <p class=\\\"date\\\">Last modification on %C</p>
         <p class=\\\"validation\\\">%v</p>"
+         :html-head ""
          :html-head-include-default-style t
          :html-head-include-scripts t)
         ("src-assets"
@@ -215,16 +221,16 @@ describe Neruda::Config do
          :publishing-function org-html-publish-to-html
          :section-numbers nil
          :with-toc nil
+         :html-postamble "<p><span class=\\\"author\\\">Written by %a</span>
+        with %c, and published with %N</p>
+        <p class=\\\"date\\\">Last modification on %C</p>
+        <p class=\\\"validation\\\">%v</p>"
          :html-head "<link rel=\\\"stylesheet\\\" type=\\\"text/css\\\" media=\\\"screen\\\"
               href=\\\"https://test.com/assets/my-theme/css/style.css\\\">
         <link rel=\\\"stylesheet\\\" type=\\\"text/css\\\" media=\\\"screen\\\"
               href=\\\"https://test.com/assets/my-theme/css/htmlize.css\\\">
         <link rel=\\\"alternate\\\" type=\\\"application/atom+xml\\\" title=\\\"Atom 1.0\\\"
               href=\\\"https://test.com/feeds/index.xml\\\" />"
-         :html-postamble "<p><span class=\\\"author\\\">Written by %a</span>
-        with %c, and published with %N</p>
-        <p class=\\\"date\\\">Last modification on %C</p>
-        <p class=\\\"validation\\\">%v</p>"
          :html-head-include-default-style nil
          :html-head-include-scripts nil)
         ("news-assets"

@@ -145,8 +145,6 @@ module Neruda
          #{other_lines.join("\n ")}
          :publishing-directory "#{publish_in}"
          :publishing-function org-html-publish-to-html
-         :section-numbers nil
-         :with-toc nil
          #{opts['org_headers']})
         ("#{project_name}-assets"
          :base-directory "#{opts['path']}"
@@ -178,17 +176,20 @@ module Neruda
     end
 
     def org_default_html_options(project)
-      curtheme = project['theme'] || settings['theme']
-      if curtheme.nil? || curtheme == 'default'
-        return { 'html-head' => '__ATOM_FEED__',
-                 'html-postamble' => org_default_postamble,
-                 'html-head-include-default-style' => 't',
-                 'html-head-include-scripts' => 't' }
-      end
-      { 'html-head' => org_default_html_head,
+      defaults = {
+        'section-numbers' => 'nil',
+        'with-toc' => 'nil',
         'html-postamble' => org_default_postamble,
-        'html-head-include-default-style' => 'nil',
-        'html-head-include-scripts' => 'nil' }
+        'html-head' => '__ATOM_FEED__',
+        'html-head-include-default-style' => 't',
+        'html-head-include-scripts' => 't'
+      }
+      curtheme = project['theme'] || settings['theme']
+      return defaults if curtheme.nil? || curtheme == 'default'
+      defaults['html-head'] = org_default_html_head
+      defaults['html-head-include-default-style'] = 'nil'
+      defaults['html-head-include-scripts'] = 'nil'
+      defaults
     end
 
     def expand_vars_in_html_head(head, project)
