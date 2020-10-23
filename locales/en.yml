@@ -2,6 +2,7 @@
 pablo:
   error:
     no_command: 'ERROR: no command or unknown command given.'
+    no_file: 'ERROR: no file to open or edit.'
   usage: 'Usage: pablo %1 [options]'
   commands:
     cmd_title: Commands

@@ -1,7 +1,8 @@
 ---
 pablo:
   error:
-    no_command: 'ERREUR: Aucune commande ou commande inconnue donnée.'
+    no_command: 'ERREUR : Aucune commande ou commande inconnue donnée.'
+    no_file: 'ERREUR : Aucun fichier à ouvrir ou éditer.'
   usage: 'Usage : pablo %1 [options]'
   commands:
     cmd_title: Commandes
