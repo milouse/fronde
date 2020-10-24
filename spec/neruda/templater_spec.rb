@@ -237,6 +237,49 @@ describe Neruda::Templater do
         described_class.customize_output('public_html/customize_test.html')
         expect(IO.read('public_html/customize_test.html')).to eq(result)
       end
+
+      it 'moves elements around' do
+        other_html_base = <<~HTML
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <title>My website</title>
+            </head>
+            <body>
+              <div id="content">
+                <h1>My website</h1>
+                <nav>My menu</nav><p>Lorem ipsum...</p>
+              </div>
+            </body>
+          </html>
+        HTML
+        IO.write('public_html/customize_test.html', other_html_base)
+        Neruda::Config.load_test(
+          'templates' => [
+            { 'type' => 'before',
+              'selector' => 'div#content',
+              'source' => 'div#content>nav' }
+          ]
+        )
+        described_class.customize_output('public_html/customize_test.html')
+        result = <<~HTML
+          <!DOCTYPE html>
+          <html>
+            <head>
+          <!-- Neruda Template: #{Digest::MD5.hexdigest('<nav>My menu</nav>')} -->
+
+              <title>My website</title>
+            </head>
+            <body>
+              <nav>My menu</nav><div id="content">
+                <h1>My website</h1>
+                <p>Lorem ipsum...</p>
+              </div>
+            </body>
+          </html>
+        HTML
+        expect(IO.read('public_html/customize_test.html')).to eq(result)
+      end
     end
 
     context 'with multiple customize call' do
