@@ -3,23 +3,23 @@
 require 'neruda/templater'
 
 describe Neruda::Templater do
+  let(:html_base) do
+    <<~HTML
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>My website</title>
+        </head>
+        <body>
+          <h1>My website</h1>
+        </body>
+      </html>
+    HTML
+  end
+
   context 'with a testing website' do
     let(:metatag) { '<meta property="test" content="TEST">' }
     let(:metatag_digest) { Digest::MD5.hexdigest(metatag) }
-    let(:html_base) do
-      <<~HTML
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <title>My website</title>
-          </head>
-          <body>
-            <h1>My website</h1>
-          </body>
-        </html>
-      HTML
-    end
-
     let(:result) do
       <<~RESULT
         <!DOCTYPE html>
@@ -242,18 +242,7 @@ describe Neruda::Templater do
     context 'with multiple customize call' do
       before do
         FileUtils.mkdir_p 'public_html/customize'
-        other_html_base = <<~HTML
-          <!DOCTYPE html>
-          <html>
-            <head>
-              <title>My website</title>
-            </head>
-            <body>
-              <h1>My website</h1>
-            </body>
-          </html>
-        HTML
-        IO.write('public_html/customize_test.html', other_html_base)
+        IO.write('public_html/customize_test.html', html_base)
         IO.write('public_html/customize/test.html', html_base)
         Neruda::Config.load_test(
           'templates' => [
@@ -288,18 +277,7 @@ describe Neruda::Templater do
     context 'with multiple path to customize' do
       before do
         FileUtils.mkdir_p ['public_html/customize', 'public_html/other']
-        other_html_base = <<~HTML
-          <!DOCTYPE html>
-          <html>
-            <head>
-              <title>My website</title>
-            </head>
-            <body>
-              <h1>My website</h1>
-            </body>
-          </html>
-        HTML
-        IO.write('public_html/customize_test.html', other_html_base)
+        IO.write('public_html/customize_test.html', html_base)
         IO.write('public_html/customize/test.html', html_base)
         IO.write('public_html/other/file.html', html_base)
         Neruda::Config.load_test(
