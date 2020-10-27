@@ -77,37 +77,13 @@ context 'with a testing website' do
       expect(IO.read('public_html/index.html')).not_to eql(old_content)
     end
 
-    it 'builds one specific file', rake: true do
-      o = Neruda::OrgFile.new('src/tutu.org', title: 'Tutu test')
-      o.write
-      rake(verbose: false).invoke_task('site:build:one[src/tutu.org]')
-      expect(File.exist?('public_html/index.html')).to be(false)
-      expect(File.exist?('public_html/tutu.html')).to be(true)
-    end
-
-    it 'builds one specific file even in verbose mode', rake: true do
-      o = Neruda::OrgFile.new('src/tutu.org', title: 'Tutu test')
-      o.write
-      rake(verbose: true).invoke_task('site:build:one[src/tutu.org]')
-      expect(File.exist?('public_html/index.html')).to be(false)
-      expect(File.exist?('public_html/tutu.html')).to be(true)
-    end
-
-    it 'fails gracefully with wrong project', rake: true do
-      expect { rake(verbose: false).invoke_task('site:build:one[very/wrong.org]') }.to(
-        output("No project found for very/wrong.org\n").to_stderr
-      )
-    end
-
-    it 'fails gracefully with wrong file in project', rake: true do
-      expect { rake(verbose: false).invoke_task('site:build:one[src/wrong.org]') }.to(
+    it 'fails gracefully when something goes wrong', rake: true do
+      old_conf = Neruda::Config.settings.dup
+      old_conf['emacs'] = 'notemacsatall'
+      Neruda::Config.load_test(old_conf)
+      expect { rake(verbose: false).invoke_task('site:build') }.to(
         output(/Aborting/).to_stderr
       )
-    end
-
-    it 'raises an error if no file is given in build:one', rake: true do
-      expect { rake(verbose: false).invoke_task('site:build:one') }.to \
-        output("No source file given\n").to_stderr
     end
   end
 

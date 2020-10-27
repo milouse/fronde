@@ -7,15 +7,6 @@ module Neruda
   # This module holds HTML formatter methods for the {Neruda::OrgFile}
   # class.
   module OrgFileHtmlizer
-    # Publish the current file
-    #
-    # @return [Boolean, nil] the underlying ~system~ method return value
-    def publish
-      Neruda::Emacs.new(
-        file_path: @file, verbose: @options[:verbose]
-      ).publish
-    end
-
     private
 
     # Format {Neruda::OrgFile#keywords} list in an HTML listing.
