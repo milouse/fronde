@@ -27,7 +27,6 @@ module PabloCommands
 
   def pablo_build
     @rake.options.build_all = true
-    # Update org-config.el, if necessary
     suffix = ''
     if !ARGV[0].nil?
       suffix = ":one[#{ARGV[0]}]"
