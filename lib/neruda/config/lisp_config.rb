@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'json'
 require 'open-uri'
 require 'neruda/version'
 
@@ -16,17 +17,13 @@ module Neruda
         @org_version = IO.read('tmp/__last_org_version__')
         return @org_version
       end
-      index = URI('https://orgmode.org/index.html').open.read
-      last_ver = index.match(/https:\/\/orgmode\.org\/org-([0-9.]+)\.tar\.gz/)
-      # :nocov:
-      if last_ver.nil?
-        warn 'Org last version not found'
-        return nil
-      end
+      versions = JSON.parse(
+        URI('https://updates.orgmode.org/data/releases').open.read
+      ).sort { |a, b| b['date'] <=> a['date'] }
+      @org_version = versions.first['version']
       FileUtils.mkdir_p 'tmp'
-      IO.write('tmp/__last_org_version__', last_ver[1])
-      # :nocov:
-      @org_version = last_ver[1]
+      IO.write('tmp/__last_org_version__', @org_version)
+      @org_version
     end
 
     # Generate emacs lisp configuration file for Org and write it.
