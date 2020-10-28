@@ -5,10 +5,10 @@ require './lib/fronde/version'
 Gem::Specification.new do |s|
   s.name        = 'fronde'
   s.version     = Fronde::VERSION
-  s.summary     = 'A simplistic way to create an Org static website.'
+  s.summary     = 'An opinionated static website generator for Org'
   s.description = <<~DESC
-    An opinionated Org static website generator.
-    Write your org-mode files, we take care of the rest.
+    Fronde helps you to convert Org mode files into websites, giving you
+    full control over the publication process.
   DESC
   s.authors     = ['Étienne Deparis']
   s.email       = 'etienne@depar.is'

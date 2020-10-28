@@ -10,8 +10,9 @@
 #+attr_html: :style width:150px;float:right;margin-top:-4.5em;margin-left:2em;
 [[file:./tigre.png]]
 
-Fronde is a static website generator made for [[https://orgmode.org][Org files]]. It improves the
-default Org HTML exporting/publishing routine.
+Fronde is an opinionated static website generator for [[https://orgmode.org][Org]]. It helps you
+converting Org mode files into websites, giving you full control over
+the publication process.
 
 * Features
 
@@ -26,7 +27,7 @@ default Org HTML exporting/publishing routine.
 - Can use different theme for different sources
 - Supports tags and [[https://en.wikipedia.org/wiki/Atom_(Web_standard)][ATOM feeds]]
 
-* How to install it
+* Quick install
 
 Fronde is a [[https://rubygems.org/][Ruby gem]]. You need a working Ruby environment to use it. We
 recommand you to use [[https://rvm.io][RVM]] and a specific gemset. However it will works
@@ -35,21 +36,20 @@ with a global ruby installation too.
 #+caption: Installation procedure with RVM
 #+begin_src shell
 rvm get latest
-rvm use ruby-2.6.3@fronde --create
+rvm use ruby-2.7.2@fronde --create
 gem install fronde
 #+end_src
 
 Now, you're ready to create your first Fronde website.
 
 #+begin_src shell
+mkdir mywebite
+cd mywebsite
 fronde init -t "My first fronde website"
+fronde build
+fronde preview
 #+end_src
 
 * Going further
 
-All the Fronde configuration is stored in one [[https://en.wikipedia.org/wiki/YAML][YAML]] file named
-~config.yml~ and stored at the root of your project. If none exists, a
-default one will be created the first time you run any ~fronde~ command.
-
-You should read the [[./CONFIG.org][config file documentation]] to discover its various
-options.
+Please refer to the [[./DOCUMENTATION.org][documentation]].
