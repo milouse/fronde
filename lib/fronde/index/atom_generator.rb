@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 require 'cgi'
-require 'neruda/config'
+require 'fronde/config'
 
-module Neruda
+module Fronde
   # Embeds Atom feeds sepecific methods
   module IndexAtomGenerator
     def to_atom(index_name = 'index')
@@ -16,7 +16,7 @@ module Neruda
 
     def write_atom(index_name)
       return unless save?
-      slug = Neruda::OrgFile.slug index_name
+      slug = Fronde::OrgFile.slug index_name
       FileUtils.mkdir_p "#{@pubdir}/feeds"
       atomdest = "#{@pubdir}/feeds/#{slug}.xml"
       IO.write(atomdest, to_atom(index_name))
@@ -29,15 +29,15 @@ module Neruda
     # @param title [String] the title of the current atom feed
     # @return [String] the Atom header as a String
     def atom_header(title)
-      domain = Neruda::Config.settings['domain']
+      domain = Fronde::Config.settings['domain']
       upddate = @date.rfc3339
       if title == 'index'
         slug = 'index'
         tagurl = domain
-        title = Neruda::Config.settings['title'] || \
-                R18n.t.neruda.index.all_tags
+        title = Fronde::Config.settings['title'] || \
+                R18n.t.fronde.index.all_tags
       else
-        slug = Neruda::OrgFile.slug(title)
+        slug = Fronde::OrgFile.slug(title)
         tagurl = "#{domain}/tags/#{slug}.html"
         title = @tags_names[title]
       end
@@ -47,21 +47,21 @@ module Neruda
         <feed xmlns="http://www.w3.org/2005/Atom"
               xmlns:dc="http://purl.org/dc/elements/1.1/"
               xmlns:wfw="http://wellformedweb.org/CommentAPI/"
-              xml:lang="#{Neruda::Config.settings['lang']}">
+              xml:lang="#{Fronde::Config.settings['lang']}">
 
         <title>#{title}</title>
         <link href="#{domain}/feeds/#{slug}.xml" rel="self" type="application/atom+xml"/>
         <link href="#{tagurl}" rel="alternate" type="text/html" title="#{title}"/>
         <updated>#{upddate}</updated>
-        <author><name>#{Neruda::Config.settings['author'] || ''}</name></author>
+        <author><name>#{Fronde::Config.settings['author'] || ''}</name></author>
         <id>urn:md5:#{Digest::MD5.hexdigest(domain)}</id>
-        <generator uri="https://git.umaneti.net/neruda/about/">Neruda</generator>
+        <generator uri="https://git.umaneti.net/fronde/about/">Fronde</generator>
       ENDATOM
     end
 
     # Render an Atom feed entry.
     #
-    # @param article [Neruda::OrgFile] the related org document for this
+    # @param article [Fronde::OrgFile] the related org document for this
     #   entry
     # @return [String] the Atom entry as a String
     def atom_entry(article)

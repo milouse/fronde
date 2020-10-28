@@ -50,7 +50,7 @@ SAMPLE_CONFIG_5 = <<~CONF
     theme: default
 CONF
 
-describe Neruda::Config do
+describe Fronde::Config do
   context 'with a config file' do
     before do
       FileUtils.mkdir_p 'tmp/config'

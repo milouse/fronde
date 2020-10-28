@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-module Neruda
-  # This module holds extracter methods for the {Neruda::OrgFile} class.
+module Fronde
+  # This module holds extracter methods for the {Fronde::OrgFile} class.
   module OrgFileExtracter
     private
 
     # Main method, which will call the other to initialize an
-    #   {Neruda::OrgFile} instance.
+    #   {Fronde::OrgFile} instance.
     def extract_data
       @content = IO.read @file
       @title = extract_title
@@ -49,7 +49,7 @@ module Neruda
 
     def extract_author
       m = /^#\+author:(.+)$/i.match(@content)
-      return Neruda::Config.settings['author'] if m.nil?
+      return Fronde::Config.settings['author'] if m.nil?
       m[1].strip
     end
 
@@ -61,7 +61,7 @@ module Neruda
 
     def extract_lang
       m = /^#\+language:(.+)$/i.match(@content)
-      return Neruda::Config.settings['lang'] if m.nil?
+      return Fronde::Config.settings['lang'] if m.nil?
       m[1].strip
     end
 

@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require 'neruda/templater'
+require 'fronde/templater'
 
-describe Neruda::Templater do
+describe Fronde::Templater do
   let(:html_base) do
     <<~HTML
       <!DOCTYPE html>
@@ -25,7 +25,7 @@ describe Neruda::Templater do
         <!DOCTYPE html>
         <html>
           <head>
-        <!-- Neruda Template: #{metatag_digest} -->
+        <!-- Fronde Template: #{metatag_digest} -->
 
             <meta property="test" content="TEST">
         <title>My website</title>
@@ -54,11 +54,11 @@ describe Neruda::Templater do
 
       after do
         FileUtils.rm_r ['public_html', 'src'], force: true
-        Neruda::Config.load_test({})
+        Fronde::Config.load_test({})
       end
 
       it 'customizes a given html file with simple template' do
-        Neruda::Config.load_test(
+        Fronde::Config.load_test(
           'templates' => [
             { 'selector' => 'title',
               'content' => metatag }
@@ -69,7 +69,7 @@ describe Neruda::Templater do
           <!DOCTYPE html>
           <html>
             <head>
-          <!-- Neruda Template: #{metatag_digest} -->
+          <!-- Fronde Template: #{metatag_digest} -->
 
               <title>My website</title>
           <meta property="test" content="TEST">
@@ -83,7 +83,7 @@ describe Neruda::Templater do
       end
 
       it 'customizes a given html file with a given org object' do
-        Neruda::Config.load_test(
+        Fronde::Config.load_test(
           'templates' => [
             { 'selector' => 'title',
               'content' => metatag }
@@ -96,13 +96,13 @@ describe Neruda::Templater do
         ORG
         FileUtils.mkdir 'src'
         IO.write('src/index.org', org_content)
-        o = Neruda::OrgFile.new('src/index.org')
+        o = Fronde::OrgFile.new('src/index.org')
         described_class.customize_output('public_html/customize_test.html', o)
         local_result = <<~RESULT
           <!DOCTYPE html>
           <html>
             <head>
-          <!-- Neruda Template: #{metatag_digest} -->
+          <!-- Fronde Template: #{metatag_digest} -->
 
               <title>My website</title>
           <meta property="test" content="TEST">
@@ -116,7 +116,7 @@ describe Neruda::Templater do
       end
 
       it 'customizes a given html file with before' do
-        Neruda::Config.load_test(
+        Fronde::Config.load_test(
           'templates' => [
             { 'selector' => 'title',
               'type' => 'before',
@@ -128,7 +128,7 @@ describe Neruda::Templater do
       end
 
       it 'customizes a given html file with after' do
-        Neruda::Config.load_test(
+        Fronde::Config.load_test(
           'templates' => [
             { 'selector' => 'title',
               'type' => 'after',
@@ -140,7 +140,7 @@ describe Neruda::Templater do
           <!DOCTYPE html>
           <html>
             <head>
-          <!-- Neruda Template: #{metatag_digest} -->
+          <!-- Fronde Template: #{metatag_digest} -->
 
               <title>My website</title>
           <meta property="test" content="TEST">
@@ -154,7 +154,7 @@ describe Neruda::Templater do
       end
 
       it 'customizes a given html file with replace content' do
-        Neruda::Config.load_test(
+        Fronde::Config.load_test(
           'templates' => [
             { 'selector' => 'body>h1',
               'type' => 'replace',
@@ -166,7 +166,7 @@ describe Neruda::Templater do
           <!DOCTYPE html>
           <html>
             <head>
-          <!-- Neruda Template: #{Digest::MD5.hexdigest('<p>Toto tata</p>')} -->
+          <!-- Fronde Template: #{Digest::MD5.hexdigest('<p>Toto tata</p>')} -->
 
               <title>My website</title>
             </head>
@@ -179,7 +179,7 @@ describe Neruda::Templater do
       end
 
       it 'customizes a given html file with previous comments in head' do
-        Neruda::Config.load_test(
+        Fronde::Config.load_test(
           'templates' => [
             { 'selector' => 'body>h1',
               'type' => 'replace',
@@ -204,7 +204,7 @@ describe Neruda::Templater do
           <!DOCTYPE html>
           <html>
             <head>
-          <!-- Neruda Template: #{Digest::MD5.hexdigest('<p>Toto tata</p>')} -->
+          <!-- Fronde Template: #{Digest::MD5.hexdigest('<p>Toto tata</p>')} -->
 
               <!-- This is a test comment -->
               <title>My website</title>
@@ -219,7 +219,7 @@ describe Neruda::Templater do
 
       it 'does not customize a given html file with wrong templates' do
         result = IO.read('public_html/customize_test.html')
-        Neruda::Config.load_test(
+        Fronde::Config.load_test(
           'templates' => [
             { 'type' => 'replace',
               'content' => '<p>Toto tata</p>' },
@@ -233,7 +233,7 @@ describe Neruda::Templater do
 
       it 'does not customize a given html file with no templates' do
         result = IO.read('public_html/customize_test.html')
-        Neruda::Config.load_test({})
+        Fronde::Config.load_test({})
         described_class.customize_output('public_html/customize_test.html')
         expect(IO.read('public_html/customize_test.html')).to eq(result)
       end
@@ -254,7 +254,7 @@ describe Neruda::Templater do
           </html>
         HTML
         IO.write('public_html/customize_test.html', other_html_base)
-        Neruda::Config.load_test(
+        Fronde::Config.load_test(
           'templates' => [
             { 'type' => 'before',
               'selector' => 'div#content',
@@ -266,7 +266,7 @@ describe Neruda::Templater do
           <!DOCTYPE html>
           <html>
             <head>
-          <!-- Neruda Template: #{Digest::MD5.hexdigest('<nav>My menu</nav>')} -->
+          <!-- Fronde Template: #{Digest::MD5.hexdigest('<nav>My menu</nav>')} -->
 
               <title>My website</title>
             </head>
@@ -287,7 +287,7 @@ describe Neruda::Templater do
         FileUtils.mkdir_p 'public_html/customize'
         IO.write('public_html/customize_test.html', html_base)
         IO.write('public_html/customize/test.html', html_base)
-        Neruda::Config.load_test(
+        Fronde::Config.load_test(
           'templates' => [
             { 'selector' => 'title',
               'path' => '/customize/*',
@@ -299,7 +299,7 @@ describe Neruda::Templater do
 
       after do
         FileUtils.rm_r 'public_html', force: true
-        Neruda::Config.load_test({})
+        Fronde::Config.load_test({})
       end
 
       it 'customizes a file on a specific path' do
@@ -323,7 +323,7 @@ describe Neruda::Templater do
         IO.write('public_html/customize_test.html', html_base)
         IO.write('public_html/customize/test.html', html_base)
         IO.write('public_html/other/file.html', html_base)
-        Neruda::Config.load_test(
+        Fronde::Config.load_test(
           'templates' => [
             { 'selector' => 'title',
               'path' => ['/customize/*', '/other/*'],
@@ -337,7 +337,7 @@ describe Neruda::Templater do
 
       after do
         FileUtils.rm_r 'public_html', force: true
-        Neruda::Config.load_test({})
+        Fronde::Config.load_test({})
       end
 
       it 'customizes a file on a specific path' do

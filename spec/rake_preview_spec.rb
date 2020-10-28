@@ -6,19 +6,19 @@ require 'net/http'
 
 def init_preview
   copy_org_tarball_to_fake_tmp
-  Neruda::Config.send(:load_settings)
+  Fronde::Config.send(:load_settings)
   rake.invoke_task('org:install')
   FileUtils.cp(
-    File.expand_path('../Firma_Pablo_Neruda.png', __dir__),
-    'src/firma.png'
+    File.expand_path('../tigre.png', __dir__),
+    'src/tigre.png'
   )
-  Neruda::OrgFile.new(
+  Fronde::OrgFile.new(
     'src/index.org',
     title: 'My website',
     content: <<~CONTENT
       Nice content.
 
-      [[http://mydomain.local/firma.png][Firma]]
+      [[http://mydomain.local/tigre.png][Tigre]]
     CONTENT
   ).write
 end
@@ -52,11 +52,11 @@ context 'when trying preview mode' do
       proof = File.expand_path('data/index_proof.html', __dir__)
       proof_content = IO.read(proof).gsub(/__PUB_DATE__/, now_str)
       expect(home_page).to eq(proof_content)
-      firma = URI('http://localhost:5000/firma.png')
-      res = Net::HTTP.get_response(firma)
+      tigre = URI('http://localhost:5000/tigre.png')
+      res = Net::HTTP.get_response(tigre)
       expect(res).to be_a(Net::HTTPOK)
       expect(res['content-type']).to eq('image/png')
-      expect(res['content-length']).to eq(File.size('src/firma.png').to_s)
+      expect(res['content-length']).to eq(File.size('src/tigre.png').to_s)
     end
 
     it 'serves index', rake: true do
@@ -84,9 +84,9 @@ context 'when trying preview mode' do
     around do |test|
       init_testing_website
       init_preview
-      old_conf = Neruda::Config.settings.dup
+      old_conf = Fronde::Config.settings.dup
       old_conf['domain'] = 'http://mydomain.local'
-      Neruda::Config.load_test(old_conf)
+      Fronde::Config.load_test(old_conf)
       rake.invoke_task('site:build')
       webrick_app = Thread.new do
         rake.invoke_task('site:preview')

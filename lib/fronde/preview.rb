@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 require 'webrick'
-require 'neruda/config'
+require 'fronde/config'
 
-module Neruda # rubocop:disable Style/Documentation
+module Fronde # rubocop:disable Style/Documentation
   # A tiny preview server, which main goal is to replace references to
   # the target domain by localhost.
   class PreviewServlet < WEBrick::HTTPServlet::AbstractServlet
@@ -19,9 +19,9 @@ module Neruda # rubocop:disable Style/Documentation
     private
 
     def local_path(requested_path)
-      routes = Neruda::Config.settings.dig('preview', 'routes') || {}
+      routes = Fronde::Config.settings.dig('preview', 'routes') || {}
       return routes[requested_path] if routes.has_key? requested_path
-      local_path = Neruda::Config.settings['public_folder'] + requested_path
+      local_path = Fronde::Config.settings['public_folder'] + requested_path
       if File.directory? local_path
         local_path = format(
           '%<path>s/index.html', path: local_path.delete_suffix('/')
@@ -34,7 +34,7 @@ module Neruda # rubocop:disable Style/Documentation
     def parse_body(local_path, local_host)
       body = IO.read local_path
       return body unless local_path.match?(/\.(?:ht|x)ml\z/)
-      domain = Neruda::Config.settings['domain']
+      domain = Fronde::Config.settings['domain']
       return body if domain == ''
       body.gsub(/"file:\/\//, format('"%<host>s', host: local_host))
           .gsub(/"#{domain}/, format('"%<host>s', host: local_host))
@@ -45,9 +45,9 @@ module Neruda # rubocop:disable Style/Documentation
     def start_preview
       # Inspired by ruby un.rb library, which allows normally to start a
       # webrick server in one line: ruby -run -e httpd public_html -p 5000
-      port = Neruda::Config.settings.dig('preview', 'server_port') || 5000
+      port = Fronde::Config.settings.dig('preview', 'server_port') || 5000
       s = WEBrick::HTTPServer.new(Port: port)
-      s.mount '/', Neruda::PreviewServlet
+      s.mount '/', Fronde::PreviewServlet
       ['TERM', 'QUIT', 'INT'].each { |sig| trap(sig, proc { s.shutdown }) }
       s.start
     end

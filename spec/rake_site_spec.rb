@@ -30,7 +30,7 @@ context 'with a testing website' do
   before do
     init_testing_website
     copy_org_tarball_to_fake_tmp
-    Neruda::Config.send(:load_settings)
+    Fronde::Config.send(:load_settings)
     rake.invoke_task('org:install')
   end
 
@@ -41,7 +41,7 @@ context 'with a testing website' do
 
   context 'when building org files' do
     before do
-      o = Neruda::OrgFile.new('src/index.org',
+      o = Fronde::OrgFile.new('src/index.org',
                               title: 'My website',
                               content: 'Nice content.')
       o.write
@@ -60,9 +60,9 @@ context 'with a testing website' do
     it 'does not build again with successive call', rake: true do
       rake(verbose: false).invoke_task('site:build')
       old_content = IO.read('public_html/index.html')
-      old_conf = Neruda::Config.settings.dup
+      old_conf = Fronde::Config.settings.dup
       old_conf['org-html']['html-postamble'] = '<footer>Modified!</footer>'
-      Neruda::Config.load_test(old_conf)
+      Fronde::Config.load_test(old_conf)
       rake(verbose: false).invoke_task('site:build')
       expect(IO.read('public_html/index.html')).to eql(old_content)
     end
@@ -70,17 +70,17 @@ context 'with a testing website' do
     it 'builds again when call with force option', rake: true do
       rake(verbose: false).invoke_task('site:build')
       old_content = IO.read('public_html/index.html')
-      old_conf = Neruda::Config.settings.dup
+      old_conf = Fronde::Config.settings.dup
       old_conf['org-html']['html-postamble'] = '<footer>Modified!</footer>'
-      Neruda::Config.load_test(old_conf)
+      Fronde::Config.load_test(old_conf)
       rake(verbose: false).invoke_task('site:build[true]')
       expect(IO.read('public_html/index.html')).not_to eql(old_content)
     end
 
     it 'fails gracefully when something goes wrong', rake: true do
-      old_conf = Neruda::Config.settings.dup
+      old_conf = Fronde::Config.settings.dup
       old_conf['emacs'] = 'notemacsatall'
-      Neruda::Config.load_test(old_conf)
+      Fronde::Config.load_test(old_conf)
       expect { rake(verbose: false).invoke_task('site:build') }.to(
         output(/Aborting/).to_stderr
       )
@@ -92,9 +92,9 @@ context 'with a testing website' do
 
     context 'without blog setting', rake: true do
       before do
-        old_conf = Neruda::Config.settings.dup
+        old_conf = Fronde::Config.settings.dup
         old_conf['sources'][1]['is_blog'] = false
-        Neruda::Config.load_test(old_conf)
+        Fronde::Config.load_test(old_conf)
       end
 
       it 'does not generate index', rake: true do
@@ -132,9 +132,9 @@ context 'with a testing website' do
 
     context 'with wrong blog settings', rake: true do
       before do
-        old_conf = Neruda::Config.settings.dup
+        old_conf = Fronde::Config.settings.dup
         old_conf['sources'][1]['path'] = 'src/test'
-        Neruda::Config.load_test(old_conf)
+        Fronde::Config.load_test(old_conf)
       end
 
       it 'does not generate index', rake: true do

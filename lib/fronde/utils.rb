@@ -4,9 +4,9 @@ require 'uri'
 require 'rainbow'
 require 'net/http'
 require 'r18n-core'
-require 'neruda/config'
+require 'fronde/config'
 
-module Neruda
+module Fronde
   # Embeds usefull methods, mainly used in rake tasks.
   module Utils
     # @return [Hash] the possible throbber themes
@@ -22,9 +22,9 @@ module Neruda
                     '⡀ ⠄ ⠂ ⠁ ⠂ ⠄ ⡀', '⠄ ⡀ ⠄ ⠂ ⠁ ⠂ ⠄', '⠂ ⠄ ⡀ ⠄ ⠂ ⠁ ⠂']
     }.freeze
 
-    # @return [Hash] the possible ~pablo~ options and their
+    # @return [Hash] the possible ~fronde~ options and their
     #   configuration
-    PABLO_OPTIONS = {
+    FRONDE_OPTIONS = {
       '-a' => { long: 'author' },
       '-f' => { long: 'force', boolean: true },
       '-h' => { long: 'help', boolean: true, meth: :on_tail },
@@ -35,9 +35,9 @@ module Neruda
       '-V' => { long: 'version', boolean: true, meth: :on_tail }
     }.freeze
 
-    # @return [Hash] the possible ~pablo~ subcommands and their
+    # @return [Hash] the possible ~fronde~ subcommands and their
     #   configuration
-    PABLO_COMMANDS = {
+    FRONDE_COMMANDS = {
       'init' => { opts: ['-a', '-h', '-l', '-t', '-v'] },
       'config' => { alias: 'init' },
       'preview' => { opts: ['-h'] },
@@ -55,11 +55,11 @@ module Neruda
       #
       # The animation is chosen among a bunch of themes, with the
       # configuration option ~throbber~ (retrieved via
-      # {Neruda::Config#settings}).
+      # {Fronde::Config#settings}).
       #
       # @example
       #     long_stuff = Thread.new { very_long_operation }
-      #     Neruda::Utils.throbber(long_stuff, 'Computing hard stuff:')
+      #     Fronde::Utils.throbber(long_stuff, 'Computing hard stuff:')
       #
       # @param thread [Thread] the long-running operation to decorate
       # @param message [String] the message to display before the throbber
@@ -80,53 +80,53 @@ module Neruda
       # Returns the short and long options specification for a given
       #   short option.
       #
-      # This method use the {Neruda::Utils::PABLO_OPTIONS} Hash to
+      # This method use the {Fronde::Utils::FRONDE_OPTIONS} Hash to
       # retrieve corresponding values.
       #
       # @example
-      #     spec = Neruda::Utils.decorate_option('-a')
+      #     spec = Fronde::Utils.decorate_option('-a')
       #     => ['-a AUTHOR', '--author AUTHOR']
       #
       # @param short [String] the short option to decorate
       # @return [Array] the short and long specification for an option
       def decorate_option(short)
-        opt = Neruda::Utils::PABLO_OPTIONS[short]
+        opt = Fronde::Utils::FRONDE_OPTIONS[short]
         long = "--#{opt[:long]}"
         return [short, long] if opt[:boolean]
         key = opt[:keyword] || opt[:long].upcase
         [short + key, format('%<long>s %<key>s', long: long, key: key)]
       end
 
-      # Returns the ~pablo~ help summary for a given command.
+      # Returns the ~fronde~ help summary for a given command.
       #
       # @param command [String] the command for which a summary
       #   should be given
       # @return [String]
       def summarize_command(command)
-        Neruda::Utils::PABLO_COMMANDS[command][:opts].map do |k|
-          short, long = Neruda::Utils.decorate_option(k)
-          opt = Neruda::Utils::PABLO_OPTIONS[k]
+        Fronde::Utils::FRONDE_COMMANDS[command][:opts].map do |k|
+          short, long = Fronde::Utils.decorate_option(k)
+          opt = Fronde::Utils::FRONDE_OPTIONS[k]
           label = [short, long].join(', ')
           line = [format('    %<opt>s', opt: label).ljust(30)]
-          if R18n.t.pablo.options[opt[:long]].translated?
-            line << R18n.t.pablo.options[opt[:long]]
+          if R18n.t.fronde.bin.options[opt[:long]].translated?
+            line << R18n.t.fronde.bin.options[opt[:long]]
           end
           line.join(' ')
         end.join("\n")
       end
 
-      # Returns a formatted list of available commands for ~pablo~.
+      # Returns a formatted list of available commands for ~fronde~.
       #
       # @return [String]
       def list_commands
         lines = []
-        Neruda::Utils::PABLO_COMMANDS.each do |cmd, opt|
+        Fronde::Utils::FRONDE_COMMANDS.each do |cmd, opt|
           next if cmd == 'basic'
           line = ['   ', cmd.ljust(10)]
           if opt.has_key? :alias
-            line << R18n.t.pablo.commands.alias(opt[:alias])
+            line << R18n.t.fronde.bin.commands.alias(opt[:alias])
           else
-            line << R18n.t.pablo.commands[cmd]
+            line << R18n.t.fronde.bin.commands[cmd]
           end
           lines << line.join(' ')
         end
@@ -139,8 +139,8 @@ module Neruda
       # @param command [String] the command to resolve
       # @return [String]
       def resolve_possible_alias(command)
-        return 'basic' unless Neruda::Utils::PABLO_COMMANDS.include?(command)
-        cmd_opt = Neruda::Utils::PABLO_COMMANDS[command]
+        return 'basic' unless Fronde::Utils::FRONDE_COMMANDS.include?(command)
+        cmd_opt = Fronde::Utils::FRONDE_COMMANDS[command]
         return cmd_opt[:alias] if cmd_opt.has_key?(:alias)
         command
       end
@@ -163,9 +163,9 @@ module Neruda
       # @return [String] the downloaded org-mode version
       def download_org
         # :nocov:
-        return if Neruda::Config.org_last_version.nil?
+        return if Fronde::Config.org_last_version.nil?
         # :nocov:
-        tarball = "org-#{Neruda::Config.org_last_version}.tar.gz"
+        tarball = "org-#{Fronde::Config.org_last_version}.tar.gz"
         # Remove version number in dest file to allow easy rake file
         # task naming
         dest_file = 'tmp/org.tar.gz'
@@ -188,16 +188,16 @@ module Neruda
           format(
             "%<message>s %<label>s\n%<explanation>s",
             message: message,
-            label: Rainbow(R18n.t.neruda.error.label).bold.red,
-            explanation: Rainbow(R18n.t.neruda.error.explanation).bold
+            label: Rainbow(R18n.t.fronde.error.label).bold.red,
+            explanation: Rainbow(R18n.t.fronde.error.explanation).bold
           )
         )
       end
 
       def select_throbber_frames
-        model = Neruda::Config.settings['throbber'] || 'default'
-        model = 'default' unless Neruda::Utils::THROBBER_FRAMES.has_key?(model)
-        Neruda::Utils::THROBBER_FRAMES[model]
+        model = Fronde::Config.settings['throbber'] || 'default'
+        model = 'default' unless Fronde::Utils::THROBBER_FRAMES.has_key?(model)
+        Fronde::Utils::THROBBER_FRAMES[model]
       end
 
       def run_and_decorate_thread(thread, message, frames)

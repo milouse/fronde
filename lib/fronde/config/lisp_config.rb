@@ -2,9 +2,9 @@
 
 require 'json'
 require 'open-uri'
-require 'neruda/version'
+require 'fronde/version'
 
-module Neruda
+module Fronde
   # This module contains utilitary methods to ease ~org-config.el~
   # file generation
   module LispConfig
@@ -38,9 +38,9 @@ module Neruda
       projects = org_generate_projects(with_tags: with_tags)
       workdir = Dir.pwd
       content = IO.read(File.expand_path('./org-config.el', __dir__))
-                  .gsub('__VERSION__', Neruda::VERSION)
+                  .gsub('__VERSION__', Fronde::VERSION)
                   .gsub('__WORK_DIR__', workdir)
-                  .gsub('__NERUDA_DIR__', __dir__)
+                  .gsub('__FRONDE_DIR__', __dir__)
                   .gsub('__ORG_VER__', org_last_version)
                   .gsub('__ALL_PROJECTS__', all_projects(projects))
                   .gsub('__THEME_CONFIG__', org_default_theme_config)
@@ -54,8 +54,8 @@ module Neruda
     # Generate emacs directory variables file.
     #
     # This method generate the file ~.dir-locals.el~, which is
-    # responsible to load neruda Org settings when visiting an Org file
-    # of this neruda instance.
+    # responsible to load fronde Org settings when visiting an Org file
+    # of this fronde instance.
     #
     # @return [Integer] the length written (as returned by the
     #   underlying ~IO.write~ method call)
@@ -71,12 +71,12 @@ module Neruda
 
     def r18n_full_datetime_format
       locale = R18n.get.locale
-      date_fmt = R18n.t.neruda.index.full_date_format(
+      date_fmt = R18n.t.fronde.index.full_date_format(
         date: locale.full_format
       )
       date_fmt = locale.year_format.sub('_', date_fmt)
       time_fmt = locale.time_format.delete('_').strip
-      R18n.t.neruda.index.full_date_with_time_format(
+      R18n.t.fronde.index.full_date_with_time_format(
         date: date_fmt, time: time_fmt
       )
     end
@@ -155,9 +155,9 @@ module Neruda
 
     def org_default_postamble
       <<~POSTAMBLE
-        <p><span class="author">#{R18n.t.neruda.org.postamble.written_by}</span>
-        #{R18n.t.neruda.org.postamble.with_emacs}</p>
-        <p class="date">#{R18n.t.neruda.org.postamble.last_modification}</p>
+        <p><span class="author">#{R18n.t.fronde.org.postamble.written_by}</span>
+        #{R18n.t.fronde.org.postamble.with_emacs}</p>
+        <p class="date">#{R18n.t.fronde.org.postamble.last_modification}</p>
         <p class="validation">%v</p>
       POSTAMBLE
     end

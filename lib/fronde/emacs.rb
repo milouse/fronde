@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require 'neruda/config'
+require 'fronde/config'
 
-module Neruda
+module Fronde
   # Wraps Gnu/Emacs calls
   class Emacs
     def initialize(file_path: nil, verbose: false)
@@ -24,7 +24,7 @@ module Neruda
     private
 
     def emacs_command(*arguments)
-      default_emacs = Neruda::Config.settings['emacs']
+      default_emacs = Fronde::Config.settings['emacs']
       emacs_cmd = [
         default_emacs || 'emacs -Q --batch -nw',
         '--eval \'(setq enable-dir-local-variables nil)\''

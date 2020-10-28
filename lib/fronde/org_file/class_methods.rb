@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
-module Neruda
-  # This module holds class methods for the {Neruda::OrgFile} class.
+module Fronde
+  # This module holds class methods for the {Fronde::OrgFile} class.
   module OrgFileClassMethods
     def source_for_target(file_name)
       # file_name may be frozen...
       src = file_name.sub(/\.html\z/, '.org')
-      pubfolder = Neruda::Config.settings['public_folder']
+      pubfolder = Fronde::Config.settings['public_folder']
       src.sub!(/^#{pubfolder}\//, '')
       # Look for match in each possible sources. The first found wins.
-      Neruda::Config.sources.each do |project|
+      Fronde::Config.sources.each do |project|
         if project['target'] == '.'
           origin = File.join(project['path'], src)
         else
@@ -36,13 +36,13 @@ module Neruda
         target = "#{project['target']}/#{target}" if project['target'] != '.'
       end
       return target unless with_public_folder
-      pubfolder = Neruda::Config.settings['public_folder']
+      pubfolder = Fronde::Config.settings['public_folder']
       "#{pubfolder}/#{target}"
     end
 
     def project_for_source(file_name)
       # Look for match in each possible sources. The first found wins.
-      Neruda::Config.sources.each do |project|
+      Fronde::Config.sources.each do |project|
         project_relative_path = project['path'].sub(/^#{Dir.pwd}\//, '')
         return project if file_name.match?(/^#{project_relative_path}\//)
       end

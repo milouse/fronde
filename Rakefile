@@ -8,8 +8,8 @@ begin
 
   YARD::Rake::YardocTask.new do |t|
     t.options = ['-m', 'org', '--no-progress',
-                 '--files', 'CONFIG.org',
-                 '--asset', 'Firma_Pablo_Neruda.png']
+                 '--files', 'DOCUMENTATION.org',
+                 '--asset', 'tigre.png']
   end
 rescue LoadError
   warn 'You are not using the development bundle.'

@@ -4,8 +4,8 @@
 (load-file (expand-file-name "htmlize.el" "__TEST_DIR__"))
 
 ;; Current project options
-(setq neruda/version "__VERSION__"
-      neruda/current-work-dir "__TEST_DIR__"
+(setq fronde/version "__VERSION__"
+      fronde/current-work-dir "__TEST_DIR__"
       user-mail-address ""
       user-full-name "Tata"
       org-html-metadata-timestamp-format "%A %-d of %B, %Y at %R"
@@ -19,7 +19,7 @@
          :publishing-function org-html-publish-to-html
          :section-numbers nil
          :with-toc nil
-         :html-postamble "<footer>Published by Neruda.</footer>"
+         :html-postamble "<footer>Published by Fronde.</footer>"
          :html-head "<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\"
               href=\"/assets/toto/css/style.css\">
         <link rel=\"stylesheet\" type=\"text/css\" media=\"screen\"
@@ -40,7 +40,7 @@
          :publishing-function org-html-publish-to-html
          :section-numbers nil
          :with-toc nil
-         :html-postamble "<footer>Published by Neruda.</footer>"
+         :html-postamble "<footer>Published by Fronde.</footer>"
          :html-head "<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\"
               href=\"/assets/toto/css/style.css\">
         <link rel=\"stylesheet\" type=\"text/css\" media=\"screen\"
@@ -64,7 +64,7 @@
          :publishing-function org-html-publish-to-html
          :section-numbers nil
          :with-toc nil
-         :html-postamble "<footer>Published by Neruda.</footer>"
+         :html-postamble "<footer>Published by Fronde.</footer>"
          :html-head "<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\"
               href=\"/assets/toto/css/style.css\">
         <link rel=\"stylesheet\" type=\"text/css\" media=\"screen\"
@@ -85,7 +85,7 @@
          :publishing-function org-html-publish-to-html
          :section-numbers nil
          :with-toc nil
-         :html-postamble "<footer>Published by Neruda.</footer>"
+         :html-postamble "<footer>Published by Fronde.</footer>"
          :html-head "<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\"
               href=\"/assets/toto/css/style.css\">
         <link rel=\"stylesheet\" type=\"text/css\" media=\"screen\"
@@ -106,5 +106,5 @@
          :publishing-function org-publish-attachment)
         ("website" :components ("org" "org-assets" "news" "news-assets" "test" "test-assets" "tata" "tata-assets" "theme-toto"))))
 
-;; Load neruda lib
-(load-file (expand-file-name "ox-neruda.el" "__BASE_DIR__/lib/neruda/config"))
+;; Load fronde lib
+(load-file (expand-file-name "ox-fronde.el" "__BASE_DIR__/lib/fronde/config"))

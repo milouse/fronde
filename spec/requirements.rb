@@ -15,14 +15,14 @@ SimpleCov.start do
   # Remove dev only tools from coverage check
   add_filter ['lib/tasks/sync.rake']
   # Sort coverage results into usefull groups
-  add_group 'Core libs', 'lib/neruda'
+  add_group 'Core libs', 'lib/fronde'
   add_group 'Rake tasks', 'lib/tasks'
   add_group 'Specs', 'spec'
 end
 
 # The following requires other components automatically
-require 'neruda/org_file'
-require 'neruda/utils'
+require 'fronde/org_file'
+require 'fronde/utils'
 
 ENV['LANG'] = 'en'
 ENV['USER'] = 'alice'
@@ -51,7 +51,7 @@ def init_testing_website
     author: Tata
     title: This is a website about test
     org-html:
-      html-postamble: '<footer>Published by Neruda.</footer>'
+      html-postamble: '<footer>Published by Fronde.</footer>'
     sources:
     - name: org
       path: src
@@ -68,7 +68,7 @@ def init_testing_website
     - type: before
       selector: title
       content: |
-        <meta property="neruda-test" content="test"/>
+        <meta property="fronde-test" content="test"/>
     preview:
       routes:
         /test: public_html/index.html
@@ -94,7 +94,7 @@ end
 
 RSpec.configure do |config|
   config.before(:suite) do
-    Neruda::Utils.download_org
+    Fronde::Utils.download_org
   end
 
   config.after(:suite) do

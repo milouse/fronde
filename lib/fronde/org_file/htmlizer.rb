@@ -1,30 +1,30 @@
 # frozen_string_literal: true
 
-require 'neruda/config'
-require 'neruda/emacs'
+require 'fronde/config'
+require 'fronde/emacs'
 
-module Neruda
-  # This module holds HTML formatter methods for the {Neruda::OrgFile}
+module Fronde
+  # This module holds HTML formatter methods for the {Fronde::OrgFile}
   # class.
   module OrgFileHtmlizer
     private
 
-    # Format {Neruda::OrgFile#keywords} list in an HTML listing.
+    # Format {Fronde::OrgFile#keywords} list in an HTML listing.
     #
     # @return [String] the HTML keywords list
     def keywords_to_html
-      domain = Neruda::Config.settings['domain']
+      domain = Fronde::Config.settings['domain']
       klist = @keywords.map do |k|
         <<~KEYWORDLINK
           <li class="keyword">
-            <a href="#{domain}/tags/#{Neruda::OrgFile.slug(k)}.html">#{k}</a>
+            <a href="#{domain}/tags/#{Fronde::OrgFile.slug(k)}.html">#{k}</a>
           </li>
         KEYWORDLINK
       end.join
       "<ul class=\"keywords-list\">#{klist}</ul>"
     end
 
-    # Format {Neruda::OrgFile#date} as a HTML `time` tag.
+    # Format {Fronde::OrgFile#date} as a HTML `time` tag.
     #
     # @return [String] the HTML `time` tag
     def date_to_html(dateformat = :full)
@@ -32,7 +32,7 @@ module Neruda
       "<time datetime=\"#{@date.rfc3339}\">#{datestring(dateformat)}</time>"
     end
 
-    # Format {Neruda::OrgFile#author} in a HTML `span` tag with a
+    # Format {Fronde::OrgFile#author} in a HTML `span` tag with a
     #   specific class.
     #
     # @return [String] the author HTML `span`

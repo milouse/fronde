@@ -106,7 +106,7 @@ SAMPLE_ATOM = <<~ATOM.strip
   <updated>%<date>s</updated>
   <author><name>Test</name></author>
   <id>urn:md5:75d53866bcb20465b3287cf237234464</id>
-  <generator uri="https://git.umaneti.net/neruda/about/">Neruda</generator>
+  <generator uri="https://git.umaneti.net/fronde/about/">Fronde</generator>
 
   <entry>
     <title>My third article</title>
@@ -142,7 +142,7 @@ SAMPLE_ATOM = <<~ATOM.strip
   </feed>
 ATOM
 
-describe Neruda::Index do
+describe Fronde::Index do
   context 'with blog settings' do
     context 'with working org files' do
       before do
@@ -160,12 +160,12 @@ describe Neruda::Index do
       after do
         Dir.chdir File.expand_path('../..', __dir__)
         FileUtils.rm_r 'tmp/blog', force: true
-        Neruda::Config.load_test({})
+        Fronde::Config.load_test({})
       end
 
       context 'with recursive config' do
         before do
-          Neruda::Config.load_test(
+          Fronde::Config.load_test(
             'title' => 'Blog',
             'author' => 'Test',
             'public_folder' => 'output',
@@ -185,9 +185,9 @@ describe Neruda::Index do
         end
 
         it 'excludes specified pattern from indexes', core: true do
-          old_conf = Neruda::Config.settings.dup
+          old_conf = Fronde::Config.settings.dup
           old_conf['sources'][0]['exclude'] = 'test3\.org$'
-          Neruda::Config.load_test(old_conf)
+          Fronde::Config.load_test(old_conf)
           index = described_class.new
           expect(index.entries.length).to eq(1)
           expect(index.entries.include?('toto')).to be(false)
@@ -286,7 +286,7 @@ describe Neruda::Index do
 
       context 'without recursive config' do
         before do
-          Neruda::Config.load_test(
+          Fronde::Config.load_test(
             'title' => 'Blog',
             'author' => 'Test',
             'public_folder' => 'output',
@@ -332,7 +332,7 @@ describe Neruda::Index do
         FileUtils.mkdir_p 'tmp/blog/writings'
         FileUtils.mkdir_p 'tmp/blog/output'
         Dir.chdir 'tmp/blog'
-        Neruda::Config.load_test(
+        Fronde::Config.load_test(
           'title' => 'Blog',
           'author' => 'Test',
           'public_folder' => 'output',
@@ -348,7 +348,7 @@ describe Neruda::Index do
       after do
         Dir.chdir File.expand_path('../..', __dir__)
         FileUtils.rm_r 'tmp/blog', force: true
-        Neruda::Config.load_test({})
+        Fronde::Config.load_test({})
       end
 
       it 'has generated no index', core: true do
@@ -406,7 +406,7 @@ describe Neruda::Index do
           <updated>%<date>s</updated>
           <author><name>Test</name></author>
           <id>urn:md5:75d53866bcb20465b3287cf237234464</id>
-          <generator uri="https://git.umaneti.net/neruda/about/">Neruda</generator>
+          <generator uri="https://git.umaneti.net/fronde/about/">Fronde</generator>
           </feed>
         ATOM
         expect(index.to_atom).to(
@@ -466,7 +466,7 @@ describe Neruda::Index do
           <updated>%<date>s</updated>
           <author><name>Test</name></author>
           <id>urn:md5:75d53866bcb20465b3287cf237234464</id>
-          <generator uri="https://git.umaneti.net/neruda/about/">Neruda</generator>
+          <generator uri="https://git.umaneti.net/fronde/about/">Fronde</generator>
           </feed>
         ATOM
         expect(IO.read('output/feeds/index.xml')).to(
@@ -494,7 +494,7 @@ describe Neruda::Index do
         'tmp/txt/writings'
       )
       Dir.chdir 'tmp/txt'
-      Neruda::Config.load_test(
+      Fronde::Config.load_test(
         'title' => 'My site',
         'author' => 'Test',
         'public_folder' => 'output',
@@ -506,7 +506,7 @@ describe Neruda::Index do
     after do
       Dir.chdir File.expand_path('../..', __dir__)
       FileUtils.rm_r 'tmp/txt', force: true
-      Neruda::Config.load_test({})
+      Fronde::Config.load_test({})
     end
 
     it 'does not have generated any indexes', core: true do
@@ -555,7 +555,7 @@ describe Neruda::Index do
         <updated>%<date>s</updated>
         <author><name>Test</name></author>
         <id>urn:md5:75d53866bcb20465b3287cf237234464</id>
-        <generator uri="https://git.umaneti.net/neruda/about/">Neruda</generator>
+        <generator uri="https://git.umaneti.net/fronde/about/">Fronde</generator>
         </feed>
       EMPTY_ATOM
       expect(index.to_atom).to(
@@ -591,7 +591,7 @@ describe Neruda::Index do
       FileUtils.mkdir_p 'tmp/txt/output'
       FileUtils.cp 'spec/data/test1.org', 'tmp/txt/writings'
       Dir.chdir 'tmp/txt'
-      Neruda::Config.load_test(
+      Fronde::Config.load_test(
         'public_folder' => 'output',
         'domain' => 'http://perdu.com',
         'sources' => [{ 'path' => 'writings', 'target' => '.' }]
@@ -601,7 +601,7 @@ describe Neruda::Index do
     after do
       Dir.chdir File.expand_path('../..', __dir__)
       FileUtils.rm_r 'tmp/txt', force: true
-      Neruda::Config.load_test({})
+      Fronde::Config.load_test({})
     end
 
     it 'does not have generated any indexes', core: true do
@@ -650,7 +650,7 @@ describe Neruda::Index do
         <updated>%<date>s</updated>
         <author><name>alice</name></author>
         <id>urn:md5:75d53866bcb20465b3287cf237234464</id>
-        <generator uri="https://git.umaneti.net/neruda/about/">Neruda</generator>
+        <generator uri="https://git.umaneti.net/fronde/about/">Fronde</generator>
         </feed>
       EMPTY_ATOM
       expect(index.to_atom).to(

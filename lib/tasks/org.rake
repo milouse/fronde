@@ -2,8 +2,8 @@
 
 require 'open-uri'
 
-# Neruda::Config is required by Neruda::Utils
-require 'neruda/utils'
+# Fronde::Config is required by Fronde::Utils
+require 'fronde/utils'
 
 require 'rake/clean'
 
@@ -17,21 +17,21 @@ namespace :org do
   file 'tmp/org.tar.gz' do
     verbose = Rake::FileUtilsExt.verbose_flag
     download = Thread.new do
-      Thread.current[:org_version] = Neruda::Config.org_last_version
-      Neruda::Utils.download_org
+      Thread.current[:org_version] = Fronde::Config.org_last_version
+      Fronde::Utils.download_org
     end
     if verbose
       download.join
       warn "Org version #{download[:org_version]} has been downloaded"
     else
-      Neruda::Utils.throbber(download, 'Downloading Org:')
+      Fronde::Utils.throbber(download, 'Downloading Org:')
     end
   end
 
   desc 'Compile Org'
   task compile: 'tmp/org.tar.gz' do |task|
     verbose = Rake::FileUtilsExt.verbose_flag
-    org_version = "org-#{Neruda::Config.org_last_version}"
+    org_version = "org-#{Fronde::Config.org_last_version}"
     next if Dir.exist?("#{org_version}/lisp")
     make = ['make', '-C', org_version]
     unless verbose
@@ -51,7 +51,7 @@ namespace :org do
       build.join
       warn "#{org_version} has been locally installed"
     else
-      Neruda::Utils.throbber(build, 'Installing Org:')
+      Fronde::Utils.throbber(build, 'Installing Org:')
     end
   end
 
@@ -63,17 +63,17 @@ namespace :org do
   end
 
   file 'org-config.el' => 'htmlize.el' do
-    Neruda::Config.write_org_lisp_config
+    Fronde::Config.write_org_lisp_config
   end
 
   file '.dir-locals.el' do
-    Neruda::Config.write_dir_locals
+    Fronde::Config.write_dir_locals
   end
 
   desc 'Install Org'
   multitask install: ['org:compile', 'org-config.el', '.dir-locals.el'] do
-    mkdir_p "#{Neruda::Config.settings['public_folder']}/assets"
-    Neruda::Config.sources.each do |s|
+    mkdir_p "#{Fronde::Config.settings['public_folder']}/assets"
+    Fronde::Config.sources.each do |s|
       mkdir_p s['path'] unless Dir.exist? s['path']
     end
   end

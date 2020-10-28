@@ -4,8 +4,8 @@
 (load-file (expand-file-name "htmlize.el" "__WORK_DIR__"))
 
 ;; Current project options
-(setq neruda/version "__VERSION__"
-      neruda/current-work-dir "__WORK_DIR__"
+(setq fronde/version "__VERSION__"
+      fronde/current-work-dir "__WORK_DIR__"
       user-mail-address "__AUTHOR_EMAIL__"
       user-full-name "__AUTHOR_NAME__"
       org-html-metadata-timestamp-format "__LONG_DATE_FMT__"
@@ -13,5 +13,5 @@
       `(__ALL_PROJECTS____THEME_CONFIG__
         ("website" :components (__ALL_PROJECTS_NAMES__))))
 
-;; Load neruda lib
-(load-file (expand-file-name "ox-neruda.el" "__NERUDA_DIR__"))
+;; Load fronde lib
+(load-file (expand-file-name "ox-fronde.el" "__FRONDE_DIR__"))

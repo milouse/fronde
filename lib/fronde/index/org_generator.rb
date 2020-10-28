@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Neruda
+module Fronde
   # Embeds methods responsible for generating an org file for a given
   #   index.
   module IndexOrgGenerator
@@ -14,7 +14,7 @@ module Neruda
 
     def write_org(index_name)
       return unless save?
-      slug = Neruda::OrgFile.slug index_name
+      slug = Fronde::OrgFile.slug index_name
       FileUtils.mkdir 'tags' unless Dir.exist? 'tags'
       content = to_org index_name
       orgdest = "tags/#{slug}.org"
@@ -32,7 +32,7 @@ module Neruda
     end
 
     def write_all_blog_home(verbose)
-      Neruda::Config.sources.each do |project|
+      Fronde::Config.sources.each do |project|
         next unless project['is_blog']
         next unless Dir.exist?(project['path'])
         warn "Generated blog home for #{project['name']}" if verbose
@@ -43,11 +43,11 @@ module Neruda
 
     def all_tags_index
       content = [
-        org_header(R18n.t.neruda.index.all_tags, is_tag: false)
+        org_header(R18n.t.fronde.index.all_tags, is_tag: false)
       ]
       sort_tags_by_name_and_weight.each do |t, tags|
         content << ''
-        content << org_title(R18n.t.neruda.index.send(t), 'index-tags')
+        content << org_title(R18n.t.fronde.index.send(t), 'index-tags')
         next if tags.empty?
         tags.each do |k|
           content << "- #{tag_published_url(k)} (#{@index[k].length})"
@@ -57,7 +57,7 @@ module Neruda
     end
 
     def tag_published_url(tag_name)
-      domain = Neruda::Config.settings['domain']
+      domain = Fronde::Config.settings['domain']
       title = @tags_names[tag_name]
       tag_link = "#{domain}/tags/#{tag_name}.html"
       "[[#{tag_link}][#{title}]]"
@@ -67,12 +67,12 @@ module Neruda
       if is_tag
         title = @tags_names[title]
       elsif title.nil? || title == 'index'
-        title = Neruda::Config.settings['title']
+        title = Fronde::Config.settings['title']
       end
       <<~HEADER.strip
         #+title: #{title}
-        #+author: #{Neruda::Config.settings['author']}
-        #+language: #{Neruda::Config.settings['lang']}
+        #+author: #{Fronde::Config.settings['author']}
+        #+language: #{Fronde::Config.settings['lang']}
       HEADER
     end
 
@@ -93,7 +93,7 @@ module Neruda
       line = "- *[[#{article.url}][#{article.title}]]*"
       if article.date
         art_date = article.datestring(:full, year: false)
-        published = R18n.t.neruda.index.published_on art_date
+        published = R18n.t.fronde.index.published_on art_date
         line += " / #{published}"
       end
       line += " \\\\\n  #{article.excerpt}" if article.excerpt != ''
@@ -101,7 +101,7 @@ module Neruda
     end
 
     def org_title(year, html_class = 'index-year')
-      year = R18n.t.neruda.index.unsorted if year == '0000'
+      year = R18n.t.fronde.index.unsorted if year == '0000'
       <<~ENDPROP
         * #{year}
         :PROPERTIES:

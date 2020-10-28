@@ -3,17 +3,17 @@
 require 'rake'
 
 context 'with working org files' do
-  let(:org_dir) { "org-#{Neruda::Config.org_last_version}" }
+  let(:org_dir) { "org-#{Fronde::Config.org_last_version}" }
 
   before do
     init_testing_website
-    Neruda::Config.send(:load_settings)
+    Fronde::Config.send(:load_settings)
   end
 
   after do
     Dir.glob('org-[0-9.]*').each { |ov| FileUtils.rm_r(ov, force: true) }
     FileUtils.rm ['.dir-locals.el', 'org-config.el'], force: true
-    Neruda::Config.load_test({})
+    Fronde::Config.load_test({})
     Dir.chdir File.expand_path('..', __dir__)
     FileUtils.rm_r 'tmp/website_testing', force: true
   end
@@ -26,15 +26,15 @@ context 'with working org files' do
     proof_content = IO.read(proof)
                       .gsub(/__TEST_DIR__/, Dir.pwd)
                       .gsub(/__BASE_DIR__/, base_dir)
-                      .gsub(/__VERSION__/, Neruda::VERSION)
-                      .gsub(/__ORG_VERSION__/, Neruda::Config.org_last_version)
+                      .gsub(/__VERSION__/, Fronde::VERSION)
+                      .gsub(/__ORG_VERSION__/, Fronde::Config.org_last_version)
     expect(IO.read('org-config.el')).to eq(proof_content)
   end
 
   it 'compiles org-config.el for blog', rake: true do
-    old_conf = Neruda::Config.settings.dup
+    old_conf = Fronde::Config.settings.dup
     old_conf['theme'] = 'toto'
-    Neruda::Config.load_test(old_conf)
+    Fronde::Config.load_test(old_conf)
     rake.invoke_task('org-config.el')
     expect(File.exist?('org-config.el')).to be(true)
     proof = File.expand_path('data/org-config-blog-proof.el', __dir__)
@@ -42,8 +42,8 @@ context 'with working org files' do
     proof_content = IO.read(proof)
                       .gsub(/__TEST_DIR__/, Dir.pwd)
                       .gsub(/__BASE_DIR__/, base_dir)
-                      .gsub(/__VERSION__/, Neruda::VERSION)
-                      .gsub(/__ORG_VERSION__/, Neruda::Config.org_last_version)
+                      .gsub(/__VERSION__/, Fronde::VERSION)
+                      .gsub(/__ORG_VERSION__/, Fronde::Config.org_last_version)
     expect(IO.read('org-config.el')).to eq(proof_content)
   end
 

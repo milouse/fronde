@@ -1,4 +1,4 @@
-;;; ox-neruda.el --- Neruda Gem specific helpers for Org Export Engine -*- lexical-binding: t; -*-
+;;; ox-fronde.el --- Fronde Gem specific helpers for Org Export Engine -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2011-2019 Free Software Foundation, Inc.
 
@@ -23,7 +23,7 @@
 ;;; Commentary:
 
 ;; This library implements specific helpers function, needed by the Ruby
-;; Gem Neruda, which offers an easy way to publish a static website
+;; Gem Fronde, which offers an easy way to publish a static website
 ;; using Org files as sources.
 
 ;;; Code:
@@ -33,17 +33,17 @@
 
 ;;; Function Declarations
 
-(defvar neruda/version ""
-  "Version of the current neruda installation")
+(defvar fronde/version ""
+  "Version of the current fronde installation")
 
-(defvar neruda/current-work-dir nil
-  "Location of the current neruda website base directory.")
+(defvar fronde/current-work-dir nil
+  "Location of the current fronde website base directory.")
 
-(defvar neruda/org-temp-dir nil
+(defvar fronde/org-temp-dir nil
   "Location of the local Org temporary directory (where to place
 org timestamps and id locations).")
 
-(defun neruda/org-html-format-spec (upstream info)
+(defun fronde/org-html-format-spec (upstream info)
   "Return format specification for preamble and postamble.
 INFO is a plist used as a communication channel."
   (let ((output (funcall upstream info)))
@@ -58,14 +58,14 @@ INFO is a plist used as a communication channel."
 	                    "\n")))
       output)
     (push `(?l . ,(org-export-data (plist-get info :language) info)) output)
-    (push `(?n . ,(format "Neruda %s" neruda/version)) output)
-    (push `(?N . ,(format "<a href=\"https://git.umaneti.net/neruda/about/\">Neruda</a> %s" neruda/version)) output)
+    (push `(?n . ,(format "Fronde %s" fronde/version)) output)
+    (push `(?N . ,(format "<a href=\"https://git.umaneti.net/fronde/about/\">Fronde</a> %s" fronde/version)) output)
     (push `(?x . ,(org-export-data (plist-get info :description) info)) output)
     (push `(?X . ,(format "<p>%s</p>"
                     (org-export-data (plist-get info :description) info)))
       output)))
 
-(defun neruda/org-i18n-export (link description format)
+(defun fronde/org-i18n-export (link description format)
   "Export a i18n link"
   (let* ((splitted-link (split-string link "|"))
          (path (car splitted-link))
@@ -80,20 +80,20 @@ INFO is a plist used as a communication channel."
       (`ascii (format "%s (%s)" desc path))
       (_ path))))
 
-(defun neruda/org-i18n-follow (link)
+(defun fronde/org-i18n-follow (link)
   "Visit a i18n link"
   (browse-url (car (split-string link "|"))))
 
 (org-link-set-parameters "i18n"
-  :export #'neruda/org-i18n-export
-  :follow #'neruda/org-i18n-follow)
+  :export #'fronde/org-i18n-export
+  :follow #'fronde/org-i18n-follow)
 
 
 ;;; Set configuration options
 
-(setq neruda/org-temp-dir (expand-file-name "tmp" neruda/current-work-dir)
-      org-publish-timestamp-directory (expand-file-name "timestamps/" neruda/org-temp-dir)
-      org-id-locations-file (expand-file-name "id-locations.el" neruda/org-temp-dir)
+(setq fronde/org-temp-dir (expand-file-name "tmp" fronde/current-work-dir)
+      org-publish-timestamp-directory (expand-file-name "timestamps/" fronde/org-temp-dir)
+      org-id-locations-file (expand-file-name "id-locations.el" fronde/org-temp-dir)
       make-backup-files nil
       enable-local-variables :all
       org-confirm-babel-evaluate nil
@@ -107,8 +107,8 @@ INFO is a plist used as a communication channel."
                                     (strike-through . "<del>%s</del>")
                                     (underline . "<span class=\"underline\">%s</span>")
                                     (verbatim . "<code>%s</code>")))
-(advice-add 'org-html-format-spec :around #'neruda/org-html-format-spec)
+(advice-add 'org-html-format-spec :around #'fronde/org-html-format-spec)
 
-(provide 'ox-neruda)
+(provide 'ox-fronde)
 
-;;; ox-neruda.el ends here
+;;; ox-fronde.el ends here

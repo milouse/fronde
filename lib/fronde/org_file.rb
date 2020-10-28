@@ -2,14 +2,14 @@
 
 require 'time'
 require 'fileutils'
-# neruda/config is required by htmlizer
-require 'neruda/org_file/htmlizer'
-require 'neruda/org_file/extracter'
-require 'neruda/org_file/class_methods'
-require 'neruda/index'
-require 'neruda/version'
+# fronde/config is required by htmlizer
+require 'fronde/org_file/htmlizer'
+require 'fronde/org_file/extracter'
+require 'fronde/org_file/class_methods'
+require 'fronde/index'
+require 'fronde/version'
 
-module Neruda
+module Fronde
   # Handles org files.
   #
   # This class is responsible for reading or writing existing or new org
@@ -73,10 +73,10 @@ module Neruda
     # @return [String] the project owning this document.
     attr_reader :project
 
-    extend Neruda::OrgFileClassMethods
+    extend Fronde::OrgFileClassMethods
 
-    include Neruda::OrgFileExtracter
-    include Neruda::OrgFileHtmlizer
+    include Fronde::OrgFileExtracter
+    include Fronde::OrgFileHtmlizer
 
     # Prepares the file named by ~file_name~ for read and write
     #   operations.
@@ -87,20 +87,20 @@ module Neruda
     # @example
     #     File.exist? './test.org'
     #     => true
-    #     o = Neruda::OrgFile.new('./test.org')
-    #     => #<Neruda::OrgFile @file='./test.org'...>
+    #     o = Fronde::OrgFile.new('./test.org')
+    #     => #<Fronde::OrgFile @file='./test.org'...>
     #     o.title
     #     => "This is an existing test file"
     #     File.exist? '/tmp/does_not_exist.org'
     #     => false
-    #     o = Neruda::OrgFile.new('/tmp/does_not_exist.org')
-    #     => #<Neruda::OrgFile @file='/tmp/does_not_exist.org'...>
+    #     o = Fronde::OrgFile.new('/tmp/does_not_exist.org')
+    #     => #<Fronde::OrgFile @file='/tmp/does_not_exist.org'...>
     #     o.title
     #     => ""
     #     File.exist? '/tmp/other.org'
     #     => false
-    #     o = Neruda::OrgFile.new('/tmp/other.org', title: 'New file')
-    #     => #<Neruda::OrgFile @file='/tmp/other.org'...>
+    #     o = Fronde::OrgFile.new('/tmp/other.org', title: 'New file')
+    #     => #<Fronde::OrgFile @file='/tmp/other.org'...>
     #     o.title
     #     => "New file"
     #
@@ -110,11 +110,11 @@ module Neruda
     # @option opts [String] author (system user or '') the author of the
     #   document
     # @option opts [Boolean] verbose (false) if the
-    #   {Neruda::OrgFileHtmlizer#publish publish} method should output
+    #   {Fronde::OrgFileHtmlizer#publish publish} method should output
     #   emacs process messages
     # @option opts [String] project the project owning this file
     #   must be stored
-    # @return [Neruda::OrgFile] the new instance of Neruda::OrgFile
+    # @return [Fronde::OrgFile] the new instance of Fronde::OrgFile
     def initialize(file_name, opts = {})
       file_name = nil if file_name == ''
       @file = file_name
@@ -183,11 +183,11 @@ module Neruda
       return R18n.l @date.to_date if dateformat == :short
       return @date.rfc3339 if dateformat == :rfc3339
       locale = R18n.get.locale
-      long_fmt = R18n.t.neruda.index.full_date_format(
+      long_fmt = R18n.t.fronde.index.full_date_format(
         date: locale.format_date_full(@date, year)
       )
       unless @notime
-        long_fmt = R18n.t.neruda.index.full_date_with_time_format(
+        long_fmt = R18n.t.fronde.index.full_date_with_time_format(
           date: long_fmt, time: locale.time_format.delete('_').strip
         )
       end
@@ -213,9 +213,9 @@ module Neruda
     # - %K :: the HTML list rendering of the keywords
     # - %l :: the lang of the document
     # - %L :: the license information, taken from the
-    #         {Neruda::Config#settings}
-    # - %n :: the Neruda name and version
-    # - %N :: the Neruda name and version with a link to the project
+    #         {Fronde::Config#settings}
+    # - %n :: the Fronde name and version
+    # - %N :: the Fronde name and version with a link to the project
     #         home on the name
     # - %s :: the subtitle of the document
     # - %t :: the title of the document
@@ -241,9 +241,9 @@ module Neruda
             .gsub('%k', @keywords.join(', '))
             .gsub('%K', keywords_to_html)
             .gsub('%l', @lang)
-            .gsub('%L', (Neruda::Config.settings['license'] || '').gsub(/\s+/, ' ').strip)
-            .gsub('%n', "Neruda #{Neruda::VERSION}")
-            .gsub('%N', "<a href=\"https://git.umaneti.net/neruda/about/\">Neruda</a> #{Neruda::VERSION}")
+            .gsub('%L', (Fronde::Config.settings['license'] || '').gsub(/\s+/, ' ').strip)
+            .gsub('%n', "Fronde #{Fronde::VERSION}")
+            .gsub('%N', "<a href=\"https://git.umaneti.net/fronde/about/\">Fronde</a> #{Fronde::VERSION}")
             .gsub('%s', @subtitle)
             .gsub('%t', @title)
             .gsub('%u', @html_file || '')
@@ -270,10 +270,10 @@ module Neruda
 
     def build_html_file_and_url
       return if @file.nil?
-      @html_file = Neruda::OrgFile.target_for_source(
+      @html_file = Fronde::OrgFile.target_for_source(
         @file, @project, with_public_folder: false
       )
-      @url = "#{Neruda::Config.settings['domain']}/#{@html_file}"
+      @url = "#{Fronde::Config.settings['domain']}/#{@html_file}"
     end
 
     def init_empty_file
@@ -281,9 +281,9 @@ module Neruda
       @subtitle = ''
       @date = DateTime.now
       @notime = false
-      @author = @options[:author] || Neruda::Config.settings['author']
+      @author = @options[:author] || Fronde::Config.settings['author']
       @keywords = []
-      @lang = @options[:lang] || Neruda::Config.settings['lang']
+      @lang = @options[:lang] || Fronde::Config.settings['lang']
       @excerpt = ''
       body = @options[:content] || ''
       @content = @options[:raw_content] || <<~ORG

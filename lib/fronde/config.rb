@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 require 'yaml'
-require 'neruda/config/lisp_config'
+require 'fronde/config/lisp_config'
 
-module Neruda
+module Fronde
   # Wrapper for configuration
   #
   # This class is a singleton interface, which share the static website
@@ -24,11 +24,11 @@ module Neruda
   # Settings will be available like this:
   #
   # #+begin_src
-  # Neruda::Config.settings['author']
+  # Fronde::Config.settings['author']
   # => "Alice Doe"
   # #+end_src
   class Config
-    extend Neruda::LispConfig
+    extend Fronde::LispConfig
 
     class << self
       # Access the current website settings
@@ -47,7 +47,7 @@ module Neruda
       # Not only this method overwrite the old settings, but it replace
       # the current shared settings with the ones given in
       # parameter. Later call to
-      # {file:Neruda/Config.html#settings-class_method settings}
+      # {file:Fronde/Config.html#settings-class_method settings}
       # will, obviously, use these new settings.
       #
       # @param new_config [Hash] the settings to save
@@ -56,7 +56,7 @@ module Neruda
         # Do not save obvious default config values. We'll always try to
         # save author and lang as they default on system variables,
         # which may be different from a system to another. Thus it may
-        # be confusing if one use neruda on two different computer and
+        # be confusing if one use fronde on two different computer and
         # these params always change.
         new_config.delete_if do |k, v|
           ['domain', 'public_folder', 'templates', 'theme'].include?(k) \
@@ -69,7 +69,7 @@ module Neruda
       # Load the given settings as if they comes from the ~config.yml~ file.
       #
       # This method is handy for testing purpose. Later call to
-      # {file:Neruda/Config.html#settings-class_method settings} will
+      # {file:Fronde/Config.html#settings-class_method settings} will
       # use these new settings.
       #
       # @param config [Hash] the settings to artificially load

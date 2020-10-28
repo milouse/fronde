@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require 'neruda/utils'
+require 'fronde/utils'
 
-describe Neruda::Utils do
-  context 'with theoritical pablo arguments' do
+describe Fronde::Utils do
+  context 'with theoritical fronde arguments' do
     it 'returns decorated options' do
       expect(described_class.decorate_option('-a')).to(
         eq(['-aAUTHOR', '--author AUTHOR'])
@@ -19,7 +19,7 @@ describe Neruda::Utils do
     it 'summarizes basic commands' do
       basic_cmd = [
         "    -h, --help                 Display help for a command and exit.\n",
-        '    -V, --version              Display Neruda version and exit.'
+        '    -V, --version              Display Fronde version and exit.'
       ].join
       expect(described_class.summarize_command('basic')).to eq(basic_cmd)
     end
@@ -38,7 +38,7 @@ describe Neruda::Utils do
 
     it 'lists possible commands' do
       basic_cmd = [
-        "    init       Initialize your Neruda instance (you just need to do it once).\n",
+        "    init       Initialize your Fronde instance (you just need to do it once).\n",
         "    config     Alias for init.\n",
         "    preview    Start a test web server to preview your website on http://127.0.0.1:5000\n",
         "    open       Open or create an org file.\n",
@@ -60,29 +60,29 @@ describe Neruda::Utils do
 
     context 'with config' do
       after do
-        Neruda::Config.load_test({})
+        Fronde::Config.load_test({})
       end
 
       it 'selects the right throbber' do
-        Neruda::Config.load_test({})
+        Fronde::Config.load_test({})
         frames = described_class.send(:select_throbber_frames)
         expect(frames).to(
           eq(['⠁ ⠂ ⠄ ⡀ ⠄ ⠂ ⠁', '⠂ ⠁ ⠂ ⠄ ⡀ ⠄ ⠂', '⠄ ⠂ ⠁ ⠂ ⠄ ⡀ ⠄',
               '⡀ ⠄ ⠂ ⠁ ⠂ ⠄ ⡀', '⠄ ⡀ ⠄ ⠂ ⠁ ⠂ ⠄', '⠂ ⠄ ⡀ ⠄ ⠂ ⠁ ⠂'])
         )
-        Neruda::Config.load_test('throbber' => 'default')
+        Fronde::Config.load_test('throbber' => 'default')
         frames = described_class.send(:select_throbber_frames)
         expect(frames).to(
           eq(['⠁ ⠂ ⠄ ⡀ ⠄ ⠂ ⠁', '⠂ ⠁ ⠂ ⠄ ⡀ ⠄ ⠂', '⠄ ⠂ ⠁ ⠂ ⠄ ⡀ ⠄',
               '⡀ ⠄ ⠂ ⠁ ⠂ ⠄ ⡀', '⠄ ⡀ ⠄ ⠂ ⠁ ⠂ ⠄', '⠂ ⠄ ⡀ ⠄ ⠂ ⠁ ⠂'])
         )
-        Neruda::Config.load_test('throbber' => 'wrong')
+        Fronde::Config.load_test('throbber' => 'wrong')
         frames = described_class.send(:select_throbber_frames)
         expect(frames).to(
           eq(['⠁ ⠂ ⠄ ⡀ ⠄ ⠂ ⠁', '⠂ ⠁ ⠂ ⠄ ⡀ ⠄ ⠂', '⠄ ⠂ ⠁ ⠂ ⠄ ⡀ ⠄',
               '⡀ ⠄ ⠂ ⠁ ⠂ ⠄ ⡀', '⠄ ⡀ ⠄ ⠂ ⠁ ⠂ ⠄', '⠂ ⠄ ⡀ ⠄ ⠂ ⠁ ⠂'])
         )
-        Neruda::Config.load_test('throbber' => 'basic')
+        Fronde::Config.load_test('throbber' => 'basic')
         frames = described_class.send(:select_throbber_frames)
         expect(frames).to eq('-\|/')
       end

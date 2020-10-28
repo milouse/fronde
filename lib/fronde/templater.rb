@@ -2,9 +2,9 @@
 
 require 'nokogiri'
 require 'digest/md5'
-require 'neruda/org_file'
+require 'fronde/org_file'
 
-module Neruda
+module Fronde
   # Insert custom part inside generated HTML files.
   class Templater
     def initialize(source, dom, opts = {})
@@ -14,7 +14,7 @@ module Neruda
       @content = extract_content opts
       @element = @dom.css(opts['selector'])
       digest = Digest::MD5.hexdigest(@content)
-      @check_line = " Neruda Template: #{digest} "
+      @check_line = " Fronde Template: #{digest} "
     end
 
     def apply
@@ -37,12 +37,12 @@ module Neruda
         templates_to_apply = filter_templates(file_name)
         return if templates_to_apply.empty?
         if source.nil?
-          sourcepath = Neruda::OrgFile.source_for_target(file_name)
-          source = Neruda::OrgFile.new(sourcepath)
+          sourcepath = Fronde::OrgFile.source_for_target(file_name)
+          source = Fronde::OrgFile.new(sourcepath)
         end
         dom = open_dom(file_name)
         templates_to_apply.each do |t|
-          tpl = Neruda::Templater.new(source, dom, t)
+          tpl = Fronde::Templater.new(source, dom, t)
           next if tpl.in_head?
           tpl.apply
         end
@@ -52,7 +52,7 @@ module Neruda
       private
 
       def filter_templates(file_name)
-        templates = Neruda::Config.settings['templates']
+        templates = Fronde::Config.settings['templates']
         return [] if templates.nil? || templates.empty?
         templates.filter { |t| check_required_keys(t, file_name) }
       end
@@ -71,7 +71,7 @@ module Neruda
       end
 
       def check_path(file_name, pathes)
-        pub_folder = Neruda::Config.settings['public_folder']
+        pub_folder = Fronde::Config.settings['public_folder']
         if pathes.is_a?(Array)
           pathes.each do |tp|
             return true if File.fnmatch?("#{pub_folder}#{tp}",

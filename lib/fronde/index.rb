@@ -2,22 +2,22 @@
 
 require 'fileutils'
 require 'digest/md5'
-require 'neruda/config'
-require 'neruda/org_file'
-require 'neruda/index/atom_generator'
-require 'neruda/index/org_generator'
+require 'fronde/config'
+require 'fronde/org_file'
+require 'fronde/index/atom_generator'
+require 'fronde/index/org_generator'
 
-module Neruda
+module Fronde
   # Generates website indexes and atom feeds for all the org documents
   #   keywords.
   class Index
     attr_reader :date
 
-    include Neruda::IndexAtomGenerator
-    include Neruda::IndexOrgGenerator
+    include Fronde::IndexAtomGenerator
+    include Fronde::IndexOrgGenerator
 
     def initialize
-      @pubdir = Neruda::Config.settings['public_folder']
+      @pubdir = Fronde::Config.settings['public_folder']
       @index = { 'index' => [] }
       @projects = {}
       @tags_names = {}
@@ -59,7 +59,7 @@ module Neruda
     private
 
     def feed
-      Neruda::Config.sources.each do |project|
+      Fronde::Config.sources.each do |project|
         next unless project['is_blog']
         if project['recursive']
           file_pattern = '**/*.org'
@@ -70,7 +70,7 @@ module Neruda
           org_file = File.join(project['path'], s)
           next if exclude_file?(org_file, project)
           add_to_indexes(
-            Neruda::OrgFile.new(org_file, project: project)
+            Fronde::OrgFile.new(org_file, project: project)
           )
         end
       end
@@ -86,7 +86,7 @@ module Neruda
       @index['index'] << article
       add_to_project_index article
       article.keywords.each do |k|
-        slug = Neruda::OrgFile.slug k
+        slug = Fronde::OrgFile.slug k
         @tags_names[slug] = k # Overwrite is permitted
         @index[slug] ||= []
         @index[slug] << article
@@ -121,7 +121,7 @@ module Neruda
 
     def save?
       return true unless empty?
-      Neruda::Config.sources.each do |project|
+      Fronde::Config.sources.each do |project|
         return true if project['is_blog'] && Dir.exist?(project['path'])
       end
       false

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # rubocop:disable Style/FormatStringToken
-describe Neruda::OrgFile do
+describe Fronde::OrgFile do
   context 'with working org files' do
     it 'parses without date', core: true do
       o = described_class.new('spec/data/test1.org')
@@ -118,11 +118,11 @@ describe Neruda::OrgFile do
   context 'with configuration' do
     after do
       # Reset config
-      Neruda::Config.load_test({})
+      Fronde::Config.load_test({})
     end
 
     it 'respects author name', core: true do
-      Neruda::Config.load_test('author' => 'Test')
+      Fronde::Config.load_test('author' => 'Test')
       o = described_class.new('spec/data/test1.org')
       expect(o.author).to eq('Test')
       o = described_class.new('spec/data/test2.org')
@@ -134,13 +134,13 @@ describe Neruda::OrgFile do
     it 'computes the right html_file path for existing sources', core: true do
       o = described_class.new('spec/data/test1.org')
       expect(o.html_file).to eq('data/test1.html')
-      Neruda::Config.load_test('domain' => 'http://perdu.com')
+      Fronde::Config.load_test('domain' => 'http://perdu.com')
       o = described_class.new('spec/data/test1.org')
       expect(o.html_file).to eq('data/test1.html')
       o = described_class.new('spec/data/content.org')
       expect(o.html_file).to eq('data/content.html')
       # The following are weird tests. We begin to test theoric stuff here
-      Neruda::Config.load_test(
+      Fronde::Config.load_test(
         'domain' => 'http://perdu.com',
         'sources' => [
           { 'path' => 'data' }
@@ -155,13 +155,13 @@ describe Neruda::OrgFile do
     it 'computes the right url for existing sources', core: true do
       o = described_class.new('spec/data/test1.org')
       expect(o.url).to eq('/data/test1.html')
-      Neruda::Config.load_test('domain' => 'http://perdu.com')
+      Fronde::Config.load_test('domain' => 'http://perdu.com')
       o = described_class.new('spec/data/test1.org')
       expect(o.url).to eq('http://perdu.com/data/test1.html')
       o = described_class.new('spec/data/content.org')
       expect(o.url).to eq('http://perdu.com/data/content.html')
       # The following are weird tests. We begin to test theoric stuff here
-      Neruda::Config.load_test(
+      Fronde::Config.load_test(
         'domain' => 'http://perdu.com',
         'sources' => [
           { 'path' => 'data' }
@@ -224,7 +224,7 @@ describe Neruda::OrgFile do
         ['src/blog/test.org', 'src/blog/toto/tata.org',
          'src/blog/toto/content.org', 'writings/notes.org']
       )
-      Neruda::Config.load_test(
+      Fronde::Config.load_test(
         'sources' => [{ 'path' => 'src', 'target' => '.' }, 'writings']
       )
     end
@@ -254,7 +254,7 @@ describe Neruda::OrgFile do
 
     it 'identifies a project for a given file path' do
       ps = described_class.project_for_source('src/test.org')
-      expect(ps).to eq(Neruda::Config.sources[0])
+      expect(ps).to eq(Fronde::Config.sources[0])
       ps = described_class.project_for_source('not/known.org')
       expect(ps).to be(nil)
     end

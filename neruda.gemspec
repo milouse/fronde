@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require './lib/neruda/version'
+require './lib/fronde/version'
 
 Gem::Specification.new do |s|
-  s.name        = 'neruda'
-  s.version     = Neruda::VERSION
+  s.name        = 'fronde'
+  s.version     = Fronde::VERSION
   s.summary     = 'A simplistic way to create an Org static website.'
   s.description = <<~DESC
     An opinionated Org static website generator.
@@ -12,22 +12,24 @@ Gem::Specification.new do |s|
   DESC
   s.authors     = ['Étienne Deparis']
   s.email       = 'etienne@depar.is'
-  s.files       = ['lib/neruda/config.rb',
-                   'lib/neruda/config/lisp_config.rb',
-                   'lib/neruda/config/org-config.el',
-                   'lib/neruda/config/ox-neruda.el',
-                   'lib/neruda/emacs.rb',
-                   'lib/neruda/index.rb',
-                   'lib/neruda/index/atom_generator.rb',
-                   'lib/neruda/index/org_generator.rb',
-                   'lib/neruda/org_file.rb',
-                   'lib/neruda/org_file/class_methods.rb',
-                   'lib/neruda/org_file/extracter.rb',
-                   'lib/neruda/org_file/htmlizer.rb',
-                   'lib/neruda/templater.rb',
-                   'lib/neruda/utils.rb',
-                   'lib/neruda/preview.rb',
-                   'lib/neruda/version.rb',
+  s.files       = ['lib/fronde/cli.rb',
+                   'lib/fronde/cli/commands.rb',
+                   'lib/fronde/config.rb',
+                   'lib/fronde/config/lisp_config.rb',
+                   'lib/fronde/config/org-config.el',
+                   'lib/fronde/config/ox-fronde.el',
+                   'lib/fronde/emacs.rb',
+                   'lib/fronde/index.rb',
+                   'lib/fronde/index/atom_generator.rb',
+                   'lib/fronde/index/org_generator.rb',
+                   'lib/fronde/org_file.rb',
+                   'lib/fronde/org_file/class_methods.rb',
+                   'lib/fronde/org_file/extracter.rb',
+                   'lib/fronde/org_file/htmlizer.rb',
+                   'lib/fronde/templater.rb',
+                   'lib/fronde/utils.rb',
+                   'lib/fronde/preview.rb',
+                   'lib/fronde/version.rb',
                    # Rake tasks
                    'lib/tasks/org.rake',
                    'lib/tasks/site.rake',
@@ -38,8 +40,8 @@ Gem::Specification.new do |s|
                    'locales/fr.yml',
                    # Others
                    'LICENSE']
-  s.executables = ['pablo']
-  s.homepage    = 'https://git.umaneti.net/neruda/about/'
+  s.executables = ['fronde']
+  s.homepage    = 'https://git.umaneti.net/fronde/about/'
   s.license     = 'WTFPL'
 
   s.required_ruby_version = '>= 2.6'
