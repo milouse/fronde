@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'json'
 require 'open-uri'
 require 'neruda/version'
 
@@ -16,17 +17,13 @@ module Neruda
         @org_version = IO.read('tmp/__last_org_version__')
         return @org_version
       end
-      index = URI('https://orgmode.org/index.html').open.read
-      last_ver = index.match(/https:\/\/orgmode\.org\/org-([0-9.]+)\.tar\.gz/)
-      # :nocov:
-      if last_ver.nil?
-        warn 'Org last version not found'
-        return nil
-      end
+      versions = JSON.parse(
+        URI('https://updates.orgmode.org/data/releases').open.read
+      ).sort { |a, b| b['date'] <=> a['date'] }
+      @org_version = versions.first['version']
       FileUtils.mkdir_p 'tmp'
-      IO.write('tmp/__last_org_version__', last_ver[1])
-      # :nocov:
-      @org_version = last_ver[1]
+      IO.write('tmp/__last_org_version__', @org_version)
+      @org_version
     end
 
     # Generate emacs lisp configuration file for Org and write it.
@@ -145,8 +142,6 @@ module Neruda
          #{other_lines.join("\n ")}
          :publishing-directory "#{publish_in}"
          :publishing-function org-html-publish-to-html
-         :section-numbers nil
-         :with-toc nil
          #{opts['org_headers']})
         ("#{project_name}-assets"
          :base-directory "#{opts['path']}"
@@ -178,17 +173,20 @@ module Neruda
     end
 
     def org_default_html_options(project)
-      curtheme = project['theme'] || settings['theme']
-      if curtheme.nil? || curtheme == 'default'
-        return { 'html-head' => '__ATOM_FEED__',
-                 'html-postamble' => org_default_postamble,
-                 'html-head-include-default-style' => 't',
-                 'html-head-include-scripts' => 't' }
-      end
-      { 'html-head' => org_default_html_head,
+      defaults = {
+        'section-numbers' => 'nil',
+        'with-toc' => 'nil',
         'html-postamble' => org_default_postamble,
-        'html-head-include-default-style' => 'nil',
-        'html-head-include-scripts' => 'nil' }
+        'html-head' => '__ATOM_FEED__',
+        'html-head-include-default-style' => 't',
+        'html-head-include-scripts' => 't'
+      }
+      curtheme = project['theme'] || settings['theme']
+      return defaults if curtheme.nil? || curtheme == 'default'
+      defaults['html-head'] = org_default_html_head
+      defaults['html-head-include-default-style'] = 'nil'
+      defaults['html-head-include-scripts'] = 'nil'
+      defaults
     end
 
     def expand_vars_in_html_head(head, project)

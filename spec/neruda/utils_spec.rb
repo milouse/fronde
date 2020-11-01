@@ -11,8 +11,8 @@ describe Neruda::Utils do
       expect(described_class.decorate_option('-l')).to(
         eq(['-lLOCALE', '--lang LOCALE'])
       )
-      expect(described_class.decorate_option('-d')).to(
-        eq(['-d', '--directory'])
+      expect(described_class.decorate_option('-v')).to(
+        eq(['-v', '--verbose'])
       )
     end
 
@@ -27,7 +27,6 @@ describe Neruda::Utils do
     it 'summarizes open commands' do
       basic_cmd = [
         "    -aAUTHOR, --author AUTHOR \n",
-        "    -d, --directory            Wrap the new org file in this named folder.\n",
         "    -h, --help                 Display help for a command and exit.\n",
         "    -lLOCALE, --lang LOCALE   \n",
         "    -pPATH, --path PATH        Path to the new file.\n",

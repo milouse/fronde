@@ -15,26 +15,21 @@ module PabloCommands
   def pablo_init
     cnf = @options.merge
     cnf.delete(:verbose)
-    cnf.delete(:directory)
     cnf.transform_keys!(&:to_s)
     Neruda::Config.save(Neruda::Config.settings.merge(cnf))
     @rake.options.build_all = true
     @rake.invoke_task('org:install')
     return if File.exist? 'src/index.org'
     Neruda::OrgFile.new('src/index.org', @options).write
+    pablo_open 'src/index.org'
   end
   alias_method :pablo_config, :pablo_init
 
-  def pablo_build(file = ARGV[0])
+  def pablo_build
     @rake.options.build_all = true
-    # Update org-config.el, if necessary
-    suffix = ''
-    if !file.nil?
-      suffix = ":one[#{file}]"
-    elsif @options[:force]
-      suffix = '[true]'
-    end
-    @rake.invoke_task("site:build#{suffix}")
+    task = 'site:build'
+    task = "#{task}[true]" if @options[:force]
+    @rake.invoke_task task
   end
 
   def pablo_preview
@@ -55,13 +50,17 @@ module PabloCommands
     @rake.invoke_task('site:preview')
   end
 
-  def pablo_open
-    filename = new_file_name(ARGV[0])
-    FileUtils.mkdir_p File.dirname(filename)
-    o = Neruda::OrgFile.new(filename, @options)
-    o.write unless File.exist? filename
+  def pablo_open(file_path = ARGV[0])
     editor = ENV['EDITOR'] || ENV['VISUAL'] || 'emacs'
-    cmd = [editor, '+6', filename]
+    cmd = [editor]
+    if file_path.nil? || !File.file?(file_path)
+      # file_path may be updated with title given in options
+      file_path = create_new_file(file_path)
+      # Only move to the end of file for new file. Let the editor handle
+      # the best position for already existing files
+      cmd << '+6'
+    end
+    cmd << file_path
     system(*cmd)
   end
   alias_method :pablo_edit, :pablo_open
@@ -86,12 +85,27 @@ module PabloCommands
 
   private
 
-  def new_file_name(title)
-    title ||= @options[:title]
-    title = 'new' if title.nil? || title == ''
-    filename = Neruda::OrgFile.slug title
-    return "#{filename}.org" unless @options[:directory]
-    "#{filename}/index.org"
+  def new_file_name(file_path)
+    file_path = File.expand_path(file_path || '')
+    return file_path if file_path[-4..] == '.org'
+    # file_path seems to be a dir path. Thus we have to create the new
+    # filename from its title
+    title = @options[:title]
+    # No title, nor a reliable file_path? Better abort
+    return nil if title.nil? || title == ''
+    filename = "#{Neruda::OrgFile.slug(title)}.org"
+    File.join file_path, filename
+  end
+
+  def create_new_file(file_path)
+    filename = new_file_name(file_path)
+    if filename.nil?
+      warn R18n.t.pablo.error.no_file
+      exit 1
+    end
+    FileUtils.mkdir_p File.dirname(filename)
+    Neruda::OrgFile.new(filename, @options).write
+    filename
   end
 
   def help_command_body(command)

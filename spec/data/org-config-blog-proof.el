@@ -19,11 +19,11 @@
          :publishing-function org-html-publish-to-html
          :section-numbers nil
          :with-toc nil
+         :html-postamble "<footer>Published by Neruda.</footer>"
          :html-head "<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\"
               href=\"/assets/toto/css/style.css\">
         <link rel=\"stylesheet\" type=\"text/css\" media=\"screen\"
               href=\"/assets/toto/css/htmlize.css\">"
-         :html-postamble "<footer>Published by Neruda.</footer>"
          :html-head-include-default-style nil
          :html-head-include-scripts nil)
         ("org-assets"
@@ -40,13 +40,13 @@
          :publishing-function org-html-publish-to-html
          :section-numbers nil
          :with-toc nil
+         :html-postamble "<footer>Published by Neruda.</footer>"
          :html-head "<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\"
               href=\"/assets/toto/css/style.css\">
         <link rel=\"stylesheet\" type=\"text/css\" media=\"screen\"
               href=\"/assets/toto/css/htmlize.css\">
         <link rel=\"alternate\" type=\"application/atom+xml\" title=\"Atom 1.0\"
               href=\"/feeds/index.xml\" />"
-         :html-postamble "<footer>Published by Neruda.</footer>"
          :html-head-include-default-style nil
          :html-head-include-scripts nil)
         ("news-assets"
@@ -64,11 +64,11 @@
          :publishing-function org-html-publish-to-html
          :section-numbers nil
          :with-toc nil
+         :html-postamble "<footer>Published by Neruda.</footer>"
          :html-head "<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\"
               href=\"/assets/toto/css/style.css\">
         <link rel=\"stylesheet\" type=\"text/css\" media=\"screen\"
               href=\"/assets/toto/css/htmlize.css\">"
-         :html-postamble "<footer>Published by Neruda.</footer>"
          :html-head-include-default-style nil
          :html-head-include-scripts nil)
         ("test-assets"
@@ -85,11 +85,11 @@
          :publishing-function org-html-publish-to-html
          :section-numbers nil
          :with-toc nil
+         :html-postamble "<footer>Published by Neruda.</footer>"
          :html-head "<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\"
               href=\"/assets/toto/css/style.css\">
         <link rel=\"stylesheet\" type=\"text/css\" media=\"screen\"
               href=\"/assets/toto/css/htmlize.css\">"
-         :html-postamble "<footer>Published by Neruda.</footer>"
          :html-head-include-default-style nil
          :html-head-include-scripts nil)
         ("tata-assets"

@@ -11,7 +11,7 @@ module Neruda
       @dom = dom
       @org_file = source
       @position = opts['type'] || 'after'
-      @content = opts['content']
+      @content = extract_content opts
       @element = @dom.css(opts['selector'])
       digest = Digest::MD5.hexdigest(@content)
       @check_line = " Neruda Template: #{digest} "
@@ -54,15 +54,7 @@ module Neruda
       def filter_templates(file_name)
         templates = Neruda::Config.settings['templates']
         return [] if templates.nil? || templates.empty?
-        templates.filter do |t|
-          if !t.has_key?('selector') || !t.has_key?('content')
-            false
-          elsif t.has_key?('path') && !check_path(file_name, t['path'])
-            false
-          else
-            true
-          end
-        end
+        templates.filter { |t| check_required_keys(t, file_name) }
       end
 
       def open_dom(file_name)
@@ -90,6 +82,13 @@ module Neruda
         File.fnmatch?("#{pub_folder}#{pathes}",
                       file_name, File::FNM_DOTMATCH)
       end
+
+      def check_required_keys(opts, file_name)
+        return false unless opts.has_key?('selector')
+        return false unless opts.has_key?('content') || opts.has_key?('source')
+        return check_path(file_name, opts['path']) if opts.has_key?('path')
+        true
+      end
     end
 
     private
@@ -107,6 +106,13 @@ module Neruda
       else
         elem.add_next_sibling content
       end
+    end
+
+    def extract_content(opts)
+      return opts['content'] if opts['content']
+      # If we don't have a content option, then we must have a source
+      # one.
+      @dom.css(opts['source']).unlink.to_s
     end
   end
 end

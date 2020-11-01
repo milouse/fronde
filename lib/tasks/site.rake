@@ -23,7 +23,7 @@ namespace :site do
     Neruda::Config.write_org_lisp_config(with_tags: true)
   end
 
-  desc 'Convert all org files'
+  desc 'Convert and customize all org files'
   task :build, [:force?] => ['org-config.el', :index] do |_, args|
     args.with_defaults(:force? => false)
     build_html = Thread.new do
@@ -45,38 +45,6 @@ namespace :site do
       end
     end
     Neruda::Utils.throbber(customize_html, 'Customizing:')
-  end
-
-  namespace :build do
-    desc 'Convert one org file'
-    task :one, [:source] => ['org-config.el'] do |_, args|
-      if args[:source].nil?
-        warn 'No source file given'
-        next
-      end
-      verbose = Rake::FileUtilsExt.verbose_flag
-      project = Neruda::OrgFile.project_for_source(args[:source])
-      if project.nil?
-        warn "No project found for #{args['source']}"
-        next
-      end
-      build_html = Thread.new do
-        o = Neruda::OrgFile.new(
-          args[:source], project: project, verbose: verbose
-        )
-        Thread.current[:org_file] = o
-        o.publish
-      end
-      begin
-        Neruda::Utils.throbber(build_html, 'Building:')
-      rescue RuntimeError
-        warn 'Aborting'
-        next
-      end
-      target = Neruda::OrgFile.target_for_source(args[:source], project)
-      warn "Customizing file #{target}" if verbose
-      Neruda::Templater.customize_output(target, build_html[:org_file])
-    end
   end
 
   desc 'Start a test server'

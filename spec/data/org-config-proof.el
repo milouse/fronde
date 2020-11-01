@@ -19,8 +19,8 @@
          :publishing-function org-html-publish-to-html
          :section-numbers nil
          :with-toc nil
-         :html-head ""
          :html-postamble "<footer>Published by Neruda.</footer>"
+         :html-head ""
          :html-head-include-default-style t
          :html-head-include-scripts t)
         ("org-assets"
@@ -37,9 +37,9 @@
          :publishing-function org-html-publish-to-html
          :section-numbers nil
          :with-toc nil
+         :html-postamble "<footer>Published by Neruda.</footer>"
          :html-head "<link rel=\"alternate\" type=\"application/atom+xml\" title=\"Atom 1.0\"
               href=\"/feeds/index.xml\" />"
-         :html-postamble "<footer>Published by Neruda.</footer>"
          :html-head-include-default-style t
          :html-head-include-scripts t)
         ("news-assets"
@@ -57,8 +57,8 @@
          :publishing-function org-html-publish-to-html
          :section-numbers nil
          :with-toc nil
-         :html-head ""
          :html-postamble "<footer>Published by Neruda.</footer>"
+         :html-head ""
          :html-head-include-default-style t
          :html-head-include-scripts t)
         ("test-assets"
@@ -75,8 +75,8 @@
          :publishing-function org-html-publish-to-html
          :section-numbers nil
          :with-toc nil
-         :html-head ""
          :html-postamble "<footer>Published by Neruda.</footer>"
+         :html-head ""
          :html-head-include-default-style t
          :html-head-include-scripts t)
         ("tata-assets"
