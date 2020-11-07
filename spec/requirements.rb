@@ -79,8 +79,8 @@ end
 
 def copy_org_tarball_to_fake_tmp
   tarball = File.expand_path('../tmp/org.tar.gz', __dir__)
-  FileUtils.mkdir 'tmp'
-  FileUtils.cp tarball, 'tmp'
+  FileUtils.mkdir_p 'var/tmp'
+  FileUtils.cp tarball, 'var/tmp'
 end
 
 def rake(verbose: false)
@@ -94,10 +94,11 @@ end
 
 RSpec.configure do |config|
   config.before(:suite) do
-    Fronde::Utils.download_org
+    FileUtils.mkdir 'tmp'
+    Fronde::Utils.download_org('tmp')
   end
 
   config.after(:suite) do
-    FileUtils.rm_r 'tmp', force: true
+    FileUtils.rm_r ['tmp', 'var'], force: true
   end
 end

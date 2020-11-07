@@ -91,7 +91,7 @@ INFO is a plist used as a communication channel."
 
 ;;; Set configuration options
 
-(setq fronde/org-temp-dir (expand-file-name "tmp" fronde/current-work-dir)
+(setq fronde/org-temp-dir (expand-file-name "var/tmp" fronde/current-work-dir)
       org-publish-timestamp-directory (expand-file-name "timestamps/" fronde/org-temp-dir)
       org-id-locations-file (expand-file-name "id-locations.el" fronde/org-temp-dir)
       make-backup-files nil

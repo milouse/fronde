@@ -8,13 +8,15 @@ require 'fronde/utils'
 require 'rake/clean'
 
 CLOBBER.push(
-  'tmp/org.tar.gz', 'tmp/__last_org_version__',
-  'org-config.el', '.dir-locals.el', 'htmlize.el'
+  'var/tmp/org.tar.gz', 'var/tmp/last_org_version',
+  'var/lib/org-config.el', '.dir-locals.el', 'lib/htmlize.el'
 )
 
 namespace :org do
+  directory 'var/tmp'
+
   desc 'Download last version of Org'
-  file 'tmp/org.tar.gz' do
+  file 'var/tmp/org.tar.gz' => 'var/tmp' do
     verbose = Rake::FileUtilsExt.verbose_flag
     download = Thread.new do
       Thread.current[:org_version] = Fronde::Config.org_last_version
@@ -29,21 +31,22 @@ namespace :org do
   end
 
   desc 'Compile Org'
-  task compile: 'tmp/org.tar.gz' do |task|
+  task compile: 'var/tmp/org.tar.gz' do |task|
     verbose = Rake::FileUtilsExt.verbose_flag
-    org_version = "org-#{Fronde::Config.org_last_version}"
-    next if Dir.exist?("#{org_version}/lisp")
-    make = ['make', '-C', org_version]
+    org_version = Fronde::Config.org_last_version
+    org_dir = "lib/org-#{org_version}"
+    next if Dir.exist?("#{org_dir}/lisp")
+    make = ['make', '-C', org_dir]
     unless verbose
       make << '-s'
       make << 'EMACSQ="emacs -Q --eval \'(setq inhibit-message t)\'"'
     end
     build = Thread.new do
-      sh "tar xzf #{task.prerequisites[0]}"
+      sh "tar -C lib -xzf #{task.prerequisites[0]}"
       sh((make + ['compile']).join(' '))
       sh((make + ['autoloads']).join(' '))
-      Dir.glob('org-[0-9.]*').each do |ov|
-        next if ov == org_version
+      Dir.glob('lib/org-[0-9.]*').each do |ov|
+        next if ov == org_dir
         rm_r ov
       end
     end
@@ -55,23 +58,25 @@ namespace :org do
     end
   end
 
-  file 'htmlize.el' do
+  directory 'lib'
+
+  file 'lib/htmlize.el' => 'lib' do
     htmlize = URI(
       'https://raw.githubusercontent.com/hniksic/emacs-htmlize/master/htmlize.el'
     ).open.read
-    IO.write 'htmlize.el', htmlize
+    IO.write 'lib/htmlize.el', htmlize
   end
 
-  file 'org-config.el' => 'htmlize.el' do
+  file 'var/lib/org-config.el' => 'lib/htmlize.el' do
     Fronde::Config.write_org_lisp_config
   end
 
-  file '.dir-locals.el' do
+  file '.dir-locals.el' => 'var/lib/org-config.el' do
     Fronde::Config.write_dir_locals
   end
 
   desc 'Install Org'
-  multitask install: ['org:compile', 'org-config.el', '.dir-locals.el'] do
+  multitask install: ['org:compile', '.dir-locals.el'] do
     mkdir_p "#{Fronde::Config.settings['public_folder']}/assets"
     Fronde::Config.sources.each do |s|
       mkdir_p s['path'] unless Dir.exist? s['path']

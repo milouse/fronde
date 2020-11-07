@@ -13,16 +13,16 @@ module Fronde
     # @return [String] the new x.x.x version string of Org
     def org_last_version
       return @org_version if @org_version
-      if File.exist?('tmp/__last_org_version__')
-        @org_version = IO.read('tmp/__last_org_version__')
+      if File.exist?('var/tmp/last_org_version')
+        @org_version = IO.read('var/tmp/last_org_version')
         return @org_version
       end
       versions = JSON.parse(
         URI('https://updates.orgmode.org/data/releases').open.read
       ).sort { |a, b| b['date'] <=> a['date'] }
       @org_version = versions.first['version']
-      FileUtils.mkdir_p 'tmp'
-      IO.write('tmp/__last_org_version__', @org_version)
+      FileUtils.mkdir_p 'var/tmp'
+      IO.write('var/tmp/last_org_version', @org_version)
       @org_version
     end
 
@@ -48,7 +48,8 @@ module Fronde
                   .gsub('__LONG_DATE_FMT__', r18n_full_datetime_format)
                   .gsub('__AUTHOR_EMAIL__', settings['author_email'] || '')
                   .gsub('__AUTHOR_NAME__', settings['author'])
-      IO.write("#{workdir}/org-config.el", content)
+      FileUtils.mkdir_p "#{workdir}/var/lib"
+      IO.write("#{workdir}/var/lib/org-config.el", content)
     end
 
     # Generate emacs directory variables file.
@@ -61,10 +62,12 @@ module Fronde
     #   underlying ~IO.write~ method call)
     def write_dir_locals
       workdir = Dir.pwd
+      # rubocop:disable Layout/LineLength
       IO.write(
         "#{workdir}/.dir-locals.el",
-        "((org-mode . ((eval . (load-file \"#{workdir}/org-config.el\")))))"
+        "((org-mode . ((eval . (load-file \"#{workdir}/var/lib/org-config.el\")))))"
       )
+      # rubocop:enable Layout/LineLength
     end
 
     private

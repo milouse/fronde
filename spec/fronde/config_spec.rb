@@ -330,13 +330,13 @@ describe Fronde::Config do
 
   context 'with config utils method' do
     after do
-      FileUtils.rm 'tmp/__last_org_version__', force: true
+      FileUtils.rm 'var/tmp/last_org_version', force: true
       described_class.class_eval '@org_version = nil', __FILE__, __LINE__
     end
 
     it 'gives current org version' do
       described_class.class_eval '@org_version = nil', __FILE__, __LINE__
-      IO.write('tmp/__last_org_version__', 'test')
+      IO.write('var/tmp/last_org_version', 'test')
       expect(described_class.org_last_version).to eq('test')
     end
   end

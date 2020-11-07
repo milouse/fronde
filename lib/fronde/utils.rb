@@ -160,15 +160,16 @@ module Fronde
 
       # Download latest org-mode tarball.
       #
+      # @param destination [String] where to save the org-mode tarball
       # @return [String] the downloaded org-mode version
-      def download_org
+      def download_org(destination = 'var/tmp')
         # :nocov:
         return if Fronde::Config.org_last_version.nil?
         # :nocov:
         tarball = "org-#{Fronde::Config.org_last_version}.tar.gz"
         # Remove version number in dest file to allow easy rake file
         # task naming
-        dest_file = 'tmp/org.tar.gz'
+        dest_file = File.expand_path('org.tar.gz', destination)
         return if File.exist?(dest_file)
         uri = URI("https://orgmode.org/#{tarball}")
         # Will crash on purpose if anything goes wrong

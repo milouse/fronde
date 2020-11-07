@@ -12,7 +12,7 @@ module Fronde
 
     def publish
       command = emacs_command(
-        '-l ./org-config.el', '--eval \'(org-publish "website")\''
+        '-l ./var/lib/org-config.el', '--eval \'(org-publish "website")\''
       )
       if @verbose
         warn command

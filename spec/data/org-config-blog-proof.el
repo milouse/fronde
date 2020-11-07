@@ -1,7 +1,7 @@
 ;; Add org-mode to load path
-(add-to-list 'load-path (expand-file-name "org-__ORG_VERSION__/lisp" "__TEST_DIR__"))
+(add-to-list 'load-path (expand-file-name "org-__ORG_VERSION__/lisp" "__TEST_DIR__/lib"))
 ;; Load last version of htmlize.el
-(load-file (expand-file-name "htmlize.el" "__TEST_DIR__"))
+(load-file (expand-file-name "htmlize.el" "__TEST_DIR__/lib"))
 
 ;; Current project options
 (setq fronde/version "__VERSION__"

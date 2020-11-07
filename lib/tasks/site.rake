@@ -24,10 +24,10 @@ namespace :site do
   end
 
   desc 'Convert and customize all org files'
-  task :build, [:force?] => ['org-config.el', :index] do |_, args|
+  task :build, [:force?] => ['var/lib/org-config.el', :index] do |_, args|
     args.with_defaults(:force? => false)
     build_html = Thread.new do
-      rm_r 'tmp/timestamps', force: true if args[:force?]
+      rm_r 'var/tmp/timestamps', force: true if args[:force?]
       Fronde::Emacs.new(verbose: Rake::FileUtilsExt.verbose_flag).publish
     end
     begin
