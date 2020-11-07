@@ -29,7 +29,6 @@ describe Fronde::Utils do
         "    -aAUTHOR, --author AUTHOR \n",
         "    -h, --help                 Display help for a command and exit.\n",
         "    -lLOCALE, --lang LOCALE   \n",
-        "    -pPATH, --path PATH        Path to the new file.\n",
         "    -tTITLE, --title TITLE    \n",
         '    -v, --verbose             '
       ].join

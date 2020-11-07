@@ -29,7 +29,6 @@ module Fronde
       '-f' => { long: 'force', boolean: true },
       '-h' => { long: 'help', boolean: true, meth: :on_tail },
       '-l' => { long: 'lang', keyword: 'LOCALE' },
-      '-p' => { long: 'path' },
       '-t' => { long: 'title' },
       '-v' => { long: 'verbose', boolean: true, meth: :on_tail },
       '-V' => { long: 'version', boolean: true, meth: :on_tail }
@@ -41,7 +40,7 @@ module Fronde
       'init' => { opts: ['-a', '-h', '-l', '-t', '-v'] },
       'config' => { alias: 'init' },
       'preview' => { opts: ['-h'] },
-      'open' => { opts: ['-a', '-h', '-l', '-p', '-t', '-v'] },
+      'open' => { opts: ['-a', '-h', '-l', '-t', '-v'] },
       'edit' => { alias: 'open' },
       'build' => { opts: ['-f', '-h'] },
       'publish' => { opts: ['-h'] },

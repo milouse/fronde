@@ -13,7 +13,6 @@ fronde:
       help: Alias pour l'argument -h.
     options:
       cmd_title: Options
-      path: Chemin vers le nouveau fichier.
       directory: Place le nouveau fichier org dans un dossier à ce nom.
       help: Affiche l'aide pour une commande et quitte.
       version: Affiche la version de Fronde et quitte.

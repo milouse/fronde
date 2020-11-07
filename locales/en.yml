@@ -13,7 +13,6 @@ fronde:
       help: Alias for the -h switch.
     options:
       cmd_title: Options
-      path: Path to the new file.
       directory: Wrap the new org file in this named folder.
       help: Display help for a command and exit.
       version: Display Fronde version and exit.
