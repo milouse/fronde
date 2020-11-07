@@ -147,6 +147,34 @@ describe Fronde::Config do
       expect(headers).to eq(head)
     end
 
+    it 'exposes correct head header with boolean values in conf' do
+      IO.write('config.yml', SAMPLE_CONFIG_3)
+      described_class.send(:load_settings)
+      old_conf = described_class.settings.dup
+      old_conf['sources'][0] = {
+        'path' => 'src',
+        'org-html' => {
+          'html-head-include-default-style' => true,
+          'html-head-include-scripts' => false
+        }
+      }
+      described_class.load_test(old_conf)
+      projects = described_class.sources
+      headers = described_class.send(:build_project_org_headers, projects[0])
+      head = <<~HEAD.strip
+        :section-numbers nil
+         :with-toc nil
+         :html-postamble "<p><span class=\\\"author\\\">Written by %a</span>
+        with %c, and published with %N</p>
+        <p class=\\\"date\\\">Last modification on %C</p>
+        <p class=\\\"validation\\\">%v</p>"
+         :html-head ""
+         :html-head-include-default-style t
+         :html-head-include-scripts nil
+      HEAD
+      expect(headers).to eq(head)
+    end
+
     it 'exposes correct head header with custom domain' do
       IO.write('config.yml', SAMPLE_CONFIG_4)
       described_class.send(:load_settings)

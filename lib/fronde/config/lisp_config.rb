@@ -202,16 +202,22 @@ module Fronde
       head.gsub('__ATOM_FEED__', atomfeed)
     end
 
+    def cast_lisp_value(value)
+      return 't' if value.is_a?(TrueClass)
+      return 'nil' if value.nil? || value.is_a?(FalseClass)
+      value.strip.gsub(/"/, '\"')
+    end
+
     def build_project_org_headers(project)
       orgtplopts = org_default_html_options(project).merge(
         settings['org-html'] || {}, project['org-html'] || {}
       )
       orgtpl = []
-      truthy_val = ['t', 'nil', '1'].freeze
+      lisp_keywords = ['t', 'nil', '1', '-1', '0'].freeze
       orgtplopts.each do |k, v|
         v = expand_vars_in_html_head(v, project) if k == 'html-head'
-        val = v.strip.gsub(/"/, '\"')
-        if truthy_val.include? val
+        val = cast_lisp_value(v)
+        if lisp_keywords.include? val
           orgtpl << ":#{k} #{val}"
         else
           orgtpl << ":#{k} \"#{val}\""
