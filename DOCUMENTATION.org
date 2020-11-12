@@ -84,12 +84,12 @@ We are already aware of some limitations we would like to leverage.
 Themes should be able to declare a set of default ~templates~ or
 specific Org export options
 
-**** TODO Improve this documentation
-**** TODO Create a theme portfolio
 **** TODO Better protect upgrade
-
 For example, Rakefile should only be overwritten after upgrade of the
 gem.
+
+**** TODO Improve this documentation
+**** TODO Create a themes portfolio
 
 ** Source code
 
