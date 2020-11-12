@@ -199,6 +199,8 @@ module Fronde
     # This method expects to find percent-tags in the given ~string~ and
     # replace them by their corresponding value.
     #
+    # It reuses the same tags than the ~org-html-format-spec~ method.
+    #
     # *** Format:
     #
     # - %a :: the raw author name
