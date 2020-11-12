@@ -1,7 +1,6 @@
 .byebug_history
-.ignore
 .ruby-*
-neruda-*.gem
+fronde-*.gem
 doc
 coverage
 .yardoc

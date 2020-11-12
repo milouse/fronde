@@ -29,7 +29,7 @@ Metrics/BlockLength:
   Exclude:
   - spec/**/*
   - lib/tasks/*
-  - neruda.gemspec
+  - fronde.gemspec
 
 Metrics/MethodLength:
   Max: 15
@@ -37,8 +37,8 @@ Metrics/MethodLength:
 Metrics/ModuleLength:
   Max: 120
   Exclude:
-  - lib/neruda/config/lisp_config.rb
-  - lib/neruda/utils.rb
+  - lib/fronde/config/lisp_config.rb
+  - lib/fronde/utils.rb
 
 Metrics/PerceivedComplexity:
   Max: 10
