@@ -109,9 +109,6 @@ module Fronde
     # @option opts [String] title ('') the title of the new Org file
     # @option opts [String] author (system user or '') the author of the
     #   document
-    # @option opts [Boolean] verbose (false) if the
-    #   {Fronde::OrgFileHtmlizer#publish publish} method should output
-    #   emacs process messages
     # @option opts [String] project the project owning this file
     #   must be stored
     # @return [Fronde::OrgFile] the new instance of Fronde::OrgFile
