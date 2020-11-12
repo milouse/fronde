@@ -8,6 +8,7 @@ module Fronde
   class CLI
     def initialize(opts = {})
       @options = { verbose: false }.merge(opts)
+      init_required_files
       init_rake
     end
 
@@ -15,8 +16,12 @@ module Fronde
 
     private
 
-    def init_rake
+    def init_required_files
       init_rakefile unless File.exist?('Rakefile')
+      init_gitignore unless File.exist?('.gitignore')
+    end
+
+    def init_rake
       @rake = Rake.application
       Rake.verbose(false) unless @options[:verbose]
       @rake.raw_load_rakefile
@@ -39,6 +44,17 @@ module Fronde
         task default: 'site:build'
       RAKE
       IO.write 'Rakefile', rakefile
+    end
+
+    def init_gitignore
+      gitignore = <<~GITIGNORE
+        .dir-locals.el
+        Rakefile
+        lib
+        public_html
+        var
+      GITIGNORE
+      IO.write '.gitignore', gitignore
     end
   end
 end
