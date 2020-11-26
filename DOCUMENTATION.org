@@ -9,8 +9,8 @@
 ** Summary
 
 *Fronde* is a static website generator for [[https://orgmode.org][Org]], written in Ruby and
-Emacs Lisp (elisp). It lets you contentrate about your writings, and
-manage all the needed steps to build and publish your Website.
+Emacs Lisp (elisp). It enables you to concentrate on your writing, and
+manage all the needed steps to build and publish your website.
 
 You can refer to the [[./README.org][read me file]] for a quick list of the main features.
 
@@ -22,18 +22,19 @@ be capitalized when used as the first word of a sentence. But when it is
 written as ~fronde~, it will always refer to the provided program you
 can call in your terminal.
 
-This document uses the short name Emacs to always refer to the [[https://www.gnu.org/software/emacs/][GNU Emacs]]
+This document uses the short name Emacs to refer to the [[https://www.gnu.org/software/emacs/][GNU Emacs]]
 editor or capabilities.
 
 ** Frequently Asked Questions
 *** Why do you think we need another static website generator?
 
-The most known of them lacks of (good) support for Org as source
-format. The second main reason I wrote this, instead of dealing with a
-pure Org publish config was my need to easily amend the generated
-HTML. I’m not an elisp expert and I would like to have some generic
-solution for all the tiny website I’m maintaining. To be short, the main
-feature of this project is surely its [[#templates_setting][templates support]].
+My main reason to write fronde was to provide (good) support for Org as a source
+format. Such support is something the best known static website generators
+lack. The second main reason I wrote this, instead of dealing with a pure Org
+publish config, was my need to easily amend the generated HTML. I’m not an elisp
+expert and I would like to have some generic solution for all the tiny websites
+I’m maintaining. In short, the main feature of this project is surely its
+[[#templates_setting][templates support]].
 
 *** Where does this name come from?
 
@@ -42,7 +43,7 @@ tribute to the french newspaper « La Fronde », created by [[https://en.wik
 Durand]] in France in 1897. This was the first all-women written and
 edited newspaper in the world. Marguerite Durand said about it in one of
 her editorial[fn:durand1902] that her newspaper was « comme les autres
-journaux… pas plus amusant » (what may be translated by “just like other
+journaux… pas plus amusant » (which may be translated as “just like other
 newspapers… as boring”).
 
 [fn:durand1902] Marguerite Durand. « En cinq ans ». La Fronde,
@@ -57,28 +58,28 @@ Web.
 
 *** Opinionated you say?
 
-Fronde is built with some strong opinion about what should be a static
-website generator, and more specifically, what should it be for Org.
+Fronde is built with some strong opinion about what a static
+website generator should be, and more specifically, what should it be for Org.
 
-- Org is a powerfull tool, which allows you to publish your writings in
-  a wide range of format. Its markup is easy to learn and as readable
-  and as convenient as Markdown. That's why fronde will never support
+- Org is a powerful tool that enables you to publish your writings in
+  a wide range of formats. Its markup is easy to learn and as readable
+  and as convenient as Markdown's. That's why fronde will never support
   any other markup language.
 - However Org HTML export should be more easily expandable. That’s why
   fronde gives you the [[#templates_setting][templates feature]] and introduces [[#formatting_tags][new formatting
   tags]] for the preamble and postamble sections.
 - Org writers should already be Emacs users, that’s why fronde will
-  directly call Emacs to convert your Org files to html. There is no
+  directly call Emacs to convert your Org files to HTML. There is no
   need to use Pandoc or org-ruby if you already have Emacs.
-- You may want to author a wide variety of things, and manage all these
+- You may want to author a wide variety of things, and managing all these
   projects inside your Emacs configuration may be a nightmare. You also
   may want to apply different settings for different projects. That’s
-  why fronde is totally independent from your Emacs settings and let’s
-  you organize your projects as you wish.
+  why fronde is totally independent from your Emacs settings and enables
+  you to organize your projects as you wish.
 
 *** What will come next?
 
-We are already aware of some limitations we would like to leverage.
+We are already aware of some limitations we would like to remove:
 
 **** TODO Allow theme to provide configuration options
 Themes should be able to declare a set of default ~templates~ or
@@ -109,7 +110,7 @@ system. You can check it too with the following command: ~gem -v~.
 
 *** Install ruby with your system package manager
 
-See the [[https://www.ruby-lang.org/en/downloads/][official ruby lang website]] to know more about options to install
+See the [[https://www.ruby-lang.org/en/downloads/][official ruby lang website]] to find out about options when installing
 a ruby environment on your system.
 
 Some operating systems already package the right ruby version to use:
@@ -143,9 +144,9 @@ OpenMandriva, thus it should not be a problem for you to install it.
 
 [[https://rvm.io][RVM]] allows you to install different ruby versions on the same
 machine. It could be interesting when you are already a ruby
-developper.
+developer.
 
-We recommand you to use a dedicated gemset for fronde, to avoid
+We recommend that you use a dedicated gemset for fronde, to avoid
 polluting your other projects.
 
 #+caption: Ruby installation procedure with RVM
@@ -168,7 +169,7 @@ it as any other gem:
 
 You may also want to install a development version of fronde, directly
 from its source code repository. We won’t describe this procedure in
-details as it should only be used by developpers or advanced users. But
+detail as it should only be used by developers or advanced users. But
 still, here are the commands you can used to build fronde from the
 sources.
 
@@ -196,7 +197,7 @@ A fronde project is essentially just a folder containing the
 configuration of your website and a subfolder containing the org files
 to publish. fronde requires a local installation of org-mode to work,
 and will generate various configuration files you are not expected to
-modify. To setup all these things, you must use the ~fronde init~
+modify. To set up all these things, you must use the ~fronde init~
 command.
 
 Thus, to create a new fronde website, you must create an empty folder
@@ -258,13 +259,13 @@ have a bunch of them, you can use them without any changes.
 By default, without any other configuration options, the website pages
 must be stored in a folder named ~src~ at the root of your
 project. However you can configure any other [[#sources_setting][sources folder]] you want,
-even one, which is not in your project directory.
+even one that is not in your project directory.
 
-In parallel of your regular Org workflow, fronde provides a little
+In parallel to your regular Org workflow, fronde provides 
 command to help you create or edit pages for your website: the ~fronde
 open~ command.
 
-The most simple use case is just to call it with a file path and it will
+The most simple use case is to call ~fronde open~ with a file path and it will
 open that file in your default ~EDITOR~ (which should be Emacs).
 
 #+caption: Open a page with the fronde open command
@@ -280,7 +281,7 @@ When creating a new page, this command accepts the following arguments:
 
 If you use the ~--title~ argument, instead of giving a full file path
 argument, you can just give the folder path where you want to save the
-new file, and the command will create the document with a Web-ready
+new file, and the command will create the document with a web-ready
 name.
 
 #+caption: Creation of a new page with the title argument
@@ -304,7 +305,7 @@ And now ~src/my-new-page-s-shiny-isn-t-it.org~ contains:
 ** Building the website
 
 Once you have written some content, you can convert your org files to
-html with the ~fronde build~ command.
+HTML with the ~fronde build~ command.
 
 #+caption: Build a fronde project
 #+begin_src shell
@@ -312,8 +313,8 @@ html with the ~fronde build~ command.
 #+end_src
 
 #+begin_tip
-As this building process makes a direct use of the org-mode publishing
-feature, it will only rebuild changed files since the last command
+Because this building process makes a direct use of the org-mode publishing
+feature, it will rebuild only files changed since the last command
 invocation. If you want to force a full rebuild, you can pass the
 ~--force~ arguments to the command.
 
@@ -338,10 +339,10 @@ the home page of your project.
 ** Config File
 
 All the fronde configuration is stored in one [[https://en.wikipedia.org/wiki/YAML][YAML]] file named
-~config.yml~ and stored at the root of your project. If none exists, a
+~config.yml~ and stored at the root of your project. If the file does not exist a
 default one will be created the first time you run any ~fronde~ command.
 
-The following document explains all possible configuration options for
+The following explains all possible configuration options for
 fronde, which may be put in file named ~config.yml~ at the root of your
 static website project. The options are listed in alphabetical
 order. However, they can be put in any order in the ~config.yml~ file.
@@ -377,15 +378,15 @@ hosted. This value is used to generate absolute path to your files on
 your expected host name (for example in the Atom feeds).
 
 #+begin_caution
-Its value is expected to *not* end by a slash. That is to say
-~https://example.com~ is a *valid* value, while ~https://example.com/~
-is not.
+Its value is expected to *not* end with a slash. That is to say
+~https://example.com~ is *valid*, whereas ~https://example.com/~
+is valid.
 #+end_caution
 
 By default, your static website is expected to be hosted at the root of
 your domain name (like ~https://example.com/index.html~). If it is not
-the case and your fronde static website is hosted in a sub directory of
-your main website, you must add this sub folder to the ~domain~
+the case and your fronde static website is hosted in a subfolder of
+your main website, you must add this subfolder to the ~domain~
 value. Thus, ~https://example.com/example~ or
 ~https://example.com/complex/example~ are *valid* values too.
 
@@ -431,11 +432,11 @@ project).
 
 The ~remote~ option contains an /rsync/ like destination string, which
 will be used to published your website when using the ~sync:push~ /rake/
-task. For exemple ~user@domain:/var/www/mywebsite/~
+task. For example ~user@domain:/var/www/mywebsite/~
 
 #+begin_note
 There is no default value for ~remote~. Publication of your website will
-just be skipped.
+be skipped if there is no value for ~remote~.
 #+end_note
 
 *** ~title~
@@ -448,12 +449,12 @@ value is used when you create a new file with the ~fronde~ command.
 
 #+begin_warning
 *This setting is not used by the regular org mode publishing process*.
-You must ensure that your org files contains an ~#+title:~ metadata
+You must ensure that your org files contain a ~#+title:~ metadata
 field before publishing them.
 #+end_warning
 
 This value is also used in the generation of the blog index page and the
-main atom feed as website title.
+main atom feed as the website title.
 
 *** ~sources~
 :PROPERTIES:
@@ -461,7 +462,7 @@ main atom feed as website title.
 :END:
 
 The ~sources~ option stores an array of all source folders, where your
-org files to be published are. This allow you to gather various
+org files to be published are. This enables you to gather from various
 different places (even at some absolute path in your computer) in your
 website.
 
@@ -470,14 +471,14 @@ following keys:
 
 - path :: [string] path to the folder containing the file to exports
 - name :: [string, optional] key used to generate the [[https://orgmode.org/org.html#Project-alist][Org “project”
-  name]]. This name never appear in a generated file, it is more like an
+  name]]. This name never appears in a generated file, it is more like an
   internal id. Defaults to the last dirname of the path value.
-- recursive :: [boolean, optional] wether the path should be exported
+- recursive :: [boolean, optional] whether the path should be exported
   recursively. Defaults to True
 - exclude :: [string, optional] Regexp of files to not export for this
   source. Default to nothing (no files to exclude).
 - target :: [string, optional] Path where to put the exported files,
-  relative to the ~public_folder~ folder. Default to the source name at
+  relative to the ~public_folder~ folder. Defaults to the source name at
   the root of the ~public_folder~ folder.
 - is_blog :: [boolean, optional] Whether this source should be
   considered as a blog and thus, serves to generate blog index, tags
@@ -486,7 +487,7 @@ following keys:
   source. Defaults to “default”.
 
 #+begin_tip
-If one of your source is expected to use all default settings, instead
+If one of your sources is expected to use all default settings, instead
 of an object, you can just provide the source path as a string. Look at
 the ~src~ source in the example bellow.
 #+end_tip
@@ -526,13 +527,13 @@ following exact value:
 
 In the first case, as nothing as been given for the ~sources~ option,
 its default value will use ~.~ as its target directory, which means to
-put generated html files directly at the root of the ~public_folder~
+put generated HTML files directly at the root of the ~public_folder~
 (which defaults to ~public_html~). But in the later case, the generated
-target will be the ~src~ folder /inside/ the ~public_folder~, what will
+target will be the ~src~ folder /inside/ the ~public_folder~, which will
 be, by default, ~public_html/src~.
 
 Thus, if you have a very simple website with only one source, you should
-avoid to set the ~sources~ options, or be very precise in what you want.
+avoid setting the ~sources~ options, or be very precise in what you specify.
 #+end_warning
 
 *** ~templates~
@@ -540,11 +541,11 @@ avoid to set the ~sources~ options, or be very precise in what you want.
 :CUSTOM_ID: templates_setting
 :END:
 
-The ~templates~ option let’s you customized the built html files,
-whatever source they come from. The main idea behind it, is to add
+The ~templates~ option enables you to customize the built HTML files,
+whatever source they come from. The main idea behind this is to add
 HTML fragments to the generated files.
 
-The ~templates~ option stores an array of /template/, each of one
+The ~templates~ option stores an array of /template/, each one
 documenting an HTML fragment to insert or move at some place in a
 specified generated file. Each template listed in that array is an
 object, which must use the following keys:
@@ -554,14 +555,14 @@ object, which must use the following keys:
   defaults to ~after~.
 - content :: [string] the HTML fragment to insert or replace. This value
   will be evaluated before insertion and some tags will be replaced in a
-  context sensitive maneer. See the [[#formatting_tags][Preamble/Postamble/Templates
+  context sensitive manner. See the [[#formatting_tags][Preamble/Postamble/Templates
   formatting tags]] section for the details.
-- selector :: [string] a CSS selector specififying where the new
-  fragment should be inserted. For exemple, if this value is ~#main
+- selector :: [string] a CSS selector specifying where to insert the new
+  fragment. For example, if this value is ~#main
   p:first-child~ and the current template ~type~ is ~after~, then the
   current ~content~ will be placed /after/ the first HTML tag ~p~ inside
-  a container, which ~id~ is ~main~.
-- path :: [string, optional] the current template will only apply on
+  a container, which has an ~id~ of ~main~.
+- path :: [string, optional] the current template will apply only to
   generated HTML files matching this glob pattern. This pattern must
   match against a published path. That means, for a HTML document stored
   at ~public_html/some/folder/doc.html~, the path could be
@@ -605,10 +606,10 @@ any generated HTML file:
       <meta property="og:site_name" content="My wonderfull website">
 #+end_src
 
-Here is another example, if you want, for example, move the generated
+Another example: if you want, for example, to move the generated
 Org table of content before the main ~#content~ div (by default, the Org
-publish process put it /inside/ this div). As we specified a ~path~
-option, this replacment will only occur for HTML document under the
+publish process puts it /inside/ this div). As we specified a ~path~
+option, this replacement occurs only for HTML documents under the
 ~/docs~ folder.
 
 #+caption: Templates setting to move the table of content outside the #content div
@@ -627,8 +628,8 @@ option, this replacment will only occur for HTML document under the
 This section documents the percent-tags you can use in the preamble or
 postamble of your [[#sources_setting][sources]], or in any of your [[#templates_setting][templates]]. This tags will
 be replaced by their corresponding content when you will build your
-website. Their value is context sensitive: it will take a value from the
-currently evaluated Org file, or by default the config of your project.
+website. The values are context sensitive, taken from the
+currently evaluated Org file, or by default from the config of your project.
 
 - %a :: the raw author name of the current Org file, or the one given in
         the config file.
@@ -639,12 +640,12 @@ currently evaluated Org file, or by default the config of your project.
 - %D :: the full date and time HTML representation.
 - %i :: the raw short date and time.
 - %I :: the raw rfc3339 date and time.
-- %k :: the current Org file keywords separated by a comma.
+- %k :: the current Org file keywords separated by commas.
 - %K :: the HTML list rendering of the keywords.
 - %l :: the lang of the document, or the one given in the config file.
 - %L :: the license information, taken from the config file.
-- %n :: the Fronde name and version.
-- %N :: the Fronde name and version with a link to the project
+- %n :: the fronde name and version.
+- %N :: the fronde name and version with a link to the project
         home.
 - %s :: the subtitle of the current Org file (from ~#+subtitle:~).
 - %t :: the title of the current Org file (from ~#+title:~).
