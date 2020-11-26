@@ -20,8 +20,8 @@ fronde:
       no_command: 'ERROR: no command or unknown command given.'
       no_file: 'ERROR: no file to open or edit.'
   error:
-    label: An error occured.
-    explanation: To see it, run again your command with more verbosity, i.e. fronde build -v
+    label: An error occurred.
+    explanation: To see the error, run your command again with more verbosity, for example, fronde build -v
   index:
     unsorted: Unsorted
     published_on: Published on %1
