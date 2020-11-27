@@ -553,7 +553,9 @@ object, which must use the following keys:
 - type :: [string] how the template should be inserted or moved in the
   HTML document. Can be either ~before~, ~after~ or ~replace~. It
   defaults to ~after~.
-- content :: [string] the HTML fragment to insert or replace. This value
+- content :: [string] this option is incompatible with the
+  ~content~: either you have a ~content~ or a ~source~, never both of
+  them. ~content~ is an HTML fragment to insert or replace. This value
   will be evaluated before insertion and some tags will be replaced in a
   context sensitive manner. See the [[#formatting_tags][Preamble/Postamble/Templates
   formatting tags]] section for the details.
