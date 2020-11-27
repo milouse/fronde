@@ -367,8 +367,8 @@ atom feed.
 #+end_src
 
 #+begin_note
-The default ~author~ setting is inferred from your user name on your
-current computer system session.
+The default ~author~ setting is your user name on your
+current computer session.
 #+end_note
 
 *** ~domain~
@@ -415,7 +415,7 @@ with the [[https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes][ISO 639-1]] st
 #+end_src
 
 #+begin_note
-The default ~lang~ setting is inferred from your current system one.
+The default ~lang~ setting is that of your current computer.
 #+end_note
 
 *** ~public_folder~
