@@ -122,9 +122,29 @@ module Fronde
     #   the ~sources~ key)
     # @return [String] the full path to the target dir of this project
     def publication_path(project)
-      publish_in = [Dir.pwd, settings['public_folder']]
+      publish_in = [Dir.pwd]
+      if project['type'] == 'gemini'
+        publish_in << (settings['gemini_public_folder'] || 'public_gmi')
+      else
+        publish_in << settings['public_folder']
+      end
       publish_in << project['target'] unless project['target'] == '.'
       publish_in.join('/')
+    end
+
+    # Return the publication function needed for a given project
+    #   configuration.
+    #
+    # @param project [Hash] a project configuration (as extracted from
+    #   the ~sources~ key)
+    # @return [String] the org publication function name
+    def publication_function(project)
+      case project['type']
+      when 'gemini'
+        'org-gmi-publish-to-gemini'
+      else
+        'org-html-publish-to-html'
+      end
     end
 
     def org_project(project_name, opts)
@@ -144,7 +164,7 @@ module Fronde
          :base-extension "org"
          #{other_lines.join("\n ")}
          :publishing-directory "#{publish_in}"
-         :publishing-function org-html-publish-to-html
+         :publishing-function #{publication_function(opts)}
          #{opts['org_headers']})
         ("#{project_name}-assets"
          :base-directory "#{opts['path']}"
@@ -177,8 +197,6 @@ module Fronde
 
     def org_default_html_options(project)
       defaults = {
-        'section-numbers' => 'nil',
-        'with-toc' => 'nil',
         'html-postamble' => org_default_postamble,
         'html-head' => '__ATOM_FEED__',
         'html-head-include-default-style' => 't',
@@ -190,6 +208,21 @@ module Fronde
       defaults['html-head-include-default-style'] = 'nil'
       defaults['html-head-include-scripts'] = 'nil'
       defaults
+    end
+
+    def org_publish_options(project)
+      defaults = {
+        'section-numbers' => 'nil',
+        'with-toc' => 'nil'
+      }
+      unless project['type'] == 'gemini'
+        defaults.merge!(
+          org_default_html_options(project),
+          settings['org-html'] || {},
+          project['org-html'] || {}
+        )
+      end
+      defaults.merge(project['org-options'] || {})
     end
 
     def expand_vars_in_html_head(head, project)
@@ -212,9 +245,7 @@ module Fronde
     end
 
     def build_project_org_headers(project)
-      orgtplopts = org_default_html_options(project).merge(
-        settings['org-html'] || {}, project['org-html'] || {}
-      )
+      orgtplopts = org_publish_options(project)
       orgtpl = []
       lisp_keywords = ['t', 'nil', '1', '-1', '0'].freeze
       orgtplopts.each do |k, v|

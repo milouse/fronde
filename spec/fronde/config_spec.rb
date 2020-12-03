@@ -212,6 +212,21 @@ describe Fronde::Config do
       expect(headers).to eq(head)
     end
 
+    it 'exposes correct head header for gemini projects' do
+      IO.write('config.yml', SAMPLE_CONFIG_3)
+      described_class.send(:load_settings)
+      old_conf = described_class.settings.dup
+      old_conf['sources'][0] = { 'path' => 'src', 'type' => 'gemini' }
+      described_class.load_test(old_conf)
+      projects = described_class.sources
+      headers = described_class.send(:build_project_org_headers, projects[0])
+      head = <<~HEAD.strip
+        :section-numbers nil
+         :with-toc nil
+      HEAD
+      expect(headers).to eq(head)
+    end
+
     it 'generates projects' do
       IO.write('config.yml', SAMPLE_CONFIG_4)
       described_class.send(:load_settings)
@@ -279,6 +294,34 @@ describe Fronde::Config do
       expect(projects).to have_key('news')
       expect(projects['src']).to eq(srcconf)
       expect(projects['news']).to eq(blogconf)
+    end
+
+    it 'generates gemini projects' do
+      IO.write('config.yml', SAMPLE_CONFIG_4)
+      described_class.send(:load_settings)
+      old_conf = described_class.settings.dup
+      old_conf['sources'][0] = { 'path' => 'src', 'type' => 'gemini' }
+      described_class.load_test(old_conf)
+      projects = described_class.send(:org_generate_projects)
+      srcconf = <<~SRCCONF
+        ("src"
+         :base-directory "#{Dir.pwd}/src"
+         :base-extension "org"
+         :recursive t
+         :publishing-directory "#{Dir.pwd}/public_gmi/src"
+         :publishing-function org-gmi-publish-to-gemini
+         :section-numbers nil
+         :with-toc nil)
+        ("src-assets"
+         :base-directory "#{Dir.pwd}/src"
+         :base-extension "jpg\\\\\\|gif\\\\\\|png\\\\\\|svg\\\\\\|pdf"
+         :recursive t
+         :publishing-directory "#{Dir.pwd}/public_gmi/src"
+         :publishing-function org-publish-attachment)
+
+      SRCCONF
+      expect(projects).to have_key('src')
+      expect(projects['src']).to eq(srcconf)
     end
 
     it 'generates projects names list' do

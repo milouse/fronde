@@ -14,4 +14,5 @@
         ("website" :components (__ALL_PROJECTS_NAMES__))))
 
 ;; Load fronde lib
+(load-file (expand-file-name "ox-gmi.el" "__WORK_DIR__/lib"))
 (load-file (expand-file-name "ox-fronde.el" "__FRONDE_DIR__"))

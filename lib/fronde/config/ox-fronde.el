@@ -30,6 +30,7 @@
 
 (require 'org)
 (require 'ox-html)
+(require 'ox-gmi)
 
 ;;; Function Declarations
 

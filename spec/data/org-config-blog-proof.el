@@ -107,4 +107,5 @@
         ("website" :components ("org" "org-assets" "news" "news-assets" "test" "test-assets" "tata" "tata-assets" "theme-toto"))))
 
 ;; Load fronde lib
+(load-file (expand-file-name "ox-gmi.el" "__TEST_DIR__/lib"))
 (load-file (expand-file-name "ox-fronde.el" "__BASE_DIR__/lib/fronde/config"))
