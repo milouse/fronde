@@ -152,13 +152,22 @@ module Fronde
       project_config.join("\n        ")
     end
 
-    def org_default_postamble
+    def org_default_html_postamble
       <<~POSTAMBLE
         <p><span class="author">#{R18n.t.fronde.org.postamble.written_by}</span>
-        #{R18n.t.fronde.org.postamble.with_emacs}</p>
+        #{R18n.t.fronde.org.postamble.with_emacs_html}</p>
         <p class="date">#{R18n.t.fronde.org.postamble.last_modification}</p>
         <p class="validation">%v</p>
       POSTAMBLE
+    end
+
+    def org_default_gemini_postamble
+      format(
+        "📅 %<date>s\n📝 %<author>s %<creator>s",
+        author: R18n.t.fronde.org.postamble.written_by,
+        creator: R18n.t.fronde.org.postamble.with_emacs,
+        date: R18n.t.fronde.org.postamble.last_modification
+      )
     end
 
     def org_default_html_head
@@ -173,7 +182,7 @@ module Fronde
 
     def org_default_html_options(project)
       defaults = {
-        'html-postamble' => org_default_postamble,
+        'html-postamble' => org_default_html_postamble,
         'html-head' => '__ATOM_FEED__',
         'html-head-include-default-style' => 't',
         'html-head-include-scripts' => 't'
@@ -191,7 +200,9 @@ module Fronde
         'section-numbers' => 'nil',
         'with-toc' => 'nil'
       }
-      unless project['type'] == 'gemini'
+      if project['type'] == 'gemini'
+        defaults['gemini-postamble'] = org_default_gemini_postamble
+      else
         defaults.merge!(
           org_default_html_options(project),
           settings['org-html'] || {},

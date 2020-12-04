@@ -9,6 +9,7 @@
       user-mail-address "__AUTHOR_EMAIL__"
       user-full-name "__AUTHOR_NAME__"
       org-html-metadata-timestamp-format "__LONG_DATE_FMT__"
+      org-gmi-timestamp-format "__LONG_DATE_FMT__"
       org-publish-project-alist
       `(__ALL_PROJECTS____THEME_CONFIG__
         ("website" :components (__ALL_PROJECTS_NAMES__))))

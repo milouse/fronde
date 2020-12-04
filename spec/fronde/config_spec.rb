@@ -223,6 +223,8 @@ describe Fronde::Config do
       head = <<~HEAD.strip
         :section-numbers nil
         :with-toc nil
+        :gemini-postamble "📅 Last modification on %C
+        📝 Written by %a with %c, and published with %n"
       HEAD
       expect(headers.join("\n")).to eq(head)
     end
@@ -311,6 +313,8 @@ describe Fronde::Config do
                  :recursive t
                  :section-numbers nil
                  :with-toc nil
+                 :gemini-postamble "📅 Last modification on %C
+        📝 Written by %a with %c, and published with %n")
                 ("src-assets"
                  :base-extension "jpg\\\\\\|gif\\\\\\|png\\\\\\|svg\\\\\\|pdf"
                  :publishing-function org-publish-attachment

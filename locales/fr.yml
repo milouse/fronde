@@ -33,5 +33,6 @@ fronde:
   org:
     postamble:
       written_by: Écrit par %a
-      with_emacs: 'avec %c et publié avec %N'
       last_modification: dernière modification le %C
+      with_emacs: 'avec %c et publié avec %n'
+      with_emacs_html: 'avec %c et publié avec %N'
