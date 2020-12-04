@@ -135,16 +135,16 @@ describe Fronde::Config do
       headers = described_class.send(:build_project_org_headers, projects[0])
       head = <<~HEAD.strip
         :section-numbers nil
-         :with-toc nil
-         :html-postamble "<p><span class=\\\"author\\\">Written by %a</span>
+        :with-toc nil
+        :html-postamble "<p><span class=\\\"author\\\">Written by %a</span>
         with %c, and published with %N</p>
         <p class=\\\"date\\\">Last modification on %C</p>
         <p class=\\\"validation\\\">%v</p>"
-         :html-head ""
-         :html-head-include-default-style t
-         :html-head-include-scripts t
+        :html-head ""
+        :html-head-include-default-style t
+        :html-head-include-scripts t
       HEAD
-      expect(headers).to eq(head)
+      expect(headers.join("\n")).to eq(head)
     end
 
     it 'exposes correct head header with boolean values in conf' do
@@ -163,16 +163,16 @@ describe Fronde::Config do
       headers = described_class.send(:build_project_org_headers, projects[0])
       head = <<~HEAD.strip
         :section-numbers nil
-         :with-toc nil
-         :html-postamble "<p><span class=\\\"author\\\">Written by %a</span>
+        :with-toc nil
+        :html-postamble "<p><span class=\\\"author\\\">Written by %a</span>
         with %c, and published with %N</p>
         <p class=\\\"date\\\">Last modification on %C</p>
         <p class=\\\"validation\\\">%v</p>"
-         :html-head ""
-         :html-head-include-default-style t
-         :html-head-include-scripts nil
+        :html-head ""
+        :html-head-include-default-style t
+        :html-head-include-scripts nil
       HEAD
-      expect(headers).to eq(head)
+      expect(headers.join("\n")).to eq(head)
     end
 
     it 'exposes correct head header with custom domain' do
@@ -182,34 +182,34 @@ describe Fronde::Config do
       headers = described_class.send(:build_project_org_headers, projects[0])
       head = <<~HEAD.strip
         :section-numbers nil
-         :with-toc nil
-         :html-postamble "<p><span class=\\\"author\\\">Written by %a</span>
+        :with-toc nil
+        :html-postamble "<p><span class=\\\"author\\\">Written by %a</span>
         with %c, and published with %N</p>
         <p class=\\\"date\\\">Last modification on %C</p>
         <p class=\\\"validation\\\">%v</p>"
-         :html-head ""
-         :html-head-include-default-style t
-         :html-head-include-scripts t
+        :html-head ""
+        :html-head-include-default-style t
+        :html-head-include-scripts t
       HEAD
-      expect(headers).to eq(head)
+      expect(headers.join("\n")).to eq(head)
       headers = described_class.send(:build_project_org_headers, projects[1])
       head = <<~HEAD.strip
         :section-numbers nil
-         :with-toc nil
-         :html-postamble "<p><span class=\\\"author\\\">Written by %a</span>
+        :with-toc nil
+        :html-postamble "<p><span class=\\\"author\\\">Written by %a</span>
         with %c, and published with %N</p>
         <p class=\\\"date\\\">Last modification on %C</p>
         <p class=\\\"validation\\\">%v</p>"
-         :html-head "<link rel=\\\"stylesheet\\\" type=\\\"text/css\\\" media=\\\"screen\\\"
+        :html-head "<link rel=\\\"stylesheet\\\" type=\\\"text/css\\\" media=\\\"screen\\\"
               href=\\\"https://test.com/assets/my-theme/css/style.css\\\">
         <link rel=\\\"stylesheet\\\" type=\\\"text/css\\\" media=\\\"screen\\\"
               href=\\\"https://test.com/assets/my-theme/css/htmlize.css\\\">
         <link rel=\\\"alternate\\\" type=\\\"application/atom+xml\\\" title=\\\"Atom 1.0\\\"
               href=\\\"https://test.com/feeds/index.xml\\\" />"
-         :html-head-include-default-style nil
-         :html-head-include-scripts nil
+        :html-head-include-default-style nil
+        :html-head-include-scripts nil
       HEAD
-      expect(headers).to eq(head)
+      expect(headers.join("\n")).to eq(head)
     end
 
     it 'exposes correct head header for gemini projects' do
@@ -222,77 +222,76 @@ describe Fronde::Config do
       headers = described_class.send(:build_project_org_headers, projects[0])
       head = <<~HEAD.strip
         :section-numbers nil
-         :with-toc nil
+        :with-toc nil
       HEAD
-      expect(headers).to eq(head)
+      expect(headers.join("\n")).to eq(head)
     end
 
     it 'generates projects' do
       IO.write('config.yml', SAMPLE_CONFIG_4)
       described_class.send(:load_settings)
       projects = described_class.send(:org_generate_projects)
-      srcconf = <<~SRCCONF
+      srcconf = <<~SRCCONF.strip
         ("src"
-         :base-directory "#{Dir.pwd}/src"
-         :base-extension "org"
-         :recursive t
-         :publishing-directory "#{Dir.pwd}/public_html/src"
-         :publishing-function org-html-publish-to-html
-         :section-numbers nil
-         :with-toc nil
-         :html-postamble "<p><span class=\\\"author\\\">Written by %a</span>
+                 :base-extension "org"
+                 :publishing-function org-html-publish-to-html
+                 :base-directory "#{Dir.pwd}/src"
+                 :publishing-directory "#{Dir.pwd}/public_html/src"
+                 :recursive t
+                 :section-numbers nil
+                 :with-toc nil
+                 :html-postamble "<p><span class=\\\"author\\\">Written by %a</span>
         with %c, and published with %N</p>
         <p class=\\\"date\\\">Last modification on %C</p>
         <p class=\\\"validation\\\">%v</p>"
-         :html-head ""
-         :html-head-include-default-style t
-         :html-head-include-scripts t)
-        ("src-assets"
-         :base-directory "#{Dir.pwd}/src"
-         :base-extension "jpg\\\\\\|gif\\\\\\|png\\\\\\|svg\\\\\\|pdf"
-         :recursive t
-         :publishing-directory "#{Dir.pwd}/public_html/src"
-         :publishing-function org-publish-attachment)
-
+                 :html-head ""
+                 :html-head-include-default-style t
+                 :html-head-include-scripts t)
+                ("src-assets"
+                 :base-extension "jpg\\\\\\|gif\\\\\\|png\\\\\\|svg\\\\\\|pdf"
+                 :publishing-function org-publish-attachment
+                 :base-directory "#{Dir.pwd}/src"
+                 :publishing-directory "#{Dir.pwd}/public_html/src"
+                 :recursive t)
       SRCCONF
-      blogconf = <<~BLOGCONF
+      expect(projects).to have_key('src')
+      expect(projects['src']).to eq(srcconf)
+
+      blogconf = <<~BLOGCONF.strip
         ("news"
-         :base-directory "#{Dir.pwd}/news"
-         :base-extension "org"
-         :recursive t
-         :publishing-directory "#{Dir.pwd}/public_html/news"
-         :publishing-function org-html-publish-to-html
-         :section-numbers nil
-         :with-toc nil
-         :html-postamble "<p><span class=\\\"author\\\">Written by %a</span>
+                 :base-extension "org"
+                 :publishing-function org-html-publish-to-html
+                 :base-directory "#{Dir.pwd}/news"
+                 :publishing-directory "#{Dir.pwd}/public_html/news"
+                 :recursive t
+                 :section-numbers nil
+                 :with-toc nil
+                 :html-postamble "<p><span class=\\\"author\\\">Written by %a</span>
         with %c, and published with %N</p>
         <p class=\\\"date\\\">Last modification on %C</p>
         <p class=\\\"validation\\\">%v</p>"
-         :html-head "<link rel=\\\"stylesheet\\\" type=\\\"text/css\\\" media=\\\"screen\\\"
+                 :html-head "<link rel=\\\"stylesheet\\\" type=\\\"text/css\\\" media=\\\"screen\\\"
               href=\\\"https://test.com/assets/my-theme/css/style.css\\\">
         <link rel=\\\"stylesheet\\\" type=\\\"text/css\\\" media=\\\"screen\\\"
               href=\\\"https://test.com/assets/my-theme/css/htmlize.css\\\">
         <link rel=\\\"alternate\\\" type=\\\"application/atom+xml\\\" title=\\\"Atom 1.0\\\"
               href=\\\"https://test.com/feeds/index.xml\\\" />"
-         :html-head-include-default-style nil
-         :html-head-include-scripts nil)
-        ("news-assets"
-         :base-directory "#{Dir.pwd}/news"
-         :base-extension "jpg\\\\\\|gif\\\\\\|png\\\\\\|svg\\\\\\|pdf"
-         :recursive t
-         :publishing-directory "#{Dir.pwd}/public_html/news"
-         :publishing-function org-publish-attachment)
-        ("theme-my-theme"
-         :base-directory "#{Dir.pwd}/themes/my-theme"
-         :base-extension "jpg\\\\\\|gif\\\\\\|png\\\\\\|js\\\\\\|css\\\\\\|otf\\\\\\|ttf\\\\\\|woff2?"
-         :recursive t
-         :publishing-directory "#{Dir.pwd}/public_html/assets/my-theme"
-         :publishing-function org-publish-attachment)
-
+                 :html-head-include-default-style nil
+                 :html-head-include-scripts nil)
+                ("news-assets"
+                 :base-extension "jpg\\\\\\|gif\\\\\\|png\\\\\\|svg\\\\\\|pdf"
+                 :publishing-function org-publish-attachment
+                 :base-directory "#{Dir.pwd}/news"
+                 :publishing-directory "#{Dir.pwd}/public_html/news"
+                 :recursive t)
+                ("theme-my-theme"
+                 :base-directory "#{Dir.pwd}/themes/my-theme"
+                 :base-extension "jpg\\\\\\|gif\\\\\\|png\\\\\\|js\\\\\\|css\\\\\\|otf\\\\\\|ttf\\\\\\|woff2?"
+                 :recursive t
+                 :publishing-directory "#{Dir.pwd}/public_html/assets/my-theme"
+                 :publishing-function org-publish-attachment)
       BLOGCONF
-      expect(projects).to have_key('src')
       expect(projects).to have_key('news')
-      expect(projects['src']).to eq(srcconf)
       expect(projects['news']).to eq(blogconf)
     end
 
@@ -303,22 +302,21 @@ describe Fronde::Config do
       old_conf['sources'][0] = { 'path' => 'src', 'type' => 'gemini' }
       described_class.load_test(old_conf)
       projects = described_class.send(:org_generate_projects)
-      srcconf = <<~SRCCONF
+      srcconf = <<~SRCCONF.strip
         ("src"
-         :base-directory "#{Dir.pwd}/src"
-         :base-extension "org"
-         :recursive t
-         :publishing-directory "#{Dir.pwd}/public_gmi/src"
-         :publishing-function org-gmi-publish-to-gemini
-         :section-numbers nil
-         :with-toc nil)
-        ("src-assets"
-         :base-directory "#{Dir.pwd}/src"
-         :base-extension "jpg\\\\\\|gif\\\\\\|png\\\\\\|svg\\\\\\|pdf"
-         :recursive t
-         :publishing-directory "#{Dir.pwd}/public_gmi/src"
-         :publishing-function org-publish-attachment)
-
+                 :base-extension "org"
+                 :publishing-function org-gmi-publish-to-gemini
+                 :base-directory "#{Dir.pwd}/src"
+                 :publishing-directory "#{Dir.pwd}/public_gmi/src"
+                 :recursive t
+                 :section-numbers nil
+                 :with-toc nil
+                ("src-assets"
+                 :base-extension "jpg\\\\\\|gif\\\\\\|png\\\\\\|svg\\\\\\|pdf"
+                 :publishing-function org-publish-attachment
+                 :base-directory "#{Dir.pwd}/src"
+                 :publishing-directory "#{Dir.pwd}/public_gmi/src"
+                 :recursive t)
       SRCCONF
       expect(projects).to have_key('src')
       expect(projects['src']).to eq(srcconf)

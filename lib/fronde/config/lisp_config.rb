@@ -42,7 +42,7 @@ module Fronde
                   .gsub('__WORK_DIR__', workdir)
                   .gsub('__FRONDE_DIR__', __dir__)
                   .gsub('__ORG_VER__', org_last_version)
-                  .gsub('__ALL_PROJECTS__', all_projects(projects))
+                  .gsub('__ALL_PROJECTS__', projects.values.join("\n        "))
                   .gsub('__THEME_CONFIG__', org_default_theme_config)
                   .gsub('__ALL_PROJECTS_NAMES__', project_names(projects))
                   .gsub('__LONG_DATE_FMT__', r18n_full_datetime_format)
@@ -109,12 +109,6 @@ module Fronde
       names.join(' ')
     end
 
-    def all_projects(projects)
-      projects.values.join("\n").strip
-              .gsub(/\n\s*\n/, "\n")
-              .gsub(/\n/, "\n        ")
-    end
-
     # Return the full path to the publication path of a given project
     #   configuration.
     #
@@ -148,32 +142,14 @@ module Fronde
     end
 
     def org_project(project_name, opts)
-      publish_in = publication_path(opts)
-      other_lines = [
-        format(':recursive %<value>s',
-               value: ruby_to_lisp_boolean(opts['recursive']))
+      shared_lines = org_project_shared_lines(opts)
+      project_config = [
+        org_project_config(project_name, opts, shared_lines),
+        org_assets_config(project_name, shared_lines)
       ]
-      if opts['exclude']
-        other_lines << format(':exclude "%<value>s"',
-                              value: opts['exclude'])
-      end
       themeconf = org_theme_config(opts['theme'])
-      <<~ORGPROJECT
-        ("#{project_name}"
-         :base-directory "#{opts['path']}"
-         :base-extension "org"
-         #{other_lines.join("\n ")}
-         :publishing-directory "#{publish_in}"
-         :publishing-function #{publication_function(opts)}
-         #{opts['org_headers']})
-        ("#{project_name}-assets"
-         :base-directory "#{opts['path']}"
-         :base-extension "jpg\\\\\\|gif\\\\\\|png\\\\\\|svg\\\\\\|pdf"
-         #{other_lines[0]}
-         :publishing-directory "#{publish_in}"
-         :publishing-function org-publish-attachment)
-        #{themeconf}
-      ORGPROJECT
+      project_config << themeconf unless themeconf == ''
+      project_config.join("\n        ")
     end
 
     def org_default_postamble
@@ -246,18 +222,16 @@ module Fronde
 
     def build_project_org_headers(project)
       orgtplopts = org_publish_options(project)
-      orgtpl = []
       lisp_keywords = ['t', 'nil', '1', '-1', '0'].freeze
-      orgtplopts.each do |k, v|
+      orgtplopts.map do |k, v|
         v = expand_vars_in_html_head(v, project) if k == 'html-head'
         val = cast_lisp_value(v)
         if lisp_keywords.include? val
-          orgtpl << ":#{k} #{val}"
+          ":#{k} #{val}"
         else
-          orgtpl << ":#{k} \"#{val}\""
+          ":#{k} \"#{val}\""
         end
       end
-      orgtpl.join("\n ")
     end
 
     def org_generate_projects(with_tags: false)
@@ -295,6 +269,46 @@ module Fronde
          :publishing-directory "#{workdir}/#{settings['public_folder']}/assets/#{theme}"
          :publishing-function org-publish-attachment)
       THEMECONFIG
+    end
+
+    def org_project_shared_lines(project)
+      [
+        format(':base-directory "%<path>s"', path: project['path']),
+        format(
+          ':publishing-directory "%<path>s"',
+          path: publication_path(project)
+        ),
+        format(
+          ':recursive %<rec>s',
+          rec: ruby_to_lisp_boolean(project['recursive'])
+        )
+      ]
+    end
+
+    def org_project_config(project_name, project, shared_lines)
+      project_lines = [
+        format('"%<name>s"', name: project_name),
+        ':base-extension "org"',
+        format(
+          ':publishing-function %<fun>s',
+          fun: publication_function(project)
+        )
+      ] + shared_lines + project['org_headers']
+      if project['exclude']
+        project_lines << format(
+          ':exclude "%<value>s"', value: project['exclude']
+        )
+      end
+      format('(%<pr>s)', pr: project_lines.join("\n         "))
+    end
+
+    def org_assets_config(project_name, shared_lines)
+      assets_lines = [
+        format('"%<name>s-assets"', name: project_name),
+        ':base-extension "jpg\\\\\\|gif\\\\\\|png\\\\\\|svg\\\\\\|pdf"',
+        ':publishing-function org-publish-attachment'
+      ] + shared_lines
+      format('(%<assets>s)', assets: assets_lines.join("\n         "))
     end
   end
 end
