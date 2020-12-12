@@ -263,23 +263,24 @@ module Fronde
     def org_default_theme_config
       theme_config = org_theme_config(settings['theme'])
       return theme_config if theme_config == ''
-      output = theme_config.split("\n").map do |line|
-        "        #{line}"
-      end
-      format("\n%<conf>s", conf: output.join("\n"))
+      format("\n        %<conf>s", conf: theme_config)
     end
 
     def org_theme_config(theme)
       return '' if theme.nil? || theme == 'default'
       workdir = Dir.pwd
-      <<~THEMECONFIG
-        ("theme-#{theme}"
-         :base-directory "#{workdir}/themes/#{theme}"
-         :base-extension "jpg\\\\\\|gif\\\\\\|png\\\\\\|js\\\\\\|css\\\\\\|otf\\\\\\|ttf\\\\\\|woff2?"
-         :recursive t
-         :publishing-directory "#{workdir}/#{settings['public_folder']}/assets/#{theme}"
-         :publishing-function org-publish-attachment)
-      THEMECONFIG
+      [
+        format('("theme-%<theme>s"', theme: theme),
+        format(' :base-directory "%<wd>s/themes/%<theme>s"',
+               wd: workdir, theme: theme),
+        # rubocop:disable Layout/LineLength
+        ' :base-extension "jpg\\\\\\|gif\\\\\\|png\\\\\\|js\\\\\\|css\\\\\\|otf\\\\\\|ttf\\\\\\|woff2?"',
+        # rubocop:enable Layout/LineLength
+        ' :recursive t',
+        format(' :publishing-directory "%<wd>s/%<pub>s/assets/%<theme>s"',
+               wd: workdir, pub: settings['public_folder'], theme: theme),
+        ' :publishing-function org-publish-attachment)'
+      ].join("\n        ").strip
     end
 
     def org_project_shared_lines(project)
