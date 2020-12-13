@@ -67,7 +67,14 @@ namespace :org do
     IO.write 'lib/htmlize.el', htmlize
   end
 
-  file 'var/lib/org-config.el' => 'lib/htmlize.el' do
+  file 'lib/ox-gmi.el' => 'lib' do
+    ox_gmi = URI(
+      'https://git.umaneti.net/ox-gmi.el/plain/ox-gmi.el'
+    ).open.read
+    IO.write 'lib/ox-gmi.el', ox_gmi
+  end
+
+  file 'var/lib/org-config.el' => ['lib/htmlize.el', 'lib/ox-gmi.el'] do
     Fronde::Config.write_org_lisp_config
   end
 

@@ -30,6 +30,7 @@
 
 (require 'org)
 (require 'ox-html)
+(require 'ox-gmi)
 
 ;;; Function Declarations
 
@@ -65,6 +66,12 @@ INFO is a plist used as a communication channel."
                     (org-export-data (plist-get info :description) info)))
       output)))
 
+(defun fronde/org-gmi-format-spec (upstream info)
+  "Return format specification for gemini postamble.
+INFO is a plist used as a communication channel."
+  (let ((output (funcall upstream info)))
+    (push `(?n . ,(format "Fronde %s" fronde/version)) output)))
+
 (defun fronde/org-i18n-export (link description format)
   "Export a i18n link"
   (let* ((splitted-link (split-string link "|"))
@@ -77,8 +84,7 @@ INFO is a plist used as a communication channel."
                          path lang desc)
                (format "<a href=\"%s\">%s</a>" path desc)))
       (`latex (format "\\href{%s}{%s}" path desc))
-      (`ascii (format "%s (%s)" desc path))
-      (_ path))))
+      (_ (format "%s (%s)" desc path)))))
 
 (defun fronde/org-i18n-follow (link)
   "Visit a i18n link"
@@ -108,6 +114,7 @@ INFO is a plist used as a communication channel."
                                     (underline . "<span class=\"underline\">%s</span>")
                                     (verbatim . "<code>%s</code>")))
 (advice-add 'org-html-format-spec :around #'fronde/org-html-format-spec)
+(advice-add 'org-gmi--format-spec :around #'fronde/org-gmi-format-spec)
 
 (provide 'ox-fronde)
 

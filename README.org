@@ -5,13 +5,13 @@
 #+description: Fronde is a ruby gem, which helps you to manage your
 #+description: static website generated with Org mode
 
-* What's for?
+* What's fronde for?
 
 #+attr_html: :style width:150px;float:right;margin-top:-4.5em;margin-left:2em;
 [[file:./tigre.png]]
 
 Fronde is an opinionated static website generator for [[https://orgmode.org][Org]]. It helps you
-converting Org mode files into websites, giving you full control over
+convert Org mode files into websites, giving you full control over
 the publication process.
 
 * Features
@@ -22,15 +22,15 @@ the publication process.
 - Does not require any server-side code, nor databases, only a simple
   http server like apache, nginx, lighttpd, hiawatha…
 - Allows fine customization of generated html files
-- Allows multiple sources for your Org file and let you organize them as
+- Allows multiple sources for your Org file and lets you organize them as
   you wish in the destination folder
-- Can use different theme for different sources
+- Can use different themes for different sources
 - Supports tags and [[https://en.wikipedia.org/wiki/Atom_(Web_standard)][ATOM feeds]]
 
 * Quick install
 
 Fronde is a [[https://rubygems.org/][Ruby gem]]. You need a working Ruby environment to use it. We
-recommand you to use [[https://rvm.io][RVM]] and a specific gemset. However it will works
+recommend that you use [[https://rvm.io][RVM]] and a specific gemset. However fronde works
 with a global ruby installation too.
 
 #+caption: Installation procedure with RVM
@@ -40,7 +40,7 @@ rvm use ruby-2.7.2@fronde --create
 gem install fronde
 #+end_src
 
-Now, you're ready to create your first Fronde website.
+Now you're ready to create your first fronde website.
 
 #+begin_src shell
 mkdir mywebite

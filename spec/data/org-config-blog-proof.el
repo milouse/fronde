@@ -9,95 +9,96 @@
       user-mail-address ""
       user-full-name "Tata"
       org-html-metadata-timestamp-format "%A %-d of %B, %Y at %R"
+      org-gmi-timestamp-format "%A %-d of %B, %Y at %R"
       org-publish-project-alist
       `(("org"
-         :base-directory "__TEST_DIR__/src"
          :base-extension "org"
-         :recursive nil
-         :exclude "tata\.org"
-         :publishing-directory "__TEST_DIR__/public_html"
          :publishing-function org-html-publish-to-html
+         :base-directory "__TEST_DIR__/src"
+         :publishing-directory "__TEST_DIR__/public_html"
+         :recursive nil
          :section-numbers nil
          :with-toc nil
          :html-postamble "<footer>Published by Fronde.</footer>"
          :html-head "<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\"
-              href=\"/assets/toto/css/style.css\">
-        <link rel=\"stylesheet\" type=\"text/css\" media=\"screen\"
-              href=\"/assets/toto/css/htmlize.css\">"
+      href=\"/assets/toto/css/style.css\">
+<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\"
+      href=\"/assets/toto/css/htmlize.css\">"
          :html-head-include-default-style nil
-         :html-head-include-scripts nil)
+         :html-head-include-scripts nil
+         :exclude "tata\.org")
         ("org-assets"
-         :base-directory "__TEST_DIR__/src"
          :base-extension "jpg\\|gif\\|png\\|svg\\|pdf"
-         :recursive nil
+         :publishing-function org-publish-attachment
+         :base-directory "__TEST_DIR__/src"
          :publishing-directory "__TEST_DIR__/public_html"
-         :publishing-function org-publish-attachment)
+         :recursive nil)
         ("news"
-         :base-directory "__TEST_DIR__/src/news"
          :base-extension "org"
-         :recursive t
-         :publishing-directory "__TEST_DIR__/public_html/news"
          :publishing-function org-html-publish-to-html
+         :base-directory "__TEST_DIR__/src/news"
+         :publishing-directory "__TEST_DIR__/public_html/news"
+         :recursive t
          :section-numbers nil
          :with-toc nil
          :html-postamble "<footer>Published by Fronde.</footer>"
          :html-head "<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\"
-              href=\"/assets/toto/css/style.css\">
-        <link rel=\"stylesheet\" type=\"text/css\" media=\"screen\"
-              href=\"/assets/toto/css/htmlize.css\">
-        <link rel=\"alternate\" type=\"application/atom+xml\" title=\"Atom 1.0\"
-              href=\"/feeds/index.xml\" />"
+      href=\"/assets/toto/css/style.css\">
+<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\"
+      href=\"/assets/toto/css/htmlize.css\">
+<link rel=\"alternate\" type=\"application/atom+xml\" title=\"Atom 1.0\"
+      href=\"/feeds/index.xml\" />"
          :html-head-include-default-style nil
          :html-head-include-scripts nil)
         ("news-assets"
+         :base-extension "jpg\\|gif\\|png\\|svg\\|pdf"
+         :publishing-function org-publish-attachment
          :base-directory "__TEST_DIR__/src/news"
-         :base-extension "jpg\\|gif\\|png\\|svg\\|pdf"
-         :recursive t
          :publishing-directory "__TEST_DIR__/public_html/news"
-         :publishing-function org-publish-attachment)
+         :recursive t)
         ("test"
-         :base-directory "__TEST_DIR__/titi/test"
          :base-extension "org"
-         :recursive nil
-         :exclude "ugly\.org"
-         :publishing-directory "__TEST_DIR__/public_html/test"
          :publishing-function org-html-publish-to-html
+         :base-directory "__TEST_DIR__/titi/test"
+         :publishing-directory "__TEST_DIR__/public_html/test"
+         :recursive nil
          :section-numbers nil
          :with-toc nil
          :html-postamble "<footer>Published by Fronde.</footer>"
          :html-head "<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\"
-              href=\"/assets/toto/css/style.css\">
-        <link rel=\"stylesheet\" type=\"text/css\" media=\"screen\"
-              href=\"/assets/toto/css/htmlize.css\">"
+      href=\"/assets/toto/css/style.css\">
+<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\"
+      href=\"/assets/toto/css/htmlize.css\">"
          :html-head-include-default-style nil
-         :html-head-include-scripts nil)
+         :html-head-include-scripts nil
+         :exclude "ugly\.org")
         ("test-assets"
-         :base-directory "__TEST_DIR__/titi/test"
          :base-extension "jpg\\|gif\\|png\\|svg\\|pdf"
-         :recursive nil
+         :publishing-function org-publish-attachment
+         :base-directory "__TEST_DIR__/titi/test"
          :publishing-directory "__TEST_DIR__/public_html/test"
-         :publishing-function org-publish-attachment)
+         :recursive nil)
         ("tata"
-         :base-directory "__TEST_DIR__/titi/tutu/tata"
          :base-extension "org"
-         :recursive t
-         :publishing-directory "__TEST_DIR__/public_html/tata"
          :publishing-function org-html-publish-to-html
+         :base-directory "__TEST_DIR__/titi/tutu/tata"
+         :publishing-directory "__TEST_DIR__/public_html/tata"
+         :recursive t
          :section-numbers nil
          :with-toc nil
          :html-postamble "<footer>Published by Fronde.</footer>"
          :html-head "<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\"
-              href=\"/assets/toto/css/style.css\">
-        <link rel=\"stylesheet\" type=\"text/css\" media=\"screen\"
-              href=\"/assets/toto/css/htmlize.css\">"
+      href=\"/assets/toto/css/style.css\">
+<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\"
+      href=\"/assets/toto/css/htmlize.css\">"
          :html-head-include-default-style nil
          :html-head-include-scripts nil)
         ("tata-assets"
-         :base-directory "__TEST_DIR__/titi/tutu/tata"
          :base-extension "jpg\\|gif\\|png\\|svg\\|pdf"
-         :recursive t
+         :publishing-function org-publish-attachment
+         :base-directory "__TEST_DIR__/titi/tutu/tata"
          :publishing-directory "__TEST_DIR__/public_html/tata"
-         :publishing-function org-publish-attachment)
+         :recursive t)
         ("theme-toto"
          :base-directory "__TEST_DIR__/themes/toto"
          :base-extension "jpg\\|gif\\|png\\|js\\|css\\|otf\\|ttf\\|woff2?"
@@ -107,4 +108,5 @@
         ("website" :components ("org" "org-assets" "news" "news-assets" "test" "test-assets" "tata" "tata-assets" "theme-toto"))))
 
 ;; Load fronde lib
+(load-file (expand-file-name "ox-gmi.el" "__TEST_DIR__/lib"))
 (load-file (expand-file-name "ox-fronde.el" "__BASE_DIR__/lib/fronde/config"))
