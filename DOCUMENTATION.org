@@ -380,7 +380,7 @@ your expected host name (for example in the Atom feeds).
 #+begin_caution
 Its value is expected to *not* end with a slash. That is to say
 ~https://example.com~ is *valid*, whereas ~https://example.com/~ is
-valid.
+*not*.
 #+end_caution
 
 By default, your static website is expected to be hosted at the root of
