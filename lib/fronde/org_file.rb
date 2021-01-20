@@ -181,7 +181,7 @@ module Fronde
       return @date.rfc3339 if dateformat == :rfc3339
       locale = R18n.get.locale
       long_fmt = R18n.t.fronde.index.full_date_format(
-        date: locale.format_date_full(@date, year)
+        date: locale.format_date_full(@date, year: year)
       )
       unless @notime
         long_fmt = R18n.t.fronde.index.full_date_with_time_format(

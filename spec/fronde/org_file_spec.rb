@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# rubocop:disable Style/FormatStringToken
 describe Fronde::OrgFile do
   context 'with working org files' do
     it 'parses without date', core: true do
@@ -45,7 +44,6 @@ describe Fronde::OrgFile do
       expect(o.subtitle).to eq('What to do with that')
     end
   end
-  # rubocop:enable Style/FormatStringToken
 
   context 'with various titles' do
     it 'transliterates them into slugs', core: true do
