@@ -13,7 +13,7 @@ def rsync_command(verbose, test = nil)
   else
     optstring << 'q'
   end
-  "rsync -#{optstring.join}rlpD --delete"
+  "rsync -#{optstring.join}rlt --delete"
 end
 
 namespace :sync do
