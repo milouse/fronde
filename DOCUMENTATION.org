@@ -215,13 +215,13 @@ Now, you can run the ~fronde init~ command with some arguments:
   fronde init -t "My brand new website"
 #+end_src
 
-#+begin_tip
+#+begin_note
 The following arguments are allowed:
 
 - -a (--author) :: Set up the default author name (see the [[#author_setting][~author~ config key]])
 - -l (--lang) :: Set up the default lang of your website (see the [[#lang_setting][~lang~ config key]])
 - -t (--title) :: Set up the title of your website (see the [[#title_setting][~title~ config key]])
-#+end_tip
+#+end_note
 
 At the end of the init process, fronde will automatically open Emacs on
 the first page of your website. You can directly write in it or close it
@@ -380,7 +380,7 @@ your expected host name (for example in the Atom feeds).
 #+begin_caution
 Its value is expected to *not* end with a slash. That is to say
 ~https://example.com~ is *valid*, whereas ~https://example.com/~ is
-valid.
+*not*.
 #+end_caution
 
 By default, your static website is expected to be hosted at the root of
