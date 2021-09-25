@@ -43,6 +43,7 @@ namespace :org do
     end
     build = Thread.new do
       sh "tar -C lib -xzf #{task.prerequisites[0]}"
+      mv "lib/org-mode-release_#{org_version}", org_dir
       sh((make + ['compile']).join(' '))
       sh((make + ['autoloads']).join(' '))
       Dir.glob('lib/org-[0-9.]*').each do |ov|

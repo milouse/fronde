@@ -165,12 +165,12 @@ module Fronde
         # :nocov:
         return if Fronde::Config.org_last_version.nil?
         # :nocov:
-        tarball = "org-#{Fronde::Config.org_last_version}.tar.gz"
         # Remove version number in dest file to allow easy rake file
         # task naming
         dest_file = File.expand_path('org.tar.gz', destination)
         return if File.exist?(dest_file)
-        uri = URI("https://orgmode.org/#{tarball}")
+        tarball = "org-mode-release_#{Fronde::Config.org_last_version}.tar.gz"
+        uri = URI("https://git.savannah.gnu.org/cgit/emacs/org-mode.git/snapshot/#{tarball}")
         # Will crash on purpose if anything goes wrong
         Net::HTTP.start(uri.host, uri.port, :use_ssl => true) do |http|
           http.request(Net::HTTP::Get.new(uri)) do |response|
