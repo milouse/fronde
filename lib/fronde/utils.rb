@@ -38,7 +38,8 @@ module Fronde
     #   configuration
     FRONDE_COMMANDS = {
       'init' => { opts: ['-a', '-h', '-l', '-t', '-v'] },
-      'config' => { alias: 'init' },
+      'update' => { opts: ['-a', '-h', '-l', '-t', '-v'] },
+      'config' => { alias: 'update' },
       'preview' => { opts: ['-h'] },
       'open' => { opts: ['-a', '-h', '-l', '-t', '-v'] },
       'edit' => { alias: 'open' },
@@ -142,6 +143,17 @@ module Fronde
         cmd_opt = Fronde::Utils::FRONDE_COMMANDS[command]
         return cmd_opt[:alias] if cmd_opt.has_key?(:alias)
         command
+      end
+
+      # Returns the given command options.
+      #
+      # This method will first try to resolve command alias, if any.
+      #
+      # @param command [String] the command, which options should be returned
+      # @return [Hash] the command options
+      def command_options(command)
+        cmd = resolve_possible_alias command
+        FRONDE_COMMANDS[cmd].merge(name: cmd)
       end
 
       # Try to discover the current host operating system.

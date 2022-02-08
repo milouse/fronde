@@ -38,7 +38,8 @@ describe Fronde::Utils do
     it 'lists possible commands' do
       basic_cmd = [
         "    init       Initialize your Fronde instance (you just need to do it once).\n",
-        "    config     Alias for init.\n",
+        "    update     Update Fronde dependency (to be run once in a while).\n",
+        "    config     Alias for update.\n",
         "    preview    Start a test web server to preview your website on http://127.0.0.1:5000\n",
         "    open       Open or create an org file.\n",
         "    edit       Alias for open.\n",
@@ -51,7 +52,8 @@ describe Fronde::Utils do
 
     it 'resolves alias' do
       expect(described_class.resolve_possible_alias('init')).to eq('init')
-      expect(described_class.resolve_possible_alias('config')).to eq('init')
+      expect(described_class.resolve_possible_alias('update')).to eq('update')
+      expect(described_class.resolve_possible_alias('config')).to eq('update')
       expect(described_class.resolve_possible_alias('build')).to eq('build')
       expect(described_class.resolve_possible_alias('edit')).to eq('open')
       expect(described_class.resolve_possible_alias('wrong')).to eq('basic')

@@ -38,7 +38,7 @@ if params[:help] || cmd_err
 end
 ARGV.shift
 
-init_cmds = [:fronde_init, :fronde_config]
+init_cmds = [:fronde_init, :fronde_config, :fronde_update]
 unless File.exist?('config.yml') || init_cmds.include?(command)
   fronde.fronde_init
 end
