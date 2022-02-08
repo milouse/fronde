@@ -12,6 +12,11 @@ Gem::Specification.new do |s|
   DESC
   s.authors     = ['Étienne Deparis']
   s.email       = 'etienne@depar.is'
+  s.metadata    = {
+    'source_code_uri' => 'https://git.umaneti.net/fronde',
+    'homepage_uri' => 'https://etienne.depar.is/fronde/',
+    'funding_uri' => 'https://liberapay.com/milouse'
+  }
   s.files       = ['lib/fronde/cli.rb',
                    'lib/fronde/cli/commands.rb',
                    'lib/fronde/config.rb',
