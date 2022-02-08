@@ -45,7 +45,7 @@ def init_testing_website
 
     task default: 'site:build'
   RAKE
-  IO.write('Rakefile', rakefile)
+  File.write('Rakefile', rakefile)
   config = <<~CONF
     ---
     author: Tata
@@ -73,7 +73,7 @@ def init_testing_website
       routes:
         /test: public_html/index.html
   CONF
-  IO.write('config.yml', config)
+  File.write('config.yml', config)
 end
 # rubocop:enable Metrics/MethodLength
 

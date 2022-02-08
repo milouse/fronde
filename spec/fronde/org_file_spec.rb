@@ -90,7 +90,7 @@ describe Fronde::OrgFile do
 
       CONTENT
       expect(File.exist?('__test__.org')).to be(true)
-      expect(IO.read('__test__.org')).to eq(empty_content)
+      expect(File.read('__test__.org')).to eq(empty_content)
     end
 
     it 'creates new Org file, even in a new folder', core: true do
@@ -109,7 +109,7 @@ describe Fronde::OrgFile do
 
         Lorem ipsum
       CONTENT
-      expect(IO.read('not/existing/test.org')).to eq(content)
+      expect(File.read('not/existing/test.org')).to eq(content)
     end
   end
 
@@ -217,7 +217,7 @@ describe Fronde::OrgFile do
       FileUtils.mkdir_p 'tmp/test_target/src/blog/toto'
       FileUtils.mkdir_p 'tmp/test_target/writings'
       Dir.chdir 'tmp/test_target'
-      IO.write 'src/test.org', 'Lorem ipsum.'
+      File.write 'src/test.org', 'Lorem ipsum.'
       FileUtils.touch(
         ['src/blog/test.org', 'src/blog/toto/tata.org',
          'src/blog/toto/content.org', 'writings/notes.org']

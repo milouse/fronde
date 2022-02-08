@@ -15,7 +15,7 @@ module Fronde
   # This class is responsible for reading or writing existing or new org
   # files, and formating their content to be used on the generated
   # website.
-  class OrgFile
+  class OrgFile # rubocop:disable Metrics/ClassLength
     # @return [String] the title of the current org document, taken from
     #   the ~#+title:~ header.
     attr_reader :title
@@ -257,12 +257,12 @@ module Fronde
     # The intermediate parent folders are created if necessary.
     #
     # @return [Integer] the length written (as returned by the
-    #   underlying ~IO.write~ method call)
+    #   underlying ~File.write~ method call)
     def write
       raise TypeError, 'no conversion from nil file name to path.' if @file.nil?
       file_dir = File.dirname @file
       FileUtils.mkdir_p file_dir unless Dir.exist? file_dir
-      IO.write @file, @content
+      File.write @file, @content
     end
 
     private

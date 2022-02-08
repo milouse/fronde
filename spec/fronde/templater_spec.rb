@@ -49,7 +49,7 @@ describe Fronde::Templater do
     context 'with a simple customization process' do
       before do
         FileUtils.mkdir 'public_html'
-        IO.write('public_html/customize_test.html', html_base)
+        File.write('public_html/customize_test.html', html_base)
       end
 
       after do
@@ -79,7 +79,7 @@ describe Fronde::Templater do
             </body>
           </html>
         RESULT
-        expect(IO.read('public_html/customize_test.html')).to eq(local_result)
+        expect(File.read('public_html/customize_test.html')).to eq(local_result)
       end
 
       it 'customizes a given html file with a given org object' do
@@ -95,7 +95,7 @@ describe Fronde::Templater do
           My website
         ORG
         FileUtils.mkdir 'src'
-        IO.write('src/index.org', org_content)
+        File.write('src/index.org', org_content)
         o = Fronde::OrgFile.new('src/index.org')
         described_class.customize_output('public_html/customize_test.html', o)
         local_result = <<~RESULT
@@ -112,7 +112,7 @@ describe Fronde::Templater do
             </body>
           </html>
         RESULT
-        expect(IO.read('public_html/customize_test.html')).to eq(local_result)
+        expect(File.read('public_html/customize_test.html')).to eq(local_result)
       end
 
       it 'customizes a given html file with before' do
@@ -124,7 +124,7 @@ describe Fronde::Templater do
           ]
         )
         described_class.customize_output('public_html/customize_test.html')
-        expect(IO.read('public_html/customize_test.html')).to eq(result)
+        expect(File.read('public_html/customize_test.html')).to eq(result)
       end
 
       it 'customizes a given html file with after' do
@@ -150,7 +150,7 @@ describe Fronde::Templater do
             </body>
           </html>
         RESULT
-        expect(IO.read('public_html/customize_test.html')).to eq(local_result)
+        expect(File.read('public_html/customize_test.html')).to eq(local_result)
       end
 
       it 'customizes a given html file with replace content' do
@@ -175,7 +175,7 @@ describe Fronde::Templater do
             </body>
           </html>
         RESULT
-        expect(IO.read('public_html/customize_test.html')).to eq(local_result)
+        expect(File.read('public_html/customize_test.html')).to eq(local_result)
       end
 
       it 'customizes a given html file with previous comments in head' do
@@ -198,7 +198,7 @@ describe Fronde::Templater do
             </body>
           </html>
         HTML
-        IO.write('public_html/customize_test2.html', local_html_base)
+        File.write('public_html/customize_test2.html', local_html_base)
         described_class.customize_output('public_html/customize_test2.html')
         local_result = <<~RESULT
           <!DOCTYPE html>
@@ -214,11 +214,11 @@ describe Fronde::Templater do
             </body>
           </html>
         RESULT
-        expect(IO.read('public_html/customize_test2.html')).to eq(local_result)
+        expect(File.read('public_html/customize_test2.html')).to eq(local_result)
       end
 
       it 'does not customize a given html file with wrong templates' do
-        result = IO.read('public_html/customize_test.html')
+        result = File.read('public_html/customize_test.html')
         Fronde::Config.load_test(
           'templates' => [
             { 'type' => 'replace',
@@ -228,14 +228,14 @@ describe Fronde::Templater do
           ]
         )
         described_class.customize_output('public_html/customize_test.html')
-        expect(IO.read('public_html/customize_test.html')).to eq(result)
+        expect(File.read('public_html/customize_test.html')).to eq(result)
       end
 
       it 'does not customize a given html file with no templates' do
-        result = IO.read('public_html/customize_test.html')
+        result = File.read('public_html/customize_test.html')
         Fronde::Config.load_test({})
         described_class.customize_output('public_html/customize_test.html')
-        expect(IO.read('public_html/customize_test.html')).to eq(result)
+        expect(File.read('public_html/customize_test.html')).to eq(result)
       end
 
       it 'moves elements around' do
@@ -253,7 +253,7 @@ describe Fronde::Templater do
             </body>
           </html>
         HTML
-        IO.write('public_html/customize_test.html', other_html_base)
+        File.write('public_html/customize_test.html', other_html_base)
         Fronde::Config.load_test(
           'templates' => [
             { 'type' => 'before',
@@ -278,15 +278,15 @@ describe Fronde::Templater do
             </body>
           </html>
         HTML
-        expect(IO.read('public_html/customize_test.html')).to eq(result)
+        expect(File.read('public_html/customize_test.html')).to eq(result)
       end
     end
 
     context 'with multiple customize call' do
       before do
         FileUtils.mkdir_p 'public_html/customize'
-        IO.write('public_html/customize_test.html', html_base)
-        IO.write('public_html/customize/test.html', html_base)
+        File.write('public_html/customize_test.html', html_base)
+        File.write('public_html/customize/test.html', html_base)
         Fronde::Config.load_test(
           'templates' => [
             { 'selector' => 'title',
@@ -304,25 +304,25 @@ describe Fronde::Templater do
 
       it 'customizes a file on a specific path' do
         described_class.customize_output('public_html/customize_test.html')
-        expect(IO.read('public_html/customize_test.html')).to eq(html_base)
+        expect(File.read('public_html/customize_test.html')).to eq(html_base)
         described_class.customize_output('public_html/customize/test.html')
-        expect(IO.read('public_html/customize/test.html')).to eq(result)
+        expect(File.read('public_html/customize/test.html')).to eq(result)
       end
 
       it 'does not customize twice a file' do
         described_class.customize_output('public_html/customize/test.html')
-        expect(IO.read('public_html/customize/test.html')).to eq(result)
+        expect(File.read('public_html/customize/test.html')).to eq(result)
         described_class.customize_output('public_html/customize/test.html')
-        expect(IO.read('public_html/customize/test.html')).to eq(result)
+        expect(File.read('public_html/customize/test.html')).to eq(result)
       end
     end
 
     context 'with multiple path to customize' do
       before do
         FileUtils.mkdir_p ['public_html/customize', 'public_html/other']
-        IO.write('public_html/customize_test.html', html_base)
-        IO.write('public_html/customize/test.html', html_base)
-        IO.write('public_html/other/file.html', html_base)
+        File.write('public_html/customize_test.html', html_base)
+        File.write('public_html/customize/test.html', html_base)
+        File.write('public_html/other/file.html', html_base)
         Fronde::Config.load_test(
           'templates' => [
             { 'selector' => 'title',
@@ -342,11 +342,11 @@ describe Fronde::Templater do
 
       it 'customizes a file on a specific path' do
         described_class.customize_output('public_html/customize_test.html')
-        expect(IO.read('public_html/customize_test.html')).to eq(html_base)
+        expect(File.read('public_html/customize_test.html')).to eq(html_base)
         described_class.customize_output('public_html/customize/test.html')
-        expect(IO.read('public_html/customize/test.html')).to eq(result)
+        expect(File.read('public_html/customize/test.html')).to eq(result)
         described_class.customize_output('public_html/other/file.html')
-        expect(IO.read('public_html/other/file.html')).to eq(result)
+        expect(File.read('public_html/other/file.html')).to eq(result)
       end
     end
   end

@@ -18,7 +18,7 @@ module Fronde
       FileUtils.mkdir 'tags' unless Dir.exist? 'tags'
       content = to_org index_name
       orgdest = "tags/#{slug}.org"
-      IO.write(orgdest, content)
+      File.write(orgdest, content)
     end
 
     private
@@ -37,7 +37,7 @@ module Fronde
         next unless Dir.exist?(project['path'])
         warn "Generated blog home for #{project['name']}" if verbose
         orgdest = format('%<root>s/index.org', root: project['path'])
-        IO.write(orgdest, to_org(project['name'], is_project: true))
+        File.write(orgdest, to_org(project['name'], is_project: true))
       end
     end
 

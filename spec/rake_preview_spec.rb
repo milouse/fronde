@@ -50,7 +50,7 @@ context 'when trying preview mode' do
     it 'is viewable with preview', rake: true do
       home_page = URI('http://localhost:5000/index.html').open.read
       proof = File.expand_path('data/index_proof.html', __dir__)
-      proof_content = IO.read(proof).gsub(/__PUB_DATE__/, now_str)
+      proof_content = File.read(proof).gsub(/__PUB_DATE__/, now_str)
       expect(home_page).to eq(proof_content)
       tigre = URI('http://localhost:5000/tigre.png')
       res = Net::HTTP.get_response(tigre)
@@ -62,14 +62,14 @@ context 'when trying preview mode' do
     it 'serves index', rake: true do
       home_page = URI('http://localhost:5000/').open.read
       proof = File.expand_path('data/index_proof.html', __dir__)
-      proof_content = IO.read(proof).gsub(/__PUB_DATE__/, now_str)
+      proof_content = File.read(proof).gsub(/__PUB_DATE__/, now_str)
       expect(home_page).to eq(proof_content)
     end
 
     it 'is viewable with routes testing', rake: true do
       home_page = URI('http://localhost:5000/test').open.read
       proof = File.expand_path('data/index_proof.html', __dir__)
-      proof_content = IO.read(proof).gsub(/__PUB_DATE__/, now_str)
+      proof_content = File.read(proof).gsub(/__PUB_DATE__/, now_str)
       expect(home_page).to eq(proof_content)
     end
 
@@ -105,7 +105,7 @@ context 'when trying preview mode' do
     it 'replaces domain occurence by localhost URIs', rake: true do
       home_page = URI('http://localhost:5000/index.html').open.read
       proof = File.expand_path('data/index_proof.html', __dir__)
-      proof_content = IO.read(proof).gsub(/__PUB_DATE__/, now_str)
+      proof_content = File.read(proof).gsub(/__PUB_DATE__/, now_str)
       proof_content.gsub!(/mydomain\.local/, 'localhost:5000')
       expect(home_page).to eq(proof_content)
     end

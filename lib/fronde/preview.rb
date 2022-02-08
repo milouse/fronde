@@ -32,7 +32,7 @@ module Fronde # rubocop:disable Style/Documentation
     end
 
     def parse_body(local_path, local_host)
-      body = IO.read local_path
+      body = File.read local_path
       return body unless local_path.match?(/\.(?:ht|x)ml\z/)
       domain = Fronde::Config.settings['domain']
       return body if domain == ''

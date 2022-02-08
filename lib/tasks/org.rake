@@ -65,14 +65,14 @@ namespace :org do
     htmlize = URI(
       'https://raw.githubusercontent.com/hniksic/emacs-htmlize/master/htmlize.el'
     ).open.read
-    IO.write 'lib/htmlize.el', htmlize
+    File.write 'lib/htmlize.el', htmlize
   end
 
   file 'lib/ox-gmi.el' => 'lib' do
     ox_gmi = URI(
       'https://git.umaneti.net/ox-gmi.el/plain/ox-gmi.el'
     ).open.read
-    IO.write 'lib/ox-gmi.el', ox_gmi
+    File.write 'lib/ox-gmi.el', ox_gmi
   end
 
   file 'var/lib/org-config.el' => ['lib/htmlize.el', 'lib/ox-gmi.el'] do

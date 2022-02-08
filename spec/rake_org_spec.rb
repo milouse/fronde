@@ -23,12 +23,12 @@ context 'with working org files' do
     expect(File.exist?('var/lib/org-config.el')).to be(true)
     proof = File.expand_path('data/org-config-proof.el', __dir__)
     base_dir = File.expand_path('../', __dir__)
-    proof_content = IO.read(proof)
-                      .gsub(/__TEST_DIR__/, Dir.pwd)
-                      .gsub(/__BASE_DIR__/, base_dir)
-                      .gsub(/__VERSION__/, Fronde::VERSION)
-                      .gsub(/__ORG_VERSION__/, Fronde::Config.org_last_version)
-    expect(IO.read('var/lib/org-config.el')).to eq(proof_content)
+    proof_content = File.read(proof)
+                        .gsub(/__TEST_DIR__/, Dir.pwd)
+                        .gsub(/__BASE_DIR__/, base_dir)
+                        .gsub(/__VERSION__/, Fronde::VERSION)
+                        .gsub(/__ORG_VERSION__/, Fronde::Config.org_last_version)
+    expect(File.read('var/lib/org-config.el')).to eq(proof_content)
   end
 
   it 'compiles org-config.el for blog', rake: true do
@@ -39,19 +39,19 @@ context 'with working org files' do
     expect(File.exist?('var/lib/org-config.el')).to be(true)
     proof = File.expand_path('data/org-config-blog-proof.el', __dir__)
     base_dir = File.expand_path('../', __dir__)
-    proof_content = IO.read(proof)
-                      .gsub(/__TEST_DIR__/, Dir.pwd)
-                      .gsub(/__BASE_DIR__/, base_dir)
-                      .gsub(/__VERSION__/, Fronde::VERSION)
-                      .gsub(/__ORG_VERSION__/, Fronde::Config.org_last_version)
-    expect(IO.read('var/lib/org-config.el')).to eq(proof_content)
+    proof_content = File.read(proof)
+                        .gsub(/__TEST_DIR__/, Dir.pwd)
+                        .gsub(/__BASE_DIR__/, base_dir)
+                        .gsub(/__VERSION__/, Fronde::VERSION)
+                        .gsub(/__ORG_VERSION__/, Fronde::Config.org_last_version)
+    expect(File.read('var/lib/org-config.el')).to eq(proof_content)
   end
 
   it 'creates .dir-locals.el', rake: true do
     rake.invoke_task('.dir-locals.el')
     expect(File.exist?('.dir-locals.el')).to be(true)
     proof = File.expand_path('var/lib/org-config.el', Dir.pwd)
-    expect(IO.read('.dir-locals.el')).to(
+    expect(File.read('.dir-locals.el')).to(
       eq("((org-mode . ((eval . (load-file \"#{proof}\")))))")
     )
   end

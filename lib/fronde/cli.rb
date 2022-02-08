@@ -43,7 +43,7 @@ module Fronde
 
         task default: 'site:build'
       RAKE
-      IO.write 'Rakefile', rakefile
+      File.write 'Rakefile', rakefile
     end
 
     def init_gitignore
@@ -54,7 +54,7 @@ module Fronde
         public_html
         var
       GITIGNORE
-      IO.write '.gitignore', gitignore
+      File.write '.gitignore', gitignore
     end
   end
 end

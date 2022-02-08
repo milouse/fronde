@@ -14,7 +14,7 @@ module Fronde
     def org_last_version
       return @org_version if @org_version
       if File.exist?('var/tmp/last_org_version')
-        @org_version = IO.read('var/tmp/last_org_version')
+        @org_version = File.read('var/tmp/last_org_version')
         return @org_version
       end
       versions = JSON.parse(
@@ -22,7 +22,7 @@ module Fronde
       ).sort { |a, b| b['date'] <=> a['date'] }
       @org_version = versions.first['version']
       FileUtils.mkdir_p 'var/tmp'
-      IO.write('var/tmp/last_org_version', @org_version)
+      File.write('var/tmp/last_org_version', @org_version)
       @org_version
     end
 
@@ -33,24 +33,29 @@ module Fronde
     # existed already.
     #
     # @return [Integer] the length written (as returned by the
-    #   underlying ~IO.write~ method call)
+    #   underlying ~File.write~ method call)
+    # rubocop:disable Metrics/MethodLength
     def write_org_lisp_config(with_tags: false)
       projects = org_generate_projects(with_tags: with_tags)
       workdir = Dir.pwd
-      content = IO.read(File.expand_path('./org-config.el', __dir__))
-                  .gsub('__VERSION__', Fronde::VERSION)
-                  .gsub('__WORK_DIR__', workdir)
-                  .gsub('__FRONDE_DIR__', __dir__)
-                  .gsub('__ORG_VER__', org_last_version)
-                  .gsub('__ALL_PROJECTS__', projects.values.join("\n        "))
-                  .gsub('__THEME_CONFIG__', org_default_theme_config)
-                  .gsub('__ALL_PROJECTS_NAMES__', project_names(projects))
-                  .gsub('__LONG_DATE_FMT__', r18n_full_datetime_format)
-                  .gsub('__AUTHOR_EMAIL__', settings['author_email'] || '')
-                  .gsub('__AUTHOR_NAME__', settings['author'])
+      content = File.read(File.expand_path('./org-config.el', __dir__))
+                    .gsub('__VERSION__', Fronde::VERSION)
+                    .gsub('__WORK_DIR__', workdir)
+                    .gsub('__FRONDE_DIR__', __dir__)
+                    .gsub('__ORG_VER__', org_last_version)
+                    .gsub(
+                      '__ALL_PROJECTS__',
+                      projects.values.join("\n        ")
+                    )
+                    .gsub('__THEME_CONFIG__', org_default_theme_config)
+                    .gsub('__ALL_PROJECTS_NAMES__', project_names(projects))
+                    .gsub('__LONG_DATE_FMT__', r18n_full_datetime_format)
+                    .gsub('__AUTHOR_EMAIL__', settings['author_email'] || '')
+                    .gsub('__AUTHOR_NAME__', settings['author'])
       FileUtils.mkdir_p "#{workdir}/var/lib"
-      IO.write("#{workdir}/var/lib/org-config.el", content)
+      File.write("#{workdir}/var/lib/org-config.el", content)
     end
+    # rubocop:enable Metrics/MethodLength
 
     # Generate emacs directory variables file.
     #
@@ -59,11 +64,11 @@ module Fronde
     # of this fronde instance.
     #
     # @return [Integer] the length written (as returned by the
-    #   underlying ~IO.write~ method call)
+    #   underlying ~File.write~ method call)
     def write_dir_locals
       workdir = Dir.pwd
       # rubocop:disable Layout/LineLength
-      IO.write(
+      File.write(
         "#{workdir}/.dir-locals.el",
         "((org-mode . ((eval . (load-file \"#{workdir}/var/lib/org-config.el\")))))"
       )

@@ -13,6 +13,7 @@ Gem::Specification.new do |s|
   s.authors     = ['Étienne Deparis']
   s.email       = 'etienne@depar.is'
   s.metadata    = {
+    'rubygems_mfa_required' => 'true',
     'source_code_uri' => 'https://git.umaneti.net/fronde',
     'homepage_uri' => 'https://etienne.depar.is/fronde/',
     'funding_uri' => 'https://liberapay.com/milouse'

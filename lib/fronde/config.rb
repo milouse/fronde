@@ -62,7 +62,7 @@ module Fronde
           ['domain', 'public_folder', 'templates', 'theme'].include?(k) \
           && v == default_settings[k]
         end
-        IO.write 'config.yml', new_config.to_yaml
+        File.write 'config.yml', new_config.to_yaml
         load_settings # Reload config, taking default settings into account
       end
 
