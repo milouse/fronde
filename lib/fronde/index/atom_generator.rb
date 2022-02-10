@@ -69,15 +69,20 @@ module Fronde
       end.join
       keywords += "\n  " if keywords != ''
       title = CGI.escapeHTML(article.title)
+      if article.project['type'] == 'gemini'
+        content_opening_tag = '<content>'
+      else
+        content_opening_tag = '<content type="html">'
+      end
       <<~ENDENTRY
         <entry>
           <title>#{title}</title>
-          <link href="#{article.url}" rel="alternate" type="text/html"
+          <link href="#{article.url}" rel="alternate" type="#{article.pub_mime_type}"
                 title="#{title}"/>
           <id>urn:md5:#{Digest::MD5.hexdigest(article.timekey)}</id>
           <published>#{article.datestring(:rfc3339)}</published>
           <author><name>#{CGI.escapeHTML(article.author)}</name></author>
-          #{keywords}<content type="html">#{CGI.escapeHTML(article.excerpt)}</content>
+          #{keywords}#{content_opening_tag}#{CGI.escapeHTML(article.excerpt)}</content>
         </entry>
       ENDENTRY
     end

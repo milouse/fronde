@@ -5,7 +5,7 @@ module Fronde
   module OrgFileClassMethods
     def source_for_target(file_name)
       # file_name may be frozen...
-      src = file_name.sub(/\.html\z/, '.org')
+      src = file_name.sub(/\.(?:html|gmi)\z/, '.org')
       pubfolder = Fronde::Config.get('public_folder')
       src.sub!(/^#{pubfolder}\//, '')
       # Look for match in each possible sources. The first found wins.
@@ -25,7 +25,8 @@ module Fronde
     def target_for_source(file_name, project, with_public_folder: true)
       return nil if file_name.nil?
       # file_name may be frozen...
-      target = file_name.sub(/\.org\z/, '.html').sub(/^#{Dir.pwd}\//, '')
+      target = file_name.sub(/^#{Dir.pwd}\//, '')
+      target.sub!(/\.org\z/, ext_for_project(project))
       if project.nil?
         subfolder = File.basename(File.dirname(target))
         target = File.basename(target)
@@ -56,6 +57,17 @@ module Fronde
     end
 
     private
+
+    def ext_for_project(project)
+      # project may be nil, often in test cases
+      return '.html' unless project
+      case project['type']
+      when 'gemini'
+        '.gmi'
+      else
+        '.html'
+      end
+    end
 
     def translit(char)
       return 'a' if ['á', 'à', 'â', 'ä', 'ǎ', 'ã', 'å'].include?(char)

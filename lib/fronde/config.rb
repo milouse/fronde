@@ -154,6 +154,7 @@ module Fronde
           'domain' => '',
           'lang' => extract_lang_from_env('en'),
           'public_folder' => 'public_html',
+          'gemini_public_folder' => 'public_gmi',
           'templates' => [],
           'theme' => 'default'
         }.freeze

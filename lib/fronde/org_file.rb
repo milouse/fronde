@@ -62,15 +62,15 @@ module Fronde
     # @return [String] the relative path to the source of this document.
     attr_reader :file
 
-    # @return [String] the relative path to the generated html file of
-    #   this document.
-    attr_reader :html_file
+    # @return [String] the relative path to the generated html or gemini
+    #   file of this document.
+    attr_reader :pub_file
 
     # @return [String] the url of this document, build from the ~domain~
-    #   settings and the above {#html_file @html_file} attribute.
+    #   settings and the above {#pub_file @pub_file} attribute.
     attr_reader :url
 
-    # @return [String] the project owning this document.
+    # @return [Hash] the project owning this document.
     attr_reader :project
 
     extend Fronde::OrgFileClassMethods
@@ -109,17 +109,17 @@ module Fronde
     # @option opts [String] title ('') the title of the new Org file
     # @option opts [String] author (system user or '') the author of the
     #   document
-    # @option opts [String] project the project owning this file
+    # @option opts [Hash] project the project owning this file
     #   must be stored
     # @return [Fronde::OrgFile] the new instance of Fronde::OrgFile
     def initialize(file_name, opts = {})
       file_name = nil if file_name == ''
       @file = file_name
-      @html_file = nil
+      @pub_file = nil
       @url = nil
       @project = opts.delete :project
       @options = opts
-      build_html_file_and_url
+      build_pub_file_and_url
       if @file && File.exist?(@file)
         extract_data
       else
@@ -191,6 +191,20 @@ module Fronde
       locale.strftime(@date, long_fmt)
     end
 
+    # Returns the MIME type of the generated file of this document.
+    #
+    # Currently, as Fronde only supports html or gemini, this method
+    # will return either text/html or text/gemini.
+    # @return [String] the MIME type of the generated file
+    def pub_mime_type
+      case @project['type']
+      when 'gemini'
+        'text/gemini'
+      else
+        'text/html'
+      end
+    end
+
     # Formats given ~string~ with values of the current OrgFile.
     #
     # This method expects to find percent-tags in the given ~string~ and
@@ -245,7 +259,7 @@ module Fronde
             .gsub('%N', "<a href=\"https://git.umaneti.net/fronde/about/\">Fronde</a> #{Fronde::VERSION}")
             .gsub('%s', @subtitle)
             .gsub('%t', @title)
-            .gsub('%u', @html_file || '')
+            .gsub('%u', @pub_file || '')
             .gsub('%x', @excerpt)
             .gsub('%X', "<p>#{@excerpt}</p>")
     end
@@ -267,12 +281,12 @@ module Fronde
 
     private
 
-    def build_html_file_and_url
+    def build_pub_file_and_url
       return if @file.nil?
-      @html_file = Fronde::OrgFile.target_for_source(
+      @pub_file = Fronde::OrgFile.target_for_source(
         @file, @project, with_public_folder: false
       )
-      @url = "#{Fronde::Config.get('domain')}/#{@html_file}"
+      @url = "#{Fronde::Config.get('domain')}/#{@pub_file}"
     end
 
     def init_empty_file

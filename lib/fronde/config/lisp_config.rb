@@ -132,7 +132,7 @@ module Fronde
     def publication_path(project)
       publish_in = [Dir.pwd]
       if project['type'] == 'gemini'
-        publish_in << get('gemini_public_folder', 'public_gmi')
+        publish_in << get('gemini_public_folder')
       else
         publish_in << get('public_folder')
       end

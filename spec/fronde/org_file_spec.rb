@@ -127,14 +127,14 @@ describe Fronde::OrgFile do
       expect(o.author).to eq('Test')
     end
 
-    it 'computes the right html_file path for existing sources', core: true do
+    it 'computes the right pub_file path for existing sources', core: true do
       o = described_class.new('data/test1.org')
-      expect(o.html_file).to eq('data/test1.html')
+      expect(o.pub_file).to eq('data/test1.html')
       Fronde::Config.load_test('domain' => 'http://perdu.com')
       o = described_class.new('data/test1.org')
-      expect(o.html_file).to eq('data/test1.html')
+      expect(o.pub_file).to eq('data/test1.html')
       o = described_class.new('data/content.org')
-      expect(o.html_file).to eq('data/content.html')
+      expect(o.pub_file).to eq('data/content.html')
       # The following are weird tests. We begin to test theoric stuff here
       Fronde::Config.load_test(
         'domain' => 'http://perdu.com',
@@ -143,9 +143,9 @@ describe Fronde::OrgFile do
         ]
       )
       o = described_class.new('data/test1.org')
-      expect(o.html_file).to eq('data/test1.html')
+      expect(o.pub_file).to eq('data/test1.html')
       o = described_class.new('data/content.org')
-      expect(o.html_file).to eq('data/content.html')
+      expect(o.pub_file).to eq('data/content.html')
     end
 
     it 'computes the right url for existing sources', core: true do
@@ -169,7 +169,7 @@ describe Fronde::OrgFile do
       expect(o.url).to eq('http://perdu.com/data/content.html')
     end
 
-    it 'computes the right html_file path for theoritical sources', core: true do
+    it 'computes the right pub_file path for theoritical sources', core: true do
       expect(described_class.target_for_source(nil, nil)).to be(nil)
       target = described_class.target_for_source('src/test.org', nil)
       expect(target).to eq('public_html/src/test.html')

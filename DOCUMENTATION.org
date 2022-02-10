@@ -485,6 +485,8 @@ following keys:
   indexes and atom feeds.
 - theme :: [string, optional] Theme name to use for this source.
   Defaults to “default”.
+- type :: [string, optional] Type of the exporter to use. Fronde
+  currently supports only “html” and “gemini”. Defaults to “html”.
 
 #+begin_tip
 If one of your sources is expected to use all default settings, instead
