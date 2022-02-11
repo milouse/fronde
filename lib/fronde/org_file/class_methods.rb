@@ -4,10 +4,7 @@ module Fronde
   # This module holds class methods for the {Fronde::OrgFile} class.
   module OrgFileClassMethods
     def source_for_target(file_name)
-      # file_name may be frozen...
-      src = file_name.sub(/\.(?:html|gmi)\z/, '.org')
-      pubfolder = Fronde::Config.get('public_folder')
-      src.sub!(/^#{pubfolder}\//, '')
+      src = possible_source_path(file_name)
       # Look for match in each possible sources. The first found wins.
       Fronde::Config.sources.each do |project|
         if project['target'] == '.'
@@ -24,9 +21,10 @@ module Fronde
 
     def target_for_source(file_name, project, with_public_folder: true)
       return nil if file_name.nil?
+      pub_settings = project_publish_settings(project)
       # file_name may be frozen...
       target = file_name.sub(/^#{Dir.pwd}\//, '')
-      target.sub!(/\.org\z/, ext_for_project(project))
+      target.sub!(/\.org\z/, pub_settings[:ext])
       if project.nil?
         subfolder = File.basename(File.dirname(target))
         target = File.basename(target)
@@ -37,8 +35,7 @@ module Fronde
         target = "#{project['target']}/#{target}" if project['target'] != '.'
       end
       return target unless with_public_folder
-      pubfolder = Fronde::Config.get('public_folder')
-      "#{pubfolder}/#{target}"
+      "#{pub_settings[:folder]}/#{target}"
     end
 
     def project_for_source(file_name)
@@ -58,15 +55,30 @@ module Fronde
 
     private
 
-    def ext_for_project(project)
+    def project_publish_settings(project)
+      default = {
+        ext: '.html',
+        folder: Fronde::Config.get('html_public_folder')
+      }
       # project may be nil, often in test cases
-      return '.html' unless project
-      case project['type']
-      when 'gemini'
-        '.gmi'
-      else
-        '.html'
+      return default unless project
+      if project['type'] == 'gemini'
+        return {
+          ext: '.gmi',
+          folder: Fronde::Config.get('gemini_public_folder')
+        }
       end
+      default
+    end
+
+    def possible_source_path(file_name)
+      ext = File.extname(file_name)
+      if ext == '.gmi'
+        pubfolder = Fronde::Config.get('gemini_public_folder')
+      else
+        pubfolder = Fronde::Config.get('html_public_folder')
+      end
+      file_name.sub(/^#{pubfolder}\//, '').sub(/#{ext}\z/, '.org')
     end
 
     def translit(char)

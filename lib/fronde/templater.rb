@@ -71,7 +71,7 @@ module Fronde
       end
 
       def check_path(file_name, pathes)
-        pub_folder = Fronde::Config.get('public_folder')
+        pub_folder = Fronde::Config.get('html_public_folder')
         if pathes.is_a?(Array)
           pathes.each do |tp|
             return true if File.fnmatch?("#{pub_folder}#{tp}",

@@ -21,7 +21,7 @@ module Fronde # rubocop:disable Style/Documentation
     def local_path(requested_path)
       routes = Fronde::Config.get(['preview', 'routes'], {})
       return routes[requested_path] if routes.has_key? requested_path
-      local_path = Fronde::Config.get('public_folder') + requested_path
+      local_path = Fronde::Config.get('html_public_folder') + requested_path
       if File.directory? local_path
         local_path = format(
           '%<path>s/index.html', path: local_path.delete_suffix('/')

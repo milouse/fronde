@@ -20,27 +20,35 @@ def rsync_command(test = nil)
   "rsync -#{optstring.join}rlt --delete"
 end
 
-def pull_or_push(direction, label, test)
+def pull_or_push(direction, standard, test)
   unless [:pull, :push].include? direction
     raise Fronde::SyncError, 'Not a valid direction'
   end
-  remote_path = Fronde::Config.get('remote')
-  raise Fronde::SyncError, 'No remote path set' if remote_path.nil?
-  public_folder = Fronde::Config.get('public_folder')
+  remote_path = Fronde::Config.get("#{standard}_remote")
+  raise Fronde::SyncError, "No #{standard} remote path set" if remote_path.nil?
+  public_folder = Fronde::Config.get("#{standard}_public_folder")
   # Default is to push
   cmd = ["#{public_folder}/", remote_path]
   cmd.reverse! if direction == :pull
   rsync = rsync_command(test)
-  publish_thread = Thread.new do
+  Thread.new do
     sh "#{rsync} #{cmd.join(' ')}"
   end
-  Fronde::Utils.throbber(publish_thread, label)
 end
 
 namespace :sync do
   desc 'Push changes to server'
   task :push, :test? do |_, args|
-    pull_or_push(:push, 'Publishing:', args[:test?])
+    ['html', 'gemini'].each do |standard|
+      publish_thread = pull_or_push(:push, standard, args[:test?])
+      if verbose
+        publish_thread.join
+      else
+        Fronde::Utils.throbber(
+          publish_thread, format('Publishing %<fmt>s:', fmt: standard)
+        )
+      end
+    end
   rescue Fronde::SyncError => e
     warn e
     next
@@ -48,7 +56,16 @@ namespace :sync do
 
   desc 'Pull changes from server'
   task :pull, :test? do |_, args|
-    pull_or_push(:pull, 'Pulling:', args[:test?])
+    ['html', 'gemini'].each do |standard|
+      pull_thread = pull_or_push(:pull, standard, args[:test?])
+      if verbose
+        pull_thread.join
+      else
+        Fronde::Utils.throbber(
+          pull_thread, format('Pulling %<fmt>s:', fmt: standard)
+        )
+      end
+    end
   rescue Fronde::SyncError => e
     warn e
     next

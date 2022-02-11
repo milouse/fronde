@@ -137,7 +137,13 @@ module Fronde
         return @config if @config
         conf_file = 'config.yml'
         if File.exist? conf_file
-          @config = default_settings.merge(YAML.load_file(conf_file)).freeze
+          user_conf = YAML.load_file(conf_file)
+          if !user_conf.has_key?('html_public_folder') && \
+             user_conf.has_key?('public_folder')
+            warn '‘public_folder’ setting is deprecated. Please use either ‘html_public_folder’ or ‘gemini_public_folder’.' # rubocop:disable Layout/LineLength
+            user_conf['html_public_folder'] = user_conf.delete('public_folder')
+          end
+          @config = default_settings.merge(user_conf).freeze
         else
           @config = default_settings
         end
@@ -153,7 +159,7 @@ module Fronde
           'author' => (ENV['USER'] || ''),
           'domain' => '',
           'lang' => extract_lang_from_env('en'),
-          'public_folder' => 'public_html',
+          'html_public_folder' => 'public_html',
           'gemini_public_folder' => 'public_gmi',
           'templates' => [],
           'theme' => 'default'

@@ -38,7 +38,7 @@ namespace :site do
     end
     # :nocov:
     customize_html = Thread.new do
-      pubfolder = Fronde::Config.get('public_folder')
+      pubfolder = Fronde::Config.get('html_public_folder')
       Dir["#{pubfolder}/**/*.html"].each do |f|
         Fronde::Templater.customize_output(f)
       end

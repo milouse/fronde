@@ -17,8 +17,9 @@ module Fronde
     def write_atom(index_name)
       return unless save?
       slug = Fronde::OrgFile.slug index_name
-      FileUtils.mkdir_p "#{@pubdir}/feeds"
-      atomdest = "#{@pubdir}/feeds/#{slug}.xml"
+      pubdir = Fronde::Config.get('html_public_folder')
+      FileUtils.mkdir_p "#{pubdir}/feeds"
+      atomdest = "#{pubdir}/feeds/#{slug}.xml"
       File.write(atomdest, to_atom(index_name))
     end
 

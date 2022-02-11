@@ -166,7 +166,7 @@ describe Fronde::Index do
           Fronde::Config.load_test(
             'title' => 'Blog',
             'author' => 'Test',
-            'public_folder' => 'output',
+            'html_public_folder' => 'output',
             'domain' => 'http://perdu.com',
             'sources' => [
               { 'path' => 'writings',
@@ -287,7 +287,7 @@ describe Fronde::Index do
           Fronde::Config.load_test(
             'title' => 'Blog',
             'author' => 'Test',
-            'public_folder' => 'output',
+            'html_public_folder' => 'output',
             'domain' => 'http://perdu.com',
             'sources' => [
               { 'path' => 'writings',
@@ -333,7 +333,7 @@ describe Fronde::Index do
         Fronde::Config.load_test(
           'title' => 'Blog',
           'author' => 'Test',
-          'public_folder' => 'output',
+          'html_public_folder' => 'output',
           'domain' => 'http://perdu.com',
           'sources' => [
             { 'path' => 'writings',
@@ -493,7 +493,7 @@ describe Fronde::Index do
       Fronde::Config.load_test(
         'title' => 'My site',
         'author' => 'Test',
-        'public_folder' => 'output',
+        'html_public_folder' => 'output',
         'domain' => 'http://perdu.com',
         'sources' => [{ 'path' => 'writings', 'target' => '.' }]
       )
@@ -586,7 +586,7 @@ describe Fronde::Index do
       FileUtils.cp 'data/test1.org', 'tmp/txt/writings'
       Dir.chdir 'tmp/txt'
       Fronde::Config.load_test(
-        'public_folder' => 'output',
+        'html_public_folder' => 'output',
         'domain' => 'http://perdu.com',
         'sources' => [{ 'path' => 'writings', 'target' => '.' }]
       )

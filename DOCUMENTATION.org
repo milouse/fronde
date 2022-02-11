@@ -400,6 +400,48 @@ are *valid* values too.
 The default ~domain~ value is an empty string.
 #+end_note
 
+*** ~gemini_public_folder~
+
+The ~gemini_public_folder~ option stores the path to the folder, which
+will contains the generated gemtext files, ready for Gemini publication.
+
+#+begin_note
+The default ~gemini_public_folder~ value is ~public_gmi~ (at the root of
+your project).
+#+end_note
+
+*** ~gemini_remote~
+
+The ~gemini_remote~ option contains an /rsync/ like destination string,
+which will be used to published your capsule when using the ~sync:push~
+/rake/ task. For example ~user@domain:/var/www/mycapsule/~
+
+#+begin_note
+There is no default value for ~gemini_remote~. Publication of your
+capsule will be skipped if there is no value for ~gemini_remote~.
+#+end_note
+
+*** ~html_public_folder~
+
+The ~html_public_folder~ option stores the path to the folder, which
+will contains the HTML generated files, ready for Web publication.
+
+#+begin_note
+The default ~html_public_folder~ value is ~public_html~ (at the root of
+your project).
+#+end_note
+
+*** ~html_remote~
+
+The ~html_remote~ option contains an /rsync/ like destination string,
+which will be used to published your website when using the ~sync:push~
+/rake/ task. For example ~user@domain:/var/www/mywebsite/~
+
+#+begin_note
+There is no default value for ~html_remote~. Publication of your website
+will be skipped if there is no value for ~html_remote~.
+#+end_note
+
 *** ~lang~
 :PROPERTIES:
 :CUSTOM_ID: lang_setting
@@ -416,27 +458,6 @@ with the [[https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes][ISO 639-1]] st
 
 #+begin_note
 The default ~lang~ setting is that of your current computer.
-#+end_note
-
-*** ~public_folder~
-
-The ~public_folder~ option stores the path to the folder, which will
-contains the generated files, ready for publication.
-
-#+begin_note
-The default ~public_folder~ value is ~public_html~ (at the root of your
-project).
-#+end_note
-
-*** ~remote~
-
-The ~remote~ option contains an /rsync/ like destination string, which
-will be used to published your website when using the ~sync:push~ /rake/
-task. For example ~user@domain:/var/www/mywebsite/~
-
-#+begin_note
-There is no default value for ~remote~. Publication of your website will
-be skipped if there is no value for ~remote~.
 #+end_note
 
 *** ~title~
@@ -478,8 +499,9 @@ following keys:
 - exclude :: [string, optional] Regexp of files to not export for this
   source. Default to nothing (no files to exclude).
 - target :: [string, optional] Path where to put the exported files,
-  relative to the ~public_folder~ folder. Defaults to the source name at
-  the root of the ~public_folder~ folder.
+  relative to the ~html_public_folder~ or ~gemini_public_folder~
+  folder. Defaults to the source name at the root of the /public/
+  folder.
 - is_blog :: [boolean, optional] Whether this source should be
   considered as a blog and thus, serves to generate blog index, tags
   indexes and atom feeds.
@@ -529,10 +551,10 @@ following exact value:
 
 In the first case, as nothing as been given for the ~sources~ option,
 its default value will use ~.~ as its target directory, which means to
-put generated HTML files directly at the root of the ~public_folder~
+put generated HTML files directly at the root of the ~html_public_folder~
 (which defaults to ~public_html~). But in the later case, the generated
-target will be the ~src~ folder /inside/ the ~public_folder~, which will
-be, by default, ~public_html/src~.
+target will be the ~src~ folder /inside/ the ~html_public_folder~, which
+will be, by default, ~public_html/src~.
 
 Thus, if you have a very simple website with only one source, you should
 avoid setting the ~sources~ options, or be very precise in what you

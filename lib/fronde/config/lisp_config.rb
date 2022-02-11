@@ -134,7 +134,7 @@ module Fronde
       if project['type'] == 'gemini'
         publish_in << get('gemini_public_folder')
       else
-        publish_in << get('public_folder')
+        publish_in << get('html_public_folder')
       end
       publish_in << project['target'] unless project['target'] == '.'
       publish_in.join('/')
@@ -292,7 +292,7 @@ module Fronde
         # rubocop:enable Layout/LineLength
         ' :recursive t',
         format(' :publishing-directory "%<wd>s/%<pub>s/assets/%<theme>s"',
-               wd: workdir, pub: get('public_folder'), theme: theme),
+               wd: workdir, pub: get('html_public_folder'), theme: theme),
         ' :publishing-function org-publish-attachment)'
       ].join("\n        ").strip
     end

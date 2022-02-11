@@ -86,7 +86,7 @@ namespace :org do
 
   desc 'Install Org'
   multitask install: ['org:compile', '.dir-locals.el'] do
-    mkdir_p "#{Fronde::Config.get('public_folder')}/assets"
+    mkdir_p "#{Fronde::Config.get('html_public_folder')}/assets"
     Fronde::Config.sources.each do |s|
       mkdir_p s['path'] unless Dir.exist? s['path']
     end
