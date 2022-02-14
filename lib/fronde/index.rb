@@ -17,7 +17,7 @@ module Fronde
     include Fronde::IndexOrgGenerator
 
     def initialize
-      @pubdir = Fronde::Config.settings['public_folder']
+      @pubdir = Fronde::Config.get('public_folder')
       @index = { 'index' => [] }
       @projects = {}
       @tags_names = {}

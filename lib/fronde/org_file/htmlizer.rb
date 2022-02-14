@@ -13,7 +13,7 @@ module Fronde
     #
     # @return [String] the HTML keywords list
     def keywords_to_html
-      domain = Fronde::Config.settings['domain']
+      domain = Fronde::Config.get('domain')
       klist = @keywords.map do |k|
         <<~KEYWORDLINK
           <li class="keyword">

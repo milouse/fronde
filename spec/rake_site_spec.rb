@@ -28,9 +28,9 @@ end
 
 context 'with a testing website' do
   before do
+    Fronde::Config.reset
     init_testing_website
     copy_org_tarball_to_fake_tmp
-    Fronde::Config.send(:load_settings)
     rake.invoke_task('org:install')
   end
 

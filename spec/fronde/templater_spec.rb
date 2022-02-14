@@ -54,7 +54,7 @@ describe Fronde::Templater do
 
       after do
         FileUtils.rm_r ['public_html', 'src'], force: true
-        Fronde::Config.load_test({})
+        Fronde::Config.reset
       end
 
       it 'customizes a given html file with simple template' do
@@ -233,7 +233,7 @@ describe Fronde::Templater do
 
       it 'does not customize a given html file with no templates' do
         result = File.read('public_html/customize_test.html')
-        Fronde::Config.load_test({})
+        Fronde::Config.reset
         described_class.customize_output('public_html/customize_test.html')
         expect(File.read('public_html/customize_test.html')).to eq(result)
       end
@@ -299,7 +299,7 @@ describe Fronde::Templater do
 
       after do
         FileUtils.rm_r 'public_html', force: true
-        Fronde::Config.load_test({})
+        Fronde::Config.reset
       end
 
       it 'customizes a file on a specific path' do
@@ -337,7 +337,7 @@ describe Fronde::Templater do
 
       after do
         FileUtils.rm_r 'public_html', force: true
-        Fronde::Config.load_test({})
+        Fronde::Config.reset
       end
 
       it 'customizes a file on a specific path' do

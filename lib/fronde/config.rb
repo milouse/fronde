@@ -24,7 +24,7 @@ module Fronde
   # Settings will be available like this:
   #
   # #+begin_src
-  # Fronde::Config.settings['author']
+  # Fronde::Config.get('author')
   # => "Alice Doe"
   # #+end_src
   class Config
@@ -33,13 +33,36 @@ module Fronde
     class << self
       # Access the current website settings
       #
-      # If the settings have not been loaded yet, this method is
-      # responsible for calling the one, which actually loads them.
+      # If necessary, this method will load settings from a config
+      # file.
       #
       # @return [Hash] the website settings
       def settings
-        return load_settings unless @config
+        load_settings
         @config
+      end
+
+      # Return a named setting.
+      #
+      # ~setting~ may be a ~String~ or an ~Array~.
+      #
+      # If the given ~setting~ name is an Array, this method will
+      # behave as ~Hash::dig~.
+      #
+      # If no value is found for the given setting, ~default~ will be
+      # returned.
+      #
+      # @param setting [String, Array] the setting to get
+      # @param default the default value to use if ~setting~ is absent
+      # @return the setting value or nil
+      def get(setting, default = nil)
+        load_settings
+        if setting.is_a? Array
+          value = @config.dig(*setting)
+        else
+          value = @config[setting]
+        end
+        value || default
       end
 
       # Save the settings given as a parameter to the ~config.yml~ file.
@@ -58,25 +81,42 @@ module Fronde
         # which may be different from a system to another. Thus it may
         # be confusing if one use fronde on two different computer and
         # these params always change.
+        default_keys = default_settings.keys
         new_config.delete_if do |k, v|
-          ['domain', 'public_folder', 'templates', 'theme'].include?(k) \
-          && v == default_settings[k]
+          default_keys.include?(k) && v == default_settings[k]
         end
         File.write 'config.yml', new_config.to_yaml
+        @config = @sources = nil
         load_settings # Reload config, taking default settings into account
+      end
+
+      # Reset settings
+      #
+      # This method is handy for testing purpose. Next call to
+      # {file:Fronde/Config.html#get-class_method get} or
+      # {file:Fronde/Config.html#settings-class_method settings} will
+      # force reload the settings from the config file
+      #
+      # @return nil
+      def reset
+        @sources = @config = nil
       end
 
       # Load the given settings as if they comes from the ~config.yml~ file.
       #
-      # This method is handy for testing purpose. Later call to
+      # This method is handy for testing purpose. Next call to
+      # {file:Fronde/Config.html#get-class_method get},
+      # {file:Fronde/Config.html#sources-class_method sources} or
       # {file:Fronde/Config.html#settings-class_method settings} will
       # use these new settings.
       #
       # @param config [Hash] the settings to artificially load
       # @return [Hash] the new settings
       def load_test(config)
-        @sources = nil # Reset sources
+        reset
         @config = default_settings.merge config
+        sources
+        @config
       end
 
       # Return the qualified projects sources list.
@@ -84,8 +124,9 @@ module Fronde
       # @return [Array] the fully qualified projects sources list
       def sources
         return @sources if @sources
+        load_settings
         default_sources = [{ 'path' => 'src', 'target' => '.' }]
-        @sources = (settings['sources'] || default_sources).map do |s|
+        @sources = get('sources', default_sources).map do |s|
           build_source(s)
         end.compact
       end
@@ -93,7 +134,7 @@ module Fronde
       private
 
       def load_settings
-        @sources = nil
+        return @config if @config
         conf_file = 'config.yml'
         if File.exist? conf_file
           @config = default_settings.merge(YAML.load_file(conf_file)).freeze

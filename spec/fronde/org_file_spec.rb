@@ -114,9 +114,8 @@ describe Fronde::OrgFile do
   end
 
   context 'with configuration' do
-    after do
-      # Reset config
-      Fronde::Config.load_test({})
+    before do
+      Fronde::Config.reset
     end
 
     it 'respects author name', core: true do

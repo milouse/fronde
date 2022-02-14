@@ -50,8 +50,8 @@ module Fronde
                     .gsub('__THEME_CONFIG__', org_default_theme_config)
                     .gsub('__ALL_PROJECTS_NAMES__', project_names(projects))
                     .gsub('__LONG_DATE_FMT__', r18n_full_datetime_format)
-                    .gsub('__AUTHOR_EMAIL__', settings['author_email'] || '')
-                    .gsub('__AUTHOR_NAME__', settings['author'])
+                    .gsub('__AUTHOR_EMAIL__', get('author_email', ''))
+                    .gsub('__AUTHOR_NAME__', get('author'))
       FileUtils.mkdir_p "#{workdir}/var/lib"
       File.write("#{workdir}/var/lib/org-config.el", content)
     end
@@ -98,12 +98,10 @@ module Fronde
       names = projects.keys.map do |p|
         ["\"#{p}\"", "\"#{p}-assets\""]
       end.flatten
-      unless settings['theme'] == 'default'
-        names << "\"theme-#{settings['theme']}\""
-      end
+      names << "\"theme-#{get('theme')}\"" unless get('theme') == 'default'
       sources.each do |s|
         # Default theme defined in settings is already included
-        next unless s['theme'] && s['theme'] != settings['theme']
+        next unless s['theme'] && s['theme'] != get('theme')
         # Never include theme named 'default' as it does not rely on any
         # file to export.
         next if s['theme'] == 'default'
@@ -123,9 +121,9 @@ module Fronde
     def publication_path(project)
       publish_in = [Dir.pwd]
       if project['type'] == 'gemini'
-        publish_in << (settings['gemini_public_folder'] || 'public_gmi')
+        publish_in << get('gemini_public_folder', 'public_gmi')
       else
-        publish_in << settings['public_folder']
+        publish_in << get('public_folder')
       end
       publish_in << project['target'] unless project['target'] == '.'
       publish_in.join('/')
@@ -192,7 +190,7 @@ module Fronde
         'html-head-include-default-style' => 't',
         'html-head-include-scripts' => 't'
       }
-      curtheme = project['theme'] || settings['theme']
+      curtheme = project['theme'] || get('theme')
       return defaults if curtheme.nil? || curtheme == 'default'
       defaults['html-head'] = org_default_html_head
       defaults['html-head-include-default-style'] = 'nil'
@@ -210,7 +208,7 @@ module Fronde
       else
         defaults.merge!(
           org_default_html_options(project),
-          settings['org-html'] || {},
+          get('org-html', {}),
           project['org-html'] || {}
         )
       end
@@ -218,14 +216,14 @@ module Fronde
     end
 
     def expand_vars_in_html_head(head, project)
-      curtheme = project['theme'] || settings['theme']
+      curtheme = project['theme'] || get('theme')
       # Head may be frozen when coming from settings
       head = head.gsub('__THEME__', curtheme)
-                 .gsub('__DOMAIN__', settings['domain'])
+                 .gsub('__DOMAIN__', get('domain'))
       return head.gsub('__ATOM_FEED__', '') unless project['is_blog']
       atomfeed = <<~ATOMFEED
         <link rel="alternate" type="application/atom+xml" title="Atom 1.0"
-              href="#{settings['domain']}/feeds/index.xml" />
+              href="#{get('domain')}/feeds/index.xml" />
       ATOMFEED
       head.gsub('__ATOM_FEED__', atomfeed)
     end
@@ -266,7 +264,7 @@ module Fronde
     end
 
     def org_default_theme_config
-      theme_config = org_theme_config(settings['theme'])
+      theme_config = org_theme_config(get('theme'))
       return theme_config if theme_config == ''
       format("\n        %<conf>s", conf: theme_config)
     end
@@ -283,7 +281,7 @@ module Fronde
         # rubocop:enable Layout/LineLength
         ' :recursive t',
         format(' :publishing-directory "%<wd>s/%<pub>s/assets/%<theme>s"',
-               wd: workdir, pub: settings['public_folder'], theme: theme),
+               wd: workdir, pub: get('public_folder'), theme: theme),
         ' :publishing-function org-publish-attachment)'
       ].join("\n        ").strip
     end

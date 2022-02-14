@@ -49,7 +49,7 @@ module Fronde
 
     def extract_author
       m = /^#\+author:(.+)$/i.match(@content)
-      return Fronde::Config.settings['author'] if m.nil?
+      return Fronde::Config.get('author') if m.nil?
       m[1].strip
     end
 
@@ -61,7 +61,7 @@ module Fronde
 
     def extract_lang
       m = /^#\+language:(.+)$/i.match(@content)
-      return Fronde::Config.settings['lang'] if m.nil?
+      return Fronde::Config.get('lang') if m.nil?
       m[1].strip
     end
 

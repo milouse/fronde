@@ -8,7 +8,7 @@ require 'fronde/version'
 require 'fronde/cli'
 
 R18n.default_places = File.expand_path('../locales', __dir__)
-R18n.set Fronde::Config.settings['lang']
+R18n.set Fronde::Config.get('lang')
 
 optparser = OptionParser.new
 optparser.version = Fronde::VERSION

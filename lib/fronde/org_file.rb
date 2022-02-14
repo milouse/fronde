@@ -240,7 +240,7 @@ module Fronde
             .gsub('%k', @keywords.join(', '))
             .gsub('%K', keywords_to_html)
             .gsub('%l', @lang)
-            .gsub('%L', (Fronde::Config.settings['license'] || '').gsub(/\s+/, ' ').strip)
+            .gsub('%L', Fronde::Config.get('license', '').gsub(/\s+/, ' ').strip)
             .gsub('%n', "Fronde #{Fronde::VERSION}")
             .gsub('%N', "<a href=\"https://git.umaneti.net/fronde/about/\">Fronde</a> #{Fronde::VERSION}")
             .gsub('%s', @subtitle)
@@ -272,7 +272,7 @@ module Fronde
       @html_file = Fronde::OrgFile.target_for_source(
         @file, @project, with_public_folder: false
       )
-      @url = "#{Fronde::Config.settings['domain']}/#{@html_file}"
+      @url = "#{Fronde::Config.get('domain')}/#{@html_file}"
     end
 
     def init_empty_file
@@ -280,9 +280,9 @@ module Fronde
       @subtitle = ''
       @date = DateTime.now
       @notime = false
-      @author = @options[:author] || Fronde::Config.settings['author']
+      @author = @options[:author] || Fronde::Config.get('author')
       @keywords = []
-      @lang = @options[:lang] || Fronde::Config.settings['lang']
+      @lang = @options[:lang] || Fronde::Config.get('lang')
       @excerpt = ''
       body = @options[:content] || ''
       @content = @options[:raw_content] || <<~ORG

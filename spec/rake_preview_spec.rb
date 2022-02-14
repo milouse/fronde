@@ -6,7 +6,7 @@ require 'net/http'
 
 def init_preview
   copy_org_tarball_to_fake_tmp
-  Fronde::Config.send(:load_settings)
+  Fronde::Config.reset
   rake.invoke_task('org:install')
   FileUtils.cp(
     File.expand_path('../tigre.png', __dir__),

@@ -60,12 +60,11 @@ describe Fronde::Utils do
     end
 
     context 'with config' do
-      after do
-        Fronde::Config.load_test({})
+      before do
+        Fronde::Config.reset
       end
 
       it 'selects the right throbber' do
-        Fronde::Config.load_test({})
         frames = described_class.send(:select_throbber_frames)
         expect(frames).to(
           eq(['⠁ ⠂ ⠄ ⡀ ⠄ ⠂ ⠁', '⠂ ⠁ ⠂ ⠄ ⡀ ⠄ ⠂', '⠄ ⠂ ⠁ ⠂ ⠄ ⡀ ⠄',

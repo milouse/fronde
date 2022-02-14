@@ -6,7 +6,7 @@ module Fronde
     def source_for_target(file_name)
       # file_name may be frozen...
       src = file_name.sub(/\.html\z/, '.org')
-      pubfolder = Fronde::Config.settings['public_folder']
+      pubfolder = Fronde::Config.get('public_folder')
       src.sub!(/^#{pubfolder}\//, '')
       # Look for match in each possible sources. The first found wins.
       Fronde::Config.sources.each do |project|
@@ -36,7 +36,7 @@ module Fronde
         target = "#{project['target']}/#{target}" if project['target'] != '.'
       end
       return target unless with_public_folder
-      pubfolder = Fronde::Config.settings['public_folder']
+      pubfolder = Fronde::Config.get('public_folder')
       "#{pubfolder}/#{target}"
     end
 

@@ -29,7 +29,7 @@ module Fronde
     def fronde_preview
       Thread.new do
         sleep 1
-        port = Fronde::Config.settings.dig('preview', 'server_port') || 5000
+        port = Fronde::Config.get(['preview', 'server_port'], 5000)
         uri = "http://127.0.0.1:#{port}/"
         current_os = Fronde::Utils.current_os
         case current_os

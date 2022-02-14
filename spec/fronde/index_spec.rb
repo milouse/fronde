@@ -160,7 +160,6 @@ describe Fronde::Index do
       after do
         Dir.chdir File.expand_path('../..', __dir__)
         FileUtils.rm_r 'tmp/blog', force: true
-        Fronde::Config.load_test({})
       end
 
       context 'with recursive config' do
@@ -348,7 +347,6 @@ describe Fronde::Index do
       after do
         Dir.chdir File.expand_path('../..', __dir__)
         FileUtils.rm_r 'tmp/blog', force: true
-        Fronde::Config.load_test({})
       end
 
       it 'has generated no index', core: true do
@@ -506,7 +504,6 @@ describe Fronde::Index do
     after do
       Dir.chdir File.expand_path('../..', __dir__)
       FileUtils.rm_r 'tmp/txt', force: true
-      Fronde::Config.load_test({})
     end
 
     it 'does not have generated any indexes', core: true do
@@ -601,7 +598,6 @@ describe Fronde::Index do
     after do
       Dir.chdir File.expand_path('../..', __dir__)
       FileUtils.rm_r 'tmp/txt', force: true
-      Fronde::Config.load_test({})
     end
 
     it 'does not have generated any indexes', core: true do
