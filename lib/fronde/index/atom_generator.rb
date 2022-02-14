@@ -17,7 +17,7 @@ module Fronde
     def write_atom(index_name)
       return unless save?
       slug = Fronde::OrgFile.slug index_name
-      pubdir = Fronde::Config.get('html_public_folder')
+      pubdir = Fronde::Config.get("#{@pub_format}_public_folder")
       FileUtils.mkdir_p "#{pubdir}/feeds"
       atomdest = "#{pubdir}/feeds/#{slug}.xml"
       File.write(atomdest, to_atom(index_name))
@@ -70,7 +70,7 @@ module Fronde
       end.join
       keywords += "\n  " if keywords != ''
       title = CGI.escapeHTML(article.title)
-      if article.project['type'] == 'gemini'
+      if @pub_format == 'gemini'
         content_opening_tag = '<content>'
       else
         content_opening_tag = '<content type="html">'

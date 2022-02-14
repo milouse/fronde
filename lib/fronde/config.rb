@@ -167,7 +167,7 @@ module Fronde
       end
 
       def build_source(seed)
-        opts = { 'recursive' => true, 'is_blog' => false }
+        opts = { 'recursive' => true, 'is_blog' => false, 'type' => 'html' }
         case seed
         when String
           opts['path'] = seed

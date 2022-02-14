@@ -32,8 +32,7 @@ module Fronde
     end
 
     def write_all_blog_home(verbose)
-      Fronde::Config.sources.each do |project|
-        next unless project['is_blog']
+      @sources.each do |project|
         next unless Dir.exist?(project['path'])
         warn "Generated blog home for #{project['name']}" if verbose
         orgdest = format('%<root>s/index.org', root: project['path'])

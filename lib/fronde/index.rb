@@ -16,13 +16,15 @@ module Fronde
     include Fronde::IndexAtomGenerator
     include Fronde::IndexOrgGenerator
 
-    def initialize
+    def initialize(publication_format = 'html')
+      @pub_format = publication_format
+      @sources = filter_sources
       @index = { 'index' => [] }
       @projects = {}
       @tags_names = {}
       @date = DateTime.now
-      feed
-      sort!
+      generate_feeds
+      sort_feeds!
     end
 
     def entries
@@ -57,14 +59,16 @@ module Fronde
 
     private
 
-    def feed
-      Fronde::Config.sources.each do |project|
-        next unless project['is_blog']
-        if project['recursive']
-          file_pattern = '**/*.org'
-        else
-          file_pattern = '*.org'
-        end
+    def filter_sources
+      Fronde::Config.sources.select do |project|
+        project['type'] == @pub_format && project['is_blog']
+      end
+    end
+
+    def generate_feeds
+      @sources.each do |project|
+        file_pattern = '*.org'
+        file_pattern = "**/#{file_pattern}" if project['recursive']
         Dir.glob(file_pattern, base: project['path']).map do |s|
           org_file = File.join(project['path'], s)
           next if exclude_file?(org_file, project)
@@ -92,7 +96,7 @@ module Fronde
       end
     end
 
-    def sort!
+    def sort_feeds!
       @index.each do |k, i|
         @index[k] = i.sort { |a, b| b.timekey <=> a.timekey }
       end
@@ -120,8 +124,8 @@ module Fronde
 
     def save?
       return true unless empty?
-      Fronde::Config.sources.each do |project|
-        return true if project['is_blog'] && Dir.exist?(project['path'])
+      @sources.each do |project|
+        return true if Dir.exist?(project['path'])
       end
       false
     end
