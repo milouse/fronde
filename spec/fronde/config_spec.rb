@@ -60,8 +60,7 @@ describe Fronde::Config do
     end
 
     after do
-      Dir.chdir File.expand_path('../..', __dir__)
-      FileUtils.rm_r 'tmp/config'
+      tear_down 'tmp/config'
     end
 
     it 'parses it successfully' do
@@ -96,8 +95,7 @@ describe Fronde::Config do
     end
 
     after do
-      Dir.chdir File.expand_path('../..', __dir__)
-      FileUtils.rm_r 'tmp/config'
+      tear_down 'tmp/config'
     end
 
     it 'lists sources' do
@@ -352,8 +350,7 @@ describe Fronde::Config do
     end
 
     after do
-      Dir.chdir File.expand_path('../..', __dir__)
-      FileUtils.rm_r 'tmp/config2'
+      tear_down 'tmp/config2'
     end
 
     it 'uses default config' do

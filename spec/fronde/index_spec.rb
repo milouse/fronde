@@ -149,17 +149,16 @@ describe Fronde::Index do
         FileUtils.mkdir_p 'tmp/blog/writings/other'
         FileUtils.mkdir_p 'tmp/blog/output'
         FileUtils.cp(
-          ['spec/data/test1.org',
-           'spec/data/test2.org'],
+          ['data/test1.org',
+           'data/test2.org'],
           'tmp/blog/writings'
         )
-        FileUtils.cp 'spec/data/test3.org', 'tmp/blog/writings/other'
+        FileUtils.cp 'data/test3.org', 'tmp/blog/writings/other'
         Dir.chdir 'tmp/blog'
       end
 
       after do
-        Dir.chdir File.expand_path('../..', __dir__)
-        FileUtils.rm_r 'tmp/blog', force: true
+        tear_down 'tmp/blog'
       end
 
       context 'with recursive config' do
@@ -345,8 +344,7 @@ describe Fronde::Index do
       end
 
       after do
-        Dir.chdir File.expand_path('../..', __dir__)
-        FileUtils.rm_r 'tmp/blog', force: true
+        tear_down 'tmp/blog'
       end
 
       it 'has generated no index', core: true do
@@ -486,9 +484,9 @@ describe Fronde::Index do
       FileUtils.mkdir_p 'tmp/txt/writings'
       FileUtils.mkdir_p 'tmp/txt/output'
       FileUtils.cp(
-        ['spec/data/test1.org',
-         'spec/data/test2.org',
-         'spec/data/test3.org'],
+        ['data/test1.org',
+         'data/test2.org',
+         'data/test3.org'],
         'tmp/txt/writings'
       )
       Dir.chdir 'tmp/txt'
@@ -502,8 +500,7 @@ describe Fronde::Index do
     end
 
     after do
-      Dir.chdir File.expand_path('../..', __dir__)
-      FileUtils.rm_r 'tmp/txt', force: true
+      tear_down 'tmp/txt'
     end
 
     it 'does not have generated any indexes', core: true do
@@ -586,7 +583,7 @@ describe Fronde::Index do
     before do
       FileUtils.mkdir_p 'tmp/txt/writings'
       FileUtils.mkdir_p 'tmp/txt/output'
-      FileUtils.cp 'spec/data/test1.org', 'tmp/txt/writings'
+      FileUtils.cp 'data/test1.org', 'tmp/txt/writings'
       Dir.chdir 'tmp/txt'
       Fronde::Config.load_test(
         'public_folder' => 'output',
@@ -596,8 +593,7 @@ describe Fronde::Index do
     end
 
     after do
-      Dir.chdir File.expand_path('../..', __dir__)
-      FileUtils.rm_r 'tmp/txt', force: true
+      tear_down 'tmp/txt'
     end
 
     it 'does not have generated any indexes', core: true do

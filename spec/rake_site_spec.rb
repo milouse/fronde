@@ -35,8 +35,7 @@ context 'with a testing website' do
   end
 
   after do
-    Dir.chdir File.expand_path('..', __dir__)
-    FileUtils.rm_r 'tmp/website_testing', force: true
+    tear_down 'tmp/website_testing'
   end
 
   context 'when building org files' do

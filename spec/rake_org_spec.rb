@@ -13,8 +13,7 @@ context 'with working org files' do
   after do
     Dir.glob('lib/org-[0-9.]*').each { |ov| FileUtils.rm_r(ov, force: true) }
     FileUtils.rm ['.dir-locals.el', 'var/lib/org-config.el'], force: true
-    Dir.chdir File.expand_path('..', __dir__)
-    FileUtils.rm_r 'tmp/website_testing', force: true
+    tear_down 'tmp/website_testing'
   end
 
   it 'compiles org-config.el', rake: true do

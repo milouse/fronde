@@ -3,7 +3,7 @@
 describe Fronde::OrgFile do
   context 'with working org files' do
     it 'parses without date', core: true do
-      o = described_class.new('spec/data/test1.org')
+      o = described_class.new('data/test1.org')
       expect(o.title).to eq('My sweet article')
       expect(o.date).to be_nil
       expect(o.timekey).to eq('00000000000000')
@@ -11,7 +11,7 @@ describe Fronde::OrgFile do
     end
 
     it 'parses with a partial date', core: true do
-      o = described_class.new('spec/data/test2.org')
+      o = described_class.new('data/test2.org')
       expect(o.title).to eq('My second article')
       expect(o.date).to eq(DateTime.strptime('2019-06-11 00:00:00', '%Y-%m-%d %H:%M:%S'))
       expect(o.timekey).to eq('20190611000000')
@@ -21,7 +21,7 @@ describe Fronde::OrgFile do
     end
 
     it 'parses with a complete date', core: true do
-      o = described_class.new('spec/data/test3.org')
+      o = described_class.new('data/test3.org')
       expect(o.title).to eq('My third article')
       expect(o.date).to eq(DateTime.strptime('2019-06-11 23:42:10', '%Y-%m-%d %H:%M:%S'))
       expect(o.timekey).to eq('20190611234210')
@@ -30,7 +30,7 @@ describe Fronde::OrgFile do
     end
 
     it 'parses with a complete date, but partial time', core: true do
-      o = described_class.new('spec/data/test4.org')
+      o = described_class.new('data/test4.org')
       expect(o.title).to eq('Fourth test')
       expect(o.date).to eq(DateTime.strptime('2019-07-25 20:45:00', '%Y-%m-%d %H:%M:%S'))
       expect(o.timekey).to eq('20190725204500')
@@ -39,7 +39,7 @@ describe Fronde::OrgFile do
     end
 
     it 'finds a subtitle', core: true do
-      o = described_class.new('spec/data/content.org')
+      o = described_class.new('data/content.org')
       expect(o.title).to eq('My first blog post?')
       expect(o.subtitle).to eq('What to do with that')
     end
@@ -62,8 +62,7 @@ describe Fronde::OrgFile do
     end
 
     after do
-      Dir.chdir File.expand_path('../..', __dir__)
-      FileUtils.rm_r 'tmp/org_test', force: true
+      tear_down 'tmp/org_test'
     end
 
     it 'raises if file_name is nil and try to write', core: true do
@@ -120,21 +119,21 @@ describe Fronde::OrgFile do
 
     it 'respects author name', core: true do
       Fronde::Config.load_test('author' => 'Test')
-      o = described_class.new('spec/data/test1.org')
+      o = described_class.new('data/test1.org')
       expect(o.author).to eq('Test')
-      o = described_class.new('spec/data/test2.org')
+      o = described_class.new('data/test2.org')
       expect(o.author).to eq('Titi')
-      o = described_class.new('spec/data/test3.org')
+      o = described_class.new('data/test3.org')
       expect(o.author).to eq('Test')
     end
 
     it 'computes the right html_file path for existing sources', core: true do
-      o = described_class.new('spec/data/test1.org')
+      o = described_class.new('data/test1.org')
       expect(o.html_file).to eq('data/test1.html')
       Fronde::Config.load_test('domain' => 'http://perdu.com')
-      o = described_class.new('spec/data/test1.org')
+      o = described_class.new('data/test1.org')
       expect(o.html_file).to eq('data/test1.html')
-      o = described_class.new('spec/data/content.org')
+      o = described_class.new('data/content.org')
       expect(o.html_file).to eq('data/content.html')
       # The following are weird tests. We begin to test theoric stuff here
       Fronde::Config.load_test(
@@ -143,19 +142,19 @@ describe Fronde::OrgFile do
           { 'path' => 'data' }
         ]
       )
-      o = described_class.new('spec/data/test1.org')
+      o = described_class.new('data/test1.org')
       expect(o.html_file).to eq('data/test1.html')
-      o = described_class.new('spec/data/content.org')
+      o = described_class.new('data/content.org')
       expect(o.html_file).to eq('data/content.html')
     end
 
     it 'computes the right url for existing sources', core: true do
-      o = described_class.new('spec/data/test1.org')
+      o = described_class.new('data/test1.org')
       expect(o.url).to eq('/data/test1.html')
       Fronde::Config.load_test('domain' => 'http://perdu.com')
-      o = described_class.new('spec/data/test1.org')
+      o = described_class.new('data/test1.org')
       expect(o.url).to eq('http://perdu.com/data/test1.html')
-      o = described_class.new('spec/data/content.org')
+      o = described_class.new('data/content.org')
       expect(o.url).to eq('http://perdu.com/data/content.html')
       # The following are weird tests. We begin to test theoric stuff here
       Fronde::Config.load_test(
@@ -164,9 +163,9 @@ describe Fronde::OrgFile do
           { 'path' => 'data' }
         ]
       )
-      o = described_class.new('spec/data/test1.org')
+      o = described_class.new('data/test1.org')
       expect(o.url).to eq('http://perdu.com/data/test1.html')
-      o = described_class.new('spec/data/content.org')
+      o = described_class.new('data/content.org')
       expect(o.url).to eq('http://perdu.com/data/content.html')
     end
 
@@ -227,8 +226,7 @@ describe Fronde::OrgFile do
     end
 
     after do
-      Dir.chdir File.expand_path('../..', __dir__)
-      FileUtils.rm_r 'tmp/test_target', force: true
+      tear_down 'tmp/test_target'
     end
 
     it 'uses file name as title when title is empty' do

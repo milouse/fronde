@@ -26,6 +26,10 @@ end
 context 'when trying preview mode' do
   let(:now_str) { DateTime.now.strftime('%A %-d of %B, %Y at %R') }
 
+  after do
+    tear_down 'tmp/website_testing'
+  end
+
   context 'without a domain name' do
     around do |test|
       init_testing_website
@@ -40,11 +44,6 @@ context 'when trying preview mode' do
       test.run         # Actually run test case
       webrick_app.exit # Be sure to kill test server
       webrick_app.join # Be patient before quitting example
-    end
-
-    after do
-      Dir.chdir File.expand_path('..', __dir__)
-      FileUtils.rm_r 'tmp/website_testing', force: true
     end
 
     it 'is viewable with preview', rake: true do
@@ -95,11 +94,6 @@ context 'when trying preview mode' do
       test.run # Actually run test
       webrick_app.exit
       webrick_app.join
-    end
-
-    after do
-      Dir.chdir File.expand_path('..', __dir__)
-      FileUtils.rm_r 'tmp/website_testing', force: true
     end
 
     it 'replaces domain occurence by localhost URIs', rake: true do

@@ -31,17 +31,19 @@ ENV['USER'] = 'alice'
 def init_testing_website
   FileUtils.mkdir_p 'tmp/website_testing'
   Dir.chdir 'tmp/website_testing'
+  # Full path is now spec/tmp/website_testing
+  # Thus we have to rewind 3 level to find fronde src directory
   rakefile = <<~RAKE
     # frozen_string_literal: true
 
     require 'r18n-core'
-    R18n.default_places = '../../locales'
+    R18n.default_places = '../../../locales'
     R18n.set 'en'
     R18n::Filters.on(:named_variables)
 
-    $LOAD_PATH.unshift('../../lib')
+    $LOAD_PATH.unshift('../../../lib')
 
-    Dir.glob('../../lib/tasks/*.rake').each { |r| import r }
+    Dir.glob('../../../lib/tasks/*.rake').each { |r| import r }
 
     task default: 'site:build'
   RAKE
@@ -78,7 +80,7 @@ end
 # rubocop:enable Metrics/MethodLength
 
 def copy_org_tarball_to_fake_tmp
-  tarball = File.expand_path('../tmp/org.tar.gz', __dir__)
+  tarball = File.expand_path('tmp/org.tar.gz', __dir__)
   FileUtils.mkdir_p 'var/tmp'
   FileUtils.cp tarball, 'var/tmp'
 end
@@ -92,13 +94,20 @@ def rake(verbose: false)
   rake
 end
 
+def tear_down(path)
+  Dir.chdir __dir__
+  FileUtils.rm_r path, force: true
+end
+
 RSpec.configure do |config|
   config.before(:suite) do
+    Dir.chdir __dir__
     FileUtils.mkdir 'tmp'
     Fronde::Utils.download_org('tmp')
   end
 
   config.after(:suite) do
+    Dir.chdir __dir__
     FileUtils.rm_r ['tmp', 'var'], force: true
   end
 end

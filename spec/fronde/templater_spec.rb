@@ -42,8 +42,7 @@ describe Fronde::Templater do
     end
 
     after do
-      Dir.chdir File.expand_path('../..', __dir__)
-      FileUtils.rm_r 'tmp/website_testing', force: true
+      tear_down 'tmp/website_testing'
     end
 
     context 'with a simple customization process' do
@@ -233,7 +232,7 @@ describe Fronde::Templater do
 
       it 'does not customize a given html file with no templates' do
         result = File.read('public_html/customize_test.html')
-        Fronde::Config.reset
+        Fronde::Config.load_test({})
         described_class.customize_output('public_html/customize_test.html')
         expect(File.read('public_html/customize_test.html')).to eq(result)
       end
