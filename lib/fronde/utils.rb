@@ -7,6 +7,9 @@ require 'r18n-core'
 require 'fronde/config'
 
 module Fronde
+  # Default Error, which may be raised by fronde code
+  class Error < ::StandardError; end
+
   # Embeds usefull methods, mainly used in rake tasks.
   module Utils
     # @return [Hash] the possible throbber themes
