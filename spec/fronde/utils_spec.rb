@@ -59,6 +59,22 @@ describe Fronde::Utils do
       expect(described_class.resolve_possible_alias('wrong')).to eq('basic')
     end
 
+    it 'returns possible options for a command' do
+      init_opts = described_class.command_options('init')
+      expect(init_opts).to have_key(:name)
+      expect(init_opts[:name]).to eq('init')
+      expect(init_opts).to have_key(:opts)
+      expect(init_opts[:opts]).to contain_exactly('-a', '-h', '-l', '-t', '-v')
+      expect(init_opts).not_to have_key(:alias)
+
+      config_opts = described_class.command_options('config')
+      expect(config_opts).to have_key(:name)
+      expect(config_opts[:name]).to eq('update')
+      expect(config_opts).to have_key(:opts)
+      expect(config_opts[:opts]).to contain_exactly('-a', '-h', '-l', '-t', '-v')
+      expect(config_opts).not_to have_key(:alias)
+    end
+
     context 'with config' do
       before do
         Fronde::Config.reset
