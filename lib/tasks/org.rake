@@ -12,6 +12,14 @@ CLOBBER.push(
   'var/lib/org-config.el', '.dir-locals.el', 'lib/htmlize.el'
 )
 
+def make_org_cmd(org_dir, target)
+  make = ['make', '-C', org_dir, target]
+  return make.join(' ') if verbose
+  make.insert(3, '-s')
+  make << 'EMACSQ="emacs -Q --eval \'(setq inhibit-message t)\'"'
+  make.join(' ')
+end
+
 namespace :org do
   directory 'var/tmp'
 
@@ -34,16 +42,11 @@ namespace :org do
     org_version = Fronde::Config.org_last_version
     org_dir = "lib/org-#{org_version}"
     next if Dir.exist?("#{org_dir}/lisp")
-    make = ['make', '-C', org_dir]
-    unless verbose
-      make << '-s'
-      make << 'EMACSQ="emacs -Q --eval \'(setq inhibit-message t)\'"'
-    end
     build = Thread.new do
       sh "tar -C lib -xzf #{task.prerequisites[0]}"
       mv "lib/org-mode-release_#{org_version}", org_dir
-      sh((make + ['compile']).join(' '))
-      sh((make + ['autoloads']).join(' '))
+      sh make_org_cmd(org_dir, 'compile')
+      sh make_org_cmd(org_dir, 'autoloads')
       Dir.glob('lib/org-[0-9.]*').each do |ov|
         next if ov == org_dir
         rm_r ov
