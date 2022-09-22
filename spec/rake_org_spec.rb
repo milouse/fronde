@@ -63,8 +63,6 @@ context 'with working org files' do
   end
 
   it 'installs Org in verbose mode', rake: true do
-    # This one is mainly for coverage
-    FileUtils.rm_r org_dir, force: true
     copy_org_tarball_to_fake_tmp
     rake(verbose: true).invoke_task('org:install')
     expect(File.exist?('var/lib/org-config.el')).to be(true)
