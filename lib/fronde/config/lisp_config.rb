@@ -4,6 +4,20 @@ require 'json'
 require 'open-uri'
 require 'fronde/version'
 
+def fetch_org_version
+  # Retrieve last org version from git repository tags page.
+  tag_rx = Regexp.new(
+    '<a href=\'/cgit/emacs/org-mode.git/tag/\?h=' \
+    '(?<tag>release_(?<number>[^\']+))\'>\k<tag></a>'
+  )
+  versions = URI(
+    'https://git.savannah.gnu.org/cgit/emacs/org-mode.git/refs/'
+  ).open.readlines.map do |line|
+    line.match(tag_rx) { |matchdata| matchdata[:number] }
+  end
+  versions.compact.first
+end
+
 module Fronde
   # This module contains utilitary methods to ease ~org-config.el~
   # file generation
@@ -17,10 +31,7 @@ module Fronde
         @org_version = File.read('var/tmp/last_org_version')
         return @org_version
       end
-      versions = JSON.parse(
-        URI('https://updates.orgmode.org/data/releases').open.read
-      ).sort { |a, b| b['date'] <=> a['date'] }
-      @org_version = versions.first['version']
+      @org_version = fetch_org_version
       FileUtils.mkdir_p 'var/tmp'
       File.write('var/tmp/last_org_version', @org_version)
       @org_version
