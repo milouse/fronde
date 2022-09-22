@@ -7,7 +7,7 @@ module Fronde
   class SyncError < Error; end
 end
 
-def rsync_command(verbose, test = nil)
+def rsync_command(test = nil)
   rsync_command = Fronde::Config.get('rsync')
   return rsync_command unless rsync_command.nil?
   optstring = []
@@ -30,7 +30,7 @@ def pull_or_push(direction, label, test)
   # Default is to push
   cmd = ["#{public_folder}/", remote_path]
   cmd.reverse! if direction == :pull
-  rsync = rsync_command(Rake::FileUtilsExt.verbose_flag, test)
+  rsync = rsync_command(test)
   publish_thread = Thread.new do
     sh "#{rsync} #{cmd.join(' ')}"
   end

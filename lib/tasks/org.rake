@@ -17,7 +17,6 @@ namespace :org do
 
   desc 'Download last version of Org'
   file 'var/tmp/org.tar.gz' => 'var/tmp' do
-    verbose = Rake::FileUtilsExt.verbose_flag
     download = Thread.new do
       Thread.current[:org_version] = Fronde::Config.org_last_version
       Fronde::Utils.download_org
@@ -32,7 +31,6 @@ namespace :org do
 
   desc 'Compile Org'
   task compile: 'var/tmp/org.tar.gz' do |task|
-    verbose = Rake::FileUtilsExt.verbose_flag
     org_version = Fronde::Config.org_last_version
     org_dir = "lib/org-#{org_version}"
     next if Dir.exist?("#{org_dir}/lisp")
