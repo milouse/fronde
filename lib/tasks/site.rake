@@ -10,7 +10,6 @@ namespace :site do
   desc 'Generates all index files'
   task :index do
     index = Fronde::Index.new
-    verbose = Rake::FileUtilsExt.verbose_flag
     if verbose
       index.write_all
       next
@@ -28,7 +27,7 @@ namespace :site do
     args.with_defaults(:force? => false)
     build_html = Thread.new do
       rm_r 'var/tmp/timestamps', force: true if args[:force?]
-      Fronde::Emacs.new(verbose: Rake::FileUtilsExt.verbose_flag).publish
+      Fronde::Emacs.new(verbose: verbose).publish
     end
     begin
       Fronde::Utils.throbber(build_html, 'Building:')
@@ -39,7 +38,7 @@ namespace :site do
     end
     # :nocov:
     customize_html = Thread.new do
-      pubfolder = Fronde::Config.settings['public_folder']
+      pubfolder = Fronde::Config.get('public_folder')
       Dir["#{pubfolder}/**/*.html"].each do |f|
         Fronde::Templater.customize_output(f)
       end

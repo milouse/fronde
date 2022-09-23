@@ -18,7 +18,7 @@ module Fronde
       FileUtils.mkdir 'tags' unless Dir.exist? 'tags'
       content = to_org index_name
       orgdest = "tags/#{slug}.org"
-      IO.write(orgdest, content)
+      File.write(orgdest, content)
     end
 
     private
@@ -37,7 +37,7 @@ module Fronde
         next unless Dir.exist?(project['path'])
         warn "Generated blog home for #{project['name']}" if verbose
         orgdest = format('%<root>s/index.org', root: project['path'])
-        IO.write(orgdest, to_org(project['name'], is_project: true))
+        File.write(orgdest, to_org(project['name'], is_project: true))
       end
     end
 
@@ -57,7 +57,7 @@ module Fronde
     end
 
     def tag_published_url(tag_name)
-      domain = Fronde::Config.settings['domain']
+      domain = Fronde::Config.get('domain')
       title = @tags_names[tag_name]
       tag_link = "#{domain}/tags/#{tag_name}.html"
       "[[#{tag_link}][#{title}]]"
@@ -67,12 +67,12 @@ module Fronde
       if is_tag
         title = @tags_names[title]
       elsif title.nil? || title == 'index'
-        title = Fronde::Config.settings['title']
+        title = Fronde::Config.get('title')
       end
       <<~HEADER.strip
         #+title: #{title}
-        #+author: #{Fronde::Config.settings['author']}
-        #+language: #{Fronde::Config.settings['lang']}
+        #+author: #{Fronde::Config.get('author')}
+        #+language: #{Fronde::Config.get('lang')}
       HEADER
     end
 

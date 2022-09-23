@@ -3,8 +3,12 @@
 require 'fronde/config'
 require 'fronde/utils'
 
-def rsync_command(verbose, test = nil)
-  rsync_command = Fronde::Config.settings['rsync']
+module Fronde
+  class SyncError < Error; end
+end
+
+def rsync_command(test = nil)
+  rsync_command = Fronde::Config.get('rsync')
   return rsync_command unless rsync_command.nil?
   optstring = []
   optstring << 'n' if test
@@ -16,19 +20,37 @@ def rsync_command(verbose, test = nil)
   "rsync -#{optstring.join}rlt --delete"
 end
 
+def pull_or_push(direction, label, test)
+  unless [:pull, :push].include? direction
+    raise Fronde::SyncError, 'Not a valid direction'
+  end
+  remote_path = Fronde::Config.get('remote')
+  raise Fronde::SyncError, 'No remote path set' if remote_path.nil?
+  public_folder = Fronde::Config.get('public_folder')
+  # Default is to push
+  cmd = ["#{public_folder}/", remote_path]
+  cmd.reverse! if direction == :pull
+  rsync = rsync_command(test)
+  publish_thread = Thread.new do
+    sh "#{rsync} #{cmd.join(' ')}"
+  end
+  Fronde::Utils.throbber(publish_thread, label)
+end
+
 namespace :sync do
-  desc 'Push change to server'
+  desc 'Push changes to server'
   task :push, :test? do |_, args|
-    remote_path = Fronde::Config.settings['remote']
-    if remote_path.nil?
-      warn 'No remote path set'
-      next
-    end
-    public_folder = Fronde::Config.settings['public_folder']
-    publish_thread = Thread.new do
-      sh [rsync_command(Rake::FileUtilsExt.verbose_flag, args[:test?]),
-          "#{public_folder}/", remote_path].join(' ')
-    end
-    Fronde::Utils.throbber(publish_thread, 'Publishing:')
+    pull_or_push(:push, 'Publishing:', args[:test?])
+  rescue Fronde::SyncError => e
+    warn e
+    next
+  end
+
+  desc 'Pull changes from server'
+  task :pull, :test? do |_, args|
+    pull_or_push(:pull, 'Pulling:', args[:test?])
+  rescue Fronde::SyncError => e
+    warn e
+    next
   end
 end

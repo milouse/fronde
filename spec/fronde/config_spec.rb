@@ -54,15 +54,13 @@ describe Fronde::Config do
   context 'with a config file' do
     before do
       FileUtils.mkdir_p 'tmp/config'
-      IO.write('tmp/config/config.yml', SAMPLE_CONFIG)
+      File.write('tmp/config/config.yml', SAMPLE_CONFIG)
       Dir.chdir 'tmp/config'
-      described_class.send(:load_settings)
+      described_class.reset
     end
 
     after do
-      described_class.load_test({})
-      Dir.chdir File.expand_path('../..', __dir__)
-      FileUtils.rm_r 'tmp/config'
+      tear_down 'tmp/config'
     end
 
     it 'parses it successfully' do
@@ -79,7 +77,7 @@ describe Fronde::Config do
     it 'saves it successfully' do
       described_class.save('author' => 'Titi', 'title' => 'Nevermind',
                            'domain' => 'https://tutu.com')
-      expect(IO.read('config.yml')).to eq(SAMPLE_CONFIG_2)
+      expect(File.read('config.yml')).to eq(SAMPLE_CONFIG_2)
       conf = described_class.settings
       expect(conf['author']).to eq('Titi')
       expect(conf['title']).to eq('Nevermind')
@@ -93,44 +91,43 @@ describe Fronde::Config do
     before do
       FileUtils.mkdir_p 'tmp/config'
       Dir.chdir 'tmp/config'
-      described_class.load_test({})
+      described_class.reset
     end
 
     after do
-      Dir.chdir File.expand_path('../..', __dir__)
-      FileUtils.rm_r 'tmp/config'
+      tear_down 'tmp/config'
     end
 
     it 'lists sources' do
-      IO.write('config.yml', SAMPLE_CONFIG_3)
-      described_class.send(:load_settings)
-      expect(described_class.sources.length).to eq(2)
-      expect(described_class.sources[0]['name']).to eq('src')
-      expect(described_class.sources[0]['path']).to(
+      File.write('config.yml', SAMPLE_CONFIG_3)
+      projects = described_class.sources
+      expect(projects.length).to eq(2)
+      expect(projects[0]['name']).to eq('src')
+      expect(projects[0]['path']).to(
         eq(File.expand_path('src'))
       )
-      expect(described_class.sources[0]['target']).to eq('src')
-      expect(described_class.sources[0]['is_blog']).to be(false)
-      expect(described_class.sources[0]['recursive']).to be(true)
-      expect(described_class.sources[1]['name']).to eq('news')
-      expect(described_class.sources[1]['path']).to(
+      expect(projects[0]['target']).to eq('src')
+      expect(projects[0]['is_blog']).to be(false)
+      expect(projects[0]['recursive']).to be(true)
+      expect(projects[1]['name']).to eq('news')
+      expect(projects[1]['path']).to(
         eq(File.expand_path('src/news'))
       )
-      expect(described_class.sources[1]['target']).to eq('news')
-      expect(described_class.sources[1]['is_blog']).to be(true)
-      expect(described_class.sources[1]['recursive']).to be(true)
+      expect(projects[1]['target']).to eq('news')
+      expect(projects[1]['is_blog']).to be(true)
+      expect(projects[1]['recursive']).to be(true)
     end
 
     it 'generates projects hash' do
-      IO.write('config.yml', SAMPLE_CONFIG_3)
-      described_class.send(:load_settings)
+      File.write('config.yml', SAMPLE_CONFIG_3)
+      described_class.reset
       projects = described_class.send(:org_generate_projects)
       expect(projects).to have_key('news')
     end
 
     it 'exposes correct head header' do
-      IO.write('config.yml', SAMPLE_CONFIG_3)
-      described_class.send(:load_settings)
+      File.write('config.yml', SAMPLE_CONFIG_3)
+      described_class.reset
       projects = described_class.sources
       headers = described_class.send(:build_project_org_headers, projects[0])
       head = <<~HEAD.strip
@@ -148,8 +145,8 @@ describe Fronde::Config do
     end
 
     it 'exposes correct head header with boolean values in conf' do
-      IO.write('config.yml', SAMPLE_CONFIG_3)
-      described_class.send(:load_settings)
+      File.write('config.yml', SAMPLE_CONFIG_3)
+      described_class.reset
       old_conf = described_class.settings.dup
       old_conf['sources'][0] = {
         'path' => 'src',
@@ -176,8 +173,8 @@ describe Fronde::Config do
     end
 
     it 'exposes correct head header with custom domain' do
-      IO.write('config.yml', SAMPLE_CONFIG_4)
-      described_class.send(:load_settings)
+      File.write('config.yml', SAMPLE_CONFIG_4)
+      described_class.reset
       projects = described_class.sources
       headers = described_class.send(:build_project_org_headers, projects[0])
       head = <<~HEAD.strip
@@ -213,8 +210,8 @@ describe Fronde::Config do
     end
 
     it 'exposes correct head header for gemini projects' do
-      IO.write('config.yml', SAMPLE_CONFIG_3)
-      described_class.send(:load_settings)
+      File.write('config.yml', SAMPLE_CONFIG_3)
+      described_class.reset
       old_conf = described_class.settings.dup
       old_conf['sources'][0] = { 'path' => 'src', 'type' => 'gemini' }
       described_class.load_test(old_conf)
@@ -230,8 +227,8 @@ describe Fronde::Config do
     end
 
     it 'generates projects' do
-      IO.write('config.yml', SAMPLE_CONFIG_4)
-      described_class.send(:load_settings)
+      File.write('config.yml', SAMPLE_CONFIG_4)
+      described_class.reset
       projects = described_class.send(:org_generate_projects)
       srcconf = <<~SRCCONF.strip
         ("src"
@@ -298,8 +295,8 @@ describe Fronde::Config do
     end
 
     it 'generates gemini projects' do
-      IO.write('config.yml', SAMPLE_CONFIG_4)
-      described_class.send(:load_settings)
+      File.write('config.yml', SAMPLE_CONFIG_4)
+      described_class.reset
       old_conf = described_class.settings.dup
       old_conf['sources'][0] = { 'path' => 'src', 'type' => 'gemini' }
       described_class.load_test(old_conf)
@@ -327,8 +324,8 @@ describe Fronde::Config do
     end
 
     it 'generates projects names list' do
-      IO.write('config.yml', SAMPLE_CONFIG_4)
-      described_class.send(:load_settings)
+      File.write('config.yml', SAMPLE_CONFIG_4)
+      described_class.reset
       projects = described_class.send(:org_generate_projects)
       expect(described_class.send(:project_names, projects)).to(
         eq('"src" "src-assets" "news" "news-assets" "other" "other-assets" "theme-my-theme"')
@@ -336,8 +333,8 @@ describe Fronde::Config do
     end
 
     it 'generates projects names list without default' do
-      IO.write('config.yml', SAMPLE_CONFIG_5)
-      described_class.send(:load_settings)
+      File.write('config.yml', SAMPLE_CONFIG_5)
+      described_class.reset
       projects = described_class.send(:org_generate_projects)
       expect(described_class.send(:project_names, projects)).to(
         eq('"src" "src-assets" "news" "news-assets" "theme-my-theme"')
@@ -349,13 +346,11 @@ describe Fronde::Config do
     before do
       FileUtils.mkdir_p 'tmp/config2'
       Dir.chdir 'tmp/config2'
-      described_class.send(:load_settings)
+      described_class.reset
     end
 
     after do
-      described_class.load_test({})
-      Dir.chdir File.expand_path('../..', __dir__)
-      FileUtils.rm_r 'tmp/config2'
+      tear_down 'tmp/config2'
     end
 
     it 'uses default config' do
@@ -381,7 +376,7 @@ describe Fronde::Config do
 
     it 'gives current org version' do
       described_class.class_eval '@org_version = nil', __FILE__, __LINE__
-      IO.write('var/tmp/last_org_version', 'test')
+      File.write('var/tmp/last_org_version', 'test')
       expect(described_class.org_last_version).to eq('test')
     end
   end

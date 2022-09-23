@@ -4,6 +4,20 @@ require 'json'
 require 'open-uri'
 require 'fronde/version'
 
+def fetch_org_version
+  # Retrieve last org version from git repository tags page.
+  tag_rx = Regexp.new(
+    '<a href=\'/cgit/emacs/org-mode.git/tag/\?h=' \
+    '(?<tag>release_(?<number>[^\']+))\'>\k<tag></a>'
+  )
+  versions = URI(
+    'https://git.savannah.gnu.org/cgit/emacs/org-mode.git/refs/'
+  ).open.readlines.map do |line|
+    line.match(tag_rx) { |matchdata| matchdata[:number] }
+  end
+  versions.compact.first
+end
+
 module Fronde
   # This module contains utilitary methods to ease ~org-config.el~
   # file generation
@@ -14,15 +28,12 @@ module Fronde
     def org_last_version
       return @org_version if @org_version
       if File.exist?('var/tmp/last_org_version')
-        @org_version = IO.read('var/tmp/last_org_version')
+        @org_version = File.read('var/tmp/last_org_version')
         return @org_version
       end
-      versions = JSON.parse(
-        URI('https://updates.orgmode.org/data/releases').open.read
-      ).sort { |a, b| b['date'] <=> a['date'] }
-      @org_version = versions.first['version']
+      @org_version = fetch_org_version
       FileUtils.mkdir_p 'var/tmp'
-      IO.write('var/tmp/last_org_version', @org_version)
+      File.write('var/tmp/last_org_version', @org_version)
       @org_version
     end
 
@@ -33,24 +44,29 @@ module Fronde
     # existed already.
     #
     # @return [Integer] the length written (as returned by the
-    #   underlying ~IO.write~ method call)
+    #   underlying ~File.write~ method call)
+    # rubocop:disable Metrics/MethodLength
     def write_org_lisp_config(with_tags: false)
       projects = org_generate_projects(with_tags: with_tags)
       workdir = Dir.pwd
-      content = IO.read(File.expand_path('./org-config.el', __dir__))
-                  .gsub('__VERSION__', Fronde::VERSION)
-                  .gsub('__WORK_DIR__', workdir)
-                  .gsub('__FRONDE_DIR__', __dir__)
-                  .gsub('__ORG_VER__', org_last_version)
-                  .gsub('__ALL_PROJECTS__', projects.values.join("\n        "))
-                  .gsub('__THEME_CONFIG__', org_default_theme_config)
-                  .gsub('__ALL_PROJECTS_NAMES__', project_names(projects))
-                  .gsub('__LONG_DATE_FMT__', r18n_full_datetime_format)
-                  .gsub('__AUTHOR_EMAIL__', settings['author_email'] || '')
-                  .gsub('__AUTHOR_NAME__', settings['author'])
+      content = File.read(File.expand_path('./org-config.el', __dir__))
+                    .gsub('__VERSION__', Fronde::VERSION)
+                    .gsub('__WORK_DIR__', workdir)
+                    .gsub('__FRONDE_DIR__', __dir__)
+                    .gsub('__ORG_VER__', org_last_version)
+                    .gsub(
+                      '__ALL_PROJECTS__',
+                      projects.values.join("\n        ")
+                    )
+                    .gsub('__THEME_CONFIG__', org_default_theme_config)
+                    .gsub('__ALL_PROJECTS_NAMES__', project_names(projects))
+                    .gsub('__LONG_DATE_FMT__', r18n_full_datetime_format)
+                    .gsub('__AUTHOR_EMAIL__', get('author_email', ''))
+                    .gsub('__AUTHOR_NAME__', get('author'))
       FileUtils.mkdir_p "#{workdir}/var/lib"
-      IO.write("#{workdir}/var/lib/org-config.el", content)
+      File.write("#{workdir}/var/lib/org-config.el", content)
     end
+    # rubocop:enable Metrics/MethodLength
 
     # Generate emacs directory variables file.
     #
@@ -59,11 +75,11 @@ module Fronde
     # of this fronde instance.
     #
     # @return [Integer] the length written (as returned by the
-    #   underlying ~IO.write~ method call)
+    #   underlying ~File.write~ method call)
     def write_dir_locals
       workdir = Dir.pwd
       # rubocop:disable Layout/LineLength
-      IO.write(
+      File.write(
         "#{workdir}/.dir-locals.el",
         "((org-mode . ((eval . (load-file \"#{workdir}/var/lib/org-config.el\")))))"
       )
@@ -93,12 +109,10 @@ module Fronde
       names = projects.keys.map do |p|
         ["\"#{p}\"", "\"#{p}-assets\""]
       end.flatten
-      unless settings['theme'] == 'default'
-        names << "\"theme-#{settings['theme']}\""
-      end
+      names << "\"theme-#{get('theme')}\"" unless get('theme') == 'default'
       sources.each do |s|
         # Default theme defined in settings is already included
-        next unless s['theme'] && s['theme'] != settings['theme']
+        next unless s['theme'] && s['theme'] != get('theme')
         # Never include theme named 'default' as it does not rely on any
         # file to export.
         next if s['theme'] == 'default'
@@ -118,9 +132,9 @@ module Fronde
     def publication_path(project)
       publish_in = [Dir.pwd]
       if project['type'] == 'gemini'
-        publish_in << (settings['gemini_public_folder'] || 'public_gmi')
+        publish_in << get('gemini_public_folder', 'public_gmi')
       else
-        publish_in << settings['public_folder']
+        publish_in << get('public_folder')
       end
       publish_in << project['target'] unless project['target'] == '.'
       publish_in.join('/')
@@ -187,7 +201,7 @@ module Fronde
         'html-head-include-default-style' => 't',
         'html-head-include-scripts' => 't'
       }
-      curtheme = project['theme'] || settings['theme']
+      curtheme = project['theme'] || get('theme')
       return defaults if curtheme.nil? || curtheme == 'default'
       defaults['html-head'] = org_default_html_head
       defaults['html-head-include-default-style'] = 'nil'
@@ -205,7 +219,7 @@ module Fronde
       else
         defaults.merge!(
           org_default_html_options(project),
-          settings['org-html'] || {},
+          get('org-html', {}),
           project['org-html'] || {}
         )
       end
@@ -213,14 +227,14 @@ module Fronde
     end
 
     def expand_vars_in_html_head(head, project)
-      curtheme = project['theme'] || settings['theme']
+      curtheme = project['theme'] || get('theme')
       # Head may be frozen when coming from settings
       head = head.gsub('__THEME__', curtheme)
-                 .gsub('__DOMAIN__', settings['domain'])
+                 .gsub('__DOMAIN__', get('domain'))
       return head.gsub('__ATOM_FEED__', '') unless project['is_blog']
       atomfeed = <<~ATOMFEED
         <link rel="alternate" type="application/atom+xml" title="Atom 1.0"
-              href="#{settings['domain']}/feeds/index.xml" />
+              href="#{get('domain')}/feeds/index.xml" />
       ATOMFEED
       head.gsub('__ATOM_FEED__', atomfeed)
     end
@@ -261,7 +275,7 @@ module Fronde
     end
 
     def org_default_theme_config
-      theme_config = org_theme_config(settings['theme'])
+      theme_config = org_theme_config(get('theme'))
       return theme_config if theme_config == ''
       format("\n        %<conf>s", conf: theme_config)
     end
@@ -278,7 +292,7 @@ module Fronde
         # rubocop:enable Layout/LineLength
         ' :recursive t',
         format(' :publishing-directory "%<wd>s/%<pub>s/assets/%<theme>s"',
-               wd: workdir, pub: settings['public_folder'], theme: theme),
+               wd: workdir, pub: get('public_folder'), theme: theme),
         ' :publishing-function org-publish-attachment)'
       ].join("\n        ").strip
     end

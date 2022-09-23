@@ -3,18 +3,21 @@
 module Fronde
   # Fronde commands
   module CLICommands
+    def fronde_update
+      update_config
+      @rake.options.build_all = true
+      @rake.invoke_task('org:upgrade')
+    end
+    alias_method :fronde_config, :fronde_update
+
     def fronde_init
-      cnf = @options.merge
-      cnf.delete(:verbose)
-      cnf.transform_keys!(&:to_s)
-      Fronde::Config.save(Fronde::Config.settings.merge(cnf))
+      update_config
       @rake.options.build_all = true
       @rake.invoke_task('org:install')
       return if File.exist? 'src/index.org'
       Fronde::OrgFile.new('src/index.org', @options).write
       fronde_open 'src/index.org'
     end
-    alias_method :fronde_config, :fronde_init
 
     def fronde_build
       @rake.options.build_all = true
@@ -26,7 +29,7 @@ module Fronde
     def fronde_preview
       Thread.new do
         sleep 1
-        port = Fronde::Config.settings.dig('preview', 'server_port') || 5000
+        port = Fronde::Config.get(['preview', 'server_port'], 5000)
         uri = "http://127.0.0.1:#{port}/"
         current_os = Fronde::Utils.current_os
         case current_os
@@ -62,10 +65,10 @@ module Fronde
 
     def fronde_help(command = 'basic', error: false)
       warn R18n.t.fronde.bin.error.no_command if error
-      cmd = Fronde::Utils.resolve_possible_alias(command)
-      cmd_opt = Fronde::Utils::FRONDE_COMMANDS[cmd]
+      cmd_opt = Fronde::Utils.command_options(command)
       label = cmd_opt[:label] || command
       warn format("%<label>s\n\n", label: R18n.t.fronde.bin.usage(label))
+      cmd = cmd_opt[:name] || command
       if R18n.t.fronde.bin.commands[cmd].translated?
         warn format("%<label>s\n\n", label: R18n.t.fronde.bin.commands[cmd])
       end
@@ -75,6 +78,13 @@ module Fronde
     end
 
     private
+
+    def update_config
+      cnf = @options.merge
+      cnf.delete(:verbose)
+      cnf.transform_keys!(&:to_s)
+      Fronde::Config.save(Fronde::Config.settings.merge(cnf))
+    end
 
     def new_file_name(file_path)
       file_path = File.expand_path(file_path || '')

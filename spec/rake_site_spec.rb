@@ -9,34 +9,33 @@ def write_base_files
 
     My website
   ORG
-  IO.write('src/index.org', org_content)
+  File.write('src/index.org', org_content)
   file1 = <<~ORG
     #+title: Index file
     #+keywords: toto, titi
 
     My website
   ORG
-  IO.write('src/news/test1.org', file1)
+  File.write('src/news/test1.org', file1)
   file2 = <<~ORG
     #+title: Index file
     #+keywords: toto
 
     My website
   ORG
-  IO.write('src/news/test2.org', file2)
+  File.write('src/news/test2.org', file2)
 end
 
 context 'with a testing website' do
   before do
+    Fronde::Config.reset
     init_testing_website
     copy_org_tarball_to_fake_tmp
-    Fronde::Config.send(:load_settings)
     rake.invoke_task('org:install')
   end
 
   after do
-    Dir.chdir File.expand_path('..', __dir__)
-    FileUtils.rm_r 'tmp/website_testing', force: true
+    tear_down 'tmp/website_testing'
   end
 
   context 'when building org files' do
@@ -59,22 +58,22 @@ context 'with a testing website' do
 
     it 'does not build again with successive call', rake: true do
       rake(verbose: false).invoke_task('site:build')
-      old_content = IO.read('public_html/index.html')
+      old_content = File.read('public_html/index.html')
       old_conf = Fronde::Config.settings.dup
       old_conf['org-html']['html-postamble'] = '<footer>Modified!</footer>'
       Fronde::Config.load_test(old_conf)
       rake(verbose: false).invoke_task('site:build')
-      expect(IO.read('public_html/index.html')).to eql(old_content)
+      expect(File.read('public_html/index.html')).to eql(old_content)
     end
 
     it 'builds again when call with force option', rake: true do
       rake(verbose: false).invoke_task('site:build')
-      old_content = IO.read('public_html/index.html')
+      old_content = File.read('public_html/index.html')
       old_conf = Fronde::Config.settings.dup
       old_conf['org-html']['html-postamble'] = '<footer>Modified!</footer>'
       Fronde::Config.load_test(old_conf)
       rake(verbose: false).invoke_task('site:build[true]')
-      expect(IO.read('public_html/index.html')).not_to eql(old_content)
+      expect(File.read('public_html/index.html')).not_to eql(old_content)
     end
 
     it 'fails gracefully when something goes wrong', rake: true do

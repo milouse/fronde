@@ -8,7 +8,7 @@ module Fronde
     # Main method, which will call the other to initialize an
     #   {Fronde::OrgFile} instance.
     def extract_data
-      @content = IO.read @file
+      @content = File.read @file
       @title = extract_title
       @subtitle = extract_subtitle
       @date = extract_date
@@ -49,7 +49,7 @@ module Fronde
 
     def extract_author
       m = /^#\+author:(.+)$/i.match(@content)
-      return Fronde::Config.settings['author'] if m.nil?
+      return Fronde::Config.get('author') if m.nil?
       m[1].strip
     end
 
@@ -61,7 +61,7 @@ module Fronde
 
     def extract_lang
       m = /^#\+language:(.+)$/i.match(@content)
-      return Fronde::Config.settings['lang'] if m.nil?
+      return Fronde::Config.get('lang') if m.nil?
       m[1].strip
     end
 

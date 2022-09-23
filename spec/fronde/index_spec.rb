@@ -149,18 +149,16 @@ describe Fronde::Index do
         FileUtils.mkdir_p 'tmp/blog/writings/other'
         FileUtils.mkdir_p 'tmp/blog/output'
         FileUtils.cp(
-          ['spec/data/test1.org',
-           'spec/data/test2.org'],
+          ['data/test1.org',
+           'data/test2.org'],
           'tmp/blog/writings'
         )
-        FileUtils.cp 'spec/data/test3.org', 'tmp/blog/writings/other'
+        FileUtils.cp 'data/test3.org', 'tmp/blog/writings/other'
         Dir.chdir 'tmp/blog'
       end
 
       after do
-        Dir.chdir File.expand_path('../..', __dir__)
-        FileUtils.rm_r 'tmp/blog', force: true
-        Fronde::Config.load_test({})
+        tear_down 'tmp/blog'
       end
 
       context 'with recursive config' do
@@ -248,26 +246,26 @@ describe Fronde::Index do
         it 'correctly saves one index', core: true do
           described_class.new.write_org('index')
           expect(File.exist?('tags/index.org')).to be(true)
-          expect(IO.read('tags/index.org')).to eq(SAMPLE_ALL_INDEX)
+          expect(File.read('tags/index.org')).to eq(SAMPLE_ALL_INDEX)
         end
 
         it 'correctly saves one blog index', core: true do
           described_class.new.send(:write_all_blog_home, false)
           expect(File.exist?('writings/index.org')).to be(true)
-          expect(IO.read('writings/index.org')).to eq(SAMPLE_PROJECT_INDEX)
+          expect(File.read('writings/index.org')).to eq(SAMPLE_PROJECT_INDEX)
         end
 
         it 'correctly saves one blog index, even verbosely', core: true do
           described_class.new.send(:write_all_blog_home, true)
           expect(File.exist?('writings/index.org')).to be(true)
-          expect(IO.read('writings/index.org')).to eq(SAMPLE_PROJECT_INDEX)
+          expect(File.read('writings/index.org')).to eq(SAMPLE_PROJECT_INDEX)
         end
 
         it 'correctly saves one atom feed', core: true do
           index = described_class.new
           index.write_atom('index')
           expect(File.exist?('output/feeds/index.xml')).to be(true)
-          expect(IO.read('output/feeds/index.xml')).to(
+          expect(File.read('output/feeds/index.xml')).to(
             eq(format(SAMPLE_ATOM, date: index.date.rfc3339))
           )
         end
@@ -346,9 +344,7 @@ describe Fronde::Index do
       end
 
       after do
-        Dir.chdir File.expand_path('../..', __dir__)
-        FileUtils.rm_r 'tmp/blog', force: true
-        Fronde::Config.load_test({})
+        tear_down 'tmp/blog'
       end
 
       it 'has generated no index', core: true do
@@ -435,7 +431,7 @@ describe Fronde::Index do
           :UNNUMBERED: notoc
           :END:
         INDEX
-        expect(IO.read('tags/index.org')).to eq(empty_index)
+        expect(File.read('tags/index.org')).to eq(empty_index)
       end
 
       it 'correctly saves one blog index', core: true do
@@ -446,7 +442,7 @@ describe Fronde::Index do
           #+author: Test
           #+language: en
         INDEX
-        expect(IO.read('writings/index.org')).to eq(empty_project_index)
+        expect(File.read('writings/index.org')).to eq(empty_project_index)
       end
 
       it 'correctly saves one atom feed', core: true do
@@ -469,7 +465,7 @@ describe Fronde::Index do
           <generator uri="https://git.umaneti.net/fronde/about/">Fronde</generator>
           </feed>
         ATOM
-        expect(IO.read('output/feeds/index.xml')).to(
+        expect(File.read('output/feeds/index.xml')).to(
           eq(format(empty_atom, date: index.date.rfc3339))
         )
       end
@@ -488,9 +484,9 @@ describe Fronde::Index do
       FileUtils.mkdir_p 'tmp/txt/writings'
       FileUtils.mkdir_p 'tmp/txt/output'
       FileUtils.cp(
-        ['spec/data/test1.org',
-         'spec/data/test2.org',
-         'spec/data/test3.org'],
+        ['data/test1.org',
+         'data/test2.org',
+         'data/test3.org'],
         'tmp/txt/writings'
       )
       Dir.chdir 'tmp/txt'
@@ -504,9 +500,7 @@ describe Fronde::Index do
     end
 
     after do
-      Dir.chdir File.expand_path('../..', __dir__)
-      FileUtils.rm_r 'tmp/txt', force: true
-      Fronde::Config.load_test({})
+      tear_down 'tmp/txt'
     end
 
     it 'does not have generated any indexes', core: true do
@@ -589,7 +583,7 @@ describe Fronde::Index do
     before do
       FileUtils.mkdir_p 'tmp/txt/writings'
       FileUtils.mkdir_p 'tmp/txt/output'
-      FileUtils.cp 'spec/data/test1.org', 'tmp/txt/writings'
+      FileUtils.cp 'data/test1.org', 'tmp/txt/writings'
       Dir.chdir 'tmp/txt'
       Fronde::Config.load_test(
         'public_folder' => 'output',
@@ -599,9 +593,7 @@ describe Fronde::Index do
     end
 
     after do
-      Dir.chdir File.expand_path('../..', __dir__)
-      FileUtils.rm_r 'tmp/txt', force: true
-      Fronde::Config.load_test({})
+      tear_down 'tmp/txt'
     end
 
     it 'does not have generated any indexes', core: true do

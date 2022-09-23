@@ -38,7 +38,8 @@ describe Fronde::Utils do
     it 'lists possible commands' do
       basic_cmd = [
         "    init       Initialize your Fronde instance (you just need to do it once).\n",
-        "    config     Alias for init.\n",
+        "    update     Update Fronde dependency (to be run once in a while).\n",
+        "    config     Alias for update.\n",
         "    preview    Start a test web server to preview your website on http://127.0.0.1:5000\n",
         "    open       Open or create an org file.\n",
         "    edit       Alias for open.\n",
@@ -51,19 +52,35 @@ describe Fronde::Utils do
 
     it 'resolves alias' do
       expect(described_class.resolve_possible_alias('init')).to eq('init')
-      expect(described_class.resolve_possible_alias('config')).to eq('init')
+      expect(described_class.resolve_possible_alias('update')).to eq('update')
+      expect(described_class.resolve_possible_alias('config')).to eq('update')
       expect(described_class.resolve_possible_alias('build')).to eq('build')
       expect(described_class.resolve_possible_alias('edit')).to eq('open')
       expect(described_class.resolve_possible_alias('wrong')).to eq('basic')
     end
 
+    it 'returns possible options for a command' do
+      init_opts = described_class.command_options('init')
+      expect(init_opts).to have_key(:name)
+      expect(init_opts[:name]).to eq('init')
+      expect(init_opts).to have_key(:opts)
+      expect(init_opts[:opts]).to contain_exactly('-a', '-h', '-l', '-t', '-v')
+      expect(init_opts).not_to have_key(:alias)
+
+      config_opts = described_class.command_options('config')
+      expect(config_opts).to have_key(:name)
+      expect(config_opts[:name]).to eq('update')
+      expect(config_opts).to have_key(:opts)
+      expect(config_opts[:opts]).to contain_exactly('-a', '-h', '-l', '-t', '-v')
+      expect(config_opts).not_to have_key(:alias)
+    end
+
     context 'with config' do
-      after do
-        Fronde::Config.load_test({})
+      before do
+        Fronde::Config.reset
       end
 
       it 'selects the right throbber' do
-        Fronde::Config.load_test({})
         frames = described_class.send(:select_throbber_frames)
         expect(frames).to(
           eq(['⠁ ⠂ ⠄ ⡀ ⠄ ⠂ ⠁', '⠂ ⠁ ⠂ ⠄ ⡀ ⠄ ⠂', '⠄ ⠂ ⠁ ⠂ ⠄ ⡀ ⠄',

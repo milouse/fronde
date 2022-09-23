@@ -24,7 +24,7 @@ module Fronde
     private
 
     def emacs_command(*arguments)
-      default_emacs = Fronde::Config.settings['emacs']
+      default_emacs = Fronde::Config.get('emacs')
       emacs_cmd = [
         default_emacs || 'emacs -Q --batch -nw',
         '--eval \'(setq enable-dir-local-variables nil)\''

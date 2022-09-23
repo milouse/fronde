@@ -19,7 +19,7 @@ module Fronde
       slug = Fronde::OrgFile.slug index_name
       FileUtils.mkdir_p "#{@pubdir}/feeds"
       atomdest = "#{@pubdir}/feeds/#{slug}.xml"
-      IO.write(atomdest, to_atom(index_name))
+      File.write(atomdest, to_atom(index_name))
     end
 
     private
@@ -29,13 +29,12 @@ module Fronde
     # @param title [String] the title of the current atom feed
     # @return [String] the Atom header as a String
     def atom_header(title)
-      domain = Fronde::Config.settings['domain']
+      domain = Fronde::Config.get('domain')
       upddate = @date.rfc3339
       if title == 'index'
         slug = 'index'
         tagurl = domain
-        title = Fronde::Config.settings['title'] || \
-                R18n.t.fronde.index.all_tags
+        title = Fronde::Config.get('title', R18n.t.fronde.index.all_tags)
       else
         slug = Fronde::OrgFile.slug(title)
         tagurl = "#{domain}/tags/#{slug}.html"
@@ -47,13 +46,13 @@ module Fronde
         <feed xmlns="http://www.w3.org/2005/Atom"
               xmlns:dc="http://purl.org/dc/elements/1.1/"
               xmlns:wfw="http://wellformedweb.org/CommentAPI/"
-              xml:lang="#{Fronde::Config.settings['lang']}">
+              xml:lang="#{Fronde::Config.get('lang')}">
 
         <title>#{title}</title>
         <link href="#{domain}/feeds/#{slug}.xml" rel="self" type="application/atom+xml"/>
         <link href="#{tagurl}" rel="alternate" type="text/html" title="#{title}"/>
         <updated>#{upddate}</updated>
-        <author><name>#{Fronde::Config.settings['author'] || ''}</name></author>
+        <author><name>#{Fronde::Config.get('author', '')}</name></author>
         <id>urn:md5:#{Digest::MD5.hexdigest(domain)}</id>
         <generator uri="https://git.umaneti.net/fronde/about/">Fronde</generator>
       ENDATOM

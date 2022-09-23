@@ -19,9 +19,9 @@ module Fronde # rubocop:disable Style/Documentation
     private
 
     def local_path(requested_path)
-      routes = Fronde::Config.settings.dig('preview', 'routes') || {}
+      routes = Fronde::Config.get(['preview', 'routes'], {})
       return routes[requested_path] if routes.has_key? requested_path
-      local_path = Fronde::Config.settings['public_folder'] + requested_path
+      local_path = Fronde::Config.get('public_folder') + requested_path
       if File.directory? local_path
         local_path = format(
           '%<path>s/index.html', path: local_path.delete_suffix('/')
@@ -32,9 +32,9 @@ module Fronde # rubocop:disable Style/Documentation
     end
 
     def parse_body(local_path, local_host)
-      body = IO.read local_path
+      body = File.read local_path
       return body unless local_path.match?(/\.(?:ht|x)ml\z/)
-      domain = Fronde::Config.settings['domain']
+      domain = Fronde::Config.get('domain')
       return body if domain == ''
       body.gsub(/"file:\/\//, format('"%<host>s', host: local_host))
           .gsub(/"#{domain}/, format('"%<host>s', host: local_host))
@@ -45,7 +45,7 @@ module Fronde # rubocop:disable Style/Documentation
     def start_preview
       # Inspired by ruby un.rb library, which allows normally to start a
       # webrick server in one line: ruby -run -e httpd public_html -p 5000
-      port = Fronde::Config.settings.dig('preview', 'server_port') || 5000
+      port = Fronde::Config.get(['preview', 'server_port'], 5000)
       s = WEBrick::HTTPServer.new(Port: port)
       s.mount '/', Fronde::PreviewServlet
       ['TERM', 'QUIT', 'INT'].each { |sig| trap(sig, proc { s.shutdown }) }

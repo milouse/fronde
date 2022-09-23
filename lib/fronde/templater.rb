@@ -52,7 +52,7 @@ module Fronde
       private
 
       def filter_templates(file_name)
-        templates = Fronde::Config.settings['templates']
+        templates = Fronde::Config.get('templates')
         return [] if templates.nil? || templates.empty?
         templates.filter { |t| check_required_keys(t, file_name) }
       end
@@ -71,7 +71,7 @@ module Fronde
       end
 
       def check_path(file_name, pathes)
-        pub_folder = Fronde::Config.settings['public_folder']
+        pub_folder = Fronde::Config.get('public_folder')
         if pathes.is_a?(Array)
           pathes.each do |tp|
             return true if File.fnmatch?("#{pub_folder}#{tp}",
