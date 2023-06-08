@@ -32,7 +32,7 @@ Metrics/BlockLength:
   - fronde.gemspec
 
 Metrics/MethodLength:
-  Max: 15
+  Max: 10
 
 Metrics/ModuleLength:
   Max: 120
@@ -70,9 +70,3 @@ Style/PreferredHashMethods:
 Style/RegexpLiteral:
   EnforcedStyle: slashes
   AllowInnerSlashes: yes
-
-Style/SymbolArray:
-  EnforcedStyle: brackets
-
-Style/WordArray:
-  EnforcedStyle: brackets
