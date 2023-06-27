@@ -628,7 +628,7 @@ option, this replacement occurs only for HTML documents under the
   path: "/docs/*.html"
 #+end_src
 
-** Preamble/Postamble/Templates formatting tags
+** Preamble, Postamble, and Templates formatting tags
 :PROPERTIES:
 :CUSTOM_ID: formatting_tags
 :END:
