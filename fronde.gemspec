@@ -56,12 +56,4 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'rainbow', '~> 3.1'
   s.add_runtime_dependency 'rake', '~> 13.0'
   s.add_runtime_dependency 'webrick', '~> 1.8'
-
-  s.add_development_dependency 'org-ruby', '~> 0.9'
-  s.add_development_dependency 'rspec', '~> 3.12'
-  s.add_development_dependency 'rubocop', '~> 1.56'
-  s.add_development_dependency 'rubocop-performance', '~> 1.19'
-  s.add_development_dependency 'rubocop-rspec', '~> 2.23'
-  s.add_development_dependency 'simplecov', '~> 0.22'
-  s.add_development_dependency 'yard', '~> 0.9'
 end
