@@ -71,7 +71,7 @@ namespace :org do
 
   file 'lib/ox-gmi.el' => 'lib' do
     ox_gmi = URI(
-      'https://git.umaneti.net/ox-gmi.el/plain/ox-gmi.el'
+      'https://git.umaneti.net/ox-gmi/plain/ox-gmi.el'
     ).open.read
     File.write 'lib/ox-gmi.el', ox_gmi
   end
