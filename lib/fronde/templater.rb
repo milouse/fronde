@@ -2,7 +2,7 @@
 
 require 'nokogiri'
 require 'digest/md5'
-require 'fronde/org_file'
+require_relative 'org_file'
 
 module Fronde
   # Insert custom part inside generated HTML files.
@@ -33,13 +33,14 @@ module Fronde
     end
 
     class << self
-      def customize_output(file_name, source = nil)
+      def customize_output(file_name)
         templates_to_apply = filter_templates(file_name)
         return if templates_to_apply.empty?
-        if source.nil?
-          sourcepath = Fronde::OrgFile.source_for_target(file_name)
-          source = Fronde::OrgFile.new(sourcepath)
-        end
+
+        source = Fronde::OrgFile.new(file_name)
+        # Return if no org file found for this published file
+        return if source.file == file_name
+
         dom = open_dom(file_name)
         templates_to_apply.each do |t|
           tpl = Fronde::Templater.new(source, dom, t)
@@ -52,7 +53,7 @@ module Fronde
       private
 
       def filter_templates(file_name)
-        templates = Fronde::Config.get('templates')
+        templates = Fronde::CONFIG.get('templates')
         return [] if templates.nil? || templates.empty?
         templates.filter { |t| check_required_keys(t, file_name) }
       end
@@ -71,7 +72,7 @@ module Fronde
       end
 
       def check_path(file_name, pathes)
-        pub_folder = Fronde::Config.get('html_public_folder')
+        pub_folder = Fronde::CONFIG.get('html_public_folder')
         if pathes.is_a?(Array)
           pathes.each do |tp|
             return true if File.fnmatch?("#{pub_folder}#{tp}",

@@ -45,16 +45,6 @@ describe Fronde::OrgFile do
     end
   end
 
-  context 'with various titles' do
-    it 'transliterates them into slugs', core: true do
-      expect(described_class.slug('toto')).to eq('toto')
-      expect(described_class.slug('TotO')).to eq('toto')
-      expect(described_class.slug('Tôto')).to eq('toto')
-      expect(described_class.slug('Tôto tata')).to eq('toto-tata')
-      expect(described_class.slug('ÀùéïỸç/+*= truñlu°`')).to eq('aueiyc-trunlu')
-    end
-  end
-
   context 'without a working file' do
     before do
       FileUtils.mkdir_p 'tmp/org_test'
@@ -66,8 +56,8 @@ describe Fronde::OrgFile do
     end
 
     it 'raises if file_name is nil and try to write', core: true do
-      expect { described_class.new(nil).write }.to raise_error(TypeError)
-      expect { described_class.new('').write }.to raise_error(TypeError)
+      expect { described_class.new(nil).write }.to raise_error(RuntimeError)
+      expect { described_class.new('').write }.to raise_error(RuntimeError)
     end
 
     it 'returns a new org file structure', core: true do
@@ -110,15 +100,20 @@ describe Fronde::OrgFile do
       CONTENT
       expect(File.read('not/existing/test.org')).to eq(content)
     end
+
+    it 'uses file name as title when title is empty' do
+      FileUtils.mkdir 'src'
+      File.write 'src/no_title.org', 'Lorem ipsum.'
+      o = described_class.new('src/no_title.org')
+      expect(o.title).to eq('src/no_title.org')
+    end
   end
 
   context 'with configuration' do
-    before do
-      Fronde::Config.reset
-    end
+    before { Fronde::CONFIG.reset }
 
     it 'respects author name', core: true do
-      Fronde::Config.load_test('author' => 'Test')
+      Fronde::CONFIG.load_test('author' => 'Test')
       o = described_class.new('data/test1.org')
       expect(o.author).to eq('Test')
       o = described_class.new('data/test2.org')
@@ -129,19 +124,17 @@ describe Fronde::OrgFile do
 
     it 'computes the right pub_file path for existing sources', core: true do
       o = described_class.new('data/test1.org')
-      expect(o.pub_file).to eq('data/test1.html')
-      Fronde::Config.load_test('domain' => 'http://perdu.com')
+      expect(o.pub_file).to be_nil # No source match
+
+      config = { 'sources' => [{ 'path' => 'data' }] }
+      Fronde::CONFIG.load_test config
       o = described_class.new('data/test1.org')
       expect(o.pub_file).to eq('data/test1.html')
       o = described_class.new('data/content.org')
       expect(o.pub_file).to eq('data/content.html')
-      # The following are weird tests. We begin to test theoric stuff here
-      Fronde::Config.load_test(
-        'domain' => 'http://perdu.com',
-        'sources' => [
-          { 'path' => 'data' }
-        ]
-      )
+
+      config['domain'] = 'http://perdu.com'
+      Fronde::CONFIG.load_test config
       o = described_class.new('data/test1.org')
       expect(o.pub_file).to eq('data/test1.html')
       o = described_class.new('data/content.org')
@@ -150,67 +143,25 @@ describe Fronde::OrgFile do
 
     it 'computes the right url for existing sources', core: true do
       o = described_class.new('data/test1.org')
-      expect(o.url).to eq('/data/test1.html')
-      Fronde::Config.load_test('domain' => 'http://perdu.com')
-      o = described_class.new('data/test1.org')
-      expect(o.url).to eq('http://perdu.com/data/test1.html')
-      o = described_class.new('data/content.org')
-      expect(o.url).to eq('http://perdu.com/data/content.html')
-      # The following are weird tests. We begin to test theoric stuff here
-      Fronde::Config.load_test(
-        'domain' => 'http://perdu.com',
-        'sources' => [
-          { 'path' => 'data' }
-        ]
-      )
-      o = described_class.new('data/test1.org')
-      expect(o.url).to eq('http://perdu.com/data/test1.html')
-      o = described_class.new('data/content.org')
-      expect(o.url).to eq('http://perdu.com/data/content.html')
-    end
+      expect(o.url).to be_nil # No source match
 
-    it 'computes the right pub_file path for theoritical sources', core: true do
-      expect(described_class.target_for_source(nil, nil)).to be(nil)
-      target = described_class.target_for_source('src/test.org', nil)
-      expect(target).to eq('public_html/src/test.html')
-      target = described_class.target_for_source('not/known/at/all.org', nil)
-      expect(target).to eq('public_html/at/all.html')
-      target = described_class.target_for_source(
-        'not/known/at/all.org', nil, with_public_folder: false
-      )
-      expect(target).to eq('at/all.html')
-      project = { 'path' => 'src', 'target' => '.' }
-      target = described_class.target_for_source('src/test.org', project)
-      expect(target).to eq('public_html/test.html')
-      target = described_class.target_for_source(
-        'src/test.org', project, with_public_folder: false
-      )
-      expect(target).to eq('test.html')
-      target = described_class.target_for_source(
-        'src/blog/test.org', project
-      )
-      expect(target).to eq('public_html/blog/test.html')
-      target = described_class.target_for_source(
-        'src/blog/toto/tata.org', project
-      )
-      expect(target).to eq('public_html/blog/toto/tata.html')
-      target = described_class.target_for_source(
-        'src/blog/toto/content.org', project
-      )
-      expect(target).to eq('public_html/blog/toto/content.html')
-      project = { 'path' => '~/tata', 'target' => '.' }
-      target = described_class.target_for_source(
-        '~/tata/tutu/content.org', project
-      )
-      expect(target).to eq('public_html/tutu/content.html')
-      target = described_class.target_for_source(
-        '~/tata/blog/content.org', project
-      )
-      expect(target).to eq('public_html/blog/content.html')
+      config = { 'sources' => [{ 'path' => 'data' }] }
+      Fronde::CONFIG.load_test config
+      o = described_class.new('data/test1.org')
+      expect(o.url).to eq('/data/test1.html')
+      o = described_class.new('data/content.org')
+      expect(o.url).to eq('/data/content.html')
+
+      config['domain'] = 'http://perdu.com'
+      Fronde::CONFIG.load_test config
+      o = described_class.new('data/test1.org')
+      expect(o.url).to eq('http://perdu.com/data/test1.html')
+      o = described_class.new('data/content.org')
+      expect(o.url).to eq('http://perdu.com/data/content.html')
     end
   end
 
-  context 'with a fake sources structure' do
+  context 'with an html file as file name' do
     before do
       FileUtils.mkdir_p 'tmp/test_target/src/blog/toto'
       FileUtils.mkdir_p 'tmp/test_target/writings'
@@ -220,7 +171,7 @@ describe Fronde::OrgFile do
         ['src/blog/test.org', 'src/blog/toto/tata.org',
          'src/blog/toto/content.org', 'writings/notes.org']
       )
-      Fronde::Config.load_test(
+      Fronde::CONFIG.load_test(
         'sources' => [{ 'path' => 'src', 'target' => '.' }, 'writings']
       )
     end
@@ -229,38 +180,31 @@ describe Fronde::OrgFile do
       tear_down 'tmp/test_target'
     end
 
-    it 'uses file name as title when title is empty' do
-      o = described_class.new('src/test.org')
-      expect(o.title).to eq('src/test.org')
-    end
-
     it 'computes the right source path', core: true do
-      lp = described_class.source_for_target('public_html/test.html')
-      expect(lp).to eq(File.expand_path('src/test.org'))
-      lp = described_class.source_for_target('public_html/blog/test.html')
-      expect(lp).to eq(File.expand_path('src/blog/test.org'))
-      lp = described_class.source_for_target('public_html/blog/toto/tata.html')
-      expect(lp).to eq(File.expand_path('src/blog/toto/tata.org'))
-      lp = described_class.source_for_target(
-        'public_html/blog/toto/content.html'
+      o = described_class.new('public_html/test.html', from_target: true)
+      expect(o.file).to eq(File.expand_path('src/test.org'))
+      o = described_class.new('public_html/blog/test.html', from_target: true)
+      expect(o.file).to eq(File.expand_path('src/blog/test.org'))
+      o = described_class.new(
+        'public_html/blog/toto/tata.html', from_target: true
       )
-      expect(lp).to eq(File.expand_path('src/blog/toto/content.org'))
-    end
-
-    it 'identifies a project for a given file path' do
-      ps = described_class.project_for_source('src/test.org')
-      expect(ps).to eq(Fronde::Config.sources[0])
-      ps = described_class.project_for_source('not/known.org')
-      expect(ps).to be(nil)
+      expect(o.file).to eq(File.expand_path('src/blog/toto/tata.org'))
+      o = described_class.new(
+        'public_html/blog/toto/content.html', from_target: true
+      )
+      expect(o.file).to eq(File.expand_path('src/blog/toto/content.org'))
     end
 
     it 'identifies a source for a given published file' do
-      s = described_class.source_for_target('public_html/writings/notes.html')
-      expect(s).to eq(File.expand_path('writings/notes.org'))
-      s = described_class.source_for_target('public_html/test.html')
-      expect(s).to eq(File.expand_path('src/test.org'))
-      s = described_class.source_for_target('public_html/not/known.html')
-      expect(s).to be(nil)
+      o = described_class.new('public_html/writings/notes.html', from_target: true)
+      expect(o.file).to eq(File.expand_path('writings/notes.org'))
+      expect(o.project).not_to be_nil
+      o = described_class.new('public_html/test.html', from_target: true)
+      expect(o.file).to eq(File.expand_path('src/test.org'))
+      expect(o.project).not_to be_nil
+      o = described_class.new('public_html/not/known.html', from_target: true)
+      expect(o.file).to eq(File.expand_path('public_html/not/known.html'))
+      expect(o.project).to be_nil
     end
   end
 end

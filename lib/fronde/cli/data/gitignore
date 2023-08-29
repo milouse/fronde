@@ -1,0 +1,5 @@
+.dir-locals.el
+Rakefile
+lib/
+public_html/
+var/

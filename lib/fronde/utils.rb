@@ -4,7 +4,7 @@ require 'uri'
 require 'rainbow'
 require 'net/http'
 require 'r18n-core'
-require 'fronde/config'
+require_relative 'config'
 
 module Fronde
   # Default Error, which may be raised by fronde code
@@ -47,7 +47,7 @@ module Fronde
       'open' => { opts: ['-a', '-h', '-l', '-t', '-v'] },
       'edit' => { alias: 'open' },
       'build' => { opts: ['-f', '-h'] },
-      'publish' => { opts: ['-h'] },
+      'publish' => { opts: ['-h'], with_args: true },
       'help' => { opts: ['-h'] },
       'basic' => { opts: ['-h', '-V'], label: '<command>' }
     }.freeze
@@ -58,7 +58,7 @@ module Fronde
       #
       # The animation is chosen among a bunch of themes, with the
       # configuration option ~throbber~ (retrieved via
-      # {Fronde::Config#settings}).
+      # {Fronde::Config::Store#get}).
       #
       # @example
       #     long_stuff = Thread.new { very_long_operation }
@@ -178,13 +178,13 @@ module Fronde
       # @return [String] the downloaded org-mode version
       def download_org(destination = 'var/tmp')
         # :nocov:
-        return if Fronde::Config.org_last_version.nil?
+        return if Fronde::CONFIG.org_last_version.nil?
         # :nocov:
         # Remove version number in dest file to allow easy rake file
         # task naming
         dest_file = File.expand_path('org.tar.gz', destination)
         return if File.exist?(dest_file)
-        tarball = "org-mode-release_#{Fronde::Config.org_last_version}.tar.gz"
+        tarball = "org-mode-release_#{Fronde::CONFIG.org_last_version}.tar.gz"
         uri = URI("https://git.savannah.gnu.org/cgit/emacs/org-mode.git/snapshot/#{tarball}")
         # Will crash on purpose if anything goes wrong
         Net::HTTP.start(uri.host, uri.port, :use_ssl => true) do |http|
@@ -194,6 +194,12 @@ module Fronde
             end
           end
         end
+      end
+
+      def slug(title)
+        title.downcase.tr(' ', '-')
+             .encode('ascii', fallback: ->(k) { translit(k) })
+             .gsub(/[^\w-]/, '').delete_suffix('-')
       end
 
       private
@@ -210,7 +216,7 @@ module Fronde
       end
 
       def select_throbber_frames
-        model = Fronde::Config.settings['throbber'] || 'default'
+        model = Fronde::CONFIG.get 'throbber', 'default'
         model = 'default' unless Fronde::Utils::THROBBER_FRAMES.has_key?(model)
         Fronde::Utils::THROBBER_FRAMES[model]
       end
@@ -223,6 +229,18 @@ module Fronde
           print "#{message} #{frames[current % frames.length]}\r"
           current += 1
         end
+      end
+
+      def translit(char)
+        return 'a' if %w[á à â ä ǎ ã å].include?(char)
+        return 'e' if %w[é è ê ë ě ẽ].include?(char)
+        return 'i' if %w[í ì î ï ǐ ĩ].include?(char)
+        return 'o' if %w[ó ò ô ö ǒ õ].include?(char)
+        return 'u' if %w[ú ù û ü ǔ ũ].include?(char)
+        return 'y' if %w[ý ỳ ŷ ÿ ỹ].include?(char)
+        return 'c' if char == 'ç'
+        return 'n' if char == 'ñ'
+        '-'
       end
     end
   end

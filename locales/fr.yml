@@ -5,24 +5,42 @@ fronde:
     commands:
       cmd_title: Commandes
       alias: Alias pour %1.
-      init: Initialise votre instance de Fronde (vous ne devriez faire cela qu'une fois).
-      update: Met à jour les dépendances de Fronde (à lancer une fois de temps à autre).
-      preview: "Démarre un serveur web de test pour prévisualiser votre site à l'adresse http://127.0.0.1:5000"
+      init: >-
+        Initialise votre instance de Fronde (vous ne devriez faire cela
+        qu'une fois).
+      update: >-
+        Met à jour les dépendances de Fronde (à lancer une fois de temps
+        à autre).
+      preview: >-
+        Démarre un serveur web de test pour prévisualiser votre site à
+        l'adresse http://127.0.0.1:5000
       open: Ouvre ou crée un fichier org.
       build: Compile vos fichiers org en HTML.
-      publish: Pousse vos changements locaux vers votre serveur web public.
+      publish: >-
+        Pousse vos changements locaux vers votre serveur web public.
       help: Alias pour l'argument -h.
     options:
       cmd_title: Options
       directory: Place le nouveau fichier org dans un dossier à ce nom.
       help: Affiche l'aide pour une commande et quitte.
       version: Affiche la version de Fronde et quitte.
+      default_title: Nouvel article
     error:
       no_command: 'ERREUR : Aucune commande ou commande inconnue donnée.'
-      no_file: 'ERREUR : Aucun fichier à ouvrir ou éditer.'
+      no_file: >-
+        Attention : Aucun chemin de fichier donné. Utilisation du
+        fichier par défaut.
   error:
     label: Une erreur est survenue
-    explanation: Pour voir le détail, lancez de nouveau la commande avec plus de verbosité, par exemple fronde build -v
+    explanation: >-
+      Pour voir le détail, lancez de nouveau la commande avec plus de
+      verbosité, par exemple fronde build -v
+    source:
+      no_path: >-
+        La clé ‘path’ est manquante dans la source %{source}. Ignorée.
+    org_file:
+      no_file_or_title: Aucun chemin de fichier ou titre donné.
+      no_project: Aucun projet trouvé pour %{file}. Sa publication va échouer.
   index:
     unsorted: Non triés
     published_on: Publié le %1
@@ -32,8 +50,9 @@ fronde:
     full_date_format: '%A %{date}'
     full_date_with_time_format: '%{date} à %{time}'
   org:
+    generate_blog_index: Génération de la page d’accueil du blog pour %{name}
     postamble:
       written_by: Écrit par %a
       last_modification: dernière modification le %C
-      with_emacs: 'avec %c et publié avec %n'
-      with_emacs_html: 'avec %c et publié avec %N'
+      with_emacs: avec %c et publié avec %n
+      with_emacs_html: avec %c et publié avec %N

@@ -37,13 +37,9 @@ describe Fronde::Templater do
       RESULT
     end
 
-    before do
-      init_testing_website
-    end
+    before { init_testing_environment }
 
-    after do
-      tear_down 'tmp/website_testing'
-    end
+    after { tear_down 'tmp/website_testing' }
 
     context 'with a simple customization process' do
       before do
@@ -52,12 +48,12 @@ describe Fronde::Templater do
       end
 
       after do
-        FileUtils.rm_r ['public_html', 'src'], force: true
-        Fronde::Config.reset
+        FileUtils.rm_r %w[public_html src], force: true
+        Fronde::CONFIG.reset
       end
 
       it 'customizes a given html file with simple template' do
-        Fronde::Config.load_test(
+        Fronde::CONFIG.load_test(
           'templates' => [
             { 'selector' => 'title',
               'content' => metatag }
@@ -82,7 +78,7 @@ describe Fronde::Templater do
       end
 
       it 'customizes a given html file with a given org object' do
-        Fronde::Config.load_test(
+        Fronde::CONFIG.load_test(
           'templates' => [
             { 'selector' => 'title',
               'content' => metatag }
@@ -94,9 +90,8 @@ describe Fronde::Templater do
           My website
         ORG
         FileUtils.mkdir 'src'
-        File.write('src/index.org', org_content)
-        o = Fronde::OrgFile.new('src/index.org')
-        described_class.customize_output('public_html/customize_test.html', o)
+        File.write('src/customize_test.org', org_content)
+        described_class.customize_output('public_html/customize_test.html')
         local_result = <<~RESULT
           <!DOCTYPE html>
           <html>
@@ -115,7 +110,7 @@ describe Fronde::Templater do
       end
 
       it 'customizes a given html file with before' do
-        Fronde::Config.load_test(
+        Fronde::CONFIG.load_test(
           'templates' => [
             { 'selector' => 'title',
               'type' => 'before',
@@ -127,7 +122,7 @@ describe Fronde::Templater do
       end
 
       it 'customizes a given html file with after' do
-        Fronde::Config.load_test(
+        Fronde::CONFIG.load_test(
           'templates' => [
             { 'selector' => 'title',
               'type' => 'after',
@@ -153,7 +148,7 @@ describe Fronde::Templater do
       end
 
       it 'customizes a given html file with replace content' do
-        Fronde::Config.load_test(
+        Fronde::CONFIG.load_test(
           'templates' => [
             { 'selector' => 'body>h1',
               'type' => 'replace',
@@ -178,7 +173,7 @@ describe Fronde::Templater do
       end
 
       it 'customizes a given html file with previous comments in head' do
-        Fronde::Config.load_test(
+        Fronde::CONFIG.load_test(
           'templates' => [
             { 'selector' => 'body>h1',
               'type' => 'replace',
@@ -218,7 +213,7 @@ describe Fronde::Templater do
 
       it 'does not customize a given html file with wrong templates' do
         result = File.read('public_html/customize_test.html')
-        Fronde::Config.load_test(
+        Fronde::CONFIG.load_test(
           'templates' => [
             { 'type' => 'replace',
               'content' => '<p>Toto tata</p>' },
@@ -232,7 +227,7 @@ describe Fronde::Templater do
 
       it 'does not customize a given html file with no templates' do
         result = File.read('public_html/customize_test.html')
-        Fronde::Config.load_test({})
+        Fronde::CONFIG.load_test({})
         described_class.customize_output('public_html/customize_test.html')
         expect(File.read('public_html/customize_test.html')).to eq(result)
       end
@@ -253,7 +248,7 @@ describe Fronde::Templater do
           </html>
         HTML
         File.write('public_html/customize_test.html', other_html_base)
-        Fronde::Config.load_test(
+        Fronde::CONFIG.load_test(
           'templates' => [
             { 'type' => 'before',
               'selector' => 'div#content',
@@ -286,7 +281,7 @@ describe Fronde::Templater do
         FileUtils.mkdir_p 'public_html/customize'
         File.write('public_html/customize_test.html', html_base)
         File.write('public_html/customize/test.html', html_base)
-        Fronde::Config.load_test(
+        Fronde::CONFIG.load_test(
           'templates' => [
             { 'selector' => 'title',
               'path' => '/customize/*',
@@ -298,7 +293,7 @@ describe Fronde::Templater do
 
       after do
         FileUtils.rm_r 'public_html', force: true
-        Fronde::Config.reset
+        Fronde::CONFIG.reset
       end
 
       it 'customizes a file on a specific path' do
@@ -322,7 +317,7 @@ describe Fronde::Templater do
         File.write('public_html/customize_test.html', html_base)
         File.write('public_html/customize/test.html', html_base)
         File.write('public_html/other/file.html', html_base)
-        Fronde::Config.load_test(
+        Fronde::CONFIG.load_test(
           'templates' => [
             { 'selector' => 'title',
               'path' => ['/customize/*', '/other/*'],
@@ -336,7 +331,7 @@ describe Fronde::Templater do
 
       after do
         FileUtils.rm_r 'public_html', force: true
-        Fronde::Config.reset
+        Fronde::CONFIG.reset
       end
 
       it 'customizes a file on a specific path' do

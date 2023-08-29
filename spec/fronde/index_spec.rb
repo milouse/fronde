@@ -163,7 +163,7 @@ describe Fronde::Index do
 
       context 'with recursive config' do
         before do
-          Fronde::Config.load_test(
+          Fronde::CONFIG.load_test(
             'title' => 'Blog',
             'author' => 'Test',
             'html_public_folder' => 'output',
@@ -183,9 +183,9 @@ describe Fronde::Index do
         end
 
         it 'excludes specified pattern from indexes', core: true do
-          old_conf = Fronde::Config.settings.dup
+          old_conf = Fronde::CONFIG.settings.merge
           old_conf['sources'][0]['exclude'] = 'test3\.org$'
-          Fronde::Config.load_test(old_conf)
+          Fronde::CONFIG.load_test(old_conf)
           index = described_class.new
           expect(index.entries.length).to eq(1)
           expect(index.entries.include?('toto')).to be(false)
@@ -284,7 +284,7 @@ describe Fronde::Index do
 
       context 'without recursive config' do
         before do
-          Fronde::Config.load_test(
+          Fronde::CONFIG.load_test(
             'title' => 'Blog',
             'author' => 'Test',
             'html_public_folder' => 'output',
@@ -330,7 +330,7 @@ describe Fronde::Index do
         FileUtils.mkdir_p 'tmp/blog/writings'
         FileUtils.mkdir_p 'tmp/blog/output'
         Dir.chdir 'tmp/blog'
-        Fronde::Config.load_test(
+        Fronde::CONFIG.load_test(
           'title' => 'Blog',
           'author' => 'Test',
           'html_public_folder' => 'output',
@@ -490,7 +490,7 @@ describe Fronde::Index do
         'tmp/txt/writings'
       )
       Dir.chdir 'tmp/txt'
-      Fronde::Config.load_test(
+      Fronde::CONFIG.load_test(
         'title' => 'My site',
         'author' => 'Test',
         'html_public_folder' => 'output',
@@ -585,7 +585,7 @@ describe Fronde::Index do
       FileUtils.mkdir_p 'tmp/txt/output'
       FileUtils.cp 'data/test1.org', 'tmp/txt/writings'
       Dir.chdir 'tmp/txt'
-      Fronde::Config.load_test(
+      Fronde::CONFIG.load_test(
         'html_public_folder' => 'output',
         'domain' => 'http://perdu.com',
         'sources' => [{ 'path' => 'writings', 'target' => '.' }]

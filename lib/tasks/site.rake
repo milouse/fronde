@@ -18,8 +18,6 @@ namespace :site do
       index.write_all(verbose: false)
     end
     Fronde::Utils.throbber(build, 'Generating indexes:')
-    next if index.empty?
-    Fronde::Config.write_org_lisp_config(with_tags: true)
   end
 
   desc 'Convert and customize all org files'
@@ -38,7 +36,7 @@ namespace :site do
     end
     # :nocov:
     customize_html = Thread.new do
-      pubfolder = Fronde::Config.get('html_public_folder')
+      pubfolder = Fronde::CONFIG.get('html_public_folder')
       Dir["#{pubfolder}/**/*.html"].each do |f|
         Fronde::Templater.customize_output(f)
       end

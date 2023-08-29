@@ -18,24 +18,30 @@ Gem::Specification.new do |s|
     'homepage_uri' => 'https://etienne.depar.is/fronde/',
     'funding_uri' => 'https://liberapay.com/milouse'
   }
-  s.files       = ['lib/fronde/cli.rb',
-                   'lib/fronde/cli/commands.rb',
+  s.files       = ['lib/fronde/cli/commands.rb',
+                   'lib/fronde/cli/data/gitignore',
+                   'lib/fronde/cli/data/Rakefile',
+                   'lib/fronde/cli/helpers.rb',
+                   'lib/fronde/cli.rb',
+                   'lib/fronde/config/data/org-config.el',
+                   'lib/fronde/config/data/ox-fronde.el',
+                   'lib/fronde/config/helpers.rb',
+                   'lib/fronde/config/lisp.rb',
                    'lib/fronde/config.rb',
-                   'lib/fronde/config/lisp_config.rb',
-                   'lib/fronde/config/org-config.el',
-                   'lib/fronde/config/ox-fronde.el',
                    'lib/fronde/emacs.rb',
-                   'lib/fronde/index.rb',
                    'lib/fronde/index/atom_generator.rb',
                    'lib/fronde/index/org_generator.rb',
-                   'lib/fronde/org_file.rb',
-                   'lib/fronde/org_file/class_methods.rb',
+                   'lib/fronde/index.rb',
                    'lib/fronde/org_file/extracter.rb',
                    'lib/fronde/org_file/htmlizer.rb',
+                   'lib/fronde/org_file.rb',
+                   'lib/fronde/preview.rb',
+                   'lib/fronde/source.rb',
                    'lib/fronde/templater.rb',
                    'lib/fronde/utils.rb',
-                   'lib/fronde/preview.rb',
                    'lib/fronde/version.rb',
+                   # Monkey patches / extensions
+                   'lib/ext/r18n.rb',
                    # Rake tasks
                    'lib/tasks/org.rake',
                    'lib/tasks/site.rake',
@@ -51,6 +57,7 @@ Gem::Specification.new do |s|
   s.license     = 'WTFPL'
 
   s.required_ruby_version = '>= 2.7'
+  s.add_runtime_dependency 'liquid', '~> 5.4'
   s.add_runtime_dependency 'nokogiri', '~> 1.15'
   s.add_runtime_dependency 'r18n-core', '~> 5.0'
   s.add_runtime_dependency 'rainbow', '~> 3.1'

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative '../utils'
+
 module Fronde
   # Embeds methods responsible for generating an org file for a given
   #   index.
@@ -14,8 +16,8 @@ module Fronde
 
     def write_org(index_name)
       return unless save?
-      slug = Fronde::OrgFile.slug index_name
-      FileUtils.mkdir 'tags' unless Dir.exist? 'tags'
+      slug = Fronde::Utils.slug index_name
+      FileUtils.mkdir_p 'tags'
       content = to_org index_name
       orgdest = "tags/#{slug}.org"
       File.write(orgdest, content)
@@ -34,7 +36,9 @@ module Fronde
     def write_all_blog_home(verbose)
       @sources.each do |project|
         next unless Dir.exist?(project['path'])
-        warn "Generated blog home for #{project['name']}" if verbose
+        if verbose
+          warn R18n.t.fronde.org.generate_blog_index(name: project['name'])
+        end
         orgdest = format('%<root>s/index.org', root: project['path'])
         File.write(orgdest, to_org(project['name'], is_project: true))
       end
@@ -56,7 +60,7 @@ module Fronde
     end
 
     def tag_published_url(tag_name)
-      domain = Fronde::Config.get('domain')
+      domain = Fronde::CONFIG.get('domain')
       title = @tags_names[tag_name]
       tag_link = "#{domain}/tags/#{tag_name}.html"
       "[[#{tag_link}][#{title}]]"
@@ -66,12 +70,12 @@ module Fronde
       if is_tag
         title = @tags_names[title]
       elsif title.nil? || title == 'index'
-        title = Fronde::Config.get('title')
+        title = Fronde::CONFIG.get('title')
       end
       <<~HEADER.strip
         #+title: #{title}
-        #+author: #{Fronde::Config.get('author')}
-        #+language: #{Fronde::Config.get('lang')}
+        #+author: #{Fronde::CONFIG.get('author')}
+        #+language: #{Fronde::CONFIG.get('lang')}
       HEADER
     end
 

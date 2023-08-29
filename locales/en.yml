@@ -5,9 +5,12 @@ fronde:
     commands:
       cmd_title: Commands
       alias: Alias for %1.
-      init: Initialize your Fronde instance (you just need to do it once).
+      init: >-
+        Initialize your Fronde instance (you just need to do it once).
       update: Update Fronde dependency (to be run once in a while).
-      preview: 'Start a test web server to preview your website on http://127.0.0.1:5000'
+      preview: >-
+        Start a test web server to preview your website on
+        http://127.0.0.1:5000
       open: Open or create an org file.
       build: Compile your org files to HTML.
       publish: Push local changes to your public web server.
@@ -17,12 +20,21 @@ fronde:
       directory: Wrap the new org file in this named folder.
       help: Display help for a command and exit.
       version: Display Fronde version and exit.
+      default_title: New article
     error:
       no_command: 'ERROR: no command or unknown command given.'
-      no_file: 'ERROR: no file to open or edit.'
+      no_file: >-
+        Warning: No file path given. Default file will be used.
   error:
     label: An error occurred.
-    explanation: To see the error, run your command again with more verbosity, for example, fronde build -v
+    explanation: >-
+      To see the error, run your command again with more verbosity, for
+      example, fronde build -v
+    source:
+      no_path: ‘path’ key is missing from source %{source}. Ignored.
+    org_file:
+      no_file_or_title: No file or title given.
+      no_project: No project found for %{file}. Publication will fail.
   index:
     unsorted: Unsorted
     published_on: Published on %1
@@ -32,8 +44,9 @@ fronde:
     full_date_format: '%A %{date}'
     full_date_with_time_format: '%{date} at %{time}'
   org:
+    generate_blog_index: Generating blog home page for %{name}
     postamble:
       written_by: Written by %a
       last_modification: Last modification on %C
-      with_emacs: 'with %c, and published with %n'
-      with_emacs_html: 'with %c, and published with %N'
+      with_emacs: with %c, and published with %n
+      with_emacs_html: with %c, and published with %N

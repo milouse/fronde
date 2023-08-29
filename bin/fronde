@@ -3,12 +3,12 @@
 
 require 'optparse'
 require 'r18n-core'
-require 'fronde/utils'
-require 'fronde/version'
-require 'fronde/cli'
+require_relative '../lib/fronde/utils'
+require_relative '../lib/fronde/version'
+require_relative '../lib/fronde/cli'
 
 R18n.default_places = File.expand_path('../locales', __dir__)
-R18n.set Fronde::Config.get('lang')
+R18n.set Fronde::CONFIG.get('lang')
 
 optparser = OptionParser.new
 optparser.version = Fronde::VERSION
@@ -29,17 +29,26 @@ if ARGV[0] == 'help'
   params[:help] = true
   ARGV.shift
 end
-fronde = Fronde::CLI.new(params)
-command = "fronde_#{ARGV[0]}".to_sym
-cmd_err = !fronde.respond_to?(command)
+command = ARGV[0]
+
+fronde = Fronde::CLI::App.new(params)
+method = "fronde_#{command}".to_sym
+cmd_err = !fronde.respond_to?(method)
 if params[:help] || cmd_err
-  cmd_err = false if params[:help] && !ARGV[0]
-  fronde.fronde_help(ARGV[0], error: cmd_err)
+  cmd_err = false if params[:help] && !command
+  warn R18n.t.fronde.bin.error.no_command if cmd_err
+  fronde.fronde_help(command)
+  exit(cmd_err ? 1 : 0)
 end
+
 ARGV.shift
 
-init_cmds = [:fronde_init, :fronde_config, :fronde_update]
-unless File.exist?('config.yml') || init_cmds.include?(command)
+init_cmds = %i[fronde_init fronde_config fronde_update]
+unless File.exist?('config.yml') || init_cmds.include?(method)
   fronde.fronde_init
 end
-fronde.send command
+if Fronde::Utils.command_options(command)[:with_args]
+  fronde.send method, *ARGV
+else
+  fronde.send method
+end

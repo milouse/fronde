@@ -2,10 +2,10 @@
 
 require 'fileutils'
 require 'digest/md5'
-require 'fronde/config'
-require 'fronde/org_file'
-require 'fronde/index/atom_generator'
-require 'fronde/index/org_generator'
+require_relative 'config'
+require_relative 'org_file'
+require_relative 'index/atom_generator'
+require_relative 'index/org_generator'
 
 module Fronde
   # Generates website indexes and atom feeds for all the org documents
@@ -46,7 +46,7 @@ module Fronde
     end
 
     def sort_by(kind)
-      if [:name, :weight].include?(kind)
+      if %i[name weight].include?(kind)
         tags_sorted = sort_tags_by_name_and_weight["by_#{kind}".to_sym]
         # Reverse in order to have most important or A near next prompt
         # and avoid to scroll to find the beginning of the list.
@@ -60,8 +60,8 @@ module Fronde
     private
 
     def filter_sources
-      Fronde::Config.sources.select do |project|
-        project['type'] == @pub_format && project['is_blog']
+      CONFIG.sources.select do |project|
+        project['type'] == @pub_format && project.blog?
       end
     end
 
@@ -69,12 +69,11 @@ module Fronde
       @sources.each do |project|
         file_pattern = '*.org'
         file_pattern = "**/#{file_pattern}" if project['recursive']
-        Dir.glob(file_pattern, base: project['path']).map do |s|
-          org_file = File.join(project['path'], s)
+        Dir.glob(file_pattern, base: project['path']).map do |index_file|
+          org_file = File.join(project['path'], index_file)
           next if exclude_file?(org_file, project)
-          add_to_indexes(
-            Fronde::OrgFile.new(org_file, project: project)
-          )
+
+          add_to_indexes(Fronde::OrgFile.new(org_file))
         end
       end
     end
@@ -89,7 +88,7 @@ module Fronde
       @index['index'] << article
       add_to_project_index article
       article.keywords.each do |k|
-        slug = Fronde::OrgFile.slug k
+        slug = Fronde::Utils.slug k
         @tags_names[slug] = k # Overwrite is permitted
         @index[slug] ||= []
         @index[slug] << article

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'webrick'
-require 'fronde/config'
+require_relative 'config'
 
 module Fronde # rubocop:disable Style/Documentation
   # A tiny preview server, which main goal is to replace references to
@@ -19,9 +19,9 @@ module Fronde # rubocop:disable Style/Documentation
     private
 
     def local_path(requested_path)
-      routes = Fronde::Config.get(['preview', 'routes'], {})
+      routes = Fronde::CONFIG.get(%w[preview routes], {})
       return routes[requested_path] if routes.has_key? requested_path
-      local_path = Fronde::Config.get('html_public_folder') + requested_path
+      local_path = Fronde::CONFIG.get('html_public_folder') + requested_path
       if File.directory? local_path
         local_path = format(
           '%<path>s/index.html', path: local_path.delete_suffix('/')
@@ -34,10 +34,10 @@ module Fronde # rubocop:disable Style/Documentation
     def parse_body(local_path, local_host)
       body = File.read local_path
       return body unless local_path.match?(/\.(?:ht|x)ml\z/)
-      domain = Fronde::Config.get('domain')
+      domain = Fronde::CONFIG.get('domain')
       return body if domain == ''
-      body.gsub(/"file:\/\//, format('"%<host>s', host: local_host))
-          .gsub(/"#{domain}/, format('"%<host>s', host: local_host))
+      host_repl = %("#{local_host})
+      body.gsub('"file://', host_repl).gsub(%("#{domain}), host_repl)
     end
   end
 
@@ -45,10 +45,10 @@ module Fronde # rubocop:disable Style/Documentation
     def start_preview
       # Inspired by ruby un.rb library, which allows normally to start a
       # webrick server in one line: ruby -run -e httpd public_html -p 5000
-      port = Fronde::Config.get(['preview', 'server_port'], 5000)
+      port = Fronde::CONFIG.get(%w[preview server_port], 5000)
       s = WEBrick::HTTPServer.new(Port: port)
       s.mount '/', Fronde::PreviewServlet
-      ['TERM', 'QUIT', 'INT'].each { |sig| trap(sig, proc { s.shutdown }) }
+      %w[TERM QUIT INT].each { |sig| trap(sig, proc { s.shutdown }) }
       s.start
     end
   end

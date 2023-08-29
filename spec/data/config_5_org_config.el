@@ -7,14 +7,14 @@
 (setq fronde/version "{{ version }}"
       fronde/current-work-dir "{{ test_dir }}"
       user-mail-address ""
-      user-full-name "alice"
+      user-full-name "Tata"
       org-html-metadata-timestamp-format "%A %-d of %B, %Y at %R"
       org-gmi-timestamp-format "%A %-d of %B, %Y at %R"
       org-publish-project-alist
       `(("src"
          :base-directory "{{ test_dir }}/src"
          :base-extension "org"
-         :publishing-directory "{{ test_dir }}/public_html"
+         :publishing-directory "{{ test_dir }}/public_html/src"
          :recursive t
          :section-numbers nil
          :with-toc nil
@@ -24,15 +24,36 @@ with %c, and published with %N</p>
 <p class=\"date\">Last modification on %C</p>
 <p class=\"validation\">%v</p>"
          :html-head "<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\"
-      href=\"/assets/toto/css/style.css\">
+      href=\"https://test.com/assets/my-theme/css/style.css\">
 <link rel=\"stylesheet\" type=\"text/css\" media=\"screen\"
-      href=\"/assets/toto/css/htmlize.css\">"
+      href=\"https://test.com/assets/my-theme/css/htmlize.css\">"
          :html-head-include-default-style nil
          :html-head-include-scripts nil)
         ("src-assets"
          :base-directory "{{ test_dir }}/src"
          :base-extension "jpg\\|gif\\|png\\|svg\\|pdf"
-         :publishing-directory "{{ test_dir }}/public_html"
+         :publishing-directory "{{ test_dir }}/public_html/src"
+         :publishing-function org-publish-attachment
+         :recursive t)
+        ("news"
+         :base-directory "{{ test_dir }}/news"
+         :base-extension "org"
+         :publishing-directory "{{ test_dir }}/public_html/news"
+         :recursive t
+         :section-numbers nil
+         :with-toc nil
+         :publishing-function org-html-publish-to-html
+         :html-postamble "<p><span class=\"author\">Written by %a</span>
+with %c, and published with %N</p>
+<p class=\"date\">Last modification on %C</p>
+<p class=\"validation\">%v</p>"
+         :html-head ""
+         :html-head-include-default-style t
+         :html-head-include-scripts t)
+        ("news-assets"
+         :base-directory "{{ test_dir }}/news"
+         :base-extension "jpg\\|gif\\|png\\|svg\\|pdf"
+         :publishing-directory "{{ test_dir }}/public_html/news"
          :publishing-function org-publish-attachment
          :recursive t)
         ("tags"
@@ -48,9 +69,9 @@ with %c, and published with %N</p>
 <p class=\"date\">Last modification on %C</p>
 <p class=\"validation\">%v</p>"
          :html-head "<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\"
-      href=\"/assets/toto/css/style.css\">
+      href=\"https://test.com/assets/my-theme/css/style.css\">
 <link rel=\"stylesheet\" type=\"text/css\" media=\"screen\"
-      href=\"/assets/toto/css/htmlize.css\">"
+      href=\"https://test.com/assets/my-theme/css/htmlize.css\">"
          :html-head-include-default-style nil
          :html-head-include-scripts nil)
         ("tags-assets"
@@ -59,13 +80,13 @@ with %c, and published with %N</p>
          :publishing-directory "{{ test_dir }}/public_html/tags"
          :publishing-function org-publish-attachment
          :recursive nil)
-        ("theme-toto"
-         :base-directory "{{ test_dir }}/themes/toto"
+        ("theme-my-theme"
+         :base-directory "{{ test_dir }}/themes/my-theme"
          :base-extension "jpg\\|gif\\|png\\|js\\|css\\|otf\\|ttf\\|woff2?"
-         :publishing-directory "{{ test_dir }}/public_html/assets/toto"
+         :publishing-directory "{{ test_dir }}/public_html/assets/my-theme"
          :publishing-function org-publish-attachment
          :recursive t)
-        ("website" :components ("src" "src-assets" "tags" "tags-assets" "theme-toto"))))
+        ("website" :components ("src" "src-assets" "news" "news-assets" "tags" "tags-assets" "theme-my-theme"))))
 
 ;; Load fronde lib
 (load-file (expand-file-name "ox-gmi.el" "{{ test_dir }}/lib"))

@@ -26,7 +26,7 @@ namespace :org do
   desc 'Download last version of Org'
   file 'var/tmp/org.tar.gz' => 'var/tmp' do
     download = Thread.new do
-      Thread.current[:org_version] = Fronde::Config.org_last_version
+      Thread.current[:org_version] = Fronde::CONFIG.org_last_version
       Fronde::Utils.download_org
     end
     if verbose
@@ -39,7 +39,7 @@ namespace :org do
 
   desc 'Compile Org'
   task compile: 'var/tmp/org.tar.gz' do |task|
-    org_version = Fronde::Config.org_last_version
+    org_version = Fronde::CONFIG.org_last_version
     org_dir = "lib/org-#{org_version}"
     next if Dir.exist?("#{org_dir}/lisp")
     build = Thread.new do
@@ -77,18 +77,18 @@ namespace :org do
   end
 
   file 'var/lib/org-config.el' => ['lib/htmlize.el', 'lib/ox-gmi.el'] do
-    Fronde::Config.write_org_lisp_config
+    Fronde::CONFIG.write_org_lisp_config
   end
 
   file '.dir-locals.el' => 'var/lib/org-config.el' do
-    Fronde::Config.write_dir_locals
+    Fronde::Config::Helpers.write_dir_locals
   end
 
   desc 'Install Org'
   multitask install: ['org:compile', '.dir-locals.el'] do
-    mkdir_p "#{Fronde::Config.get('html_public_folder')}/assets"
-    Fronde::Config.sources.each do |s|
-      mkdir_p s['path'] unless Dir.exist? s['path']
+    mkdir_p "#{Fronde::CONFIG.get('html_public_folder')}/assets"
+    Fronde::CONFIG.sources.each do |s|
+      mkdir_p s['path']
     end
   end
 

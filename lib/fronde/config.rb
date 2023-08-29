@@ -1,44 +1,60 @@
 # frozen_string_literal: true
 
 require 'yaml'
-require 'fronde/config/lisp_config'
+require 'singleton'
+require_relative 'config/lisp'
+require_relative 'source'
 
 module Fronde
-  # Wrapper for configuration
-  #
-  # This class is a singleton interface, which share the static website
-  # being build settings among different steps or tasks.
-  #
-  # It expects the website author to holds their custom settings in a
-  # YAML file named ~config.yml~ available at the root of their
-  # project.
-  #
-  # For example, with the given config file:
-  #
-  # #+begin_src
-  # ---
-  # title: My website
-  # author: Alice Doe
-  # #+end_src
-  #
-  # Settings will be available like this:
-  #
-  # #+begin_src
-  # Fronde::Config.get('author')
-  # => "Alice Doe"
-  # #+end_src
-  class Config
-    extend Fronde::LispConfig
+  module Config
+    # Wrapper for configuration
+    #
+    # This class is a singleton interface, which share the static website
+    # being build settings among different steps or tasks.
+    #
+    # It expects the website author to holds their custom settings in a
+    # YAML file named ~config.yml~ available at the root of their
+    # project.
+    #
+    # For example, with the given config file:
+    #
+    # #+begin_src
+    # ---
+    # title: My website
+    # author: Alice Doe
+    # #+end_src
+    #
+    # Settings will be available like this:
+    #
+    # #+begin_src
+    # Fronde::CONFIG.get('author')
+    # => "Alice Doe"
+    # #+end_src
+    class Store
+      include Singleton
 
-    class << self
+      attr_reader :sources
+
+      def initialize
+        @default_settings = {
+          'author' => (ENV['USER'] || ''),
+          'domain' => '',
+          'lang' => Fronde::Config::Helpers.extract_lang_from_env('en'),
+          'html_public_folder' => 'public_html',
+          'gemini_public_folder' => 'public_gmi',
+          'templates' => [], 'theme' => 'default'
+        }.freeze
+        @org_version = @sources = nil
+        @config = load_settings
+        # Do not load sources now to avoid dependency loop on config
+      end
+
+      include Fronde::Config::Lisp
+
       # Access the current website settings
-      #
-      # If necessary, this method will load settings from a config
-      # file.
       #
       # @return [Hash] the website settings
       def settings
-        load_settings
         @config
       end
 
@@ -56,7 +72,6 @@ module Fronde
       # @param default the default value to use if ~setting~ is absent
       # @return the setting value or nil
       def get(setting, default = nil)
-        load_settings
         if setting.is_a? Array
           value = @config.dig(*setting)
         else
@@ -74,20 +89,21 @@ module Fronde
       # will, obviously, use these new settings.
       #
       # @param new_config [Hash] the settings to save
-      # @return [Hash] the new settings after save
+      # @return [Fronde::Config::Store] self
       def save(new_config)
         # Do not save obvious default config values. We'll always try to
         # save author and lang as they default on system variables,
         # which may be different from a system to another. Thus it may
         # be confusing if one use fronde on two different computer and
         # these params always change.
-        default_keys = default_settings.keys
-        new_config.delete_if do |k, v|
-          default_keys.include?(k) && v == default_settings[k]
+        default_keys = @default_settings.keys
+        new_config.delete_if do |key, value|
+          default_keys.include?(key) && value == @default_settings[key]
         end
         File.write 'config.yml', new_config.to_yaml
-        @config = @sources = nil
-        load_settings # Reload config, taking default settings into account
+        # Reload config, taking default settings into account
+        reset
+        self
       end
 
       # Reset settings
@@ -99,7 +115,10 @@ module Fronde
       #
       # @return nil
       def reset
-        @sources = @config = nil
+        # Reload config, taking default settings into account
+        @config = load_settings
+        @org_version = @sources = nil
+        @sources = load_sources
       end
 
       # Load the given settings as if they comes from the ~config.yml~ file.
@@ -111,75 +130,89 @@ module Fronde
       # use these new settings.
       #
       # @param config [Hash] the settings to artificially load
-      # @return [Hash] the new settings
+      # @return [Fronde::Config::Store] self
       def load_test(config)
-        reset
-        @config = default_settings.merge config
-        sources
-        @config
+        @config = @default_settings.merge config
+        @org_version = @sources = nil
+        @sources = load_sources
+        self
       end
 
       # Return the qualified projects sources list.
       #
       # @return [Array] the fully qualified projects sources list
-      def sources
+      def load_sources
         return @sources if @sources
-        load_settings
-        default_sources = [{ 'path' => 'src', 'target' => '.' }]
-        @sources = get('sources', default_sources).map do |s|
-          build_source(s)
-        end.compact
+        sources = build_sources
+        @sources = remove_inclusion(remove_duplicate(sources))
       end
 
       private
 
       def load_settings
-        return @config if @config
         conf_file = 'config.yml'
-        if File.exist? conf_file
-          user_conf = YAML.load_file(conf_file)
-          if !user_conf.has_key?('html_public_folder') && \
-             user_conf.has_key?('public_folder')
-            warn '‘public_folder’ setting is deprecated. Please use either ‘html_public_folder’ or ‘gemini_public_folder’.' # rubocop:disable Layout/LineLength
-            user_conf['html_public_folder'] = user_conf.delete('public_folder')
+        return @default_settings unless File.exist? conf_file
+
+        user_conf = YAML.load_file(conf_file)
+        user_conf = Fronde::Config::Helpers.migrate(user_conf)
+        @default_settings.merge(user_conf).freeze
+      end
+
+      def build_sources
+        default_sources = [{ 'path' => 'src', 'target' => '.' }]
+        get('sources', default_sources).filter_map do |source_conf|
+          source_conf = { 'path' => source_conf } if source_conf.is_a?(String)
+          path = source_conf['path']
+          unless path
+            # Filtering sources without path
+            warn(
+              R18n.t.fronde.error.source.no_path(source: source_conf.inspect)
+            )
+            next
           end
-          @config = default_settings.merge(user_conf).freeze
-        else
-          @config = default_settings
+          Source.new(source_conf)
         end
       end
 
-      def extract_lang_from_env(default)
-        (ENV['LANG'] || default).split('_', 2).first
-      end
-
-      def default_settings
-        return @default_settings if @default_settings
-        @default_settings = {
-          'author' => (ENV['USER'] || ''),
-          'domain' => '',
-          'lang' => extract_lang_from_env('en'),
-          'html_public_folder' => 'public_html',
-          'gemini_public_folder' => 'public_gmi',
-          'templates' => [],
-          'theme' => 'default'
-        }.freeze
-      end
-
-      def build_source(seed)
-        opts = { 'recursive' => true, 'is_blog' => false, 'type' => 'html' }
-        case seed
-        when String
-          opts['path'] = seed
-        when Hash
-          opts.merge! seed
+      def remove_duplicate(sources)
+        check_paths = {}
+        sources.each do |source|
+          path = source.path
+          # Avoid duplicate
+          if check_paths.has_key?(path)
+            warn R18n.t.fronde.error.source.duplicate(source: path)
+            next
+          end
+          check_paths[path] = source
         end
-        return nil unless opts.has_key?('path')
-        opts['path'] = File.expand_path(opts['path'])
-        opts['name'] ||= File.basename(opts['path']).sub(/^\./, '')
-        opts['target'] ||= opts['name']
-        opts
+        check_paths
+      end
+
+      def remove_inclusion(check_paths)
+        check_paths.filter_map do |path, source|
+          # Ensure that the current source does not embed another one or
+          # is not embedde into another one.
+          possible_matchs = check_paths.select do |other_path, other_source|
+            # This is a problem only if the other source is recursive
+            other_path.start_with?(path) && other_source.recursive?
+          end.keys
+          # At this point we cannot have any duplicate, as they must
+          # have been removed in the previous filter_map. Thus we cannot
+          # have only one possible config per path. It is then safe to
+          # assume we can remove the current path from the
+          # possible_paths array as this item is the one currently
+          # checked.
+          possible_matchs.delete(path)
+          # We only keep the configuration if it is not recursive (so
+          # no problem to have other config targeting folder under it),
+          # or if no other config already target it.
+          source if possible_matchs.empty? || !source.recursive?
+        end
       end
     end
   end
+
+  CONFIG = Config::Store.instance
 end
+
+Fronde::CONFIG.load_sources

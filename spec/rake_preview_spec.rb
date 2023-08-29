@@ -6,7 +6,23 @@ require 'net/http'
 
 def init_preview
   copy_org_tarball_to_fake_tmp
-  Fronde::Config.reset
+  config = <<~CONF
+    ---
+    author: Tata
+    title: This is a website about test
+    org-html:
+      html-postamble: '<footer>Published by Fronde.</footer>'
+    templates:
+    - type: before
+      selector: title
+      content: |
+        <meta property="fronde-test" content="test"/>
+    preview:
+      routes:
+        /test: public_html/index.html
+  CONF
+  File.write('config.yml', config)
+  Fronde::CONFIG.reset
   rake.invoke_task('org:install')
   FileUtils.cp(
     File.expand_path('../tigre.png', __dir__),
@@ -26,13 +42,11 @@ end
 context 'when trying preview mode' do
   let(:now_str) { DateTime.now.strftime('%A %-d of %B, %Y at %R') }
 
-  after do
-    tear_down 'tmp/website_testing'
-  end
+  after { tear_down 'tmp/website_testing' }
 
   context 'without a domain name' do
     around do |test|
-      init_testing_website
+      init_testing_environment
       init_preview
 
       rake.invoke_task('site:build')
@@ -49,7 +63,7 @@ context 'when trying preview mode' do
     it 'is viewable with preview', rake: true do
       home_page = URI('http://localhost:5000/index.html').open.read
       proof = File.expand_path('data/index_proof.html', __dir__)
-      proof_content = File.read(proof).gsub(/__PUB_DATE__/, now_str)
+      proof_content = File.read(proof).gsub('__PUB_DATE__', now_str)
       expect(home_page).to eq(proof_content)
       tigre = URI('http://localhost:5000/tigre.png')
       res = Net::HTTP.get_response(tigre)
@@ -61,14 +75,14 @@ context 'when trying preview mode' do
     it 'serves index', rake: true do
       home_page = URI('http://localhost:5000/').open.read
       proof = File.expand_path('data/index_proof.html', __dir__)
-      proof_content = File.read(proof).gsub(/__PUB_DATE__/, now_str)
+      proof_content = File.read(proof).gsub('__PUB_DATE__', now_str)
       expect(home_page).to eq(proof_content)
     end
 
     it 'is viewable with routes testing', rake: true do
       home_page = URI('http://localhost:5000/test').open.read
       proof = File.expand_path('data/index_proof.html', __dir__)
-      proof_content = File.read(proof).gsub(/__PUB_DATE__/, now_str)
+      proof_content = File.read(proof).gsub('__PUB_DATE__', now_str)
       expect(home_page).to eq(proof_content)
     end
 
@@ -81,11 +95,11 @@ context 'when trying preview mode' do
 
   context 'with a domain name' do
     around do |test|
-      init_testing_website
+      init_testing_environment
       init_preview
-      old_conf = Fronde::Config.settings.dup
+      old_conf = Fronde::CONFIG.settings.merge
       old_conf['domain'] = 'http://mydomain.local'
-      Fronde::Config.load_test(old_conf)
+      Fronde::CONFIG.load_test(old_conf)
       rake.invoke_task('site:build')
       webrick_app = Thread.new do
         rake.invoke_task('site:preview')
@@ -99,8 +113,8 @@ context 'when trying preview mode' do
     it 'replaces domain occurence by localhost URIs', rake: true do
       home_page = URI('http://localhost:5000/index.html').open.read
       proof = File.expand_path('data/index_proof.html', __dir__)
-      proof_content = File.read(proof).gsub(/__PUB_DATE__/, now_str)
-      proof_content.gsub!(/mydomain\.local/, 'localhost:5000')
+      proof_content = File.read(proof).gsub('__PUB_DATE__', now_str)
+      proof_content.gsub!('mydomain.local', 'localhost:5000')
       expect(home_page).to eq(proof_content)
     end
   end

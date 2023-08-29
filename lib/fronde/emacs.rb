@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'fronde/config'
+require_relative 'config'
 
 module Fronde
   # Wraps Gnu/Emacs calls
@@ -24,7 +24,7 @@ module Fronde
     private
 
     def emacs_command(*arguments)
-      default_emacs = Fronde::Config.get('emacs')
+      default_emacs = Fronde::CONFIG.get('emacs')
       emacs_cmd = [
         default_emacs || 'emacs -Q --batch -nw',
         '--eval \'(setq enable-dir-local-variables nil)\''

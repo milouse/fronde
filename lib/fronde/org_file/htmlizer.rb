@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
-require 'fronde/config'
-require 'fronde/emacs'
+require_relative '../config'
+require_relative '../emacs'
+require_relative '../utils'
 
 module Fronde
   # This module holds HTML formatter methods for the {Fronde::OrgFile}
@@ -13,11 +14,11 @@ module Fronde
     #
     # @return [String] the HTML keywords list
     def keywords_to_html
-      domain = Fronde::Config.get('domain')
-      klist = @keywords.map do |k|
+      domain = Fronde::CONFIG.get('domain')
+      klist = @data[:keywords].map do |k|
         <<~KEYWORDLINK
           <li class="keyword">
-            <a href="#{domain}/tags/#{Fronde::OrgFile.slug(k)}.html">#{k}</a>
+            <a href="#{domain}/tags/#{Fronde::Utils.slug(k)}.html">#{k}</a>
           </li>
         KEYWORDLINK
       end.join
@@ -28,8 +29,8 @@ module Fronde
     #
     # @return [String] the HTML `time` tag
     def date_to_html(dateformat = :full)
-      return '<time></time>' if @date.nil?
-      "<time datetime=\"#{@date.rfc3339}\">#{datestring(dateformat)}</time>"
+      return '<time></time>' if @data[:date].nil?
+      "<time datetime=\"#{@data[:date].rfc3339}\">#{datestring(dateformat)}</time>"
     end
 
     # Format {Fronde::OrgFile#author} in a HTML `span` tag with a
@@ -37,7 +38,7 @@ module Fronde
     #
     # @return [String] the author HTML `span`
     def author_to_html
-      "<span class=\"author\">#{@author}</span>"
+      "<span class=\"author\">#{@data[:author]}</span>"
     end
   end
 end

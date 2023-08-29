@@ -8,65 +8,65 @@ module Fronde
     # Main method, which will call the other to initialize an
     #   {Fronde::OrgFile} instance.
     def extract_data
-      @content = File.read @file
-      @title = extract_title
-      @subtitle = extract_subtitle
-      @date = extract_date
-      @author = extract_author
-      @keywords = extract_keywords
-      @lang = extract_lang
-      @excerpt = extract_excerpt
+      @data = { content: File.read(@file), pub_file: nil, url: nil }
+      %i[title subtitle date author keywords lang excerpt].each do |param|
+        @data[param] = send("extract_#{param}".to_sym)
+      end
+      return unless @project
+
+      @data[:pub_file] = @project.target_for @file
+      @data[:url] = "#{CONFIG.get('domain')}/#{@data[:pub_file]}"
     end
 
     def extract_date
       timerx = '([0-9:]{5})(?::([0-9]{2}))?'
-      m = /^#\+date: *<([0-9-]{10}) [\w.]+(?: #{timerx})?> *$/i.match(@content)
-      return nil if m.nil?
-      @notime = m[2].nil?
-      if @notime
+      daterx = /^#\+date: *<([0-9-]{10}) [\w.]+(?: #{timerx})?> *$/i
+      match = daterx.match(@data[:content])
+      return nil if match.nil?
+
+      @data[:notime] = match[2].nil?
+      if @data[:notime]
         time = '00:00:00'
       else
-        time = "#{m[2]}:#{m[3] || '00'}"
+        time = "#{match[2]}:#{match[3] || '00'}"
       end
-      DateTime.strptime("#{m[1]} #{time}", '%Y-%m-%d %H:%M:%S')
+      DateTime.strptime("#{match[1]} #{time}", '%Y-%m-%d %H:%M:%S')
     end
 
     def extract_title
-      m = /^#\+title:(.+)$/i.match(@content)
-      if m.nil?
+      match = /^#\+title:(.+)$/i.match(@data[:content])
+      if match.nil?
         # Avoid to leak absolute path
         project_relative_path = @file.sub(/^#{Dir.pwd}\//, '')
         return project_relative_path
       end
-      m[1].strip
+      match[1].strip
     end
 
     def extract_subtitle
-      m = /^#\+subtitle:(.+)$/i.match(@content)
-      return '' if m.nil?
-      m[1].strip
+      match = /^#\+subtitle:(.+)$/i.match(@data[:content])
+      (match && match[1].strip) || ''
     end
 
     def extract_author
-      m = /^#\+author:(.+)$/i.match(@content)
-      return Fronde::Config.get('author') if m.nil?
-      m[1].strip
+      match = /^#\+author:(.+)$/i.match(@data[:content])
+      (match && match[1].strip) || CONFIG.get('author')
     end
 
     def extract_keywords
-      m = /^#\+keywords:(.+)$/i.match(@content)
-      return [] if m.nil?
-      m[1].split(',').map(&:strip)
+      match = /^#\+keywords:(.+)$/i.match(@data[:content])
+      (match && match[1].split(',').map(&:strip)) || []
     end
 
     def extract_lang
-      m = /^#\+language:(.+)$/i.match(@content)
-      return Fronde::Config.get('lang') if m.nil?
-      m[1].strip
+      match = /^#\+language:(.+)$/i.match(@data[:content])
+      (match && match[1].strip) || CONFIG.get('lang')
     end
 
     def extract_excerpt
-      @content.scan(/^#\+description:(.+)$/i).map { |l| l[0].strip }.join(' ')
+      @data[:content].scan(/^#\+description:(.+)$/i).map do |line|
+        line.first.strip
+      end.join(' ')
     end
   end
 end

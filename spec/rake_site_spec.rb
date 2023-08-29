@@ -3,6 +3,22 @@
 require 'rake'
 
 def write_base_files
+  config = <<~CONF
+    ---
+    sources:
+    - name: org
+      path: src
+      target: .
+      recursive: false
+      exclude: tata\\.org
+    - path: src/news
+      is_blog: true
+    - path: 'titi/test'
+      recursive: nil
+      exclude: ugly\\.org
+    - 'titi/tutu/tata'
+  CONF
+  File.write('config.yml', config)
   FileUtils.mkdir_p 'src/news'
   org_content = <<~ORG
     #+title: Index file
@@ -28,15 +44,13 @@ end
 
 context 'with a testing website' do
   before do
-    Fronde::Config.reset
-    init_testing_website
+    init_testing_environment
+    Fronde::CONFIG.reset
     copy_org_tarball_to_fake_tmp
     rake.invoke_task('org:install')
   end
 
-  after do
-    tear_down 'tmp/website_testing'
-  end
+  after { tear_down 'tmp/website_testing' }
 
   context 'when building org files' do
     before do
@@ -59,9 +73,11 @@ context 'with a testing website' do
     it 'does not build again with successive call', rake: true do
       rake(verbose: false).invoke_task('site:build')
       old_content = File.read('public_html/index.html')
-      old_conf = Fronde::Config.settings.dup
-      old_conf['org-html']['html-postamble'] = '<footer>Modified!</footer>'
-      Fronde::Config.load_test(old_conf)
+      custom_footer = {
+        'org-html' => { 'html-postamble' => '<footer>Modified!</footer>' }
+      }
+      new_conf = Fronde::CONFIG.settings.merge(custom_footer)
+      Fronde::CONFIG.load_test(new_conf)
       rake(verbose: false).invoke_task('site:build')
       expect(File.read('public_html/index.html')).to eql(old_content)
     end
@@ -69,17 +85,19 @@ context 'with a testing website' do
     it 'builds again when call with force option', rake: true do
       rake(verbose: false).invoke_task('site:build')
       old_content = File.read('public_html/index.html')
-      old_conf = Fronde::Config.settings.dup
-      old_conf['org-html']['html-postamble'] = '<footer>Modified!</footer>'
-      Fronde::Config.load_test(old_conf)
+      custom_footer = {
+        'org-html' => { 'html-postamble' => '<footer>Modified!</footer>' }
+      }
+      new_conf = Fronde::CONFIG.settings.merge(custom_footer)
+      Fronde::CONFIG.load_test(new_conf)
       rake(verbose: false).invoke_task('site:build[true]')
       expect(File.read('public_html/index.html')).not_to eql(old_content)
     end
 
     it 'fails gracefully when something goes wrong', rake: true do
-      old_conf = Fronde::Config.settings.dup
+      old_conf = Fronde::CONFIG.settings.merge
       old_conf['emacs'] = 'notemacsatall'
-      Fronde::Config.load_test(old_conf)
+      Fronde::CONFIG.load_test(old_conf)
       expect { rake(verbose: false).invoke_task('site:build') }.to(
         output(/Aborting/).to_stderr
       )
@@ -87,13 +105,16 @@ context 'with a testing website' do
   end
 
   context 'when generating indexes' do
-    before { write_base_files }
+    before do
+      write_base_files
+      Fronde::CONFIG.reset
+    end
 
     context 'without blog setting', rake: true do
       before do
-        old_conf = Fronde::Config.settings.dup
+        old_conf = Fronde::CONFIG.settings.merge
         old_conf['sources'][1]['is_blog'] = false
-        Fronde::Config.load_test(old_conf)
+        Fronde::CONFIG.load_test(old_conf)
       end
 
       it 'does not generate index', rake: true do
@@ -131,9 +152,9 @@ context 'with a testing website' do
 
     context 'with wrong blog settings', rake: true do
       before do
-        old_conf = Fronde::Config.settings.dup
+        old_conf = Fronde::CONFIG.settings.merge
         old_conf['sources'][1]['path'] = 'src/test'
-        Fronde::Config.load_test(old_conf)
+        Fronde::CONFIG.load_test(old_conf)
       end
 
       it 'does not generate index', rake: true do

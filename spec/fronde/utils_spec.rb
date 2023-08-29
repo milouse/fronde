@@ -75,9 +75,17 @@ describe Fronde::Utils do
       expect(config_opts).not_to have_key(:alias)
     end
 
+    it 'transliterates titles into slugs', core: true do
+      expect(described_class.slug('toto')).to eq('toto')
+      expect(described_class.slug('TotO')).to eq('toto')
+      expect(described_class.slug('Tôto')).to eq('toto')
+      expect(described_class.slug('Tôto tata')).to eq('toto-tata')
+      expect(described_class.slug('ÀùéïỸç/+*= truñlu°`')).to eq('aueiyc-trunlu')
+    end
+
     context 'with config' do
       before do
-        Fronde::Config.reset
+        Fronde::CONFIG.reset
       end
 
       it 'selects the right throbber' do
@@ -86,19 +94,19 @@ describe Fronde::Utils do
           eq(['⠁ ⠂ ⠄ ⡀ ⠄ ⠂ ⠁', '⠂ ⠁ ⠂ ⠄ ⡀ ⠄ ⠂', '⠄ ⠂ ⠁ ⠂ ⠄ ⡀ ⠄',
               '⡀ ⠄ ⠂ ⠁ ⠂ ⠄ ⡀', '⠄ ⡀ ⠄ ⠂ ⠁ ⠂ ⠄', '⠂ ⠄ ⡀ ⠄ ⠂ ⠁ ⠂'])
         )
-        Fronde::Config.load_test('throbber' => 'default')
+        Fronde::CONFIG.load_test('throbber' => 'default')
         frames = described_class.send(:select_throbber_frames)
         expect(frames).to(
           eq(['⠁ ⠂ ⠄ ⡀ ⠄ ⠂ ⠁', '⠂ ⠁ ⠂ ⠄ ⡀ ⠄ ⠂', '⠄ ⠂ ⠁ ⠂ ⠄ ⡀ ⠄',
               '⡀ ⠄ ⠂ ⠁ ⠂ ⠄ ⡀', '⠄ ⡀ ⠄ ⠂ ⠁ ⠂ ⠄', '⠂ ⠄ ⡀ ⠄ ⠂ ⠁ ⠂'])
         )
-        Fronde::Config.load_test('throbber' => 'wrong')
+        Fronde::CONFIG.load_test('throbber' => 'wrong')
         frames = described_class.send(:select_throbber_frames)
         expect(frames).to(
           eq(['⠁ ⠂ ⠄ ⡀ ⠄ ⠂ ⠁', '⠂ ⠁ ⠂ ⠄ ⡀ ⠄ ⠂', '⠄ ⠂ ⠁ ⠂ ⠄ ⡀ ⠄',
               '⡀ ⠄ ⠂ ⠁ ⠂ ⠄ ⡀', '⠄ ⡀ ⠄ ⠂ ⠁ ⠂ ⠄', '⠂ ⠄ ⡀ ⠄ ⠂ ⠁ ⠂'])
         )
-        Fronde::Config.load_test('throbber' => 'basic')
+        Fronde::CONFIG.load_test('throbber' => 'basic')
         frames = described_class.send(:select_throbber_frames)
         expect(frames).to eq('-\|/')
       end

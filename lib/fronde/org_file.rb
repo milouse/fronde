@@ -3,11 +3,10 @@
 require 'time'
 require 'fileutils'
 # fronde/config is required by htmlizer
-require 'fronde/org_file/htmlizer'
-require 'fronde/org_file/extracter'
-require 'fronde/org_file/class_methods'
-require 'fronde/index'
-require 'fronde/version'
+require_relative 'org_file/htmlizer'
+require_relative 'org_file/extracter'
+require_relative 'index'
+require_relative 'version'
 
 module Fronde
   # Handles org files.
@@ -15,68 +14,15 @@ module Fronde
   # This class is responsible for reading or writing existing or new org
   # files, and formating their content to be used on the generated
   # website.
-  class OrgFile # rubocop:disable Metrics/ClassLength
-    # @return [String] the title of the current org document, taken from
-    #   the ~#+title:~ header.
-    attr_reader :title
-
-    # @return [String] the subtitle of the current org document, taken
-    #   from the ~#+subtitle:~ header.
-    attr_reader :subtitle
-
-    # @return [DateTime] the date and time of the current org document,
-    #   taken from the ~#+date:~ header.
-    attr_reader :date
-
-    # @return [Boolean] wether a time has been extracted from the
-    #   current org document ~#+date:~ header.
-    attr_reader :notime
-
-    # The author of the current org document, taken from the ~#+author:~
-    #   header.
-    #
-    # If the current document doesn't have any authorship information,
-    # the one from the ~config.yml~ file will be used instead
-    #
-    # @return [String] the author name
-    attr_reader :author
-
-    # @return [Array] the keywords list of the current org document,
-    #   taken from the ~#+keywords:~ header.
-    attr_reader :keywords
-
-    # @return [String] the description of this org document, taken from
-    #   the ~#+description:~ header.
-    attr_reader :excerpt
-
-    # The locale of the current org document, taken from the
-    #   ~#+language:~ header.
-    #
-    # If the current document doesn't have any language information, the
-    # one from the ~config.yml~ file will be used instead, or "en" by
-    # default.
-    #
-    # @return [String] the document lang
-    attr_reader :lang
-
+  class OrgFile
     # @return [String] the relative path to the source of this document.
     attr_reader :file
-
-    # @return [String] the relative path to the generated html or gemini
-    #   file of this document.
-    attr_reader :pub_file
-
-    # @return [String] the url of this document, build from the ~domain~
-    #   settings and the above {#pub_file @pub_file} attribute.
-    attr_reader :url
 
     # @return [Hash] the project owning this document.
     attr_reader :project
 
-    extend Fronde::OrgFileClassMethods
-
-    include Fronde::OrgFileExtracter
-    include Fronde::OrgFileHtmlizer
+    include OrgFileExtracter
+    include OrgFileHtmlizer
 
     # Prepares the file named by ~file_name~ for read and write
     #   operations.
@@ -109,18 +55,16 @@ module Fronde
     # @option opts [String] title ('') the title of the new Org file
     # @option opts [String] author (system user or '') the author of the
     #   document
-    # @option opts [Hash] project the project owning this file
-    #   must be stored
+    # @option opts [Boolean] from_target (false) whether the given
+    #   file_name refer to an org source file or a target html/gmi file.
     # @return [Fronde::OrgFile] the new instance of Fronde::OrgFile
     def initialize(file_name, opts = {})
-      file_name = nil if file_name == ''
-      @file = file_name
-      @pub_file = nil
-      @url = nil
-      @project = opts.delete :project
+      file_name ||= ''
+      @file = File.expand_path file_name
       @options = opts
-      build_pub_file_and_url
-      if @file && File.exist?(@file)
+      @project = find_source
+      @data = {}
+      if File.file?(@file)
         extract_data
       else
         init_empty_file
@@ -155,8 +99,8 @@ module Fronde
     #
     # @return [String] the document key
     def timekey
-      return '00000000000000' if @date.nil?
-      @date.strftime('%Y%m%d%H%M%S')
+      return '00000000000000' if @data[:date].nil?
+      @data[:date].strftime('%Y%m%d%H%M%S')
     end
 
     # Returns the current OrgFile instance DateTime as a String.
@@ -176,19 +120,19 @@ module Fronde
     #   contain the year
     # @return [String] the document DateTime string representation
     def datestring(dateformat = :full, year: true)
-      return '' if @date.nil?
-      return R18n.l @date.to_date if dateformat == :short
-      return @date.rfc3339 if dateformat == :rfc3339
+      return '' if @data[:date].nil?
+      return R18n.l @data[:date].to_date if dateformat == :short
+      return @data[:date].rfc3339 if dateformat == :rfc3339
       locale = R18n.get.locale
       long_fmt = R18n.t.fronde.index.full_date_format(
-        date: locale.format_date_full(@date, year: year)
+        date: locale.format_date_full(@data[:date], year: year)
       )
-      unless @notime
+      unless @data[:notime]
         long_fmt = R18n.t.fronde.index.full_date_with_time_format(
           date: long_fmt, time: locale.time_format.delete('_').strip
         )
       end
-      locale.strftime(@date, long_fmt)
+      locale.strftime(@data[:date], long_fmt)
     end
 
     # Returns the MIME type of the generated file of this document.
@@ -245,23 +189,23 @@ module Fronde
     # rubocop:disable Metrics/MethodLength
     # rubocop:disable Layout/LineLength
     def format(string)
-      string.gsub('%a', @author)
+      string.gsub('%a', @data[:author])
             .gsub('%A', author_to_html)
             .gsub('%d', date_to_html(:short))
             .gsub('%D', date_to_html)
             .gsub('%i', datestring(:short))
             .gsub('%I', datestring(:rfc3339))
-            .gsub('%k', @keywords.join(', '))
+            .gsub('%k', @data[:keywords].join(', '))
             .gsub('%K', keywords_to_html)
-            .gsub('%l', @lang)
-            .gsub('%L', Fronde::Config.get('license', '').gsub(/\s+/, ' ').strip)
-            .gsub('%n', "Fronde #{Fronde::VERSION}")
-            .gsub('%N', "<a href=\"https://git.umaneti.net/fronde/about/\">Fronde</a> #{Fronde::VERSION}")
-            .gsub('%s', @subtitle)
-            .gsub('%t', @title)
-            .gsub('%u', @pub_file || '')
-            .gsub('%x', @excerpt)
-            .gsub('%X', "<p>#{@excerpt}</p>")
+            .gsub('%l', @data[:lang])
+            .gsub('%L', CONFIG.get('license', '').gsub(/\s+/, ' ').strip)
+            .gsub('%n', "Fronde #{VERSION}")
+            .gsub('%N', "<a href=\"https://git.umaneti.net/fronde/about/\">Fronde</a> #{VERSION}")
+            .gsub('%s', @data[:subtitle])
+            .gsub('%t', @data[:title])
+            .gsub('%u', @data[:pub_file] || '')
+            .gsub('%x', @data[:excerpt])
+            .gsub('%X', "<p>#{@data[:excerpt]}</p>")
     end
     # rubocop:enable Layout/LineLength
     # rubocop:enable Metrics/MethodLength
@@ -273,37 +217,83 @@ module Fronde
     # @return [Integer] the length written (as returned by the
     #   underlying ~File.write~ method call)
     def write
-      raise TypeError, 'no conversion from nil file name to path.' if @file.nil?
-      file_dir = File.dirname @file
-      FileUtils.mkdir_p file_dir unless Dir.exist? file_dir
-      File.write @file, @content
+      if File.directory? @file
+        if @data[:title] == ''
+          raise R18n.t.fronde.error.org_file.no_file_or_title
+        end
+        @file = File.join @file, "#{Utils.slug(@data[:title])}.org"
+      else
+        file_dir = File.dirname @file
+        FileUtils.mkdir_p file_dir
+      end
+      File.write @file, @data[:content]
+    end
+
+    def method_missing(method_name, *args, &block)
+      reader_method = method_name.to_s.delete_suffix('=').to_sym
+      if @data.has_key? reader_method
+        return @data[reader_method] if reader_method == method_name
+
+        return @data[reader_method] = args.first
+      end
+      super
+    end
+
+    def respond_to_missing?(method_name, include_private = false)
+      return true if @data.has_key? method_name
+
+      reader_method = method_name.to_s.delete_suffix('=').to_sym
+      return true if @data.has_key? reader_method
+
+      super
     end
 
     private
 
-    def build_pub_file_and_url
-      return if @file.nil?
-      @pub_file = Fronde::OrgFile.target_for_source(
-        @file, @project, with_public_folder: false
-      )
-      @url = "#{Fronde::Config.get('domain')}/#{@pub_file}"
+    def find_source
+      if @options.delete(:from_target)
+        source = find_source_for_publication_file
+      else
+        source = find_source_for_org_file
+      end
+      warn R18n.t.fronde.error.org_file.no_project(file: @file) unless source
+      source
+    end
+
+    def find_source_for_org_file
+      CONFIG.sources.find do |project|
+        project.source_for? @file
+      end
+    end
+
+    def find_source_for_publication_file
+      CONFIG.sources.find do |project|
+        org_file = project.source_for @file
+        next unless org_file
+
+        @file = org_file
+      end
     end
 
     def init_empty_file
-      @title = @options[:title] || ''
-      @subtitle = ''
-      @date = DateTime.now
-      @notime = false
-      @author = @options[:author] || Fronde::Config.get('author')
-      @keywords = []
-      @lang = @options[:lang] || Fronde::Config.get('lang')
-      @excerpt = ''
+      @data = {
+        title: @options[:title] || '',
+        subtitle: '',
+        date: DateTime.now,
+        notime: false,
+        author: @options[:author] || CONFIG.get('author'),
+        keywords: [],
+        lang: @options[:lang] || CONFIG.get('lang'),
+        excerpt: '',
+        pub_file: nil,
+        url: nil
+      }
       body = @options[:content] || ''
-      @content = @options[:raw_content] || <<~ORG
-        #+title: #{@title}
-        #+date: <#{@date.strftime('%Y-%m-%d %a. %H:%M:%S')}>
-        #+author: #{@author}
-        #+language: #{@lang}
+      @data[:content] = @options[:raw_content] || <<~ORG
+        #+title: #{@data[:title]}
+        #+date: <#{@data[:date].strftime('%Y-%m-%d %a. %H:%M:%S')}>
+        #+author: #{@data[:author]}
+        #+language: #{@data[:lang]}
 
         #{body}
       ORG

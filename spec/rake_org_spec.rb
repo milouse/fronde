@@ -3,11 +3,11 @@
 require 'rake'
 
 context 'with working org files' do
-  let(:org_dir) { "lib/org-#{Fronde::Config.org_last_version}" }
+  let(:org_dir) { "lib/org-#{Fronde::CONFIG.org_last_version}" }
 
   before do
-    Fronde::Config.reset
-    init_testing_website
+    init_testing_environment
+    Fronde::CONFIG.reset
   end
 
   after do
@@ -19,30 +19,18 @@ context 'with working org files' do
   it 'compiles org-config.el', rake: true do
     rake.invoke_task('var/lib/org-config.el')
     expect(File.exist?('var/lib/org-config.el')).to be(true)
-    proof = File.expand_path('data/org-config-proof.el', __dir__)
-    base_dir = File.expand_path('../', __dir__)
-    proof_content = File.read(proof)
-                        .gsub(/__TEST_DIR__/, Dir.pwd)
-                        .gsub(/__BASE_DIR__/, base_dir)
-                        .gsub(/__VERSION__/, Fronde::VERSION)
-                        .gsub(/__ORG_VERSION__/, Fronde::Config.org_last_version)
-    expect(File.read('var/lib/org-config.el')).to eq(proof_content)
+    proof = proof_content 'org-config-proof.el'
+    expect(File.read('var/lib/org-config.el')).to eq(proof)
   end
 
   it 'compiles org-config.el for blog', rake: true do
-    old_conf = Fronde::Config.settings.dup
+    old_conf = Fronde::CONFIG.settings.merge
     old_conf['theme'] = 'toto'
-    Fronde::Config.load_test(old_conf)
+    Fronde::CONFIG.load_test(old_conf)
     rake.invoke_task('var/lib/org-config.el')
     expect(File.exist?('var/lib/org-config.el')).to be(true)
-    proof = File.expand_path('data/org-config-blog-proof.el', __dir__)
-    base_dir = File.expand_path('../', __dir__)
-    proof_content = File.read(proof)
-                        .gsub(/__TEST_DIR__/, Dir.pwd)
-                        .gsub(/__BASE_DIR__/, base_dir)
-                        .gsub(/__VERSION__/, Fronde::VERSION)
-                        .gsub(/__ORG_VERSION__/, Fronde::Config.org_last_version)
-    expect(File.read('var/lib/org-config.el')).to eq(proof_content)
+    proof = proof_content('org-config-blog-proof.el')
+    expect(File.read('var/lib/org-config.el')).to eq(proof)
   end
 
   it 'creates .dir-locals.el', rake: true do
