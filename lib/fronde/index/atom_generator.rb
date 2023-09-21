@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require 'cgi'
 require_relative '../config'
 require_relative '../utils'
 
@@ -8,11 +7,10 @@ module Fronde
   # Embeds Atom feeds sepecific methods
   module IndexAtomGenerator
     def to_atom(index_name = 'index')
-      content = [atom_header(index_name)]
-      @index[index_name][0...10].each do |article|
-        content << atom_entry(article)
-      end
-      format '%<content>s</feed>', content: content.join("\n")
+      entries = @index[index_name][0...10].map(&:to_h)
+      return atom_index(entries) if index_name == 'index'
+
+      atom_file(index_name, entries)
     end
 
     def write_atom(index_name)
@@ -26,67 +24,47 @@ module Fronde
 
     private
 
-    # Render the Atom feed header.
+    # Render an Atom feed file.
     #
     # @param title [String] the title of the current atom feed
+    # @param entries [Array] the article to list in this file
     # @return [String] the Atom header as a String
-    def atom_header(title)
+    def atom_file(title, entries)
       domain = Fronde::CONFIG.get('domain')
-      upddate = @date.rfc3339
-      if title == 'index'
-        slug = 'index'
-        tagurl = domain
-        title = Fronde::CONFIG.get('title', R18n.t.fronde.index.all_tags)
-      else
-        slug = Fronde::Utils.slug(title)
-        tagurl = "#{domain}/tags/#{slug}.html"
-        title = @tags_names[title]
-      end
-      title = CGI.escapeHTML(title)
-      <<~ENDATOM
-        <?xml version="1.0" encoding="utf-8"?>
-        <feed xmlns="http://www.w3.org/2005/Atom"
-              xmlns:dc="http://purl.org/dc/elements/1.1/"
-              xmlns:wfw="http://wellformedweb.org/CommentAPI/"
-              xml:lang="#{Fronde::CONFIG.get('lang')}">
-
-        <title>#{title}</title>
-        <link href="#{domain}/feeds/#{slug}.xml" rel="self" type="application/atom+xml"/>
-        <link href="#{tagurl}" rel="alternate" type="text/html" title="#{title}"/>
-        <updated>#{upddate}</updated>
-        <author><name>#{Fronde::CONFIG.get('author', '')}</name></author>
-        <id>urn:md5:#{Digest::MD5.hexdigest(domain)}</id>
-        <generator uri="https://git.umaneti.net/fronde/about/">Fronde</generator>
-      ENDATOM
+      slug = Fronde::Utils.slug(title)
+      tagurl = "#{domain}/tags/#{slug}.html"
+      Config::Helpers.render_liquid_template(
+        File.read(File.expand_path('./data/template.xml', __dir__)),
+        'title' => @tags_names[title],
+        'lang' => Fronde::CONFIG.get('lang'),
+        'domain' => domain,
+        'slug' => slug,
+        'tagurl' => tagurl,
+        'upddate' => @date.rfc3339,
+        'author' => Fronde::CONFIG.get('author', ''),
+        'publication_format' => @pub_format,
+        'entries' => entries
+      )
     end
 
-    # Render an Atom feed entry.
+    # Render the main/index Atom feed.
     #
-    # @param article [Fronde::OrgFile] the related org document for this
-    #   entry
-    # @return [String] the Atom entry as a String
-    def atom_entry(article)
-      keywords = article.keywords.map do |k|
-        "<dc:subject>#{CGI.escapeHTML(k)}</dc:subject>"
-      end.join
-      keywords += "\n  " if keywords != ''
-      title = CGI.escapeHTML(article.title)
-      if @pub_format == 'gemini'
-        content_opening_tag = '<content>'
-      else
-        content_opening_tag = '<content type="html">'
-      end
-      <<~ENDENTRY
-        <entry>
-          <title>#{title}</title>
-          <link href="#{article.url}" rel="alternate" type="#{article.pub_mime_type}"
-                title="#{title}"/>
-          <id>urn:md5:#{Digest::MD5.hexdigest(article.timekey)}</id>
-          <published>#{article.datestring(:rfc3339)}</published>
-          <author><name>#{CGI.escapeHTML(article.author)}</name></author>
-          #{keywords}#{content_opening_tag}#{CGI.escapeHTML(article.excerpt)}</content>
-        </entry>
-      ENDENTRY
+    # @param entries [Array] the article to list in this file
+    # @return [String] the Atom header as a String
+    def atom_index(entries)
+      domain = Fronde::CONFIG.get('domain')
+      Config::Helpers.render_liquid_template(
+        File.read(File.expand_path('./data/template.xml', __dir__)),
+        'title' => Fronde::CONFIG.get('title', R18n.t.fronde.index.all_tags),
+        'lang' => Fronde::CONFIG.get('lang'),
+        'domain' => domain,
+        'slug' => 'index',
+        'tagurl' => domain,
+        'upddate' => @date.rfc3339,
+        'author' => Fronde::CONFIG.get('author', ''),
+        'publication_format' => @pub_format,
+        'entries' => entries
+      )
     end
   end
 end

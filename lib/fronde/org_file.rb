@@ -248,6 +248,13 @@ module Fronde
       super
     end
 
+    def to_h
+      fields = %w[author excerpt keywords pub_mime_type timekey title url]
+      data = fields.to_h { |key| [key, send(key)] }
+      data['published'] = datestring(:rfc3339)
+      data
+    end
+
     private
 
     def find_source

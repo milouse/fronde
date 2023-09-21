@@ -93,52 +93,71 @@ SAMPLE_PROJECT_NO_REC_INDEX = <<~BLOG_IDX.strip
   - *[[http://perdu.com/test1.html][My sweet article]]*
 BLOG_IDX
 
-SAMPLE_ATOM = <<~ATOM.strip
+SAMPLE_ATOM = <<~ATOM
   <?xml version="1.0" encoding="utf-8"?>
   <feed xmlns="http://www.w3.org/2005/Atom"
         xmlns:dc="http://purl.org/dc/elements/1.1/"
-        xmlns:wfw="http://wellformedweb.org/CommentAPI/"
         xml:lang="en">
 
-  <title>Blog</title>
-  <link href="http://perdu.com/feeds/index.xml" rel="self" type="application/atom+xml"/>
-  <link href="http://perdu.com" rel="alternate" type="text/html" title="Blog"/>
-  <updated>%<date>s</updated>
-  <author><name>Test</name></author>
-  <id>urn:md5:75d53866bcb20465b3287cf237234464</id>
-  <generator uri="https://git.umaneti.net/fronde/about/">Fronde</generator>
-
-  <entry>
-    <title>My third article</title>
-    <link href="http://perdu.com/other/test3.html" rel="alternate" type="text/html"
-          title="My third article"/>
-    <id>urn:md5:8865383febd94ddf9df318267af5ae85</id>
-    <published>2019-06-11T23:42:10+00:00</published>
+    <title>Blog</title>
+    <link href="http://perdu.com/feeds/index.xml" rel="self" type="application/atom+xml"/>
+    <link href="http://perdu.com" rel="alternate" type="text/html" title="Blog"/>
+    <updated>%<date>s</updated>
     <author><name>Test</name></author>
-    <dc:subject>toto</dc:subject><dc:subject>tutu</dc:subject>
-    <content type="html"></content>
-  </entry>
+    <id>urn:md5:75d53866bcb20465b3287cf237234464</id>
+    <generator uri="https://git.umaneti.net/fronde/about/">Fronde</generator>
 
-  <entry>
-    <title>My second article</title>
-    <link href="http://perdu.com/test2.html" rel="alternate" type="text/html"
-          title="My second article"/>
-    <id>urn:md5:123104bd8bb4c61e02a1e2a136e2fd6b</id>
-    <published>2019-06-11T00:00:00+00:00</published>
-    <author><name>Titi</name></author>
-    <content type="html">Lorem ipsum</content>
-  </entry>
+    <entry>
+      <title>My third article</title>
+      <link href="http://perdu.com/other/test3.html" rel="alternate"
+            type="text/html"
+            title="My third article"/>
+      <id>urn:md5:8865383febd94ddf9df318267af5ae85</id>
+      <published>2019-06-11T23:42:10+00:00</published>
+      <author><name>Test</name></author>
+      <dc:subject>toto</dc:subject>
+      <dc:subject>tutu</dc:subject>
+      <content type="html"></content>
+    </entry>
 
-  <entry>
-    <title>My sweet article</title>
-    <link href="http://perdu.com/test1.html" rel="alternate" type="text/html"
-          title="My sweet article"/>
-    <id>urn:md5:c47532bbb1e2883c902071591ae1ec9b</id>
-    <published></published>
-    <author><name>Test</name></author>
-    <dc:subject>tutu</dc:subject>
-    <content type="html"></content>
-  </entry>
+    <entry>
+      <title>My second article</title>
+      <link href="http://perdu.com/test2.html" rel="alternate"
+            type="text/html"
+            title="My second article"/>
+      <id>urn:md5:123104bd8bb4c61e02a1e2a136e2fd6b</id>
+      <published>2019-06-11T00:00:00+00:00</published>
+      <author><name>Titi</name></author>
+      <content type="html">Lorem ipsum</content>
+    </entry>
+
+    <entry>
+      <title>My sweet article</title>
+      <link href="http://perdu.com/test1.html" rel="alternate"
+            type="text/html"
+            title="My sweet article"/>
+      <id>urn:md5:c47532bbb1e2883c902071591ae1ec9b</id>
+      <published></published>
+      <author><name>Test</name></author>
+      <dc:subject>tutu</dc:subject>
+      <content type="html"></content>
+    </entry>
+  </feed>
+ATOM
+
+SAMPLE_EMPTY_ATOM = <<~ATOM
+  <?xml version="1.0" encoding="utf-8"?>
+  <feed xmlns="http://www.w3.org/2005/Atom"
+        xmlns:dc="http://purl.org/dc/elements/1.1/"
+        xml:lang="en">
+
+    <title>%<title>s</title>
+    <link href="http://perdu.com/feeds/index.xml" rel="self" type="application/atom+xml"/>
+    <link href="http://perdu.com" rel="alternate" type="text/html" title="%<title>s"/>
+    <updated>%<date>s</updated>
+    <author><name>%<author>s</name></author>
+    <id>urn:md5:75d53866bcb20465b3287cf237234464</id>
+    <generator uri="https://git.umaneti.net/fronde/about/">Fronde</generator>
   </feed>
 ATOM
 
@@ -389,25 +408,13 @@ describe Fronde::Index do
         index = described_class.new
         index_date_str = index.date.strftime('%Y-%m-%d %H:%M')
         expect(index_date_str).to eq(now_str)
-        empty_atom = <<~ATOM.strip
-          <?xml version="1.0" encoding="utf-8"?>
-          <feed xmlns="http://www.w3.org/2005/Atom"
-                xmlns:dc="http://purl.org/dc/elements/1.1/"
-                xmlns:wfw="http://wellformedweb.org/CommentAPI/"
-                xml:lang="en">
-
-          <title>Blog</title>
-          <link href="http://perdu.com/feeds/index.xml" rel="self" type="application/atom+xml"/>
-          <link href="http://perdu.com" rel="alternate" type="text/html" title="Blog"/>
-          <updated>%<date>s</updated>
-          <author><name>Test</name></author>
-          <id>urn:md5:75d53866bcb20465b3287cf237234464</id>
-          <generator uri="https://git.umaneti.net/fronde/about/">Fronde</generator>
-          </feed>
-        ATOM
-        expect(index.to_atom).to(
-          eq(format(empty_atom, date: index.date.rfc3339))
+        comp = format(
+          SAMPLE_EMPTY_ATOM,
+          date: index.date.rfc3339,
+          author: 'Test',
+          title: 'Blog'
         )
+        expect(index.to_atom).to eq(comp)
       end
 
       it 'correctly saves one index', core: true do
@@ -449,25 +456,13 @@ describe Fronde::Index do
         index = described_class.new
         index.write_atom('index')
         expect(File.exist?('output/feeds/index.xml')).to be(true)
-        empty_atom = <<~ATOM.strip
-          <?xml version="1.0" encoding="utf-8"?>
-          <feed xmlns="http://www.w3.org/2005/Atom"
-                xmlns:dc="http://purl.org/dc/elements/1.1/"
-                xmlns:wfw="http://wellformedweb.org/CommentAPI/"
-                xml:lang="en">
-
-          <title>Blog</title>
-          <link href="http://perdu.com/feeds/index.xml" rel="self" type="application/atom+xml"/>
-          <link href="http://perdu.com" rel="alternate" type="text/html" title="Blog"/>
-          <updated>%<date>s</updated>
-          <author><name>Test</name></author>
-          <id>urn:md5:75d53866bcb20465b3287cf237234464</id>
-          <generator uri="https://git.umaneti.net/fronde/about/">Fronde</generator>
-          </feed>
-        ATOM
-        expect(File.read('output/feeds/index.xml')).to(
-          eq(format(empty_atom, date: index.date.rfc3339))
+        comp = format(
+          SAMPLE_EMPTY_ATOM,
+          date: index.date.rfc3339,
+          author: 'Test',
+          title: 'Blog'
         )
+        expect(File.read('output/feeds/index.xml')).to eq(comp)
       end
 
       it 'writes them all', core: true do
@@ -536,25 +531,13 @@ describe Fronde::Index do
       index = described_class.new
       index_date_str = index.date.strftime('%Y-%m-%d %H:%M')
       expect(index_date_str).to eq(now_str)
-      empty_atom = <<~EMPTY_ATOM.strip
-        <?xml version="1.0" encoding="utf-8"?>
-        <feed xmlns="http://www.w3.org/2005/Atom"
-              xmlns:dc="http://purl.org/dc/elements/1.1/"
-              xmlns:wfw="http://wellformedweb.org/CommentAPI/"
-              xml:lang="en">
-
-        <title>My site</title>
-        <link href="http://perdu.com/feeds/index.xml" rel="self" type="application/atom+xml"/>
-        <link href="http://perdu.com" rel="alternate" type="text/html" title="My site"/>
-        <updated>%<date>s</updated>
-        <author><name>Test</name></author>
-        <id>urn:md5:75d53866bcb20465b3287cf237234464</id>
-        <generator uri="https://git.umaneti.net/fronde/about/">Fronde</generator>
-        </feed>
-      EMPTY_ATOM
-      expect(index.to_atom).to(
-        eq(format(empty_atom, date: index.date.rfc3339))
+      comp = format(
+        SAMPLE_EMPTY_ATOM,
+        date: index.date.rfc3339,
+        author: 'Test',
+        title: 'My site'
       )
+      expect(index.to_atom).to eq(comp)
     end
 
     it 'does not save one index', core: true do
@@ -629,25 +612,28 @@ describe Fronde::Index do
       index = described_class.new
       index_date_str = index.date.strftime('%Y-%m-%d %H:%M')
       expect(index_date_str).to eq(now_str)
-      empty_atom = <<~EMPTY_ATOM.strip
+      empty_atom = <<~EMPTY_ATOM
         <?xml version="1.0" encoding="utf-8"?>
         <feed xmlns="http://www.w3.org/2005/Atom"
               xmlns:dc="http://purl.org/dc/elements/1.1/"
-              xmlns:wfw="http://wellformedweb.org/CommentAPI/"
               xml:lang="en">
 
-        <title>All tags</title>
-        <link href="http://perdu.com/feeds/index.xml" rel="self" type="application/atom+xml"/>
-        <link href="http://perdu.com" rel="alternate" type="text/html" title="All tags"/>
-        <updated>%<date>s</updated>
-        <author><name>alice</name></author>
-        <id>urn:md5:75d53866bcb20465b3287cf237234464</id>
-        <generator uri="https://git.umaneti.net/fronde/about/">Fronde</generator>
+          <title>All tags</title>
+          <link href="http://perdu.com/feeds/index.xml" rel="self" type="application/atom+xml"/>
+          <link href="http://perdu.com" rel="alternate" type="text/html" title="All tags"/>
+          <updated>%<date>s</updated>
+          <author><name>alice</name></author>
+          <id>urn:md5:75d53866bcb20465b3287cf237234464</id>
+          <generator uri="https://git.umaneti.net/fronde/about/">Fronde</generator>
         </feed>
       EMPTY_ATOM
-      expect(index.to_atom).to(
-        eq(format(empty_atom, date: index.date.rfc3339))
+      comp = format(
+        SAMPLE_EMPTY_ATOM,
+        date: index.date.rfc3339,
+        author: 'alice',
+        title: 'All tags'
       )
+      expect(index.to_atom).to eq(comp)
     end
 
     it 'does not save any index', core: true do

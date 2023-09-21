@@ -73,6 +73,10 @@ module Fronde
         value.gsub!('"', '\"')
         %("#{value}")
       end
+
+      def md5(value)
+        Digest::MD5.hexdigest(value)
+      end
     end
   end
 end

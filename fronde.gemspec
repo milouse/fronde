@@ -30,6 +30,7 @@ Gem::Specification.new do |s|
                    'lib/fronde/config.rb',
                    'lib/fronde/emacs.rb',
                    'lib/fronde/index/atom_generator.rb',
+                   'lib/fronde/index/data/template.xml',
                    'lib/fronde/index/org_generator.rb',
                    'lib/fronde/index.rb',
                    'lib/fronde/org_file/extracter.rb',
