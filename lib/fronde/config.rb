@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 require 'yaml'
+require 'r18n-core'
 require 'singleton'
+
 require_relative 'config/lisp'
 require_relative 'source'
 
@@ -214,5 +216,9 @@ module Fronde
 
   CONFIG = Config::Store.instance
 end
+
+R18n.default_places = File.expand_path('../../locales', __dir__)
+R18n::Filters.on(:named_variables)
+R18n.set Fronde::CONFIG.get('lang', 'en')
 
 Fronde::CONFIG.load_sources

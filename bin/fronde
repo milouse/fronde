@@ -1,15 +1,11 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require 'optparse'
-require 'r18n-core'
 require_relative '../lib/fronde/utils'
 require_relative '../lib/fronde/version'
 require_relative '../lib/fronde/cli'
 
-R18n.default_places = File.expand_path('../locales', __dir__)
-R18n.set Fronde::CONFIG.get('lang')
-
+require 'optparse'
 optparser = OptionParser.new
 optparser.version = Fronde::VERSION
 

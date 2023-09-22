@@ -3,11 +3,6 @@
 require 'fileutils'
 require 'simplecov'
 
-require 'r18n-core'
-R18n.default_places = File.expand_path('../locales', __dir__)
-R18n.set 'en'
-R18n::Filters.on(:named_variables)
-
 require 'liquid'
 
 SimpleCov.start do
@@ -26,8 +21,8 @@ ENV['LANG'] = 'en'
 ENV['USER'] = 'alice'
 
 # The following requires other components automatically
-require 'fronde/org_file'
 require 'fronde/utils'
+require 'fronde/org_file'
 
 def init_testing_environment
   FileUtils.mkdir_p 'tmp/website_testing'
@@ -36,11 +31,6 @@ def init_testing_environment
   # Thus we have to rewind 3 level to find fronde src directory
   rakefile = <<~RAKE
     # frozen_string_literal: true
-
-    require 'r18n-core'
-    R18n.default_places = '../../../locales'
-    R18n.set 'en'
-    R18n::Filters.on(:named_variables)
 
     $LOAD_PATH.unshift('../../../lib')
 
