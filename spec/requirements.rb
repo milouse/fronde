@@ -21,8 +21,9 @@ ENV['LANG'] = 'en'
 ENV['USER'] = 'alice'
 
 # The following requires other components automatically
-require 'fronde/utils'
-require 'fronde/org_file'
+require_relative '../lib/fronde/config'
+require_relative '../lib/fronde/org_file'
+require_relative '../lib/fronde/cli/helpers'
 
 def init_testing_environment
   FileUtils.mkdir_p 'tmp/website_testing'
@@ -76,7 +77,7 @@ RSpec.configure do |config|
   config.before(:suite) do
     Dir.chdir __dir__
     FileUtils.mkdir 'tmp'
-    Fronde::Utils.download_org('tmp')
+    Fronde::CLI::Helpers.download_org('tmp')
   end
 
   config.after(:suite) do

@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require_relative '../lib/fronde/utils'
+require_relative '../lib/fronde/config'
 require_relative '../lib/fronde/version'
 require_relative '../lib/fronde/cli'
 
@@ -9,8 +9,8 @@ require 'optparse'
 optparser = OptionParser.new
 optparser.version = Fronde::VERSION
 
-Fronde::Utils::FRONDE_OPTIONS.each do |k, opt|
-  optparser.send(opt[:meth] || :on, *Fronde::Utils.decorate_option(k))
+Fronde::CLI::OptParse::FRONDE_OPTIONS.each do |k, opt|
+  optparser.send(opt[:meth] || :on, *Fronde::CLI::OptParse.decorate_option(k))
 end
 
 params = {}
@@ -43,7 +43,8 @@ init_cmds = %i[fronde_init fronde_config fronde_update]
 unless File.exist?('config.yml') || init_cmds.include?(method)
   fronde.fronde_init
 end
-if Fronde::Utils.command_options(command)[:with_args]
+
+if Fronde::CLI::OptParse.command_options(command)[:with_args]
   fronde.send method, *ARGV
 else
   fronde.send method

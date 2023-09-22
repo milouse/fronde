@@ -4,6 +4,7 @@ require 'fileutils'
 require 'digest/md5'
 require_relative 'config'
 require_relative 'org_file'
+require_relative 'index/slug'
 require_relative 'index/atom_generator'
 require_relative 'index/org_generator'
 
@@ -13,8 +14,8 @@ module Fronde
   class Index
     attr_reader :date
 
-    include Fronde::IndexAtomGenerator
-    include Fronde::IndexOrgGenerator
+    include IndexAtomGenerator
+    include IndexOrgGenerator
 
     def initialize(publication_format = 'html')
       @pub_format = publication_format
@@ -73,7 +74,7 @@ module Fronde
           org_file = File.join(project['path'], index_file)
           next if exclude_file?(org_file, project)
 
-          add_to_indexes(Fronde::OrgFile.new(org_file))
+          add_to_indexes(OrgFile.new(org_file))
         end
       end
     end
@@ -88,7 +89,7 @@ module Fronde
       @index['index'] << article
       add_to_project_index article
       article.keywords.each do |k|
-        slug = Fronde::Utils.slug k
+        slug = Slug.slug k
         @tags_names[slug] = k # Overwrite is permitted
         @index[slug] ||= []
         @index[slug] << article

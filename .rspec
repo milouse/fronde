@@ -1,2 +1,1 @@
--I ./lib
 -r ./spec/requirements.rb

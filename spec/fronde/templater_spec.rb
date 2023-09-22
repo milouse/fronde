@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'fronde/templater'
+require_relative '../../lib/fronde/templater'
 
 describe Fronde::Templater do
   let(:html_base) do

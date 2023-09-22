@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require 'fronde/config'
-require 'fronde/utils'
+require_relative '../fronde/config'
+require_relative '../fronde/cli/throbber'
 
 module Fronde
-  class SyncError < Error; end
+  class SyncError < ::StandardError; end
 end
 
 def rsync_command(test = nil)
@@ -44,7 +44,7 @@ namespace :sync do
       if verbose
         publish_thread.join
       else
-        Fronde::Utils.throbber(
+        Fronde::CLI::Throbber.run(
           publish_thread, format('Publishing %<fmt>s:', fmt: standard)
         )
       end
@@ -61,7 +61,7 @@ namespace :sync do
       if verbose
         pull_thread.join
       else
-        Fronde::Utils.throbber(
+        Fronde::CLI::Throbber.run(
           pull_thread, format('Pulling %<fmt>s:', fmt: standard)
         )
       end

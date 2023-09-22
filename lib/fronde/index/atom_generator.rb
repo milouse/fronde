@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require_relative '../config'
-require_relative '../utils'
 
 module Fronde
   # Embeds Atom feeds sepecific methods
@@ -15,7 +14,7 @@ module Fronde
 
     def write_atom(index_name)
       return unless save?
-      slug = Fronde::Utils.slug index_name
+      slug = Slug.slug index_name
       pubdir = Fronde::CONFIG.get("#{@pub_format}_public_folder")
       FileUtils.mkdir_p "#{pubdir}/feeds"
       atomdest = "#{pubdir}/feeds/#{slug}.xml"
@@ -31,7 +30,7 @@ module Fronde
     # @return [String] the Atom header as a String
     def atom_file(title, entries)
       domain = Fronde::CONFIG.get('domain')
-      slug = Fronde::Utils.slug(title)
+      slug = Slug.slug(title)
       tagurl = "#{domain}/tags/#{slug}.html"
       Config::Helpers.render_liquid_template(
         File.read(File.expand_path('./data/template.xml', __dir__)),

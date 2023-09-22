@@ -2,8 +2,9 @@
 
 require 'open-uri'
 
-# Fronde::Config is required by Fronde::Utils
-require 'fronde/utils'
+require_relative '../fronde/config'
+require_relative '../fronde/cli/helpers'
+require_relative '../fronde/cli/throbber'
 
 require 'rake/clean'
 
@@ -27,13 +28,13 @@ namespace :org do
   file 'var/tmp/org.tar.gz' => 'var/tmp' do
     download = Thread.new do
       Thread.current[:org_version] = Fronde::CONFIG.org_last_version
-      Fronde::Utils.download_org
+      Fronde::CLI::Helpers.download_org
     end
     if verbose
       download.join
       warn "Org version #{download[:org_version]} has been downloaded"
     else
-      Fronde::Utils.throbber(download, 'Downloading Org:')
+      Fronde::CLI::Throbber.run(download, 'Downloading Org:')
     end
   end
 
@@ -58,7 +59,7 @@ namespace :org do
       build.join
       warn "#{org_version} has been locally installed"
     else
-      Fronde::Utils.throbber(build, 'Installing Org:')
+      Fronde::CLI::Throbber.run(build, 'Installing Org:')
     end
   end
 

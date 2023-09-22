@@ -2,7 +2,7 @@
 
 require_relative '../config'
 require_relative '../emacs'
-require_relative '../utils'
+require_relative '../index/slug'
 
 module Fronde
   # This module holds HTML formatter methods for the {Fronde::OrgFile}
@@ -18,7 +18,7 @@ module Fronde
       klist = @data[:keywords].map do |k|
         <<~KEYWORDLINK
           <li class="keyword">
-            <a href="#{domain}/tags/#{Fronde::Utils.slug(k)}.html">#{k}</a>
+            <a href="#{domain}/tags/#{Slug.slug(k)}.html">#{k}</a>
           </li>
         KEYWORDLINK
       end.join

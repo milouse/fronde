@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require_relative '../utils'
 using TimePatch
 
 module Fronde
@@ -17,7 +16,7 @@ module Fronde
 
     def write_org(index_name)
       return unless save?
-      slug = Fronde::Utils.slug index_name
+      slug = Slug.slug index_name
       FileUtils.mkdir_p 'tags'
       content = to_org index_name
       orgdest = "tags/#{slug}.org"

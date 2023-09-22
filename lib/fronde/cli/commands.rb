@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 require_relative 'helpers'
-require_relative '../utils'
+require_relative 'optparse'
+require_relative '../index/slug'
 
 module Fronde
   module CLI
@@ -64,14 +65,14 @@ module Fronde
       end
 
       def fronde_help(command = 'basic')
-        cmd_opt = Fronde::Utils.command_options(command)
+        cmd_opt = OptParse.command_options(command)
         label = cmd_opt[:label] || command
         warn format("%<label>s\n\n", label: R18n.t.fronde.bin.usage(label))
         cmd = cmd_opt[:name] || command
         if R18n.t.fronde.bin.commands[cmd].translated?
           warn format("%<label>s\n\n", label: R18n.t.fronde.bin.commands[cmd])
         end
-        warn Helpers.help_command_body(cmd).join("\n")
+        warn OptParse.help_command_body(cmd).join("\n")
       end
 
       private
@@ -83,7 +84,7 @@ module Fronde
           warn R18n.t.fronde.bin.error.no_file
           exit 1
         end
-        "#{Fronde::Utils.slug(title)}.org"
+        "#{Fronde::Slug.slug(title)}.org"
       end
 
       def new_file_name(file_path)

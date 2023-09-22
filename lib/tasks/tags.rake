@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'fronde/index'
+require_relative '../fronde/index'
 
 namespace :tags do
   desc 'List all tags by name'

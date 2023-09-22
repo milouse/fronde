@@ -193,7 +193,7 @@ module Fronde
         if @data[:title] == ''
           raise R18n.t.fronde.error.org_file.no_file_or_title
         end
-        @file = File.join @file, "#{Utils.slug(@data[:title])}.org"
+        @file = File.join @file, "#{Slug.slug(@data[:title])}.org"
       else
         file_dir = File.dirname @file
         FileUtils.mkdir_p file_dir

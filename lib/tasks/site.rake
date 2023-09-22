@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require 'fronde/emacs'
-require 'fronde/index'
-require 'fronde/utils'
-require 'fronde/org_file'
-require 'fronde/templater'
+require_relative '../fronde/emacs'
+require_relative '../fronde/index'
+require_relative '../fronde/org_file'
+require_relative '../fronde/templater'
+require_relative '../fronde/cli/throbber'
 
 namespace :site do
   desc 'Generates all index files'
@@ -17,7 +17,7 @@ namespace :site do
     build = Thread.new do
       index.write_all(verbose: false)
     end
-    Fronde::Utils.throbber(build, 'Generating indexes:')
+    Fronde::CLI::Throbber.run(build, 'Generating indexes:')
   end
 
   desc 'Convert and customize all org files'
@@ -28,7 +28,7 @@ namespace :site do
       Fronde::Emacs.new(verbose: verbose).publish
     end
     begin
-      Fronde::Utils.throbber(build_html, 'Building:')
+      Fronde::CLI::Throbber.run(build_html, 'Building:')
     # :nocov:
     rescue RuntimeError
       warn 'Aborting'
@@ -41,12 +41,12 @@ namespace :site do
         Fronde::Templater.customize_output(f)
       end
     end
-    Fronde::Utils.throbber(customize_html, 'Customizing:')
+    Fronde::CLI::Throbber.run(customize_html, 'Customizing:')
   end
 
   desc 'Start a test server'
   task :preview do
-    require 'fronde/preview'
+    require_relative '../fronde/preview'
     Fronde.start_preview
   end
 end
