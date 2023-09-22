@@ -3,8 +3,10 @@
 require 'json'
 require 'open-uri'
 require_relative '../version'
-require_relative '../../ext/r18n'
 require_relative 'helpers'
+
+require_relative '../../ext/r18n'
+using R18nPatch
 
 module Fronde
   module Config
