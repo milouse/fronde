@@ -7,18 +7,12 @@ module Fronde
     # Various utilitaries methods
     module Helpers
       def self.init_required_files
-        init_rakefile unless File.exist?('Rakefile')
-        init_gitignore unless File.exist?('.gitignore')
-      end
-
-      def self.init_rakefile
         FileUtils.cp(
           File.expand_path('./data/Rakefile', __dir__),
           'Rakefile'
         )
-      end
+        return if File.exist? '.gitignore'
 
-      def self.init_gitignore
         FileUtils.cp(
           File.expand_path('./data/gitignore', __dir__),
           '.gitignore'
