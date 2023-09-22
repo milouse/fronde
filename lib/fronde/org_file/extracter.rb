@@ -16,6 +16,7 @@ module Fronde
       end
       return unless @project
 
+      @data[:updated] = File.mtime(@file)
       @data[:pub_file] = @project.target_for @file
       @data[:url] = "#{CONFIG.get('domain')}/#{@data[:pub_file]}"
     end

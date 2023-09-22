@@ -114,6 +114,7 @@ SAMPLE_ATOM = <<~ATOM
             title="My third article"/>
       <id>urn:md5:8865383febd94ddf9df318267af5ae85</id>
       <published>2019-06-11T23:42:10+02:00</published>
+      <updated>%<mtime>s</updated>
       <author><name>Test</name></author>
       <dc:subject>toto</dc:subject>
       <dc:subject>tutu</dc:subject>
@@ -127,6 +128,7 @@ SAMPLE_ATOM = <<~ATOM
             title="My second article"/>
       <id>urn:md5:123104bd8bb4c61e02a1e2a136e2fd6b</id>
       <published>2019-06-11T00:00:00+02:00</published>
+      <updated>%<mtime>s</updated>
       <author><name>Titi</name></author>
       <content type="html">Lorem ipsum</content>
     </entry>
@@ -138,6 +140,7 @@ SAMPLE_ATOM = <<~ATOM
             title="My sweet article"/>
       <id>urn:md5:c47532bbb1e2883c902071591ae1ec9b</id>
       <published></published>
+      <updated>%<mtime>s</updated>
       <author><name>Test</name></author>
       <dc:subject>tutu</dc:subject>
       <content type="html"></content>
@@ -223,9 +226,12 @@ describe Fronde::Index do
           index = described_class.new
           index_date_str = index.date.strftime('%Y-%m-%d %H:%M')
           expect(index_date_str).to eq(now_str)
-          expect(index.to_atom).to(
-            eq(format(SAMPLE_ATOM, date: index.date.xmlschema))
+          comp = format(
+            SAMPLE_ATOM,
+            date: index.date.xmlschema,
+            mtime: File.mtime('writings/test1.org').xmlschema
           )
+          expect(index.to_atom).to eq(comp)
         end
 
         it 'generates the right org-header' do
@@ -284,9 +290,12 @@ describe Fronde::Index do
           index = described_class.new
           index.write_atom('index')
           expect(File.exist?('output/feeds/index.xml')).to be(true)
-          expect(File.read('output/feeds/index.xml')).to(
-            eq(format(SAMPLE_ATOM, date: index.date.xmlschema))
+          comp = format(
+            SAMPLE_ATOM,
+            date: index.date.xmlschema,
+            mtime: File.mtime('writings/test1.org').xmlschema
           )
+          expect(File.read('output/feeds/index.xml')).to eq(comp)
         end
 
         it 'writes them all', core: true do

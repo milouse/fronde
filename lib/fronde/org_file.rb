@@ -226,6 +226,7 @@ module Fronde
       fields = %w[author excerpt keywords pub_mime_type timekey title url]
       data = fields.to_h { |key| [key, send(key)] }
       data['published'] = @data[:date].xmlschema
+      data['updated'] = @data[:updated].xmlschema
       data
     end
 

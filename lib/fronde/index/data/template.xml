@@ -20,6 +20,7 @@
           title="{{ article.title }}"/>
     <id>urn:md5:{{ article.timekey | md5 }}</id>
     <published>{{ article.published }}</published>
+    <updated>{{ article.updated }}</updated>
     <author><name>{{ article.author | escape }}</name></author>
     {%- for keyword in article.keywords %}
     <dc:subject>{{ keyword | escape }}</dc:subject>
