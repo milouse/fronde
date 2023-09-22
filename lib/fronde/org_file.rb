@@ -164,7 +164,7 @@ module Fronde
     # rubocop:disable Layout/LineLength
     def format(string)
       string.gsub('%a', @data[:author])
-            .gsub('%A', author_to_html)
+            .gsub('%A', "<span class=\"author\">#{@data[:author]}</span>")
             .gsub('%d', @data[:date].l18n_short_date_html)
             .gsub('%D', @data[:date].l18n_long_date_html)
             .gsub('%i', @data[:date].l18n_short_date_string)

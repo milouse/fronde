@@ -24,13 +24,5 @@ module Fronde
       end.join
       "<ul class=\"keywords-list\">#{klist}</ul>"
     end
-
-    # Format {Fronde::OrgFile#author} in a HTML `span` tag with a
-    #   specific class.
-    #
-    # @return [String] the author HTML `span`
-    def author_to_html
-      "<span class=\"author\">#{@data[:author]}</span>"
-    end
   end
 end
