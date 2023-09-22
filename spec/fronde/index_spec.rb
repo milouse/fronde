@@ -113,7 +113,7 @@ SAMPLE_ATOM = <<~ATOM
             type="text/html"
             title="My third article"/>
       <id>urn:md5:8865383febd94ddf9df318267af5ae85</id>
-      <published>2019-06-11T23:42:10+00:00</published>
+      <published>2019-06-11T23:42:10+02:00</published>
       <author><name>Test</name></author>
       <dc:subject>toto</dc:subject>
       <dc:subject>tutu</dc:subject>
@@ -126,7 +126,7 @@ SAMPLE_ATOM = <<~ATOM
             type="text/html"
             title="My second article"/>
       <id>urn:md5:123104bd8bb4c61e02a1e2a136e2fd6b</id>
-      <published>2019-06-11T00:00:00+00:00</published>
+      <published>2019-06-11T00:00:00+02:00</published>
       <author><name>Titi</name></author>
       <content type="html">Lorem ipsum</content>
     </entry>
@@ -219,12 +219,12 @@ describe Fronde::Index do
         end
 
         it 'generates an atom feed', core: true do
-          now_str = DateTime.now.strftime('%Y-%m-%d %H:%M')
+          now_str = Time.now.strftime('%Y-%m-%d %H:%M')
           index = described_class.new
           index_date_str = index.date.strftime('%Y-%m-%d %H:%M')
           expect(index_date_str).to eq(now_str)
           expect(index.to_atom).to(
-            eq(format(SAMPLE_ATOM, date: index.date.rfc3339))
+            eq(format(SAMPLE_ATOM, date: index.date.xmlschema))
           )
         end
 
@@ -285,7 +285,7 @@ describe Fronde::Index do
           index.write_atom('index')
           expect(File.exist?('output/feeds/index.xml')).to be(true)
           expect(File.read('output/feeds/index.xml')).to(
-            eq(format(SAMPLE_ATOM, date: index.date.rfc3339))
+            eq(format(SAMPLE_ATOM, date: index.date.xmlschema))
           )
         end
 
@@ -404,13 +404,13 @@ describe Fronde::Index do
       end
 
       it 'generates an atom feed', core: true do
-        now_str = DateTime.now.strftime('%Y-%m-%d %H:%M')
+        now_str = Time.now.strftime('%Y-%m-%d %H:%M')
         index = described_class.new
         index_date_str = index.date.strftime('%Y-%m-%d %H:%M')
         expect(index_date_str).to eq(now_str)
         comp = format(
           SAMPLE_EMPTY_ATOM,
-          date: index.date.rfc3339,
+          date: index.date.xmlschema,
           author: 'Test',
           title: 'Blog'
         )
@@ -458,7 +458,7 @@ describe Fronde::Index do
         expect(File.exist?('output/feeds/index.xml')).to be(true)
         comp = format(
           SAMPLE_EMPTY_ATOM,
-          date: index.date.rfc3339,
+          date: index.date.xmlschema,
           author: 'Test',
           title: 'Blog'
         )
@@ -527,13 +527,13 @@ describe Fronde::Index do
     end
 
     it 'generates an empty atom feed', core: true do
-      now_str = DateTime.now.strftime('%Y-%m-%d %H:%M')
+      now_str = Time.now.strftime('%Y-%m-%d %H:%M')
       index = described_class.new
       index_date_str = index.date.strftime('%Y-%m-%d %H:%M')
       expect(index_date_str).to eq(now_str)
       comp = format(
         SAMPLE_EMPTY_ATOM,
-        date: index.date.rfc3339,
+        date: index.date.xmlschema,
         author: 'Test',
         title: 'My site'
       )
@@ -608,7 +608,7 @@ describe Fronde::Index do
     end
 
     it 'generates an empty atom feed', core: true do
-      now_str = DateTime.now.strftime('%Y-%m-%d %H:%M')
+      now_str = Time.now.strftime('%Y-%m-%d %H:%M')
       index = described_class.new
       index_date_str = index.date.strftime('%Y-%m-%d %H:%M')
       expect(index_date_str).to eq(now_str)
@@ -629,7 +629,7 @@ describe Fronde::Index do
       EMPTY_ATOM
       comp = format(
         SAMPLE_EMPTY_ATOM,
-        date: index.date.rfc3339,
+        date: index.date.xmlschema,
         author: 'alice',
         title: 'All tags'
       )

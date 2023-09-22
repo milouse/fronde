@@ -1,7 +1,12 @@
 # frozen_string_literal: true
 
 require 'time'
+require_relative '../ext/nil_time'
+require_relative '../ext/time'
+using TimePatch
+
 require 'fileutils'
+
 # fronde/config is required by htmlizer
 require_relative 'org_file/htmlizer'
 require_relative 'org_file/extracter'
@@ -81,13 +86,13 @@ module Fronde
     #
     # @example with the org header ~#+date: <2019-07-03 Wed 20:52:49>~
     #     org_file.date
-    #     => #<DateTime: 2019-07-03T20:52:49+02:00...>
+    #     => #<Time: 2019-07-03T20:52:49+02:00...>
     #     org_file.timekey
     #     => "20190703205349"
     #
     # @example with the org header ~#+date: <2019-07-03 Wed>~
     #     org_file.date
-    #     => #<DateTime: 2019-07-03T00:00:00+02:00...>
+    #     => #<Time: 2019-07-03T00:00:00+02:00...>
     #     org_file.timekey
     #     => "20190703000000"
     #
@@ -99,40 +104,9 @@ module Fronde
     #
     # @return [String] the document key
     def timekey
-      return '00000000000000' if @data[:date].nil?
-      @data[:date].strftime('%Y%m%d%H%M%S')
-    end
+      return '00000000000000' if @data[:date].is_a? NilTime
 
-    # Returns the current OrgFile instance DateTime as a String.
-    #
-    # This method accepts three values for the ~dateformat~ parameter:
-    #
-    # - ~:full~ (or ~:long~) :: outputs a complete date and time
-    #   representation, localized through R18n;
-    # - ~:short~ :: outputs a short date representation (without time),
-    #   localized with R18n;
-    # - ~:rfc3339~ :: outputs the RFC 3339 date and time representation,
-    #   used in atom feed.
-    #
-    # @param dateformat [Symbol] the format to use to convert DateTime
-    #   into String
-    # @param year [Boolean] wether or not the ~:full~ format must
-    #   contain the year
-    # @return [String] the document DateTime string representation
-    def datestring(dateformat = :full, year: true)
-      return '' if @data[:date].nil?
-      return R18n.l @data[:date].to_date if dateformat == :short
-      return @data[:date].rfc3339 if dateformat == :rfc3339
-      locale = R18n.get.locale
-      long_fmt = R18n.t.fronde.index.full_date_format(
-        date: locale.format_date_full(@data[:date], year: year)
-      )
-      unless @data[:notime]
-        long_fmt = R18n.t.fronde.index.full_date_with_time_format(
-          date: long_fmt, time: locale.time_format.delete('_').strip
-        )
-      end
-      locale.strftime(@data[:date], long_fmt)
+      @data[:date].strftime('%Y%m%d%H%M%S')
     end
 
     # Returns the MIME type of the generated file of this document.
@@ -165,7 +139,7 @@ module Fronde
     #         to ~<time datetime="%I">%i</time>~
     # - %D :: the ~:full~ date and time HTML representation
     # - %i :: the raw ~:short~ date and time
-    # - %I :: the raw ~:rfc3339~ date and time
+    # - %I :: the raw ~:iso8601~ date and time
     # - %k :: the keywords separated by a comma
     # - %K :: the HTML list rendering of the keywords
     # - %l :: the lang of the document
@@ -191,10 +165,10 @@ module Fronde
     def format(string)
       string.gsub('%a', @data[:author])
             .gsub('%A', author_to_html)
-            .gsub('%d', date_to_html(:short))
-            .gsub('%D', date_to_html)
-            .gsub('%i', datestring(:short))
-            .gsub('%I', datestring(:rfc3339))
+            .gsub('%d', @data[:date].l18n_short_date_html)
+            .gsub('%D', @data[:date].l18n_long_date_html)
+            .gsub('%i', @data[:date].l18n_short_date_string)
+            .gsub('%I', @data[:date].xmlschema)
             .gsub('%k', @data[:keywords].join(', '))
             .gsub('%K', keywords_to_html)
             .gsub('%l', @data[:lang])
@@ -251,7 +225,7 @@ module Fronde
     def to_h
       fields = %w[author excerpt keywords pub_mime_type timekey title url]
       data = fields.to_h { |key| [key, send(key)] }
-      data['published'] = datestring(:rfc3339)
+      data['published'] = @data[:date].xmlschema
       data
     end
 
@@ -286,8 +260,7 @@ module Fronde
       @data = {
         title: @options[:title] || '',
         subtitle: '',
-        date: DateTime.now,
-        notime: false,
+        date: Time.now,
         author: @options[:author] || CONFIG.get('author'),
         keywords: [],
         lang: @options[:lang] || CONFIG.get('lang'),

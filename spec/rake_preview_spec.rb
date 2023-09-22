@@ -40,7 +40,7 @@ def init_preview
 end
 
 context 'when trying preview mode' do
-  let(:now_str) { DateTime.now.strftime('%A %-d of %B, %Y at %R') }
+  let(:now_str) { Time.now.strftime('%A %-d of %B, %Y at %R') }
 
   after { tear_down 'tmp/website_testing' }
 

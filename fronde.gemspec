@@ -42,7 +42,9 @@ Gem::Specification.new do |s|
                    'lib/fronde/utils.rb',
                    'lib/fronde/version.rb',
                    # Monkey patches / extensions
+                   'lib/ext/nil_time.rb',
                    'lib/ext/r18n.rb',
+                   'lib/ext/time.rb',
                    # Rake tasks
                    'lib/tasks/org.rake',
                    'lib/tasks/site.rake',

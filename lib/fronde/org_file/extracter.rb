@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+using TimePatch
+
 module Fronde
   # This module holds extracter methods for the {Fronde::OrgFile} class.
   module OrgFileExtracter
@@ -22,15 +24,17 @@ module Fronde
       timerx = '([0-9:]{5})(?::([0-9]{2}))?'
       daterx = /^#\+date: *<([0-9-]{10}) [\w.]+(?: #{timerx})?> *$/i
       match = daterx.match(@data[:content])
-      return nil if match.nil?
+      return NilTime.new if match.nil?
 
-      @data[:notime] = match[2].nil?
-      if @data[:notime]
+      notime = match[2].nil?
+      if notime
         time = '00:00:00'
       else
         time = "#{match[2]}:#{match[3] || '00'}"
       end
-      DateTime.strptime("#{match[1]} #{time}", '%Y-%m-%d %H:%M:%S')
+      date = Time.strptime("#{match[1]} #{time}", '%Y-%m-%d %H:%M:%S')
+      date.no_time = notime
+      date
     end
 
     def extract_title

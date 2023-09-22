@@ -25,14 +25,6 @@ module Fronde
       "<ul class=\"keywords-list\">#{klist}</ul>"
     end
 
-    # Format {Fronde::OrgFile#date} as a HTML `time` tag.
-    #
-    # @return [String] the HTML `time` tag
-    def date_to_html(dateformat = :full)
-      return '<time></time>' if @data[:date].nil?
-      "<time datetime=\"#{@data[:date].rfc3339}\">#{datestring(dateformat)}</time>"
-    end
-
     # Format {Fronde::OrgFile#author} in a HTML `span` tag with a
     #   specific class.
     #

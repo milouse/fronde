@@ -22,7 +22,7 @@ module Fronde
       @index = { 'index' => [] }
       @projects = {}
       @tags_names = {}
-      @date = DateTime.now
+      @date = Time.now
       generate_feeds
       sort_feeds!
     end

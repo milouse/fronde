@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative '../utils'
+using TimePatch
 
 module Fronde
   # Embeds methods responsible for generating an org file for a given
@@ -94,8 +95,8 @@ module Fronde
 
     def org_entry(article)
       line = "- *[[#{article.url}][#{article.title}]]*"
-      if article.date
-        art_date = article.datestring(:full, year: false)
+      art_date = article.date.l18n_long_date_string(with_year: false)
+      unless art_date == ''
         published = R18n.t.fronde.index.published_on art_date
         line += " / #{published}"
       end

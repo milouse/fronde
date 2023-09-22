@@ -671,7 +671,7 @@ evaluated Org file, or by default from the config of your project.
         ~<time datetime="%I">%i</time>~.
 - %D :: the full date and time HTML representation.
 - %i :: the raw short date and time.
-- %I :: the raw rfc3339 date and time.
+- %I :: the raw ISO 8601 date and time.
 - %k :: the current Org file keywords separated by commas.
 - %K :: the HTML list rendering of the keywords.
 - %l :: the lang of the document, or the one given in the config file.
