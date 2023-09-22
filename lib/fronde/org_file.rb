@@ -60,8 +60,6 @@ module Fronde
     # @option opts [String] title ('') the title of the new Org file
     # @option opts [String] author (system user or '') the author of the
     #   document
-    # @option opts [Boolean] from_target (false) whether the given
-    #   file_name refer to an org source file or a target html/gmi file.
     # @return [Fronde::OrgFile] the new instance of Fronde::OrgFile
     def initialize(file_name, opts = {})
       file_name ||= ''
@@ -233,10 +231,10 @@ module Fronde
     private
 
     def find_source
-      if @options.delete(:from_target)
-        source = find_source_for_publication_file
-      else
+      if File.extname(@file) == '.org'
         source = find_source_for_org_file
+      else
+        source = find_source_for_publication_file
       end
       warn R18n.t.fronde.error.org_file.no_project(file: @file) unless source
       source

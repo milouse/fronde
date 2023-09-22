@@ -178,28 +178,28 @@ describe Fronde::OrgFile do
     end
 
     it 'computes the right source path', core: true do
-      o = described_class.new('public_html/test.html', from_target: true)
+      o = described_class.new('public_html/test.html')
       expect(o.file).to eq(File.expand_path('src/test.org'))
-      o = described_class.new('public_html/blog/test.html', from_target: true)
+      o = described_class.new('public_html/blog/test.html')
       expect(o.file).to eq(File.expand_path('src/blog/test.org'))
       o = described_class.new(
-        'public_html/blog/toto/tata.html', from_target: true
+        'public_html/blog/toto/tata.html'
       )
       expect(o.file).to eq(File.expand_path('src/blog/toto/tata.org'))
       o = described_class.new(
-        'public_html/blog/toto/content.html', from_target: true
+        'public_html/blog/toto/content.html'
       )
       expect(o.file).to eq(File.expand_path('src/blog/toto/content.org'))
     end
 
     it 'identifies a source for a given published file' do
-      o = described_class.new('public_html/writings/notes.html', from_target: true)
+      o = described_class.new('public_html/writings/notes.html')
       expect(o.file).to eq(File.expand_path('writings/notes.org'))
       expect(o.project).not_to be_nil
-      o = described_class.new('public_html/test.html', from_target: true)
+      o = described_class.new('public_html/test.html')
       expect(o.file).to eq(File.expand_path('src/test.org'))
       expect(o.project).not_to be_nil
-      o = described_class.new('public_html/not/known.html', from_target: true)
+      o = described_class.new('public_html/not/known.html')
       expect(o.file).to eq(File.expand_path('public_html/not/known.html'))
       expect(o.project).to be_nil
     end
