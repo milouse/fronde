@@ -223,10 +223,12 @@ module Fronde
 
       def run_and_decorate_thread(thread, message, frames)
         thread.abort_on_exception = true
+        terminal_width = `tput cols`.strip.to_i - 1
         current = 0
         while thread.alive?
           sleep 0.1
-          print "#{message} #{frames[current % frames.length]}\r"
+          frame = "#{message} #{frames[current % frames.length]}"
+          print "#{frame.ljust(terminal_width)}\r"
           current += 1
         end
       end
