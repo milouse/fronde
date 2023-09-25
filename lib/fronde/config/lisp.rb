@@ -71,9 +71,7 @@ module Fronde
       end
 
       def org_generate_themes(projects)
-        all_themes = projects.map do |project|
-          project['attributes']['theme']
-        end
+        all_themes = projects.filter_map { |project| project['theme'] }
         all_themes << get('theme')
         all_themes.uniq.compact.filter_map do |theme|
           next if theme == 'default'

@@ -92,10 +92,14 @@ module Fronde
 
     def org_config
       name = @config['name']
-      [{ 'name' => name,
-         'attributes' => org_project_config },
-       { 'name' => "#{name}-assets",
-         'attributes' => org_assets_config }]
+      config = [{ 'name' => name,
+                  'attributes' => org_project_config },
+                { 'name' => "#{name}-assets",
+                  'attributes' => org_assets_config }]
+      return config if @config['type'] == 'gemini'
+
+      config[0]['theme'] = @config['theme']
+      config
     end
 
     class << self

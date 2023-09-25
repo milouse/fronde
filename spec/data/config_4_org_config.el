@@ -103,7 +103,13 @@ with %c, and published with %N</p>
          :publishing-directory "{{ test_dir }}/public_html/tags"
          :publishing-function org-publish-attachment
          :recursive nil)
-        ("website" :components ("src" "src-assets" "news" "news-assets" "other" "other-assets" "tags" "tags-assets"))))
+        ("theme-my-theme"
+         :base-directory "{{ test_dir }}/themes/my-theme"
+         :base-extension "css\\|js\\|gif\\|jpg\\|png\\|svg\\|otf\\|ttf\\|woff2?"
+         :publishing-directory "{{ test_dir }}/public_html/assets/my-theme"
+         :publishing-function org-publish-attachment
+         :recursive t)
+        ("website" :components ("src" "src-assets" "news" "news-assets" "other" "other-assets" "tags" "tags-assets" "theme-my-theme"))))
 
 ;; Load fronde lib
 (load-file (expand-file-name "ox-gmi.el" "{{ test_dir }}/lib"))

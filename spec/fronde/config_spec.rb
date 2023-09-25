@@ -28,7 +28,7 @@ CONF
 SAMPLE_CONFIG_4 = <<~CONF
   ---
   author: Tata
-  title: This is a website with a blog
+  title: This is a website with a blog and custom theme
   domain: https://test.com
   sources:
   - src
