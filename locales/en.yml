@@ -31,7 +31,13 @@ fronde:
       To see the error, run your command again with more verbosity, for
       example, fronde build -v
     source:
-      no_path: ‘path’ key is missing from source %{source}. Ignored.
+      no_path: Skipping %{source} as its ‘path’ key is missing.
+      duplicate: >-
+        Skipping %{source} as it is appears at least twice in
+        the sources.
+      inclusion: >-
+        Skipping %{source} as it might be already embedded into one of
+        the other sources %{possible_matchs}.
     org_file:
       no_file_or_title: No file or title given.
       no_project: No project found for %{file}. Publication will fail.

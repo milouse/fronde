@@ -37,7 +37,13 @@ fronde:
       verbosité, par exemple fronde build -v
     source:
       no_path: >-
-        La clé ‘path’ est manquante dans la source %{source}. Ignorée.
+        Ignore %{source} comme sa clé ‘path’ est manquante.
+      duplicate: >-
+        Ignore %{source} comme elle apparaît au moins deux fois dans les
+        sources.
+      inclusion: >-
+        Ignore %{source} qui semble déjà inclue dans l’une de ces autres
+        sources %{possible_matchs}.
     org_file:
       no_file_or_title: Aucun chemin de fichier ou titre donné.
       no_project: Aucun projet trouvé pour %{file}. Sa publication va échouer.

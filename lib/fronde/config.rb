@@ -213,7 +213,13 @@ module Fronde
           # We only keep the configuration if it is not recursive (so
           # no problem to have other config targeting folder under it),
           # or if no other config already target it.
-          source if possible_matchs.empty? || !source.recursive?
+          next source if possible_matchs.empty? || !source.recursive?
+
+          warn(
+            R18n.t.fronde.error.source.inclusion(
+              source: source, possible_matchs: possible_matchs
+            )
+          )
         end
       end
     end
