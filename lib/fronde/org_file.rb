@@ -107,20 +107,6 @@ module Fronde
       @data[:date].strftime('%Y%m%d%H%M%S')
     end
 
-    # Returns the MIME type of the generated file of this document.
-    #
-    # Currently, as Fronde only supports html or gemini, this method
-    # will return either text/html or text/gemini.
-    # @return [String] the MIME type of the generated file
-    def pub_mime_type
-      case @project['type']
-      when 'gemini'
-        'text/gemini'
-      else
-        'text/html'
-      end
-    end
-
     # Formats given ~string~ with values of the current OrgFile.
     #
     # This method expects to find percent-tags in the given ~string~ and
@@ -221,10 +207,11 @@ module Fronde
     end
 
     def to_h
-      fields = %w[author excerpt keywords pub_mime_type timekey title url]
+      fields = %w[author excerpt keywords timekey title url]
       data = fields.to_h { |key| [key, send(key)] }
       data['published'] = @data[:date].xmlschema
       data['updated'] = @data[:updated].xmlschema
+      data['mime_type'] = @project['mime_type']
       data
     end
 

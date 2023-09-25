@@ -14,6 +14,7 @@
       `(("src"
          :base-directory "{{ test_dir }}/src"
          :base-extension "org"
+         :gemini-head ""
          :publishing-directory "{{ test_dir }}/public_gmi/src"
          :recursive nil
          :section-numbers nil

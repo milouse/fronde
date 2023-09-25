@@ -16,7 +16,7 @@
   <entry>
     <title>{{ article.title | escape }}</title>
     <link href="{{ article.url }}" rel="alternate"
-          type="{{ article.pub_mime_type }}"
+          type="{{ article.mime_type }}"
           title="{{ article.title }}"/>
     <id>urn:md5:{{ article.timekey | md5 }}</id>
     <published>{{ article.published }}</published>

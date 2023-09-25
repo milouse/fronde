@@ -147,7 +147,7 @@ module Fronde
         return @sources if @sources
         sources = build_sources
         if sources.any?(&:blog?)
-          sources << Fronde::Source.new(
+          sources << Fronde::HtmlSource.new(
             'path' => 'tags', 'recursive' => false
           )
         end
@@ -168,16 +168,12 @@ module Fronde
       def build_sources
         default_sources = [{ 'path' => 'src', 'target' => '.' }]
         get('sources', default_sources).filter_map do |source_conf|
-          source_conf = { 'path' => source_conf } if source_conf.is_a?(String)
-          path = source_conf['path']
-          unless path
-            # Filtering sources without path
-            warn(
-              R18n.t.fronde.error.source.no_path(source: source_conf.inspect)
-            )
+          config = Source.canonical_config source_conf.dup
+          unless config['path']
+            warn R18n.t.fronde.error.source.no_path(source: config.inspect)
             next
           end
-          Source.new(source_conf)
+          Source.new_from_config config
         end
       end
 

@@ -40,6 +40,8 @@ Gem::Specification.new do |s|
                    'lib/fronde/org_file/htmlizer.rb',
                    'lib/fronde/org_file.rb',
                    'lib/fronde/preview.rb',
+                   'lib/fronde/source/gemini_source.rb',
+                   'lib/fronde/source/html_source.rb',
                    'lib/fronde/source.rb',
                    'lib/fronde/templater.rb',
                    'lib/fronde/version.rb',

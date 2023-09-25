@@ -2,23 +2,22 @@
 
 module Fronde
   # Wrapper for each possible project source.
+  # Must be subclassed by specific source type (like Gemini or HTML)
   class Source
     def initialize(source_config)
       @config = {
         'recursive' => true, 'is_blog' => false,
-        'type' => 'html', 'ext' => '.html',
-        'domain' => CONFIG.get('domain'),
-        'folder' => CONFIG.get('html_public_folder'),
-        'atom_feed' => '', 'org-html' => {},
+        'domain' => CONFIG.get('domain'), 'atom_feed' => '',
         'org-options' => {
           'section-numbers' => 'nil',
-          'with-toc' => 'nil',
-          'publishing-function' => 'org-html-publish-to-html'
+          'with-toc' => 'nil'
         }
       }
       @config.merge! source_config
+      specific_config
       clean_config
       org_publish_options
+      render_heading
     end
 
     def [](key)
@@ -92,43 +91,23 @@ module Fronde
 
     def org_config
       name = @config['name']
-      config = [{ 'name' => name,
-                  'attributes' => org_project_config },
-                { 'name' => "#{name}-assets",
-                  'attributes' => org_assets_config }]
-      return config if @config['type'] == 'gemini'
-
-      config[0]['theme'] = @config['theme']
-      config
+      [{ 'name' => name,
+         'attributes' => org_project_config },
+       { 'name' => "#{name}-assets",
+         'attributes' => org_assets_config }]
     end
 
     class << self
-      def org_default_gemini_postamble
-        format(
-          "📅 %<date>s\n📝 %<author>s %<creator>s",
-          author: R18n.t.fronde.org.postamble.written_by,
-          creator: R18n.t.fronde.org.postamble.with_emacs,
-          date: R18n.t.fronde.org.postamble.last_modification
-        )
+      def canonical_config(config)
+        config = { 'path' => config } if config.is_a?(String)
+        config['type'] ||= 'html'
+        config
       end
 
-      def org_default_html_postamble
-        <<~POSTAMBLE
-          <p><span class="author">#{R18n.t.fronde.org.postamble.written_by}</span>
-          #{R18n.t.fronde.org.postamble.with_emacs_html}</p>
-          <p class="date">#{R18n.t.fronde.org.postamble.last_modification}</p>
-          <p class="validation">%v</p>
-        POSTAMBLE
-      end
-
-      def org_default_html_head
-        <<~HTMLHEAD
-          <link rel="stylesheet" type="text/css" media="screen"
-                href="{{ domain }}/assets/{{ theme }}/css/style.css">
-          <link rel="stylesheet" type="text/css" media="screen"
-                href="{{ domain }}/assets/{{ theme }}/css/htmlize.css">
-          {{ atom_feed }}
-        HTMLHEAD
+      def new_from_config(config)
+        klass_name = config['type'].capitalize
+        klass = Kernel.const_get("::Fronde::#{klass_name}Source")
+        klass.new(config)
       end
     end
 
@@ -141,12 +120,7 @@ module Fronde
     #   the ~sources~ key)
     # @return [String] the full path to the target dir of this project
     def publication_path
-      publish_in = [Dir.pwd]
-      if @config['type'] == 'gemini'
-        publish_in << CONFIG.get('gemini_public_folder')
-      else
-        publish_in << CONFIG.get('html_public_folder')
-      end
+      publish_in = [Dir.pwd, @config['folder']]
       target = @config['target']
       publish_in << target unless target == '.'
       publish_in.join('/')
@@ -161,47 +135,29 @@ module Fronde
 
     def org_publish_options
       options = @config['org-options']
-      if @config['type'] == 'gemini'
-        @config['ext'] = '.gmi'
-        @config['folder'] = CONFIG.get('gemini_public_folder')
-        options['gemini-postamble'] = Source.org_default_gemini_postamble
-        options['publishing-function'] = 'org-gmi-publish-to-gemini'
-        return
-      end
+      type = @config['type']
+      heading_key = "#{type}-head"
+      klass = self.class
+      options[heading_key] = klass.org_default_head
+      options["#{type}-postamble"] = klass.org_default_postamble
+
       options.merge!(
-        org_default_html_options,
-        CONFIG.get('org-html', {}),
-        @config['org-html'] || {}
+        org_default_options,
+        CONFIG.get("org-#{type}", {}),
+        @config["org-#{type}"] || {}
       )
-      if @config['is_blog']
-        @config['atom_feed'] = <<~ATOMFEED
-          <link rel="alternate" type="application/atom+xml" title="Atom 1.0"
-                href="#{@config['domain']}/feeds/index.xml" />
-        ATOMFEED
-      end
-      html_head = options['html-head']
-      if html_head
-        options['html-head'] = \
-          Config::Helpers.render_liquid_template(
-            html_head, to_h
-          )
-      end
       @config['org-options'] = options
     end
 
-    def org_default_html_options
-      defaults = {
-        'html-postamble' => Source.org_default_html_postamble,
-        'html-head' => '{{ atom_feed }}',
-        'html-head-include-default-style' => 't',
-        'html-head-include-scripts' => 't'
-      }
-      return defaults if @config['theme'] == 'default'
+    def render_heading
+      heading_key = "#{@config['type']}-head"
+      heading = @config.dig 'org-options', heading_key
+      return unless heading
 
-      defaults['html-head'] = Source.org_default_html_head
-      defaults['html-head-include-default-style'] = 'nil'
-      defaults['html-head-include-scripts'] = 'nil'
-      defaults
+      @config['org-options'][heading_key] = \
+        Config::Helpers.render_liquid_template(
+          heading, to_h
+        )
     end
 
     def org_project_config
@@ -227,3 +183,5 @@ module Fronde
     end
   end
 end
+
+Dir['source/*.rb', base: __dir__].each { |f| require_relative f }
