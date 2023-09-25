@@ -45,6 +45,8 @@ namespace :org do
     build = Thread.new do
       sh "tar -C lib -xzf #{task.prerequisites[0]}"
       mv "lib/org-mode-release_#{org_version}", org_dir
+      # Fix a weird unknown package version
+      File.write("#{org_dir}/mk/version.mk", "ORGVERSION ?= #{org_version}")
       sh make_org_cmd(org_dir, 'compile')
       sh make_org_cmd(org_dir, 'autoloads')
       Dir.glob('lib/org-[0-9.]*').each do |ov|
