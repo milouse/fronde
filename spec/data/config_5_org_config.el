@@ -31,7 +31,7 @@ with %c, and published with %N</p>
          :html-head-include-scripts nil)
         ("src-assets"
          :base-directory "{{ test_dir }}/src"
-         :base-extension "jpg\\|gif\\|png\\|svg\\|pdf"
+         :base-extension "gif\\|jpg\\|png\\|svg\\|pdf"
          :publishing-directory "{{ test_dir }}/public_html/src"
          :publishing-function org-publish-attachment
          :recursive t)
@@ -52,7 +52,7 @@ with %c, and published with %N</p>
          :html-head-include-scripts t)
         ("news-assets"
          :base-directory "{{ test_dir }}/news"
-         :base-extension "jpg\\|gif\\|png\\|svg\\|pdf"
+         :base-extension "gif\\|jpg\\|png\\|svg\\|pdf"
          :publishing-directory "{{ test_dir }}/public_html/news"
          :publishing-function org-publish-attachment
          :recursive t)
@@ -76,13 +76,13 @@ with %c, and published with %N</p>
          :html-head-include-scripts nil)
         ("tags-assets"
          :base-directory "{{ test_dir }}/tags"
-         :base-extension "jpg\\|gif\\|png\\|svg\\|pdf"
+         :base-extension "gif\\|jpg\\|png\\|svg\\|pdf"
          :publishing-directory "{{ test_dir }}/public_html/tags"
          :publishing-function org-publish-attachment
          :recursive nil)
         ("theme-my-theme"
          :base-directory "{{ test_dir }}/themes/my-theme"
-         :base-extension "jpg\\|gif\\|png\\|js\\|css\\|otf\\|ttf\\|woff2?"
+         :base-extension "css\\|js\\|gif\\|jpg\\|png\\|svg\\|otf\\|ttf\\|woff2?"
          :publishing-directory "{{ test_dir }}/public_html/assets/my-theme"
          :publishing-function org-publish-attachment
          :recursive t)

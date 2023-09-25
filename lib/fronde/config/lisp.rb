@@ -70,7 +70,7 @@ module Fronde
         workdir = Dir.pwd
         { 'base-directory' => "#{workdir}/themes/#{theme}",
           # rubocop:disable Layout/LineLength
-          'base-extension' => 'jpg\\\\|gif\\\\|png\\\\|js\\\\|css\\\\|otf\\\\|ttf\\\\|woff2?',
+          'base-extension' => %w[css js gif jpg png svg otf ttf woff2?].join('\\\\|'),
           'publishing-directory' => "#{workdir}/#{get('html_public_folder')}/assets/#{theme}",
           # rubocop:enable Layout/LineLength
           'publishing-function' => 'org-publish-attachment',

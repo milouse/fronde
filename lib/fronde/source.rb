@@ -215,7 +215,7 @@ module Fronde
     def org_assets_config
       {
         'base-directory' => @config['path'],
-        'base-extension' => 'jpg\\\\|gif\\\\|png\\\\|svg\\\\|pdf',
+        'base-extension' => %w[gif jpg png svg pdf].join('\\\\|'),
         'publishing-directory' => publication_path,
         'publishing-function' => 'org-publish-attachment',
         'recursive' => @config['recursive']
