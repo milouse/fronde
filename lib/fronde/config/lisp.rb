@@ -39,7 +39,7 @@ module Fronde
       # rubocop:disable Metrics/MethodLength
       def write_org_lisp_config
         workdir = Dir.pwd
-        all_projects = org_generate_projects
+        all_projects = sources.map(&:org_config).flatten
         all_themes = org_generate_themes(all_projects)
         FileUtils.mkdir_p "#{workdir}/var/lib"
         content = Helpers.render_liquid_template(
@@ -58,13 +58,6 @@ module Fronde
       # rubocop:enable Metrics/MethodLength
 
       private
-
-      def org_generate_projects
-        projects_sources = sources + [
-          Fronde::Source.new('path' => 'tags', 'recursive' => false)
-        ]
-        projects_sources.map(&:org_config).flatten
-      end
 
       def org_theme_config(theme)
         workdir = Dir.pwd

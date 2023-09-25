@@ -56,37 +56,13 @@ with %c, and published with %N</p>
          :publishing-directory "{{ test_dir }}/public_html/news"
          :publishing-function org-publish-attachment
          :recursive t)
-        ("tags"
-         :base-directory "{{ test_dir }}/tags"
-         :base-extension "org"
-         :publishing-directory "{{ test_dir }}/public_html/tags"
-         :recursive nil
-         :section-numbers nil
-         :with-toc nil
-         :publishing-function org-html-publish-to-html
-         :html-postamble "<p><span class=\"author\">Written by %a</span>
-with %c, and published with %N</p>
-<p class=\"date\">Last modification on %C</p>
-<p class=\"validation\">%v</p>"
-         :html-head "<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\"
-      href=\"https://test.com/assets/my-theme/css/style.css\">
-<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\"
-      href=\"https://test.com/assets/my-theme/css/htmlize.css\">"
-         :html-head-include-default-style nil
-         :html-head-include-scripts nil)
-        ("tags-assets"
-         :base-directory "{{ test_dir }}/tags"
-         :base-extension "gif\\|jpg\\|png\\|svg\\|pdf"
-         :publishing-directory "{{ test_dir }}/public_html/tags"
-         :publishing-function org-publish-attachment
-         :recursive nil)
         ("theme-my-theme"
          :base-directory "{{ test_dir }}/themes/my-theme"
          :base-extension "css\\|js\\|gif\\|jpg\\|png\\|svg\\|otf\\|ttf\\|woff2?"
          :publishing-directory "{{ test_dir }}/public_html/assets/my-theme"
          :publishing-function org-publish-attachment
          :recursive t)
-        ("website" :components ("src" "src-assets" "news" "news-assets" "tags" "tags-assets" "theme-my-theme"))))
+        ("website" :components ("src" "src-assets" "news" "news-assets" "theme-my-theme"))))
 
 ;; Load fronde lib
 (load-file (expand-file-name "ox-gmi.el" "{{ test_dir }}/lib"))

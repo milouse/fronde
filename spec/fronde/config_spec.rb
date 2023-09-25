@@ -42,7 +42,7 @@ CONF
 SAMPLE_CONFIG_5 = <<~CONF
   ---
   author: Tata
-  title: This is a website with a blog
+  title: This is a website without a blog
   domain: https://test.com
   theme: my-theme
   sources:
@@ -128,21 +128,33 @@ describe Fronde::CONFIG do
 
     it 'lists sources' do
       projects = described_class.sources
-      expect(projects.length).to eq(2)
+      expect(projects.length).to eq(3)
       expect(projects[0]['name']).to eq('src')
       expect(projects[0]['path']).to(
         eq(File.expand_path('src'))
       )
       expect(projects[0]['target']).to eq('src')
       expect(projects[0]['is_blog']).to be(false)
+      expect(projects[0].blog?).to be(false)
       expect(projects[0]['recursive']).to be(false)
+
       expect(projects[1]['name']).to eq('news')
       expect(projects[1]['path']).to(
         eq(File.expand_path('src/news'))
       )
       expect(projects[1]['target']).to eq('news')
       expect(projects[1]['is_blog']).to be(true)
+      expect(projects[1].blog?).to be(true)
       expect(projects[1]['recursive']).to be(true)
+
+      expect(projects[2]['name']).to eq('tags')
+      expect(projects[2]['path']).to(
+        eq(File.expand_path('tags'))
+      )
+      expect(projects[2]['target']).to eq('tags')
+      expect(projects[2]['is_blog']).to be(false)
+      expect(projects[2].blog?).to be(false)
+      expect(projects[2]['recursive']).to be(false)
     end
 
     it 'generates lisp-config.el' do

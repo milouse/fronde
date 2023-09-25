@@ -146,6 +146,11 @@ module Fronde
       def load_sources
         return @sources if @sources
         sources = build_sources
+        if sources.any?(&:blog?)
+          sources << Fronde::Source.new(
+            'path' => 'tags', 'recursive' => false
+          )
+        end
         @sources = remove_inclusion(remove_duplicate(sources))
       end
 
