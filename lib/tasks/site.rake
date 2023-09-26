@@ -35,6 +35,8 @@ namespace :site do
       next
     end
     # :nocov:
+    next unless Fronde::CONFIG.sources.any? { |source| source.type == 'html' }
+
     customize_html = Thread.new do
       pubfolder = Fronde::CONFIG.get('html_public_folder')
       Dir["#{pubfolder}/**/*.html"].each do |f|
