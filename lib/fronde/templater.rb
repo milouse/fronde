@@ -7,113 +7,134 @@ require_relative 'org_file'
 module Fronde
   # Insert custom part inside generated HTML files.
   class Templater
-    def initialize(source, dom, opts = {})
+    def initialize(source, dom, config = {})
       @dom = dom
       @org_file = source
-      @position = opts['type'] || 'after'
-      @content = extract_content opts
-      @element = @dom.css(opts['selector'])
-      digest = Digest::MD5.hexdigest(@content)
-      @check_line = " Fronde Template: #{digest} "
+      @config = { 'type' => 'after' }.merge(config)
+      digest = Digest::MD5.hexdigest(config.to_s)
+      @config['check_line'] = " Fronde Template: #{digest} "
     end
 
     def apply
-      flag_head
-      content = @org_file.format(@content)
-      @element.each do |e|
-        insert_new_node_at e, content
+      content = @org_file.format extract_content
+
+      # Flag the file for this template
+      @dom.xpath('//head').first.prepend_child(
+        "<!--#{@config['check_line']}-->"
+      )
+      # Remove source element if necessary to avoid doubling it during
+      # the insert action
+      @config['source'].unlink if @config.has_key? 'source'
+      # Insert new content
+      @dom.css(@config['selector']).each do |element|
+        insert_new_node_at element, content
       end
     end
 
     def in_head?
-      @dom.xpath('//head').children.to_a.filter(&:comment?).each do |c|
-        return true if c.text == @check_line
+      check_line = @config['check_line']
+      # Lie if we don’t have a valid check line in config
+      return true unless check_line
+
+      @dom.xpath('//head').children.any? do |child|
+        next false unless child.comment?
+
+        child.text == check_line
       end
-      false
+    end
+
+    def valid?(file_name)
+      return false unless @config.has_key?('selector')
+      unless @config.has_key?('content') || @config.has_key?('source')
+        return false
+      end
+      check_path(file_name)
     end
 
     class << self
       def customize_output(file_name)
-        templates_to_apply = filter_templates(file_name)
-        return if templates_to_apply.empty?
-
         source = Fronde::OrgFile.new(file_name)
         # Return if no org file found for this published file
         return if source.file == file_name
 
         dom = open_dom(file_name)
-        templates_to_apply.each do |t|
-          tpl = Fronde::Templater.new(source, dom, t)
-          next if tpl.in_head?
-          tpl.apply
+        updated = false
+        Fronde::CONFIG.get('templates', []).each do |config|
+          template = Fronde::Templater.new(source, dom, config)
+          next if !template.valid?(file_name) || template.in_head?
+
+          template.apply
+          updated = true
         end
-        write_dom(file_name, dom)
+        write_dom(file_name, dom) if updated
       end
 
       private
 
-      def filter_templates(file_name)
-        templates = Fronde::CONFIG.get('templates')
-        return [] if templates.nil? || templates.empty?
-        templates.filter { |t| check_required_keys(t, file_name) }
-      end
-
       def open_dom(file_name)
-        file = File.new file_name, 'r'
-        dom = Nokogiri::HTML file
-        file.close
-        dom
+        File.open(file_name, 'r') do |file|
+          Nokogiri::HTML file
+        end
       end
 
       def write_dom(file_name, dom)
-        file = File.new file_name, 'w'
-        dom.write_to file
-        file.close
-      end
-
-      def check_path(file_name, pathes)
-        pub_folder = Fronde::CONFIG.get('html_public_folder')
-        if pathes.is_a?(Array)
-          pathes.each do |tp|
-            return true if File.fnmatch?("#{pub_folder}#{tp}",
-                                         file_name, File::FNM_DOTMATCH)
-          end
-          return false
+        File.open(file_name, 'w') do |file|
+          dom.write_to file
         end
-        File.fnmatch?("#{pub_folder}#{pathes}",
-                      file_name, File::FNM_DOTMATCH)
-      end
-
-      def check_required_keys(opts, file_name)
-        return false unless opts.has_key?('selector')
-        return false unless opts.has_key?('content') || opts.has_key?('source')
-        return check_path(file_name, opts['path']) if opts.has_key?('path')
-        true
       end
     end
 
     private
 
-    def flag_head
-      @dom.xpath('//head').first.prepend_child("<!--#{@check_line}-->\n")
-    end
-
-    def insert_new_node_at(elem, content)
-      case @position
+    def insert_new_node_at(element, content)
+      case @config['type']
       when 'before'
-        elem.add_previous_sibling content
+        element.add_previous_sibling content
       when 'replace'
-        elem.replace content
+        element.replace content
       else
-        elem.add_next_sibling content
+        element.add_next_sibling content
       end
     end
 
-    def extract_content(opts)
-      return opts['content'] if opts['content']
-      # If we don't have a content option, then we must have a source
-      # one.
-      @dom.css(opts['source']).unlink.to_s
+    def extract_content
+      # We must either have a source or a content key
+      source = @config.delete 'source'
+      unless source.is_a?(String) && source != ''
+        return @config['content'] || ''
+      end
+
+      node = @dom.css(source)
+      # Do nothing if we don’t have a reliable content to work with
+      unless node.any?
+        pub_folder = Fronde::CONFIG.get('html_public_folder')
+        pub_file = "#{pub_folder}/#{@org_file.pub_file}"
+        warn(
+          R18n.t.fronde.error.templater.no_element_found(
+            source: source, file: pub_file
+          )
+        )
+        return ''
+      end
+
+      @config['source'] = node
+      node.to_s
+    end
+
+    def check_path(file_name)
+      paths = @config['path']
+      return true unless paths
+
+      paths = [paths] unless paths.is_a? Array
+
+      pub_folder = Fronde::CONFIG.get('html_public_folder')
+      paths.any? do |template_path|
+        File.fnmatch?(
+          "#{pub_folder}#{template_path}",
+          file_name,
+          File::FNM_DOTMATCH
+        )
+      end
     end
   end
 end

@@ -2,6 +2,22 @@
 
 require_relative '../../lib/fronde/templater'
 
+def template_proof(digest)
+  <<~RESULT
+    <!DOCTYPE html>
+    <html>
+      <head>
+    <!-- Fronde Template: #{digest} -->
+        <meta property="test" content="TEST">
+    <title>My website</title>
+      </head>
+      <body>
+        <h1>My website</h1>
+      </body>
+    </html>
+  RESULT
+end
+
 describe Fronde::Templater do
   let(:html_base) do
     <<~HTML
@@ -19,23 +35,6 @@ describe Fronde::Templater do
 
   context 'with a testing website' do
     let(:metatag) { '<meta property="test" content="TEST">' }
-    let(:metatag_digest) { Digest::MD5.hexdigest(metatag) }
-    let(:result) do
-      <<~RESULT
-        <!DOCTYPE html>
-        <html>
-          <head>
-        <!-- Fronde Template: #{metatag_digest} -->
-
-            <meta property="test" content="TEST">
-        <title>My website</title>
-          </head>
-          <body>
-            <h1>My website</h1>
-          </body>
-        </html>
-      RESULT
-    end
 
     before { init_testing_environment }
 
@@ -64,8 +63,7 @@ describe Fronde::Templater do
           <!DOCTYPE html>
           <html>
             <head>
-          <!-- Fronde Template: #{metatag_digest} -->
-
+          <!-- Fronde Template: e5a93c7cd8b3e75e4956a81dae18b7fe -->
               <title>My website</title>
           <meta property="test" content="TEST">
             </head>
@@ -96,8 +94,7 @@ describe Fronde::Templater do
           <!DOCTYPE html>
           <html>
             <head>
-          <!-- Fronde Template: #{metatag_digest} -->
-
+          <!-- Fronde Template: e5a93c7cd8b3e75e4956a81dae18b7fe -->
               <title>My website</title>
           <meta property="test" content="TEST">
             </head>
@@ -118,7 +115,9 @@ describe Fronde::Templater do
           ]
         )
         described_class.customize_output('public_html/customize_test.html')
-        expect(File.read('public_html/customize_test.html')).to eq(result)
+        expect(File.read('public_html/customize_test.html')).to(
+          eq(template_proof('89a9811158ace2802f70a06146f96e46'))
+        )
       end
 
       it 'customizes a given html file with after' do
@@ -134,8 +133,7 @@ describe Fronde::Templater do
           <!DOCTYPE html>
           <html>
             <head>
-          <!-- Fronde Template: #{metatag_digest} -->
-
+          <!-- Fronde Template: 04d9fa11efccbebe205507cceace0b3c -->
               <title>My website</title>
           <meta property="test" content="TEST">
             </head>
@@ -160,8 +158,7 @@ describe Fronde::Templater do
           <!DOCTYPE html>
           <html>
             <head>
-          <!-- Fronde Template: #{Digest::MD5.hexdigest('<p>Toto tata</p>')} -->
-
+          <!-- Fronde Template: 1db4871b83a08057505303f8298c3060 -->
               <title>My website</title>
             </head>
             <body>
@@ -198,8 +195,7 @@ describe Fronde::Templater do
           <!DOCTYPE html>
           <html>
             <head>
-          <!-- Fronde Template: #{Digest::MD5.hexdigest('<p>Toto tata</p>')} -->
-
+          <!-- Fronde Template: 1db4871b83a08057505303f8298c3060 -->
               <!-- This is a test comment -->
               <title>My website</title>
             </head>
@@ -260,8 +256,7 @@ describe Fronde::Templater do
           <!DOCTYPE html>
           <html>
             <head>
-          <!-- Fronde Template: #{Digest::MD5.hexdigest('<nav>My menu</nav>')} -->
-
+          <!-- Fronde Template: 850906143b13df4a1d627f062fb667d0 -->
               <title>My website</title>
             </head>
             <body>
@@ -299,15 +294,68 @@ describe Fronde::Templater do
       it 'customizes a file on a specific path' do
         described_class.customize_output('public_html/customize_test.html')
         expect(File.read('public_html/customize_test.html')).to eq(html_base)
+        # Run it a second time
         described_class.customize_output('public_html/customize/test.html')
-        expect(File.read('public_html/customize/test.html')).to eq(result)
+        expect(File.read('public_html/customize/test.html')).to(
+          eq(template_proof('d310e02360415c4ddd995a0fcb104057'))
+        )
       end
 
       it 'does not customize twice a file' do
         described_class.customize_output('public_html/customize/test.html')
-        expect(File.read('public_html/customize/test.html')).to eq(result)
+        expect(File.read('public_html/customize/test.html')).to(
+          eq(template_proof('d310e02360415c4ddd995a0fcb104057'))
+        )
+        # Run it a second time
         described_class.customize_output('public_html/customize/test.html')
-        expect(File.read('public_html/customize/test.html')).to eq(result)
+        expect(File.read('public_html/customize/test.html')).to(
+          eq(template_proof('d310e02360415c4ddd995a0fcb104057'))
+        )
+      end
+
+      it 'does not remove moving elements' do
+        other_html_base = <<~HTML
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <title>My website</title>
+            </head>
+            <body>
+              <div id="content">
+                <h1>My website</h1>
+                <nav>My menu</nav><p>Lorem ipsum...</p>
+              </div>
+            </body>
+          </html>
+        HTML
+        File.write('public_html/customize_test.html', other_html_base)
+        Fronde::CONFIG.load_test(
+          'templates' => [
+            { 'type' => 'before',
+              'selector' => 'div#content',
+              'source' => 'div#content>nav' }
+          ]
+        )
+        described_class.customize_output('public_html/customize_test.html')
+        result = <<~HTML
+          <!DOCTYPE html>
+          <html>
+            <head>
+          <!-- Fronde Template: 850906143b13df4a1d627f062fb667d0 -->
+              <title>My website</title>
+            </head>
+            <body>
+              <nav>My menu</nav><div id="content">
+                <h1>My website</h1>
+                <p>Lorem ipsum...</p>
+              </div>
+            </body>
+          </html>
+        HTML
+        expect(File.read('public_html/customize_test.html')).to eq(result)
+        # Run it a second time
+        described_class.customize_output('public_html/customize_test.html')
+        expect(File.read('public_html/customize_test.html')).to eq(result)
       end
     end
 
@@ -338,9 +386,13 @@ describe Fronde::Templater do
         described_class.customize_output('public_html/customize_test.html')
         expect(File.read('public_html/customize_test.html')).to eq(html_base)
         described_class.customize_output('public_html/customize/test.html')
-        expect(File.read('public_html/customize/test.html')).to eq(result)
+        expect(File.read('public_html/customize/test.html')).to(
+          eq(template_proof('651709ceba80342164e93a462d4743ed'))
+        )
         described_class.customize_output('public_html/other/file.html')
-        expect(File.read('public_html/other/file.html')).to eq(result)
+        expect(File.read('public_html/other/file.html')).to(
+          eq(template_proof('651709ceba80342164e93a462d4743ed'))
+        )
       end
     end
   end

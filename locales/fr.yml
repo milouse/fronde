@@ -47,6 +47,9 @@ fronde:
     org_file:
       no_file_or_title: Aucun chemin de fichier ou titre donné.
       no_project: Aucun projet trouvé pour %{file}. Sa publication va échouer.
+    templater:
+      no_element_found: >-
+        Aucun élément trouvé avec le sélecteur %{source} dans %{file}.
   index:
     unsorted: Non triés
     published_on: Publié le %1

@@ -41,6 +41,9 @@ fronde:
     org_file:
       no_file_or_title: No file or title given.
       no_project: No project found for %{file}. Publication will fail.
+    templater:
+      no_element_found: >-
+        No element found with the selector %{source} in %{file}.
   index:
     unsorted: Unsorted
     published_on: Published on %1
