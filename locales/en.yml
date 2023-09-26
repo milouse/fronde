@@ -34,10 +34,10 @@ fronde:
       no_path: Skipping %{source} as its ‘path’ key is missing.
       duplicate: >-
         Skipping %{source} as it is appears at least twice in
-        the sources.
+        the sources of type %{type}.
       inclusion: >-
         Skipping %{source} as it might be already embedded into one of
-        the other sources %{possible_matchs}.
+        the other sources %{possible_matchs} of type %{type}.
     org_file:
       no_file_or_title: No file or title given.
       no_project: No project found for %{file}. Publication will fail.
