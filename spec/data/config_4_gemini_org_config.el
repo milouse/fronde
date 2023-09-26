@@ -15,13 +15,13 @@
          :base-directory "{{ test_dir }}/src"
          :base-extension "org"
          :gemini-head ""
+         :gemini-postamble "📅 Last modification on %C
+📝 Written by %a with %c, and published with %n"
          :publishing-directory "{{ test_dir }}/public_gmi/src"
+         :publishing-function org-gmi-publish-to-gemini
          :recursive t
          :section-numbers nil
-         :with-toc nil
-         :publishing-function org-gmi-publish-to-gemini
-         :gemini-postamble "📅 Last modification on %C
-📝 Written by %a with %c, and published with %n")
+         :with-toc nil)
         ("src-assets"
          :base-directory "{{ test_dir }}/src"
          :base-extension "gif\\|jpg\\|png\\|svg\\|pdf"
@@ -31,15 +31,6 @@
         ("news"
          :base-directory "{{ test_dir }}/news"
          :base-extension "org"
-         :publishing-directory "{{ test_dir }}/public_html/news"
-         :recursive t
-         :section-numbers nil
-         :with-toc nil
-         :publishing-function org-html-publish-to-html
-         :html-postamble "<p><span class=\"author\">Written by %a</span>
-with %c, and published with %N</p>
-<p class=\"date\">Last modification on %C</p>
-<p class=\"validation\">%v</p>"
          :html-head "<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\"
       href=\"https://test.com/assets/my-theme/css/style.css\">
 <link rel=\"stylesheet\" type=\"text/css\" media=\"screen\"
@@ -47,7 +38,16 @@ with %c, and published with %N</p>
 <link rel=\"alternate\" type=\"application/atom+xml\" title=\"Atom 1.0\"
       href=\"https://test.com/feeds/index.xml\" />"
          :html-head-include-default-style nil
-         :html-head-include-scripts nil)
+         :html-head-include-scripts nil
+         :html-postamble "<p><span class=\"author\">Written by %a</span>
+with %c, and published with %N</p>
+<p class=\"date\">Last modification on %C</p>
+<p class=\"validation\">%v</p>"
+         :publishing-directory "{{ test_dir }}/public_html/news"
+         :publishing-function org-html-publish-to-html
+         :recursive t
+         :section-numbers nil
+         :with-toc nil)
         ("news-assets"
          :base-directory "{{ test_dir }}/news"
          :base-extension "gif\\|jpg\\|png\\|svg\\|pdf"
@@ -57,21 +57,21 @@ with %c, and published with %N</p>
         ("other"
          :base-directory "{{ test_dir }}/other"
          :base-extension "org"
-         :publishing-directory "{{ test_dir }}/public_html/other"
-         :recursive t
-         :section-numbers nil
-         :with-toc nil
-         :publishing-function org-html-publish-to-html
-         :html-postamble "<p><span class=\"author\">Written by %a</span>
-with %c, and published with %N</p>
-<p class=\"date\">Last modification on %C</p>
-<p class=\"validation\">%v</p>"
          :html-head "<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\"
       href=\"https://test.com/assets/my-theme/css/style.css\">
 <link rel=\"stylesheet\" type=\"text/css\" media=\"screen\"
       href=\"https://test.com/assets/my-theme/css/htmlize.css\">"
          :html-head-include-default-style nil
-         :html-head-include-scripts nil)
+         :html-head-include-scripts nil
+         :html-postamble "<p><span class=\"author\">Written by %a</span>
+with %c, and published with %N</p>
+<p class=\"date\">Last modification on %C</p>
+<p class=\"validation\">%v</p>"
+         :publishing-directory "{{ test_dir }}/public_html/other"
+         :publishing-function org-html-publish-to-html
+         :recursive t
+         :section-numbers nil
+         :with-toc nil)
         ("other-assets"
          :base-directory "{{ test_dir }}/other"
          :base-extension "gif\\|jpg\\|png\\|svg\\|pdf"
@@ -81,18 +81,18 @@ with %c, and published with %N</p>
         ("tags"
          :base-directory "{{ test_dir }}/tags"
          :base-extension "org"
-         :publishing-directory "{{ test_dir }}/public_html/tags"
-         :recursive nil
-         :section-numbers nil
-         :with-toc nil
-         :publishing-function org-html-publish-to-html
+         :html-head ""
+         :html-head-include-default-style t
+         :html-head-include-scripts t
          :html-postamble "<p><span class=\"author\">Written by %a</span>
 with %c, and published with %N</p>
 <p class=\"date\">Last modification on %C</p>
 <p class=\"validation\">%v</p>"
-         :html-head ""
-         :html-head-include-default-style t
-         :html-head-include-scripts t)
+         :publishing-directory "{{ test_dir }}/public_html/tags"
+         :publishing-function org-html-publish-to-html
+         :recursive nil
+         :section-numbers nil
+         :with-toc nil)
         ("tags-assets"
          :base-directory "{{ test_dir }}/tags"
          :base-extension "gif\\|jpg\\|png\\|svg\\|pdf"

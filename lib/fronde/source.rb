@@ -169,7 +169,7 @@ module Fronde
       }.merge(@config['org-options'])
       exclude = @config['exclude']
       attributes['exclude'] = exclude if exclude
-      attributes
+      attributes.sort.to_h # Have lisp config sorted
     end
 
     def org_assets_config
