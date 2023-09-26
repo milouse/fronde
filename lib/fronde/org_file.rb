@@ -134,7 +134,7 @@ module Fronde
     #         home on the name
     # - %s :: the subtitle of the document
     # - %t :: the title of the document
-    # - %u :: the web path to the related published HTML document
+    # - %u :: the URL to the related published HTML document
     # - %x :: the raw description (eXcerpt)
     # - %X :: the description, enclosed in an HTML ~p~ tag, equivalent
     #         to ~<p>%x</p>~
@@ -161,7 +161,7 @@ module Fronde
             .gsub('%N', "<a href=\"https://git.umaneti.net/fronde/about/\">Fronde</a> #{VERSION}")
             .gsub('%s', @data[:subtitle])
             .gsub('%t', @data[:title])
-            .gsub('%u', @data[:pub_file] || '')
+            .gsub('%u', @data[:url] || '')
             .gsub('%x', @data[:excerpt])
             .gsub('%X', "<p>#{@data[:excerpt]}</p>")
     end
