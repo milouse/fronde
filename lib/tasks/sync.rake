@@ -20,13 +20,11 @@ def rsync_command(test = nil)
   "rsync -#{optstring.join}rlt --delete"
 end
 
-def pull_or_push(direction, standard, test)
-  unless %i[pull push].include? direction
-    raise Fronde::SyncError, 'Not a valid direction'
-  end
-  remote_path = Fronde::CONFIG.get("#{standard}_remote")
-  raise Fronde::SyncError, "No #{standard} remote path set" if remote_path.nil?
-  public_folder = Fronde::CONFIG.get("#{standard}_public_folder")
+def pull_or_push(direction, type, test)
+  remote_path = Fronde::CONFIG.get("#{type}_remote")
+  raise Fronde::SyncError, "No #{type} remote path set" if remote_path.nil?
+
+  public_folder = Fronde::CONFIG.get("#{type}_public_folder")
   # Default is to push
   cmd = ["#{public_folder}/", remote_path]
   cmd.reverse! if direction == :pull
@@ -36,38 +34,42 @@ def pull_or_push(direction, standard, test)
   end
 end
 
+def source_types
+  Fronde::CONFIG.sources.map(&:type).uniq
+end
+
 namespace :sync do
   desc 'Push changes to server'
   task :push, :test? do |_, args|
-    %w[html gemini].each do |standard|
-      publish_thread = pull_or_push(:push, standard, args[:test?])
+    source_types.each do |type|
+      publish_thread = pull_or_push(:push, type, args[:test?])
       if verbose
         publish_thread.join
       else
         Fronde::CLI::Throbber.run(
-          publish_thread, format('Publishing %<fmt>s:', fmt: standard)
+          publish_thread, format('Publishing %<fmt>s:', fmt: type)
         )
       end
+    rescue Fronde::SyncError => e
+      warn e
+      next
     end
-  rescue Fronde::SyncError => e
-    warn e
-    next
   end
 
   desc 'Pull changes from server'
   task :pull, :test? do |_, args|
-    %w[html gemini].each do |standard|
-      pull_thread = pull_or_push(:pull, standard, args[:test?])
+    source_types.each do |type|
+      pull_thread = pull_or_push(:pull, type, args[:test?])
       if verbose
         pull_thread.join
       else
         Fronde::CLI::Throbber.run(
-          pull_thread, format('Pulling %<fmt>s:', fmt: standard)
+          pull_thread, format('Pulling %<fmt>s:', fmt: type)
         )
       end
+    rescue Fronde::SyncError => e
+      warn e
+      next
     end
-  rescue Fronde::SyncError => e
-    warn e
-    next
   end
 end

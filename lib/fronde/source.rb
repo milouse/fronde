@@ -28,8 +28,8 @@ module Fronde
       @config[key] = value
     end
 
-    def path
-      @config['path']
+    def type
+      @config['type']
     end
 
     def recursive?

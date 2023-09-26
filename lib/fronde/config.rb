@@ -180,7 +180,7 @@ module Fronde
       def remove_duplicate(sources)
         check_paths = {}
         sources.each do |source|
-          path = source.path
+          path = source['path']
           # Avoid duplicate
           if check_paths.has_key?(path)
             warn R18n.t.fronde.error.source.duplicate(source: path)
