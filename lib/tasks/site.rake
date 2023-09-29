@@ -21,7 +21,7 @@ namespace :site do
   end
 
   desc 'Convert and customize all org files'
-  task :build, [:force?] => ['var/lib/org-config.el', :index] do |_, args|
+  task :build, [:force?] => ['var/lib/org-config.el'] do |_, args|
     args.with_defaults(:force? => false)
     build_html = Thread.new do
       rm_r 'var/tmp/timestamps', force: true if args[:force?]
@@ -35,6 +35,7 @@ namespace :site do
       next
     end
     # :nocov:
+    Rake::Task['site:index'].invoke
     next unless Fronde::CONFIG.sources.any? { |source| source.type == 'html' }
 
     customize_html = Thread.new do

@@ -30,7 +30,7 @@
     {%- else %}
     <content type="html">
     {%- endif %}
-      {{- article.excerpt | escape -}}
+      {{- article.html_body | escape -}}
     </content>
   </entry>
   {%- endfor %}

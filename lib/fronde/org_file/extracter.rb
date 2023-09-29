@@ -73,5 +73,17 @@ module Fronde
         line.first.strip
       end.join(' ')
     end
+
+    def extract_html_body
+      pub_file = @data[:pub_file]
+      return '' unless pub_file
+
+      pub_folder = Fronde::CONFIG.get('html_public_folder')
+      file_name = "#{pub_folder}/#{pub_file}"
+      dom = File.open(file_name, 'r') { |file| Nokogiri::HTML file }
+      body = dom.css('div#content')
+      body.css('header').unlink # Remove the main title
+      body.to_s
+    end
   end
 end
