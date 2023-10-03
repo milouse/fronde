@@ -1,0 +1,14 @@
+#+title: {{ title }}
+#+author: {{ author }}
+#+language: {{ lang }}
+{% for index in indexes %}
+* {{ index.title }}
+:PROPERTIES:
+:HTML_CONTAINER_CLASS: index-tags
+:UNNUMBERED: notoc
+:END:
+
+{% for tag in index.tags -%}
+- [[{{ domain }}/tags/{{ tag.slug }}.html][{{ tag.title }}]] ({{ tag.weight }})
+{% endfor %}
+{%- endfor -%}

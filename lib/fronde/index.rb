@@ -81,37 +81,35 @@ module Fronde
 
     def add_to_project_index(article)
       project = article.project
-      @projects[project['name']] ||= []
-      @projects[project['name']] << article
+      project_name = project['name']
+      @projects[project_name] ||= []
+      @projects[project_name] << article
     end
 
     def add_to_indexes(article)
       @index['index'] << article
       add_to_project_index article
-      article.keywords.each do |k|
-        slug = Slug.slug k
-        @tags_names[slug] = k # Overwrite is permitted
+      article.keywords.each do |tag|
+        slug = Slug.slug tag
+        @tags_names[slug] = tag # Overwrite is permitted
         @index[slug] ||= []
         @index[slug] << article
       end
     end
 
     def sort_feeds!
-      @index.each do |k, i|
-        @index[k] = i.sort { |a, b| b.timekey <=> a.timekey }
-      end
-      @projects.each do |k, i|
-        @projects[k] = i.sort { |a, b| b.timekey <=> a.timekey }
-      end
+      sorter = proc { |tag, idx| [tag, idx.sort_by(&:timekey).reverse] }
+      @index = @index.to_h(&sorter)
+      @projects = @projects.to_h(&sorter)
     end
 
     def sort_tags_by_name_and_weight
       tags_sorted = {}
       all_keys = entries
       tags_sorted[:by_name] = all_keys.sort
-      tags_sorted[:by_weight] = all_keys.sort do |a, b|
-        @index[b].length <=> @index[a].length
-      end
+      tags_sorted[:by_weight] = all_keys.sort_by do |tag|
+        @index[tag].length
+      end.reverse
       tags_sorted
     end
 

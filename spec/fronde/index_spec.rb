@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-SAMPLE_ALL_INDEX = <<~INDEX.strip
+SAMPLE_ALL_INDEX = <<~INDEX
   #+title: All tags
   #+author: Test
   #+language: en
@@ -24,7 +24,7 @@ SAMPLE_ALL_INDEX = <<~INDEX.strip
   - [[http://perdu.com/tags/toto.html][toto]] (1)
 INDEX
 
-SAMPLE_PROJECT_INDEX = <<~BLOG_IDX.strip
+SAMPLE_PROJECT_INDEX = <<~BLOG_IDX
   #+title: writings
   #+author: Test
   #+language: en
@@ -48,7 +48,7 @@ SAMPLE_PROJECT_INDEX = <<~BLOG_IDX.strip
   - *[[http://perdu.com/test1.html][My sweet article]]*
 BLOG_IDX
 
-SAMPLE_NO_REC_INDEX = <<~INDEX.strip
+SAMPLE_NO_REC_INDEX = <<~INDEX
   #+title: All tags
   #+author: Test
   #+language: en
@@ -70,7 +70,7 @@ SAMPLE_NO_REC_INDEX = <<~INDEX.strip
   - [[http://perdu.com/tags/tutu.html][tutu]] (1)
 INDEX
 
-SAMPLE_PROJECT_NO_REC_INDEX = <<~BLOG_IDX.strip
+SAMPLE_PROJECT_NO_REC_INDEX = <<~BLOG_IDX
   #+title: writings
   #+author: Test
   #+language: en
@@ -92,6 +92,26 @@ SAMPLE_PROJECT_NO_REC_INDEX = <<~BLOG_IDX.strip
 
   - *[[http://perdu.com/test1.html][My sweet article]]*
 BLOG_IDX
+
+SAMPLE_EMPTY_INDEX = <<~INDEX
+  #+title: All tags
+  #+author: %<author>s
+  #+language: en
+
+  * By alphabetical order
+  :PROPERTIES:
+  :HTML_CONTAINER_CLASS: index-tags
+  :UNNUMBERED: notoc
+  :END:
+
+
+  * By publication number
+  :PROPERTIES:
+  :HTML_CONTAINER_CLASS: index-tags
+  :UNNUMBERED: notoc
+  :END:
+
+INDEX
 
 SAMPLE_ATOM = <<~ATOM
   <?xml version="1.0" encoding="utf-8"?>
@@ -216,7 +236,7 @@ describe Fronde::Index do
         it 'generates a main index', core: true do
           index = described_class.new
           expect(index.to_s).to eq(SAMPLE_ALL_INDEX)
-          expect(index.to_s('writings', is_project: true)).to(
+          expect(index.project_home_page('writings')).to(
             eq(SAMPLE_PROJECT_INDEX)
           )
         end
@@ -232,25 +252,6 @@ describe Fronde::Index do
             mtime: File.mtime('writings/test1.org').xmlschema
           )
           expect(index.to_atom).to eq(comp)
-        end
-
-        it 'generates the right org-header' do
-          index = described_class.new
-          header = ['#+title: ', '#+author: Test', '#+language: en'].join("\n").strip
-          expect(index.send(:org_header)).to eq(header)
-          expect(index.send(:org_header, 'index')).to eq(header)
-          expect(index.send(:org_header, 'Test', is_tag: true)).to eq(header)
-
-          header = ['#+title: Blog', '#+author: Test', '#+language: en'].join("\n").strip
-          expect(index.send(:org_header, is_tag: false)).to eq(header)
-          expect(index.send(:org_header, 'index', is_tag: false)).to eq(header)
-
-          header = ['#+title: Test', '#+author: Test', '#+language: en'].join("\n")
-          expect(index.send(:org_header, 'Test', is_tag: false)).to eq(header.strip)
-
-          header = ['#+title: tutu', '#+author: Test', '#+language: en'].join("\n").strip
-          expect(index.send(:org_header, 'tutu')).to eq(header)
-          expect(index.send(:org_header, 'tutu', is_tag: true)).to eq(header)
         end
 
         it 'lists tags by name', core: true do
@@ -335,7 +336,7 @@ describe Fronde::Index do
         it 'generates a main index', core: true do
           index = described_class.new
           expect(index.to_s).to eq(SAMPLE_NO_REC_INDEX)
-          expect(index.to_s('writings', is_project: true)).to(
+          expect(index.project_home_page('writings')).to(
             eq(SAMPLE_PROJECT_NO_REC_INDEX)
           )
         end
@@ -383,31 +384,13 @@ describe Fronde::Index do
 
       it 'generates a main index', core: true do
         index = described_class.new
-        empty_index = <<~INDEX
-          #+title: All tags
-          #+author: Test
-          #+language: en
-
-          * By alphabetical order
-          :PROPERTIES:
-          :HTML_CONTAINER_CLASS: index-tags
-          :UNNUMBERED: notoc
-          :END:
-
-
-          * By publication number
-          :PROPERTIES:
-          :HTML_CONTAINER_CLASS: index-tags
-          :UNNUMBERED: notoc
-          :END:
-        INDEX
-        expect(index.to_s).to eq(empty_index)
-        empty_project_index = <<~INDEX.strip
+        expect(index.to_s).to eq(format(SAMPLE_EMPTY_INDEX, author: 'Test'))
+        empty_project_index = <<~INDEX
           #+title: writings
           #+author: Test
           #+language: en
         INDEX
-        expect(index.to_s('writings', is_project: true)).to(
+        expect(index.project_home_page('writings')).to(
           eq(empty_project_index)
         )
       end
@@ -429,31 +412,15 @@ describe Fronde::Index do
       it 'correctly saves one index', core: true do
         described_class.new.write_org('index')
         expect(File.exist?('tags/index.org')).to be(true)
-        empty_index = <<~INDEX
-          #+title: All tags
-          #+author: Test
-          #+language: en
-
-          * By alphabetical order
-          :PROPERTIES:
-          :HTML_CONTAINER_CLASS: index-tags
-          :UNNUMBERED: notoc
-          :END:
-
-
-          * By publication number
-          :PROPERTIES:
-          :HTML_CONTAINER_CLASS: index-tags
-          :UNNUMBERED: notoc
-          :END:
-        INDEX
-        expect(File.read('tags/index.org')).to eq(empty_index)
+        expect(File.read('tags/index.org')).to(
+          eq(format(SAMPLE_EMPTY_INDEX, author: 'Test'))
+        )
       end
 
       it 'correctly saves one blog index', core: true do
         described_class.new.send(:write_all_blog_home, false)
         expect(File.exist?('writings/index.org')).to be(true)
-        empty_project_index = <<~INDEX.strip
+        empty_project_index = <<~INDEX
           #+title: writings
           #+author: Test
           #+language: en
@@ -514,25 +481,9 @@ describe Fronde::Index do
     end
 
     it 'generates an empty main index', core: true do
-      empty_index = <<~EMPTY_INDEX
-        #+title: All tags
-        #+author: Test
-        #+language: en
-
-        * By alphabetical order
-        :PROPERTIES:
-        :HTML_CONTAINER_CLASS: index-tags
-        :UNNUMBERED: notoc
-        :END:
-
-
-        * By publication number
-        :PROPERTIES:
-        :HTML_CONTAINER_CLASS: index-tags
-        :UNNUMBERED: notoc
-        :END:
-      EMPTY_INDEX
-      expect(described_class.new.to_s).to eq(empty_index)
+      expect(described_class.new.to_s).to(
+        eq(format(SAMPLE_EMPTY_INDEX, author: 'Test'))
+      )
     end
 
     it 'generates an empty atom feed', core: true do
@@ -595,25 +546,9 @@ describe Fronde::Index do
     end
 
     it 'generates an empty main index', core: true do
-      empty_index = <<~EMPTY_INDEX
-        #+title: All tags
-        #+author: alice
-        #+language: en
-
-        * By alphabetical order
-        :PROPERTIES:
-        :HTML_CONTAINER_CLASS: index-tags
-        :UNNUMBERED: notoc
-        :END:
-
-
-        * By publication number
-        :PROPERTIES:
-        :HTML_CONTAINER_CLASS: index-tags
-        :UNNUMBERED: notoc
-        :END:
-      EMPTY_INDEX
-      expect(described_class.new.to_s).to eq(empty_index)
+      expect(described_class.new.to_s).to(
+        eq(format(SAMPLE_EMPTY_INDEX, author: 'alice'))
+      )
     end
 
     it 'generates an empty atom feed', core: true do
@@ -621,21 +556,6 @@ describe Fronde::Index do
       index = described_class.new
       index_date_str = index.date.strftime('%Y-%m-%d %H:%M')
       expect(index_date_str).to eq(now_str)
-      empty_atom = <<~EMPTY_ATOM
-        <?xml version="1.0" encoding="utf-8"?>
-        <feed xmlns="http://www.w3.org/2005/Atom"
-              xmlns:dc="http://purl.org/dc/elements/1.1/"
-              xml:lang="en">
-
-          <title>All tags</title>
-          <link href="http://perdu.com/feeds/index.xml" rel="self" type="application/atom+xml"/>
-          <link href="http://perdu.com" rel="alternate" type="text/html" title="All tags"/>
-          <updated>%<date>s</updated>
-          <author><name>alice</name></author>
-          <id>urn:md5:75d53866bcb20465b3287cf237234464</id>
-          <generator uri="https://git.umaneti.net/fronde/about/">Fronde</generator>
-        </feed>
-      EMPTY_ATOM
       comp = format(
         SAMPLE_EMPTY_ATOM,
         date: index.date.xmlschema,

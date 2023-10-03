@@ -1,0 +1,19 @@
+#+title: {{ title }}
+#+author: {{ author }}
+#+language: {{ lang }}
+{%- assign last_year = 0 -%}
+{% for article in entries %}
+{% assign cur_year = article.timekey | slice: 0, 4 %}
+{%- unless cur_year == last_year %}
+* {% if cur_year == "0000" %}{{ unsorted }}{% else %}{{ cur_year }}{% endif %}
+:PROPERTIES:
+:HTML_CONTAINER_CLASS: index-year
+:UNNUMBERED: notoc
+:END:
+{% assign last_year = cur_year %}
+{% endunless -%}
+- *[[{{ article.url }}][{{ article.title }}]]*
+{%- if article.published != '' %} / {{ article.published }}{% endif -%}
+{%- if article.excerpt != '' %} \\
+  {{ article.excerpt }}{% endif %}
+{%- endfor %}

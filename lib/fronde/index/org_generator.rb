@@ -6,11 +6,20 @@ module Fronde
   # Embeds methods responsible for generating an org file for a given
   #   index.
   module IndexOrgGenerator
-    def to_org(index_name = 'index', is_project: false)
-      return project_home_page(index_name) if is_project
+    def project_home_page(project_name)
+      org_index(
+        project_name,
+        (@projects[project_name] || []).map(&:to_h)
+      )
+    end
+
+    def to_org(index_name = 'index')
       return all_tags_index if index_name == 'index'
-      [org_header(index_name),
-       org_articles(@index[index_name])].join("\n")
+
+      org_index(
+        @tags_names[index_name],
+        (@index[index_name] || []).map(&:to_h)
+      )
     end
     alias_method :to_s, :to_org
 
@@ -25,12 +34,47 @@ module Fronde
 
     private
 
-    def project_home_page(project_name)
-      content = [org_header(project_name, is_tag: false)]
-      if @projects[project_name]&.any?
-        content += org_articles(@projects[project_name])
+    # Render an Org index file.
+    #
+    # @param title [String] the title of the current org index
+    # @param entries [Array] the article to list in this file
+    # @return [String] the org file content as a String
+    def org_index(title, entries)
+      entries.map! do |article|
+        published = article['published']
+        unless published == ''
+          article['published'] = R18n.t.fronde.index.published_on published
+        end
+        article
       end
-      content.join("\n")
+      Config::Helpers.render_liquid_template(
+        File.read(File.expand_path('./data/template.org', __dir__)),
+        'title' => title,
+        'lang' => Fronde::CONFIG.get('lang'),
+        'author' => Fronde::CONFIG.get('author'),
+        'unsorted' => R18n.t.fronde.index.unsorted,
+        'entries' => entries
+      )
+    end
+
+    def all_tags_index
+      indexes = sort_tags_by_name_and_weight.map do |title, tags|
+        all_tags = tags.map do |tag|
+          {
+            'slug' => tag, 'title' => @tags_names[tag],
+            'weight' => @index[tag].length
+          }
+        end
+        { 'title' => R18n.t.fronde.index.send(title), 'tags' => all_tags }
+      end
+      Config::Helpers.render_liquid_template(
+        File.read(File.expand_path('./data/all_tags.org', __dir__)),
+        'title' => R18n.t.fronde.index.all_tags,
+        'lang' => Fronde::CONFIG.get('lang'),
+        'author' => Fronde::CONFIG.get('author'),
+        'domain' => Fronde::CONFIG.get('domain'),
+        'indexes' => indexes
+      )
     end
 
     def write_all_blog_home(verbose)
@@ -40,78 +84,8 @@ module Fronde
           warn R18n.t.fronde.org.generate_blog_index(name: project['name'])
         end
         orgdest = format('%<root>s/index.org', root: project['path'])
-        File.write(orgdest, to_org(project['name'], is_project: true))
+        File.write(orgdest, project_home_page(project['name']))
       end
-    end
-
-    def all_tags_index
-      content = [
-        org_header(R18n.t.fronde.index.all_tags, is_tag: false)
-      ]
-      sort_tags_by_name_and_weight.each do |t, tags|
-        content << ''
-        content << org_title(R18n.t.fronde.index.send(t), 'index-tags')
-        next if tags.empty?
-        tags.each do |k|
-          content << "- #{tag_published_url(k)} (#{@index[k].length})"
-        end
-      end
-      content.join("\n")
-    end
-
-    def tag_published_url(tag_name)
-      domain = Fronde::CONFIG.get('domain')
-      title = @tags_names[tag_name]
-      tag_link = "#{domain}/tags/#{tag_name}.html"
-      "[[#{tag_link}][#{title}]]"
-    end
-
-    def org_header(title = nil, is_tag: true)
-      if is_tag
-        title = @tags_names[title]
-      elsif title.nil? || title == 'index'
-        title = Fronde::CONFIG.get('title')
-      end
-      <<~HEADER.strip
-        #+title: #{title}
-        #+author: #{Fronde::CONFIG.get('author')}
-        #+language: #{Fronde::CONFIG.get('lang')}
-      HEADER
-    end
-
-    def org_articles(articles_list)
-      last_year = nil
-      articles_list.map do |article|
-        year_title = ''
-        year = article.timekey.slice(0, 4)
-        if year != last_year
-          year_title = format("\n%<title>s\n", title: org_title(year))
-          last_year = year
-        end
-        year_title + org_entry(article)
-      end
-    end
-
-    def org_entry(article)
-      line = "- *[[#{article.url}][#{article.title}]]*"
-      art_date = article.date.l18n_long_date_string(with_year: false)
-      unless art_date == ''
-        published = R18n.t.fronde.index.published_on art_date
-        line += " / #{published}"
-      end
-      line += " \\\\\n  #{article.excerpt}" if article.excerpt != ''
-      line
-    end
-
-    def org_title(year, html_class = 'index-year')
-      year = R18n.t.fronde.index.unsorted if year == '0000'
-      <<~ENDPROP
-        * #{year}
-        :PROPERTIES:
-        :HTML_CONTAINER_CLASS: #{html_class}
-        :UNNUMBERED: notoc
-        :END:
-      ENDPROP
     end
   end
 end

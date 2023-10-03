@@ -25,16 +25,16 @@ module Fronde
 
     # Render an Atom feed file.
     #
-    # @param title [String] the title of the current atom feed
+    # @param tag_name [String] the tag name of the current atom feed
     # @param entries [Array] the article to list in this file
-    # @return [String] the Atom header as a String
-    def atom_file(title, entries)
+    # @return [String] the Atom feed as a String
+    def atom_file(tag_name, entries)
       domain = Fronde::CONFIG.get('domain')
-      slug = Slug.slug(title)
+      slug = Slug.slug(tag_name)
       tagurl = "#{domain}/tags/#{slug}.html"
       Config::Helpers.render_liquid_template(
         File.read(File.expand_path('./data/template.xml', __dir__)),
-        'title' => @tags_names[title],
+        'title' => @tags_names[tag_name],
         'lang' => Fronde::CONFIG.get('lang'),
         'domain' => domain,
         'slug' => slug,
@@ -49,7 +49,7 @@ module Fronde
     # Render the main/index Atom feed.
     #
     # @param entries [Array] the article to list in this file
-    # @return [String] the Atom header as a String
+    # @return [String] the Atom feed as a String
     def atom_index(entries)
       domain = Fronde::CONFIG.get('domain')
       Config::Helpers.render_liquid_template(

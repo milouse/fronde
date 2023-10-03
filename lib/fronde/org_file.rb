@@ -209,8 +209,10 @@ module Fronde
     def to_h
       fields = %w[author excerpt keywords timekey title url]
       data = fields.to_h { |key| [key, send(key)] }
-      data['published'] = @data[:date].xmlschema
-      data['updated'] = @data[:updated].xmlschema
+      pub_date = @data[:date]
+      data['published'] = pub_date.l18n_long_date_string(with_year: false)
+      data['published_xml'] = pub_date.xmlschema
+      data['updated_xml'] = @data[:updated].xmlschema
       data['mime_type'] = @project['mime_type']
       data
     end
