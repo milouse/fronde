@@ -72,7 +72,7 @@ module Fronde
         file_pattern = "**/#{file_pattern}" if project['recursive']
         Dir.glob(file_pattern, base: project['path']).map do |index_file|
           org_file = File.join(project['path'], index_file)
-          next if exclude_file?(org_file, project)
+          next if project.exclude_file? org_file
 
           add_to_indexes(OrgFile.new(org_file))
         end
@@ -113,13 +113,6 @@ module Fronde
         @index[b].length <=> @index[a].length
       end
       tags_sorted
-    end
-
-    def exclude_file?(file_path, project)
-      # Obviously excluding index itself for blogs
-      return true if file_path == File.join(project['path'], 'index.org')
-      return false unless project['exclude']
-      file_path.match? project['exclude']
     end
 
     def save?

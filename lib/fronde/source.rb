@@ -89,6 +89,16 @@ module Fronde
       "#{@config['target']}/#{target}"
     end
 
+    def exclude_file?(file_name)
+      # Obviously excluding index itself for blogs
+      return true if file_name == File.join(@config['path'], 'index.org')
+
+      exclusion_rules = @config['exclude']
+      return false unless exclusion_rules
+
+      file_name.match? exclusion_rules
+    end
+
     def org_config
       name = @config['name']
       [{ 'name' => name,
