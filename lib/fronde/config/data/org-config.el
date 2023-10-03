@@ -16,9 +16,8 @@
          {%- for attribute in project.attributes %}
          :{{ attribute[0] }} {{ attribute[1] | cast_lisp_value: attribute[0] }}
          {%- endfor %})
-        {% endfor %}
-        {%- assign project_names = all_projects | map: "name" -%}
-        ("website" :components ("{{ project_names | join: '" "' }}"))))
+        {% endfor -%}
+        ("website" :components ("{{ all_projects | map: 'name' | join: '" "' | remove: '" "tags' }}"))))
 
 ;; Load fronde lib
 (load-file (expand-file-name "ox-gmi.el" "{{ work_dir }}/lib"))

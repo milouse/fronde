@@ -5,33 +5,42 @@ require_relative 'config'
 module Fronde
   # Wraps Gnu/Emacs calls
   class Emacs
-    def initialize(file_path: nil, verbose: false)
-      @file = file_path
+    def initialize(verbose: false)
       @verbose = verbose
+      @command = nil
     end
 
-    def publish
-      command = emacs_command(
-        '-l ./var/lib/org-config.el', '--eval \'(org-publish "website")\''
-      )
-      if @verbose
-        warn command
-        return system(command, exception: true)
-      end
-      system command, out: '/dev/null', err: '/dev/null', exception: true
+    def publish_file(file_name)
+      path = File.expand_path file_name
+      build_command("(org-publish-file \"#{path}\")")
+      run_command
+    end
+
+    def publish(project = 'website')
+      build_command("(org-publish \"#{project}\")")
+      run_command
     end
 
     private
 
-    def emacs_command(*arguments)
+    def run_command
+      cmd = @command.join(' ')
+      if @verbose
+        warn cmd
+        return system(cmd, exception: true)
+      end
+      system cmd, out: '/dev/null', err: '/dev/null', exception: true
+    end
+
+    def build_command(org_action)
       default_emacs = Fronde::CONFIG.get('emacs')
-      emacs_cmd = [
-        default_emacs || 'emacs -Q --batch -nw',
-        '--eval \'(setq enable-dir-local-variables nil)\''
+      @command = [default_emacs || 'emacs -Q --batch -nw']
+      @command << '--eval \'(setq inhibit-message t)\'' unless @verbose
+      @command += [
+        '--eval \'(setq enable-dir-local-variables nil)\'',
+        '-l ./var/lib/org-config.el',
+        "--eval '#{org_action}'"
       ]
-      emacs_cmd << '--eval \'(setq inhibit-message t)\'' unless @verbose
-      emacs_cmd.concat(arguments)
-      emacs_cmd.join(' ')
     end
   end
 end

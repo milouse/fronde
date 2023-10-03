@@ -65,13 +65,7 @@ with %c, and published with %N</p>
          :recursive nil
          :section-numbers nil
          :with-toc nil)
-        ("tags-assets"
-         :base-directory "{{ test_dir }}/tags"
-         :base-extension "gif\\|jpg\\|png\\|svg\\|pdf"
-         :publishing-directory "{{ test_dir }}/public_html/tags"
-         :publishing-function org-publish-attachment
-         :recursive nil)
-        ("website" :components ("src" "src-assets" "news" "news-assets" "tags" "tags-assets"))))
+        ("website" :components ("src" "src-assets" "news" "news-assets"))))
 
 ;; Load fronde lib
 (load-file (expand-file-name "ox-gmi.el" "{{ test_dir }}/lib"))

@@ -6,7 +6,7 @@ module Fronde
   class Source
     def initialize(source_config)
       @config = {
-        'recursive' => true, 'is_blog' => false,
+        'recursive' => true, 'has_assets' => true, 'is_blog' => false,
         'domain' => CONFIG.get('domain'), 'atom_feed' => '',
         'org-options' => {
           'section-numbers' => 'nil',
@@ -101,10 +101,11 @@ module Fronde
 
     def org_config
       name = @config['name']
-      [{ 'name' => name,
-         'attributes' => org_project_config },
-       { 'name' => "#{name}-assets",
-         'attributes' => org_assets_config }]
+      config = [{ 'name' => name, 'attributes' => org_project_config }]
+      return config unless @config['has_assets']
+
+      config << { 'name' => "#{name}-assets",
+                  'attributes' => org_assets_config }
     end
 
     class << self

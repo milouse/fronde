@@ -1,6 +1,9 @@
 #+title: {{ title }}
 #+author: {{ author }}
 #+language: {{ lang }}
+{%- unless slug == '__HOME_PAGE__' %}
+#+html_head_extra: <link rel="alternate" type="application/atom+xml" title="Atom 1.0" href="{{ domain }}/feeds/{{ slug }}.xml" />
+{% endunless -%}
 {%- assign last_year = 0 -%}
 {% for article in entries %}
 {% assign cur_year = article.timekey | slice: 0, 4 %}

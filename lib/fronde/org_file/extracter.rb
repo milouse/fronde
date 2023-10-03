@@ -80,6 +80,8 @@ module Fronde
 
       pub_folder = Fronde::CONFIG.get('html_public_folder')
       file_name = "#{pub_folder}/#{pub_file}"
+      return @data[:excerpt] unless File.exist? file_name
+
       dom = File.open(file_name, 'r') { |file| Nokogiri::HTML file }
       body = dom.css('div#content')
       body.css('header').unlink # Remove the main title

@@ -29,7 +29,15 @@ module Fronde
     end
 
     def entries
-      @index.keys.reject { |k| k == 'index' }
+      @index.keys.reject { |tag| tag == 'index' }
+    end
+
+    def blog_homes
+      @sources.filter_map do |project|
+        next unless Dir.exist?(project['path'])
+        [format('%<root>s/index.org', root: project['path']),
+         project]
+      end.to_h
     end
 
     def empty?
@@ -37,11 +45,11 @@ module Fronde
     end
 
     def write_all(verbose: true)
-      @index.each_key do |k|
-        write_org(k)
-        warn "Generated index file for #{k}" if verbose
-        write_atom(k)
-        warn "Generated atom feed for #{k}" if verbose
+      @index.each_key do |tag|
+        write_org(tag)
+        warn "Generated index file for #{tag}" if verbose
+        write_atom(tag)
+        warn "Generated atom feed for #{tag}" if verbose
       end
       write_all_blog_home(verbose)
     end
@@ -51,8 +59,8 @@ module Fronde
         tags_sorted = sort_tags_by_name_and_weight["by_#{kind}".to_sym]
         # Reverse in order to have most important or A near next prompt
         # and avoid to scroll to find the beginning of the list.
-        return tags_sorted.map do |k|
-          @tags_names[k] + " (#{@index[k].length})"
+        return tags_sorted.map do |tag|
+          @tags_names[tag] + " (#{@index[tag].length})"
         end.reverse
       end
       raise ArgumentError, "#{kind} not in [:name, :weight]"

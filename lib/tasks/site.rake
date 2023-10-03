@@ -8,7 +8,7 @@ require_relative '../fronde/cli/throbber'
 
 namespace :site do
   desc 'Generates all index files'
-  task :index do
+  task :index, :build? do |_, args|
     index = Fronde::Index.new
     if verbose
       index.write_all
@@ -18,6 +18,27 @@ namespace :site do
       index.write_all(verbose: false)
     end
     Fronde::CLI::Throbber.run(build, 'Generating indexes:')
+    next unless args[:build?]
+
+    blog_homes = index.blog_homes
+    next unless blog_homes.any?
+
+    build_html = Thread.new do
+      rm_r 'var/tmp/timestamps/tags.cache', force: true
+      emacs = Fronde::Emacs.new(verbose: verbose)
+      emacs.publish('tags')
+      blog_homes.each_key do |home|
+        emacs.publish_file home
+      end
+    end
+    begin
+      Fronde::CLI::Throbber.run(build_html, 'Building indexes:')
+    # :nocov:
+    rescue RuntimeError
+      warn 'Aborting'
+      next
+    end
+    # :nocov:
   end
 
   desc 'Convert and customize all org files'
@@ -35,7 +56,7 @@ namespace :site do
       next
     end
     # :nocov:
-    Rake::Task['site:index'].invoke
+    Rake::Task['site:index'].invoke('build')
     next unless Fronde::CONFIG.sources.any? { |source| source.type == 'html' }
 
     customize_html = Thread.new do

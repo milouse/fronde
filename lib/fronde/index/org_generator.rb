@@ -8,7 +8,7 @@ module Fronde
   module IndexOrgGenerator
     def project_home_page(project_name)
       org_index(
-        project_name,
+        project_name, '__HOME_PAGE__',
         (@projects[project_name] || []).map(&:to_h)
       )
     end
@@ -17,7 +17,7 @@ module Fronde
       return all_tags_index if index_name == 'index'
 
       org_index(
-        @tags_names[index_name],
+        @tags_names[index_name], index_name,
         (@index[index_name] || []).map(&:to_h)
       )
     end
@@ -37,9 +37,10 @@ module Fronde
     # Render an Org index file.
     #
     # @param title [String] the title of the current org index
+    # @param slug [String] the slug of the current org index
     # @param entries [Array] the article to list in this file
     # @return [String] the org file content as a String
-    def org_index(title, entries)
+    def org_index(title, slug, entries)
       entries.map! do |article|
         published = article['published']
         unless published == ''
@@ -50,6 +51,8 @@ module Fronde
       Config::Helpers.render_liquid_template(
         File.read(File.expand_path('./data/template.org', __dir__)),
         'title' => title,
+        'slug' => slug,
+        'domain' => Fronde::CONFIG.get('domain'),
         'lang' => Fronde::CONFIG.get('lang'),
         'author' => Fronde::CONFIG.get('author'),
         'unsorted' => R18n.t.fronde.index.unsorted,
@@ -78,13 +81,10 @@ module Fronde
     end
 
     def write_all_blog_home(verbose)
-      @sources.each do |project|
-        next unless Dir.exist?(project['path'])
-        if verbose
-          warn R18n.t.fronde.org.generate_blog_index(name: project['name'])
-        end
-        orgdest = format('%<root>s/index.org', root: project['path'])
-        File.write(orgdest, project_home_page(project['name']))
+      blog_homes.each do |orgdest, project|
+        name = project['name']
+        warn R18n.t.fronde.org.generate_blog_index(name: name) if verbose
+        File.write(orgdest, project_home_page(name))
       end
     end
   end

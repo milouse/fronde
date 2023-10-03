@@ -148,7 +148,8 @@ module Fronde
         sources = build_sources
         if sources.any?(&:blog?)
           sources << Fronde::HtmlSource.new(
-            'path' => 'tags', 'recursive' => false
+            'path' => 'tags', 'recursive' => false,
+            'has_assets' => false
           )
         end
         @sources = remove_inclusion(remove_duplicate(sources))

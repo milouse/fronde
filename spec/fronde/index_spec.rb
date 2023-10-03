@@ -113,6 +113,12 @@ SAMPLE_EMPTY_INDEX = <<~INDEX
 
 INDEX
 
+SAMPLE_EMPTY_PROJECT_INDEX = <<~INDEX
+  #+title: writings
+  #+author: Test
+  #+language: en
+INDEX
+
 SAMPLE_ATOM = <<~ATOM
   <?xml version="1.0" encoding="utf-8"?>
   <feed xmlns="http://www.w3.org/2005/Atom"
@@ -385,13 +391,8 @@ describe Fronde::Index do
       it 'generates a main index', core: true do
         index = described_class.new
         expect(index.to_s).to eq(format(SAMPLE_EMPTY_INDEX, author: 'Test'))
-        empty_project_index = <<~INDEX
-          #+title: writings
-          #+author: Test
-          #+language: en
-        INDEX
         expect(index.project_home_page('writings')).to(
-          eq(empty_project_index)
+          eq(SAMPLE_EMPTY_PROJECT_INDEX)
         )
       end
 
@@ -420,12 +421,9 @@ describe Fronde::Index do
       it 'correctly saves one blog index', core: true do
         described_class.new.send(:write_all_blog_home, false)
         expect(File.exist?('writings/index.org')).to be(true)
-        empty_project_index = <<~INDEX
-          #+title: writings
-          #+author: Test
-          #+language: en
-        INDEX
-        expect(File.read('writings/index.org')).to eq(empty_project_index)
+        expect(File.read('writings/index.org')).to(
+          eq(SAMPLE_EMPTY_PROJECT_INDEX)
+        )
       end
 
       it 'correctly saves one atom feed', core: true do
