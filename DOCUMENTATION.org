@@ -1,6 +1,6 @@
 #+title: Fronde Documentation
 #+author: Étienne Deparis
-#+lang: en
+#+language: en
 #+description: Glossary of all possible configuration options for Fronde
 #+options: ^:{} toc:3 num:3 H:4
 
@@ -67,8 +67,8 @@ generator should be, and more specifically, what should it be for Org.
   as convenient as Markdown's. That's why fronde will never support any
   other markup language.
 - However Org HTML export should be more easily expandable. That’s why
-  fronde gives you the [[#templates_setting][templates feature]] and introduces [[#formatting_tags][new formatting
-  tags]] for the preamble and postamble sections.
+  fronde gives you the [[#templates_setting][templates feature]] and introduces [[#formatting_tags][new formatting tags]]
+  for the preamble and postamble sections.
 - Org writers should already be Emacs users, that’s why fronde will
   directly call Emacs to convert your Org files to HTML. There is no
   need to use Pandoc or org-ruby if you already have Emacs.
@@ -82,11 +82,11 @@ generator should be, and more specifically, what should it be for Org.
 
 We are already aware of some limitations we would like to remove:
 
-**** TODO Allow theme to provide configuration options
+**** TODO Allow themes to provide configuration options
 Themes should be able to declare a set of default ~templates~ or
 specific Org export options
 
-**** TODO Better protect upgrade
+**** TODO Better protected upgrade
 For example, Rakefile should only be overwritten after upgrade of the
 gem.
 
@@ -94,14 +94,16 @@ gem.
 
 ** Source code
 
-You can access the source code at: https://git.umaneti.net/fronde
+The canonical repository is located at [[https://git.umaneti.net/fronde]].
+A mirror also exists on [[https://github.com/milouse/chwall][Github]].
 
 * Getting started
 
 ** Installation
 
 Fronde is a [[https://rubygems.org/][Ruby gem]] and thus you need a working Ruby environment to use
-it. Fronde requires at least ruby 2.6 to work.
+it. Fronde requires at least ruby 2.7 to work (though this version is no
+more maintained, you should really move to ruby 3.1 as soon as possible).
 
 You may already have Ruby installed on your computer. You can check
 inside a terminal emulator by typing: ~ruby -v~. You also need the
@@ -118,7 +120,7 @@ Some operating systems already package the right ruby version to use:
 **** Archlinux-like
 
 On Archlinux, Manjaro or Parabola, you just have to install the packages
-~ruby~ and ~rubygems~:
+~rubygems~ (which will install ~ruby~ as a dependency):
 
 #+caption: Ruby installation procedure on Archlinux-like system
 #+begin_src shell
@@ -127,18 +129,18 @@ On Archlinux, Manjaro or Parabola, you just have to install the packages
 
 **** Debian-like
 
-Ruby 2.6 does not seem to be available at all. However, on Ubuntu at
-least, ruby 2.7 is available. Thus you should try the following command:
+On Debian, Ubuntu, Mint… you just have to install the package ~ruby~
+(which will install ~ruby-rubygems~ as a dependency):
 
 #+caption: Ruby installation procedure on Debian-like system
 #+begin_src shell
-  sudo apt install ruby2.7
+  sudo apt install ruby
 #+end_src
 
 **** Others
 
-Ruby 2.7 seems to be already well packaged for Fedora, Red Hat or
-OpenMandriva, thus it should not be a problem for you to install it.
+Ruby seems to be well packaged for Fedora, Red Hat or OpenMandriva, thus
+it should not be a problem for you to install it.
 
 *** Install ruby with RVM
 
@@ -151,7 +153,8 @@ polluting your other projects.
 #+caption: Ruby installation procedure with RVM
 #+begin_src shell
   rvm get latest
-  rvm use ruby-2.7.2@fronde --create
+  rvm install ruby-3.2.2
+  rvm use ruby-3.2.2@fronde --create
 #+end_src
 
 *** Install Fronde
@@ -187,7 +190,7 @@ number you just built):
 
 #+caption: Fronde installation procedure from local gem file
 #+begin_src shell
-  gem install fronde-0.3.0.gem
+  gem install fronde-0.4.0.gem
 #+end_src
 
 ** Creation of a website
