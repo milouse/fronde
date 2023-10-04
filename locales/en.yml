@@ -2,6 +2,7 @@
 fronde:
   bin:
     usage: 'Usage: fronde %1 [options]'
+    done: done
     commands:
       cmd_title: Commands
       alias: Alias for %1.
@@ -21,15 +22,19 @@ fronde:
       help: Display help for a command and exit.
       version: Display Fronde version and exit.
       default_title: New article
-    error:
+  error:
+    bin:
+      label: An error occurred.
+      explanation: >-
+        To see the error, run your command again with more verbosity, for
+        example, fronde build -v
       no_command: 'ERROR: no command or unknown command given.'
       no_file: >-
         Warning: No file path given. Default file will be used.
-  error:
-    label: An error occurred.
-    explanation: >-
-      To see the error, run your command again with more verbosity, for
-      example, fronde build -v
+    config:
+      deprecated_public_folder: >-
+        ‘public_folder’ setting is deprecated. Please use either
+        ‘html_public_folder’ or ‘gemini_public_folder’.
     source:
       no_path: Skipping %{source} as its ‘path’ key is missing.
       duplicate: >-
@@ -41,6 +46,8 @@ fronde:
     org_file:
       no_file_or_title: No file or title given.
       no_project: No project found for %{file}. Publication will fail.
+    index:
+      wrong_sort_kind: '%{kind} not in %{accepted_values}'
     templater:
       no_element_found: >-
         No element found with the selector %{source} in %{file}.
@@ -53,6 +60,8 @@ fronde:
     by_weight: By publication number
     full_date_format: '%A %{date}'
     full_date_with_time_format: '%{date} at %{time}'
+    index_generated: Generated index file for %{tag}.
+    atom_generated: Generated Atom feed for %{tag}.
   org:
     generate_blog_index: Generating blog home page for %{name}
     postamble:
@@ -60,3 +69,15 @@ fronde:
       last_modification: Last modification on %C
       with_emacs: with %c, and published with %n
       with_emacs_html: with %c, and published with %N
+  tasks:
+    site:
+      aborting: Aborting
+      generating_indexes: 'Generating index files:'
+      building_indexes: 'Building index files:'
+      building: 'Building:'
+      customizing: 'Customizing:'
+    org:
+      downloaded: Org version %{version} has been downloaded.
+      downloading: 'Downloading Org:'
+      installed: Org version %{version} has been locally installed.
+      installing: 'Installing Org:'

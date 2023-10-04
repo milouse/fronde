@@ -47,15 +47,16 @@ module Fronde
     def write_all(verbose: true)
       @index.each_key do |tag|
         write_org(tag)
-        warn "Generated index file for #{tag}" if verbose
+        warn R18n.t.fronde.index.index_generated(tag: tag) if verbose
         write_atom(tag)
-        warn "Generated atom feed for #{tag}" if verbose
+        warn R18n.t.fronde.index.atom_generated(tag: tag) if verbose
       end
       write_all_blog_home(verbose)
     end
 
     def sort_by(kind)
-      if %i[name weight].include?(kind)
+      accepted_values = %i[name weight]
+      if accepted_values.include?(kind)
         tags_sorted = sort_tags_by_name_and_weight["by_#{kind}".to_sym]
         # Reverse in order to have most important or A near next prompt
         # and avoid to scroll to find the beginning of the list.
@@ -63,7 +64,10 @@ module Fronde
           @tags_names[tag] + " (#{@index[tag].length})"
         end.reverse
       end
-      raise ArgumentError, "#{kind} not in [:name, :weight]"
+      error_msg = R18n.t.fronde.error.index.wrong_sort_kind(
+        kind: kind, accepted_values: accepted_values.inspect
+      )
+      raise ArgumentError, error_msg
     end
 
     private

@@ -41,7 +41,8 @@ module Fronde
         show_error
         raise e
       else
-        puts "#{@message} #{Rainbow('done').green}".ljust(terminal_width)
+        done = Rainbow(R18n.t.fronde.bin.done).green
+        puts "#{@message} #{done}".ljust(terminal_width)
       end
 
       class << self
@@ -72,8 +73,8 @@ module Fronde
           format(
             "%<message>s %<label>s\n%<explanation>s",
             message: @message,
-            label: Rainbow(R18n.t.fronde.error.label).bold.red,
-            explanation: Rainbow(R18n.t.fronde.error.explanation).bold
+            label: Rainbow(R18n.t.fronde.error.bin.label).bold.red,
+            explanation: Rainbow(R18n.t.fronde.error.bin.explanation).bold
           )
         )
       end

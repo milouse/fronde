@@ -15,7 +15,7 @@ module Fronde
            !config.has_key?('public_folder')
           return config
         end
-        warn '‘public_folder’ setting is deprecated. Please use either ‘html_public_folder’ or ‘gemini_public_folder’.' # rubocop:disable Layout/LineLength
+        warn R18n.t.fronde.error.config.deprecated_public_folder
         config['html_public_folder'] = config.delete('public_folder')
         config
       end

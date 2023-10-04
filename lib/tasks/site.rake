@@ -17,7 +17,9 @@ namespace :site do
     build = Thread.new do
       index.write_all(verbose: false)
     end
-    Fronde::CLI::Throbber.run(build, 'Generating indexes:')
+    Fronde::CLI::Throbber.run(
+      build, R18n.t.fronde.tasks.site.generating_indexes
+    )
     next unless args[:build?]
 
     blog_homes = index.blog_homes
@@ -32,10 +34,12 @@ namespace :site do
       end
     end
     begin
-      Fronde::CLI::Throbber.run(build_html, 'Building indexes:')
+      Fronde::CLI::Throbber.run(
+        build_html, R18n.t.fronde.tasks.site.building_indexes
+      )
     # :nocov:
     rescue RuntimeError
-      warn 'Aborting'
+      warn R18n.t.fronde.tasks.site.aborting
       next
     end
     # :nocov:
@@ -49,10 +53,10 @@ namespace :site do
       Fronde::Emacs.new(verbose: verbose).publish
     end
     begin
-      Fronde::CLI::Throbber.run(build_html, 'Building:')
+      Fronde::CLI::Throbber.run(build_html, R18n.t.fronde.tasks.site.building)
     # :nocov:
     rescue RuntimeError
-      warn 'Aborting'
+      warn R18n.t.fronde.tasks.site.aborting
       next
     end
     # :nocov:
@@ -65,7 +69,9 @@ namespace :site do
         Fronde::Templater.customize_output(f)
       end
     end
-    Fronde::CLI::Throbber.run(customize_html, 'Customizing:')
+    Fronde::CLI::Throbber.run(
+      customize_html, R18n.t.fronde.tasks.site.customizing
+    )
   end
 
   desc 'Start a test server'

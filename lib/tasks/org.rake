@@ -32,9 +32,9 @@ namespace :org do
     end
     if verbose
       download.join
-      warn "Org version #{download[:org_version]} has been downloaded"
+      warn R18n.t.fronde.tasks.org.downloaded(version: download[:org_version])
     else
-      Fronde::CLI::Throbber.run(download, 'Downloading Org:')
+      Fronde::CLI::Throbber.run(download, R18n.t.fronde.tasks.org.downloading)
     end
   end
 
@@ -57,9 +57,9 @@ namespace :org do
     end
     if verbose
       build.join
-      warn "#{org_version} has been locally installed"
+      warn R18n.t.fronde.tasks.org.installed(version: org_version)
     else
-      Fronde::CLI::Throbber.run(build, 'Installing Org:')
+      Fronde::CLI::Throbber.run(build, R18n.t.fronde.tasks.org.installing)
     end
   end
 

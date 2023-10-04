@@ -81,7 +81,7 @@ module Fronde
         title = @options[:title] || R18n.t.fronde.bin.options.default_title
         # No title, nor a reliable file_path? Better abort
         if title == ''
-          warn R18n.t.fronde.bin.error.no_file
+          warn R18n.t.fronde.error.bin.no_file
           exit 1
         end
         "#{Fronde::Slug.slug(title)}.org"

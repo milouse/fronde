@@ -2,6 +2,7 @@
 fronde:
   bin:
     usage: 'Usage : fronde %1 [options]'
+    done: fait
     commands:
       cmd_title: Commandes
       alias: Alias pour %1.
@@ -25,16 +26,21 @@ fronde:
       help: Affiche l'aide pour une commande et quitte.
       version: Affiche la version de Fronde et quitte.
       default_title: Nouvel article
-    error:
+  error:
+    bin:
+      label: Une erreur est survenue
+      explanation: >-
+        Pour voir le détail, lancez de nouveau la commande avec plus de
+        verbosité, par exemple fronde build -v
       no_command: 'ERREUR : Aucune commande ou commande inconnue donnée.'
       no_file: >-
         Attention : Aucun chemin de fichier donné. Utilisation du
         fichier par défaut.
-  error:
-    label: Une erreur est survenue
-    explanation: >-
-      Pour voir le détail, lancez de nouveau la commande avec plus de
-      verbosité, par exemple fronde build -v
+    config:
+      deprecated_public_folder: >-
+        La clé de configuration ‘public_folder’ est dépréciée. Merci
+        d’utiliser ‘html_public_folder’ ou ‘gemini_public_folder’ à la
+        place.
     source:
       no_path: >-
         Ignore %{source} comme sa clé ‘path’ est manquante.
@@ -47,6 +53,8 @@ fronde:
     org_file:
       no_file_or_title: Aucun chemin de fichier ou titre donné.
       no_project: Aucun projet trouvé pour %{file}. Sa publication va échouer.
+    index:
+      wrong_sort_kind: '%{kind} n’est pas dans %{accepted_values}'
     templater:
       no_element_found: >-
         Aucun élément trouvé avec le sélecteur %{source} dans %{file}.
@@ -59,6 +67,8 @@ fronde:
     by_weight: Par nombre de publication
     full_date_format: '%A %{date}'
     full_date_with_time_format: '%{date} à %{time}'
+    index_generated: Fichier d’index généré pour %{tag}.
+    atom_generated: Flux Atom généré pour %{tag}.
   org:
     generate_blog_index: Génération de la page d’accueil du blog pour %{name}
     postamble:
@@ -66,3 +76,15 @@ fronde:
       last_modification: dernière modification le %C
       with_emacs: avec %c et publié avec %n
       with_emacs_html: avec %c et publié avec %N
+  tasks:
+    site:
+      aborting: Annulation
+      generating_indexes: 'Génération des fichiers d’index :'
+      building_indexes: 'Compilation des fichiers d’index :'
+      building: 'Compilation :'
+      customizing: 'Décoration :'
+    org:
+      downloaded: La version %{version} de Org a été téléchargée.
+      downloading: 'Téléchargement de Org :'
+      installed: La version %{version} de Org a été installé localement.
+      installing: 'Installation de Org :'
