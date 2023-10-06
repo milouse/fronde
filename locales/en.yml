@@ -76,6 +76,7 @@ fronde:
       building_indexes: 'Building index files:'
       building: 'Building:'
       customizing: 'Customizing:'
+      remove_orphan_file: 'Remove it? [y/N]: '
     org:
       downloaded: Org version %{version} has been downloaded.
       downloading: 'Downloading Org:'

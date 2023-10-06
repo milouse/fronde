@@ -83,6 +83,7 @@ fronde:
       building_indexes: 'Compilation des fichiers d’index :'
       building: 'Compilation :'
       customizing: 'Décoration :'
+      remove_orphan_file: 'Le supprimer ? [y/N]: '
     org:
       downloaded: La version %{version} de Org a été téléchargée.
       downloading: 'Téléchargement de Org :'

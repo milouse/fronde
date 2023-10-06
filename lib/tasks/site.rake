@@ -74,6 +74,23 @@ namespace :site do
     )
   end
 
+  desc 'Cleanup orphaned published files'
+  task :clean do
+    pubfolder = Fronde::CONFIG.get('html_public_folder')
+    Dir["#{pubfolder}/**/*.html"].each do |file_name|
+      source = Fronde::Org::File.new(file_name)
+
+      # Return if an org file has been found for this published file
+      next unless source.file == file_name
+
+      print R18n.t.fronde.tasks.site.remove_orphan_file
+      action = $stdin.gets.strip.downcase
+      next unless action == 'y'
+
+      rm file_name
+    end
+  end
+
   desc 'Start a test server'
   task :preview do
     require_relative '../fronde/preview'
