@@ -64,7 +64,7 @@ namespace :site do
     next unless Fronde::CONFIG.sources.any? { |source| source.type == 'html' }
 
     customize_html = Thread.new do
-      pubfolder = Fronde::CONFIG.get('html_public_folder')
+      pubfolder = File.expand_path Fronde::CONFIG.get('html_public_folder')
       Dir["#{pubfolder}/**/*.html"].each do |f|
         Fronde::Templater.customize_output(f)
       end
