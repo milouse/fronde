@@ -50,35 +50,6 @@ module Fronde
 
         'linux'
       end
-
-      # Download latest org-mode tarball.
-      #
-      # @param destination [String] where to save the org-mode tarball
-      # @return [String] the downloaded org-mode version
-      def self.download_org(destination = 'var/tmp')
-        org_last_version = Fronde::CONFIG.org_last_version
-
-        # :nocov:
-        return if org_last_version.nil?
-
-        # :nocov:
-        # Remove version number in dest file to allow easy rake file
-        # task naming
-        dest_file = File.expand_path('org.tar.gz', destination)
-        return if File.exist?(dest_file)
-        tarball = "org-mode-release_#{org_last_version}.tar.gz"
-        uri = URI("https://git.savannah.gnu.org/cgit/emacs/org-mode.git/snapshot/#{tarball}")
-        # Will crash on purpose if anything goes wrong
-        Net::HTTP.start(uri.host) do |http|
-          request = Net::HTTP::Get.new uri
-
-          http.request request do |response|
-            File.open(dest_file, 'w') do |io|
-              response.read_body { |chunk| io.write chunk }
-            end
-          end
-        end
-      end
     end
   end
 end

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-describe Fronde::OrgFile do
+describe Fronde::Org::File do
   context 'with working org files' do
     it 'parses without date', core: true do
       o = described_class.new('data/test1.org')

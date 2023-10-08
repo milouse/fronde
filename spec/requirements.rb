@@ -22,8 +22,8 @@ ENV['USER'] = 'alice'
 
 # The following requires other components automatically
 require_relative '../lib/fronde/config'
-require_relative '../lib/fronde/org_file'
-require_relative '../lib/fronde/cli/helpers'
+require_relative '../lib/fronde/org'
+require_relative '../lib/fronde/org/file'
 
 def init_testing_environment
   FileUtils.mkdir_p 'tmp/website_testing'
@@ -55,7 +55,7 @@ def proof_content(filename)
     'test_dir' => Dir.pwd,
     'base_dir' => File.expand_path('../', __dir__),
     'version' => Fronde::VERSION,
-    'org_version' => Fronde::CONFIG.org_last_version
+    'org_version' => Fronde::Org.current_version
   )
 end
 
@@ -77,7 +77,7 @@ RSpec.configure do |config|
   config.before(:suite) do
     Dir.chdir __dir__
     FileUtils.mkdir 'tmp'
-    Fronde::CLI::Helpers.download_org('tmp')
+    Fronde::Org.download('tmp')
   end
 
   config.after(:suite) do

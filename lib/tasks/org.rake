@@ -3,7 +3,6 @@
 require 'open-uri'
 
 require_relative '../fronde/config'
-require_relative '../fronde/cli/helpers'
 require_relative '../fronde/cli/throbber'
 
 require 'rake/clean'
@@ -27,8 +26,7 @@ namespace :org do
   desc 'Download last version of Org'
   file 'var/tmp/org.tar.gz' => 'var/tmp' do
     download = Thread.new do
-      Thread.current[:org_version] = Fronde::CONFIG.org_last_version
-      Fronde::CLI::Helpers.download_org
+      Thread.current[:org_version] = Fronde::Org.download
     end
     if verbose
       download.join
@@ -39,8 +37,8 @@ namespace :org do
   end
 
   desc 'Compile Org'
-  task compile: 'var/tmp/org.tar.gz' do |task|
-    org_version = Fronde::CONFIG.org_last_version
+  multitask compile: ['var/tmp/org.tar.gz', 'lib'] do |task|
+    org_version = Fronde::Org.last_version
     org_dir = "lib/org-#{org_version}"
     next if Dir.exist?("#{org_dir}/lisp")
     build = Thread.new do
@@ -88,7 +86,10 @@ namespace :org do
   end
 
   desc 'Install Org'
-  multitask install: ['org:compile', '.dir-locals.el'] do
+  task install: ['org:compile'] do
+    # I need a fully installed org mode to correctly generate the lisp
+    # config
+    Rake::Task['.dir-locals.el'].invoke
     mkdir_p "#{Fronde::CONFIG.get('html_public_folder')}/assets"
     Fronde::CONFIG.sources.each do |s|
       mkdir_p s['path']
@@ -101,6 +102,8 @@ namespace :org do
   # :nocov:
   desc 'Upgrade Org'
   task :upgrade do
+    next if Fronde::Org.current_version == Fronde::Org.last_version(force: true)
+
     Rake::Task['clobber'].execute
     Rake::Task['org:install'].invoke
   end

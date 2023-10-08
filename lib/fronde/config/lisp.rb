@@ -3,6 +3,7 @@
 require 'json'
 require 'open-uri'
 require_relative '../version'
+require_relative '../org'
 require_relative 'helpers'
 
 require_relative '../../ext/r18n'
@@ -13,21 +14,6 @@ module Fronde
     # This module contains utilitary methods to ease ~org-config.el~
     # file generation
     module Lisp
-      # Fetch and return the last published version of Org.
-      #
-      # @return [String] the new x.x.x version string of Org
-      def org_last_version
-        return @org_version if @org_version
-        if File.exist?('var/tmp/last_org_version')
-          @org_version = File.read('var/tmp/last_org_version')
-          return @org_version
-        end
-        @org_version = Fronde::Config::Helpers.fetch_org_version
-        FileUtils.mkdir_p 'var/tmp'
-        File.write('var/tmp/last_org_version', @org_version)
-        @org_version
-      end
-
       # Generate emacs lisp configuration file for Org and write it.
       #
       # This method saves the generated configuration in the file
@@ -47,7 +33,7 @@ module Fronde
           'version' => Fronde::VERSION,
           'work_dir' => workdir,
           'fronde_data_dir' => File.expand_path('data', __dir__),
-          'org_version' => org_last_version,
+          'org_version' => Fronde::Org.current_version,
           'long_date_fmt' => R18n.t.full_datetime_format.to_s,
           'author' => { 'email' => get('author_email', ''),
                         'name' => get('author') },

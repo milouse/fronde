@@ -2,7 +2,7 @@
 
 require 'nokogiri'
 require 'digest/md5'
-require_relative 'org_file'
+require_relative 'org/file'
 
 module Fronde
   class NoHeadError < ::StandardError; end
@@ -55,7 +55,7 @@ module Fronde
 
     class << self
       def customize_output(file_name)
-        source = Fronde::OrgFile.new(file_name)
+        source = Fronde::Org::File.new(file_name)
         # Return if no org file found for this published file
         return if source.file == file_name
 

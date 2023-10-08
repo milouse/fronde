@@ -28,7 +28,7 @@ def init_preview
     File.expand_path('../tigre.png', __dir__),
     'src/tigre.png'
   )
-  Fronde::OrgFile.new(
+  Fronde::Org::File.new(
     'src/index.org',
     title: 'My website',
     content: <<~CONTENT

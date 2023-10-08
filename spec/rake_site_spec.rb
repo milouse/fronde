@@ -54,9 +54,9 @@ context 'with a testing website' do
 
   context 'when building org files' do
     before do
-      o = Fronde::OrgFile.new('src/index.org',
-                              title: 'My website',
-                              content: 'Nice content.')
+      o = Fronde::Org::File.new('src/index.org',
+                                title: 'My website',
+                                content: 'Nice content.')
       o.write
     end
 

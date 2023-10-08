@@ -3,7 +3,7 @@
 require 'rake'
 
 context 'with working org files' do
-  let(:org_dir) { "lib/org-#{Fronde::CONFIG.org_last_version}" }
+  let(:org_dir) { "lib/org-#{Fronde::Org.last_version}" }
 
   before do
     init_testing_environment

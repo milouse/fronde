@@ -2,7 +2,6 @@
 
 require_relative '../fronde/emacs'
 require_relative '../fronde/index'
-require_relative '../fronde/org_file'
 require_relative '../fronde/templater'
 require_relative '../fronde/cli/throbber'
 

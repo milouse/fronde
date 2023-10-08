@@ -3,7 +3,7 @@
 require 'fileutils'
 require 'digest/md5'
 require_relative 'config'
-require_relative 'org_file'
+require_relative 'org/file'
 require_relative 'index/slug'
 require_relative 'index/atom_generator'
 require_relative 'index/org_generator'
@@ -86,7 +86,7 @@ module Fronde
           org_file = File.join(project['path'], index_file)
           next if project.exclude_file? org_file
 
-          add_to_indexes(OrgFile.new(org_file))
+          add_to_indexes(Org::File.new(org_file))
         end
       end
     end

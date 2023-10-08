@@ -20,20 +20,6 @@ module Fronde
         config
       end
 
-      def self.fetch_org_version
-        # Retrieve last org version from git repository tags page.
-        tag_rx = Regexp.new(
-          '<a href=\'/cgit/emacs/org-mode.git/tag/\?h=' \
-          '(?<tag>release_(?<number>[^\']+))\'>\k<tag></a>'
-        )
-        versions = URI(
-          'https://git.savannah.gnu.org/cgit/emacs/org-mode.git/refs/'
-        ).open.readlines.map do |line|
-          line.match(tag_rx) { |matchdata| matchdata[:number] }
-        end
-        versions.compact.first
-      end
-
       # Generate emacs directory variables file.
       #
       # This method generate the file ~.dir-locals.el~, which is

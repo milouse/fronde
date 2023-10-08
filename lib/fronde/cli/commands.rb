@@ -20,7 +20,7 @@ module Fronde
         @rake.options.build_all = true
         @rake.invoke_task('org:install')
         return if File.exist? 'src/index.org'
-        Fronde::OrgFile.new('src/index.org', @options).write
+        Fronde::Org::File.new('src/index.org', @options).write
         fronde_open 'src/index.org'
       end
 
@@ -100,7 +100,7 @@ module Fronde
       def create_new_file(file_path)
         filename = new_file_name(file_path)
         FileUtils.mkdir_p File.dirname(filename)
-        Fronde::OrgFile.new(filename, @options).write
+        Fronde::Org::File.new(filename, @options).write
         filename
       end
     end

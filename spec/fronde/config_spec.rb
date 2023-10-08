@@ -85,13 +85,6 @@ describe Fronde::CONFIG do
       tear_down 'tmp/config'
     end
 
-    it 'gives current org version' do
-      described_class.reset
-      FileUtils.mkdir_p 'var/tmp'
-      File.write('var/tmp/last_org_version', 'test')
-      expect(described_class.org_last_version).to eq('test')
-    end
-
     it 'parses it successfully' do
       conf = described_class.settings
       expect(conf['author']).to eq('Tata')
