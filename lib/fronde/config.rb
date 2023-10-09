@@ -159,11 +159,13 @@ module Fronde
 
       def load_settings
         conf_file = 'config.yml'
-        return @default_settings unless File.exist? conf_file
-
-        user_conf = YAML.load_file(conf_file)
-        user_conf = Fronde::Config::Helpers.migrate(user_conf)
-        @default_settings.merge(user_conf).freeze
+        user_conf = {}
+        if File.exist? conf_file
+          user_conf = YAML.load_file(conf_file)
+          user_conf = Fronde::Config::Helpers.migrate(user_conf)
+        end
+        user_conf = @default_settings.merge(user_conf)
+        Fronde::Config::Helpers.ensure_expanded_paths(user_conf).freeze
       end
 
       def build_sources

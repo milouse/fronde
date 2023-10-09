@@ -132,7 +132,7 @@ module Fronde
 
       paths = [paths] unless paths.is_a? Array
 
-      pub_folder = File.expand_path Fronde::CONFIG.get('html_public_folder')
+      pub_folder = Fronde::CONFIG.get('html_public_folder')
       paths.any? do |template_path|
         File.fnmatch?("#{pub_folder}#{template_path}", file_name)
       end

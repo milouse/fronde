@@ -26,7 +26,7 @@ context 'with working org files' do
   it 'creates .dir-locals.el', rake: true do
     rake.invoke_task('.dir-locals.el')
     expect(File.exist?('.dir-locals.el')).to be(true)
-    proof = File.expand_path('var/lib/org-config.el', Dir.pwd)
+    proof = File.expand_path('var/lib/org-config.el')
     expect(File.read('.dir-locals.el')).to(
       eq("((org-mode . ((eval . (load-file \"#{proof}\")))))")
     )

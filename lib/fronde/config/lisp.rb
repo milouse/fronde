@@ -46,11 +46,10 @@ module Fronde
       private
 
       def org_theme_config(theme)
-        workdir = Dir.pwd
-        { 'base-directory' => "#{workdir}/themes/#{theme}",
+        { 'base-directory' => File.expand_path("themes/#{theme}"),
           # rubocop:disable Layout/LineLength
           'base-extension' => %w[css js gif jpg png svg otf ttf woff2?].join('\\\\|'),
-          'publishing-directory' => "#{workdir}/#{get('html_public_folder')}/assets/#{theme}",
+          'publishing-directory' => "#{get('html_public_folder')}/assets/#{theme}",
           # rubocop:enable Layout/LineLength
           'publishing-function' => 'org-publish-attachment',
           'recursive' => true }

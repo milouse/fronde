@@ -68,7 +68,7 @@ describe Fronde::CONFIG do
       author = ENV['USER'] || ''
       expect(conf['author']).to eq(author)
       expect(conf['lang']).to eq('en') # Defined in ENV in requirements.rb
-      expect(conf['html_public_folder']).to eq('public_html')
+      expect(conf['html_public_folder']).to eq(File.expand_path('public_html'))
       expect(conf['domain']).to eq('')
     end
   end

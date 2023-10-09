@@ -131,7 +131,7 @@ module Fronde
     #   the ~sources~ key)
     # @return [String] the full path to the target dir of this project
     def publication_path
-      publish_in = [Dir.pwd, @config['folder']]
+      publish_in = [File.expand_path(@config['folder'])]
       target = @config['target']
       publish_in << target unless target == '.'
       publish_in.join('/')
