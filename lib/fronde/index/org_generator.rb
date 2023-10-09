@@ -3,9 +3,9 @@
 using TimePatch
 
 module Fronde
-  # Embeds methods responsible for generating an org file for a given
-  #   index.
-  module IndexOrgGenerator
+  # Reopen Index class to embed methods responsible for generating an
+  #   org file for a given index.
+  class Index
     def project_home_page(project_name)
       org_index(
         project_name, '__HOME_PAGE__',

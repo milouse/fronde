@@ -5,17 +5,12 @@ require 'digest/md5'
 require_relative 'slug'
 require_relative 'config'
 require_relative 'org/file'
-require_relative 'index/atom_generator'
-require_relative 'index/org_generator'
 
 module Fronde
   # Generates website indexes and atom feeds for all the org documents
   #   keywords.
   class Index
     attr_reader :date
-
-    include IndexAtomGenerator
-    include IndexOrgGenerator
 
     def initialize(publication_format = 'html')
       @pub_format = publication_format
@@ -134,3 +129,6 @@ module Fronde
     end
   end
 end
+
+require_relative 'index/org_generator'
+require_relative 'index/atom_generator'

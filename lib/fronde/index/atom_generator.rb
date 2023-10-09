@@ -3,8 +3,8 @@
 require_relative '../config'
 
 module Fronde
-  # Embeds Atom feeds sepecific methods
-  module IndexAtomGenerator
+  # Reopen Index class to embed Atom feeds sepecific methods
+  class Index
     def to_atom(index_name = 'index')
       entries = @index[index_name][0...10].map(&:to_h)
       return atom_index(entries) if index_name == 'index'
