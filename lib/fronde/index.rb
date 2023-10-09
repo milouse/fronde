@@ -2,9 +2,9 @@
 
 require 'fileutils'
 require 'digest/md5'
+require_relative 'slug'
 require_relative 'config'
 require_relative 'org/file'
-require_relative 'index/slug'
 require_relative 'index/atom_generator'
 require_relative 'index/org_generator'
 

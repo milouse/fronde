@@ -2,7 +2,7 @@
 
 require_relative 'helpers'
 require_relative 'optparse'
-require_relative '../index/slug'
+require_relative '../slug'
 
 module Fronde
   module CLI
