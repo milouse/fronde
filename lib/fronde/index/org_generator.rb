@@ -6,9 +6,9 @@ module Fronde
   # Reopen Index class to embed methods responsible for generating an
   #   org file for a given index.
   class Index
-    def project_home_page(project_name)
+    def project_home_page(project_name, project_title)
       org_index(
-        project_name, '__HOME_PAGE__',
+        project_title, '__HOME_PAGE__',
         (@projects[project_name] || []).map(&:to_h)
       )
     end
@@ -84,7 +84,7 @@ module Fronde
       blog_homes.each do |orgdest, project|
         name = project['name']
         warn R18n.t.fronde.org.generate_blog_index(name: name) if verbose
-        File.write(orgdest, project_home_page(name))
+        File.write(orgdest, project_home_page(name, project['title']))
       end
     end
   end

@@ -35,7 +35,7 @@ module Fronde
     def org_publish_options
       if @config['is_blog']
         @config['atom_feed'] = <<~ATOMFEED
-          <link rel="alternate" type="application/atom+xml" title="Atom 1.0"
+          <link rel="alternate" type="application/atom+xml" title="#{@config['title']}"
                 href="#{@config['domain']}/feeds/index.xml" />
         ATOMFEED
       end

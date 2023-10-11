@@ -3,20 +3,17 @@
 SAMPLE_CONFIG = <<~CONF
   ---
   author: Tata
-  title: This is a website about test
 CONF
 
 SAMPLE_CONFIG_2 = <<~CONF
   ---
   author: Titi
-  title: Nevermind
   domain: https://tutu.com
 CONF
 
 SAMPLE_CONFIG_3 = <<~CONF
   ---
   author: Tata
-  title: This is a website with a blog
   sources:
   - path: src
     recursive: no
@@ -28,7 +25,6 @@ CONF
 SAMPLE_CONFIG_4 = <<~CONF
   ---
   author: Tata
-  title: This is a website with a blog and custom theme
   domain: https://test.com
   sources:
   - src
@@ -42,7 +38,6 @@ CONF
 SAMPLE_CONFIG_5 = <<~CONF
   ---
   author: Tata
-  title: This is a website without a blog
   domain: https://test.com
   theme: my-theme
   sources:
@@ -88,7 +83,6 @@ describe Fronde::CONFIG do
     it 'parses it successfully' do
       conf = described_class.settings
       expect(conf['author']).to eq('Tata')
-      expect(conf['title']).to eq('This is a website about test')
       expect(conf['lang']).to eq('en')
       expect(conf['theme']).to eq('default')
       expect(conf['domain']).to eq('')

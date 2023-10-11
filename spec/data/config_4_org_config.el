@@ -39,7 +39,7 @@ with %c, and published with %N</p>
       href=\"https://test.com/assets/my-theme/css/style.css\">
 <link rel=\"stylesheet\" type=\"text/css\" media=\"screen\"
       href=\"https://test.com/assets/my-theme/css/htmlize.css\">
-<link rel=\"alternate\" type=\"application/atom+xml\" title=\"Atom 1.0\"
+<link rel=\"alternate\" type=\"application/atom+xml\" title=\"news\"
       href=\"https://test.com/feeds/index.xml\" />"
          :html-head-include-default-style nil
          :html-head-include-scripts nil

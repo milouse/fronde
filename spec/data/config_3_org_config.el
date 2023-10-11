@@ -35,7 +35,7 @@ with %c, and published with %N</p>
         ("news"
          :base-directory "{{ test_dir }}/src/news"
          :base-extension "org"
-         :html-head "<link rel=\"alternate\" type=\"application/atom+xml\" title=\"Atom 1.0\"
+         :html-head "<link rel=\"alternate\" type=\"application/atom+xml\" title=\"news\"
       href=\"/feeds/index.xml\" />"
          :html-head-include-default-style t
          :html-head-include-scripts t

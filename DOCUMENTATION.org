@@ -228,7 +228,7 @@ The following arguments are allowed:
 
 - -a (--author) :: Set up the default author name (see the [[#author_setting][~author~ config key]])
 - -l (--lang) :: Set up the default lang of your website (see the [[#lang_setting][~lang~ config key]])
-- -t (--title) :: Set up the title of your website (see the [[#title_setting][~title~ config key]])
+- -t (--title) :: Set up the title of your first page
 #+end_noteblock
 
 At the end of the init process, fronde will automatically open Emacs on
@@ -468,23 +468,6 @@ with the [[https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes][ISO 639-1]] st
 The default ~lang~ setting is that of your current computer.
 #+end_noteblock
 
-*** ~title~
-:PROPERTIES:
-:CUSTOM_ID: title_setting
-:END:
-
-The ~title~ option stores the default title of your org files. This
-value is used when you create a new file with the ~fronde~ command.
-
-#+begin_warningblock
-*This setting is not used by the regular org mode publishing process*.
-You must ensure that your org files contain a ~#+title:~ metadata field
-before publishing them.
-#+end_warningblock
-
-This value is also used in the generation of the blog index page and the
-main atom feed as the website title.
-
 *** ~sources~
 :PROPERTIES:
 :CUSTOM_ID: sources_setting
@@ -502,6 +485,7 @@ following keys:
 - name :: [string, optional] key used to generate the [[https://orgmode.org/org.html#Project-alist][Org “project”
   name]]. This name never appears in a generated file, it is more like an
   internal id. Defaults to the last dirname of the path value.
+- title :: TODO
 - recursive :: [boolean, optional] whether the path should be exported
   recursively. Defaults to True
 - exclude :: [string, optional] Regexp of files to not export for this

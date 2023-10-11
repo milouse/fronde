@@ -25,7 +25,7 @@ SAMPLE_ALL_INDEX = <<~INDEX
 INDEX
 
 SAMPLE_PROJECT_INDEX = <<~BLOG_IDX
-  #+title: writings
+  #+title: Blog
   #+author: Test
   #+language: en
 
@@ -114,7 +114,7 @@ SAMPLE_EMPTY_INDEX = <<~INDEX
 INDEX
 
 SAMPLE_EMPTY_PROJECT_INDEX = <<~INDEX
-  #+title: writings
+  #+title: Blog
   #+author: Test
   #+language: en
 INDEX
@@ -125,9 +125,9 @@ SAMPLE_ATOM = <<~ATOM
         xmlns:dc="http://purl.org/dc/elements/1.1/"
         xml:lang="en">
 
-    <title>Blog</title>
+    <title>All tags</title>
     <link href="http://perdu.com/feeds/index.xml" rel="self" type="application/atom+xml"/>
-    <link href="http://perdu.com" rel="alternate" type="text/html" title="Blog"/>
+    <link href="http://perdu.com" rel="alternate" type="text/html" title="All tags"/>
     <updated>%<date>s</updated>
     <author><name>Test</name></author>
     <id>urn:md5:75d53866bcb20465b3287cf237234464</id>
@@ -212,12 +212,12 @@ describe Fronde::Index do
       context 'with recursive config' do
         before do
           Fronde::CONFIG.load_test(
-            'title' => 'Blog',
             'author' => 'Test',
             'html_public_folder' => 'output',
             'domain' => 'http://perdu.com',
             'sources' => [
               { 'path' => 'writings',
+                'title' => 'Blog',
                 'target' => '.',
                 'is_blog' => true }
             ]
@@ -242,7 +242,7 @@ describe Fronde::Index do
         it 'generates a main index', core: true do
           index = described_class.new
           expect(index.to_s).to eq(SAMPLE_ALL_INDEX)
-          expect(index.project_home_page('writings')).to(
+          expect(index.project_home_page('writings', 'Blog')).to(
             eq(SAMPLE_PROJECT_INDEX)
           )
         end
@@ -320,7 +320,6 @@ describe Fronde::Index do
       context 'without recursive config' do
         before do
           Fronde::CONFIG.load_test(
-            'title' => 'Blog',
             'author' => 'Test',
             'html_public_folder' => 'output',
             'domain' => 'http://perdu.com',
@@ -342,7 +341,7 @@ describe Fronde::Index do
         it 'generates a main index', core: true do
           index = described_class.new
           expect(index.to_s).to eq(SAMPLE_NO_REC_INDEX)
-          expect(index.project_home_page('writings')).to(
+          expect(index.project_home_page('writings', 'writings')).to(
             eq(SAMPLE_PROJECT_NO_REC_INDEX)
           )
         end
@@ -366,12 +365,12 @@ describe Fronde::Index do
         FileUtils.mkdir_p 'tmp/blog/output'
         Dir.chdir 'tmp/blog'
         Fronde::CONFIG.load_test(
-          'title' => 'Blog',
           'author' => 'Test',
           'html_public_folder' => 'output',
           'domain' => 'http://perdu.com',
           'sources' => [
             { 'path' => 'writings',
+              'title' => 'Blog',
               'target' => '.',
               'is_blog' => true }
           ]
@@ -391,7 +390,7 @@ describe Fronde::Index do
       it 'generates a main index', core: true do
         index = described_class.new
         expect(index.to_s).to eq(format(SAMPLE_EMPTY_INDEX, author: 'Test'))
-        expect(index.project_home_page('writings')).to(
+        expect(index.project_home_page('writings', 'Blog')).to(
           eq(SAMPLE_EMPTY_PROJECT_INDEX)
         )
       end
@@ -404,8 +403,7 @@ describe Fronde::Index do
         comp = format(
           SAMPLE_EMPTY_ATOM,
           date: index.date.xmlschema,
-          author: 'Test',
-          title: 'Blog'
+          author: 'Test', title: 'All tags'
         )
         expect(index.to_atom).to eq(comp)
       end
@@ -433,8 +431,7 @@ describe Fronde::Index do
         comp = format(
           SAMPLE_EMPTY_ATOM,
           date: index.date.xmlschema,
-          author: 'Test',
-          title: 'Blog'
+          author: 'Test', title: 'All tags'
         )
         expect(File.read('output/feeds/index.xml')).to eq(comp)
       end
@@ -460,11 +457,13 @@ describe Fronde::Index do
       )
       Dir.chdir 'tmp/txt'
       Fronde::CONFIG.load_test(
-        'title' => 'My site',
         'author' => 'Test',
         'html_public_folder' => 'output',
         'domain' => 'http://perdu.com',
-        'sources' => [{ 'path' => 'writings', 'target' => '.' }]
+        'sources' => [
+          { 'path' => 'writings',
+            'target' => '.' }
+        ]
       )
     end
 
@@ -493,7 +492,7 @@ describe Fronde::Index do
         SAMPLE_EMPTY_ATOM,
         date: index.date.xmlschema,
         author: 'Test',
-        title: 'My site'
+        title: 'All tags'
       )
       expect(index.to_atom).to eq(comp)
     end

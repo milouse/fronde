@@ -139,8 +139,9 @@ module Fronde
 
     def clean_config
       @config['name'] ||= File.basename(@config['path']).sub(/^\./, '')
-      @config['path'] = File.expand_path(@config['path'])
+      @config['title'] ||= @config['name']
       @config['target'] ||= @config['name']
+      @config['path'] = File.expand_path(@config['path'])
       @config['theme'] ||= CONFIG.get('theme', 'default')
     end
 

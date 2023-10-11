@@ -54,7 +54,7 @@ module Fronde
       domain = Fronde::CONFIG.get('domain')
       Config::Helpers.render_liquid_template(
         File.read(File.expand_path('./data/template.xml', __dir__)),
-        'title' => Fronde::CONFIG.get('title', R18n.t.fronde.index.all_tags),
+        'title' => R18n.t.fronde.index.all_tags,
         'lang' => Fronde::CONFIG.get('lang'),
         'domain' => domain,
         'slug' => 'index',
