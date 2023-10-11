@@ -9,14 +9,12 @@ module Fronde
     # Fronde commands
     module Commands
       def fronde_update
-        Helpers.update_config @options
         @rake.options.build_all = true
         @rake.invoke_task('org:upgrade')
       end
       alias_method :fronde_config, :fronde_update
 
       def fronde_init
-        Helpers.update_config @options
         @rake.options.build_all = true
         @rake.invoke_task('org:install')
         return if File.exist? 'src/index.org'

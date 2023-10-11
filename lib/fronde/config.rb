@@ -82,32 +82,6 @@ module Fronde
         value || default
       end
 
-      # Save the settings given as a parameter to the ~config.yml~ file.
-      #
-      # Not only this method overwrite the old settings, but it replace
-      # the current shared settings with the ones given in
-      # parameter. Later call to
-      # {file:Fronde/Config.html#settings-class_method settings}
-      # will, obviously, use these new settings.
-      #
-      # @param new_config [Hash] the settings to save
-      # @return [Fronde::Config::Store] self
-      def save(new_config)
-        # Do not save obvious default config values. We'll always try to
-        # save author and lang as they default on system variables,
-        # which may be different from a system to another. Thus it may
-        # be confusing if one use fronde on two different computer and
-        # these params always change.
-        default_keys = @default_settings.keys
-        new_config.delete_if do |key, value|
-          default_keys.include?(key) && value == @default_settings[key]
-        end
-        File.write 'config.yml', new_config.to_yaml
-        # Reload config, taking default settings into account
-        reset
-        self
-      end
-
       # Reset settings
       #
       # This method is handy for testing purpose. Next call to

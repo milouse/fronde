@@ -21,13 +21,6 @@ module Fronde
         )
       end
 
-      def self.update_config(options)
-        cnf = options.merge
-        cnf.delete(:verbose)
-        cnf.transform_keys!(&:to_s)
-        Fronde::CONFIG.save(Fronde::CONFIG.settings.merge(cnf))
-      end
-
       def self.launch_app_for_uri(uri)
         case current_os
         when 'windows'

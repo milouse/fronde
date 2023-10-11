@@ -93,18 +93,6 @@ describe Fronde::CONFIG do
       expect(conf['theme']).to eq('default')
       expect(conf['domain']).to eq('')
     end
-
-    it 'saves it successfully' do
-      described_class.save('author' => 'Titi', 'title' => 'Nevermind',
-                           'domain' => 'https://tutu.com')
-      expect(File.read('config.yml')).to eq(SAMPLE_CONFIG_2)
-      conf = described_class.settings
-      expect(conf['author']).to eq('Titi')
-      expect(conf['title']).to eq('Nevermind')
-      expect(conf['lang']).to eq('en')
-      expect(conf['theme']).to eq('default')
-      expect(conf['domain']).to eq('https://tutu.com')
-    end
   end
 
   context 'with a blog config file (config 3)' do
