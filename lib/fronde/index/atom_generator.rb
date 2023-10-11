@@ -40,7 +40,7 @@ module Fronde
         'slug' => slug,
         'tagurl' => tagurl,
         'upddate' => @date.xmlschema,
-        'author' => Fronde::CONFIG.get('author', ''),
+        'author' => Fronde::CONFIG.get('author'),
         'publication_format' => @pub_format,
         'entries' => entries
       )
@@ -60,7 +60,7 @@ module Fronde
         'slug' => 'index',
         'tagurl' => domain,
         'upddate' => @date.xmlschema,
-        'author' => Fronde::CONFIG.get('author', ''),
+        'author' => Fronde::CONFIG.get('author'),
         'publication_format' => @pub_format,
         'entries' => entries
       )

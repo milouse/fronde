@@ -211,6 +211,6 @@ end
 
 R18n.default_places = File.expand_path('../../locales', __dir__)
 R18n::Filters.on(:named_variables)
-R18n.set Fronde::CONFIG.get('lang', 'en')
+R18n.set Fronde::CONFIG.get('lang')
 
 Fronde::CONFIG.load_sources
