@@ -13,12 +13,17 @@ module Fronde
     end
 
     def write_atom(index_name)
-      return unless save?
       slug = Slug.slug index_name
-      pubdir = Fronde::CONFIG.get("#{@pub_format}_public_folder")
-      FileUtils.mkdir_p "#{pubdir}/feeds"
-      atomdest = "#{pubdir}/feeds/#{slug}.xml"
-      File.write(atomdest, to_atom(index_name))
+      atomdest = "#{@project.publication_path}/feeds/#{slug}.xml"
+      File.write atomdest, to_atom(index_name)
+    end
+
+    def write_all_feeds(verbose: true)
+      FileUtils.mkdir_p "#{@project.publication_path}/feeds"
+      @index.each_key do |tag|
+        write_atom(tag)
+        warn R18n.t.fronde.index.atom_generated(tag: tag) if verbose
+      end
     end
 
     private
@@ -31,7 +36,7 @@ module Fronde
     def atom_file(tag_name, entries)
       domain = Fronde::CONFIG.get('domain')
       slug = Slug.slug(tag_name)
-      tagurl = "#{domain}/tags/#{slug}.html"
+      tagurl = "#{domain}#{@project.public_absolute_path}tags/#{slug}.html"
       Config::Helpers.render_liquid_template(
         File.read(File.expand_path('./data/template.xml', __dir__)),
         'title' => @tags_names[tag_name],
@@ -41,7 +46,7 @@ module Fronde
         'tagurl' => tagurl,
         'upddate' => @date.xmlschema,
         'author' => Fronde::CONFIG.get('author'),
-        'publication_format' => @pub_format,
+        'publication_format' => @project['type'],
         'entries' => entries
       )
     end
@@ -54,14 +59,14 @@ module Fronde
       domain = Fronde::CONFIG.get('domain')
       Config::Helpers.render_liquid_template(
         File.read(File.expand_path('./data/template.xml', __dir__)),
-        'title' => R18n.t.fronde.index.all_tags,
+        'title' => @project['title'],
         'lang' => Fronde::CONFIG.get('lang'),
         'domain' => domain,
         'slug' => 'index',
         'tagurl' => domain,
         'upddate' => @date.xmlschema,
         'author' => Fronde::CONFIG.get('author'),
-        'publication_format' => @pub_format,
+        'publication_format' => @project['type'],
         'entries' => entries
       )
     end

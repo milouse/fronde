@@ -275,9 +275,12 @@ module Fronde
       # @return [String] the HTML keywords list
       def keywords_to_html
         domain = Fronde::CONFIG.get('domain')
+        # Allow a nil project, mainly for tests purpose. Should never
+        # happen in reality
+        pub_path = @project&.public_absolute_path || '/'
         klist = @data[:keywords].map do |k|
           %(<li class="keyword">
-            <a href="#{domain}/tags/#{Slug.slug(k)}.html">#{k}</a>
+            <a href="#{domain}#{pub_path}tags/#{Slug.slug(k)}.html">#{k}</a>
               </li>)
         end.join
         %(<ul class="keywords-list">#{klist}</ul>)

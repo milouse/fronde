@@ -32,7 +32,7 @@
          :base-directory "{{ test_dir }}/src/news"
          :base-extension "org"
          :html-head "<link rel=\"alternate\" type=\"application/atom+xml\" title=\"news\"
-      href=\"/feeds/index.xml\" />"
+      href=\"/news/feeds/index.xml\" />"
          :html-head-include-default-style t
          :html-head-include-scripts t
          :html-postamble "<p><span class=\"author\">Written by %a</span>
@@ -50,21 +50,6 @@ with %c, and published with %N</p>
          :publishing-directory "{{ test_dir }}/public_html/news"
          :publishing-function org-publish-attachment
          :recursive t)
-        ("tags"
-         :base-directory "{{ test_dir }}/tags"
-         :base-extension "org"
-         :html-head ""
-         :html-head-include-default-style t
-         :html-head-include-scripts t
-         :html-postamble "<p><span class=\"author\">Written by %a</span>
-with %c, and published with %N</p>
-<p class=\"date\">Last modification on %C</p>
-<p class=\"validation\">%v</p>"
-         :publishing-directory "{{ test_dir }}/public_html/tags"
-         :publishing-function org-html-publish-to-html
-         :recursive nil
-         :section-numbers nil
-         :with-toc nil)
         ("website" :components ("src" "src-assets" "news" "news-assets"))))
 
 ;; Load fronde lib

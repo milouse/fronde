@@ -6,60 +6,54 @@ require_relative '../fronde/templater'
 require_relative '../fronde/cli/throbber'
 
 namespace :site do
-  desc 'Generates all index files'
-  task :index, :build? do |_, args|
-    index = Fronde::Index.new
-    if verbose
-      index.write_all
-      next
-    end
-    build = Thread.new do
-      index.write_all(verbose: false)
-    end
-    Fronde::CLI::Throbber.run(
-      build, R18n.t.fronde.tasks.site.generating_indexes
-    )
-    next unless args[:build?]
-
-    blog_homes = index.blog_homes
-    next unless blog_homes.any?
-
-    build_html = Thread.new do
-      rm_r 'var/tmp/timestamps/tags.cache', force: true
-      emacs = Fronde::Emacs.new(verbose: verbose)
-      emacs.publish('tags')
-      blog_homes.each_key do |home|
-        emacs.publish_file home
-      end
-    end
-    begin
-      Fronde::CLI::Throbber.run(
-        build_html, R18n.t.fronde.tasks.site.building_indexes
-      )
-    # :nocov:
-    rescue RuntimeError
-      warn R18n.t.fronde.tasks.site.aborting
-      next
-    end
-    # :nocov:
-  end
-
-  desc 'Convert and customize all org files'
+  desc 'Build all your projects'
   task :build, [:force?] => ['var/lib/org-config.el'] do |_, args|
     args.with_defaults(:force? => false)
-    build_html = Thread.new do
-      rm_r 'var/tmp/timestamps', force: true if args[:force?]
-      Fronde::Emacs.new(verbose: verbose).publish
+    build_index = Thread.new do
+      all_index = Fronde::Index.all_html_blog_index
+      all_index.each do |index|
+        index.write_all_org(verbose: verbose)
+      end
+      Thread.current[:all_indexes] = all_index
     end
+    if verbose
+      build_index.join
+    else
+      Fronde::CLI::Throbber.run(
+        build_index, R18n.t.fronde.tasks.site.generating_indexes
+      )
+    end
+    all_indexes = build_index[:all_indexes]
+
     begin
+      build_html = Thread.new do
+        rm_r 'var/tmp/timestamps', force: true if args[:force?]
+        Fronde::Emacs.new(verbose: verbose).publish
+      end
       Fronde::CLI::Throbber.run(build_html, R18n.t.fronde.tasks.site.building)
+
     # :nocov:
     rescue RuntimeError
       warn R18n.t.fronde.tasks.site.aborting
       next
     end
     # :nocov:
-    Rake::Task['site:index'].invoke('build')
+
+    if all_indexes.any?
+      if verbose
+        all_indexes.each { |index| index.write_all_feeds }
+      else
+        publish_feed = Thread.new do
+          all_indexes.each do |index|
+            index.write_all_feeds(verbose: false)
+          end
+        end
+        Fronde::CLI::Throbber.run(
+          publish_feed, R18n.t.fronde.tasks.site.publishing_feeds
+        )
+      end
+    end
+
     next unless Fronde::CONFIG.sources.any? { |source| source.type == 'html' }
 
     customize_html = Thread.new do

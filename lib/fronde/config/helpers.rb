@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'liquid'
+require 'digest/md5'
 
 module Fronde
   module Config

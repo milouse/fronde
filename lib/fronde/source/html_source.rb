@@ -36,7 +36,7 @@ module Fronde
       if @config['is_blog']
         @config['atom_feed'] = <<~ATOMFEED
           <link rel="alternate" type="application/atom+xml" title="#{@config['title']}"
-                href="#{@config['domain']}/feeds/index.xml" />
+                href="#{@config['domain']}#{public_absolute_path}feeds/index.xml" />
         ATOMFEED
       end
       super

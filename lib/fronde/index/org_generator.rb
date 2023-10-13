@@ -6,11 +6,8 @@ module Fronde
   # Reopen Index class to embed methods responsible for generating an
   #   org file for a given index.
   class Index
-    def project_home_page(project_name, project_title)
-      org_index(
-        project_title, '__HOME_PAGE__',
-        (@projects[project_name] || []).map(&:to_h)
-      )
+    def blog_home_page
+      org_index @project['title'], '__HOME_PAGE__', @entries.map(&:to_h)
     end
 
     def to_org(index_name = 'index')
@@ -24,12 +21,18 @@ module Fronde
     alias_method :to_s, :to_org
 
     def write_org(index_name)
-      return unless save?
       slug = Slug.slug index_name
-      FileUtils.mkdir_p 'tags'
-      content = to_org index_name
-      orgdest = "tags/#{slug}.org"
-      File.write(orgdest, content)
+      orgdest = "#{@project['path']}/tags/#{slug}.org"
+      File.write orgdest, to_org(index_name)
+    end
+
+    def write_all_org(verbose: true)
+      FileUtils.mkdir_p "#{@project['path']}/tags"
+      @index.each_key do |tag|
+        write_org(tag)
+        warn R18n.t.fronde.index.index_generated(tag: tag) if verbose
+      end
+      write_blog_home_page(verbose)
     end
 
     private
@@ -52,6 +55,7 @@ module Fronde
         File.read(File.expand_path('./data/template.org', __dir__)),
         'title' => title,
         'slug' => slug,
+        'project_path' => @project.public_absolute_path,
         'domain' => Fronde::CONFIG.get('domain'),
         'lang' => Fronde::CONFIG.get('lang'),
         'author' => Fronde::CONFIG.get('author'),
@@ -76,16 +80,17 @@ module Fronde
         'lang' => Fronde::CONFIG.get('lang'),
         'author' => Fronde::CONFIG.get('author'),
         'domain' => Fronde::CONFIG.get('domain'),
+        'project_path' => @project.public_absolute_path,
         'indexes' => indexes
       )
     end
 
-    def write_all_blog_home(verbose)
-      blog_homes.each do |orgdest, project|
-        name = project['name']
-        warn R18n.t.fronde.org.generate_blog_index(name: name) if verbose
-        File.write(orgdest, project_home_page(name, project['title']))
+    def write_blog_home_page(verbose)
+      orgdest = format('%<root>s/index.org', root: @project['path'])
+      if verbose
+        warn R18n.t.fronde.org.generate_blog_index(name: @project['name'])
       end
+      File.write(orgdest, blog_home_page)
     end
   end
 end

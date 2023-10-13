@@ -9,6 +9,6 @@
 :END:
 
 {% for tag in index.tags -%}
-- [[{{ domain }}/tags/{{ tag.slug }}.html][{{ tag.title }}]] ({{ tag.weight }})
+- [[{{ domain }}{{ project_path }}tags/{{ tag.slug }}.html][{{ tag.title }}]] ({{ tag.weight }})
 {% endfor %}
 {%- endfor -%}

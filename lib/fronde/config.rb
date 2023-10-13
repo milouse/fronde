@@ -119,14 +119,8 @@ module Fronde
       # @return [Array] the fully qualified projects sources list
       def load_sources
         return @sources if @sources
-        sources = build_sources
-        if sources.any?(&:blog?)
-          sources << Fronde::Source::Html.new(
-            'path' => 'tags', 'recursive' => false,
-            'has_assets' => false
-          )
-        end
-        @sources = remove_inclusion(remove_duplicate(sources))
+
+        @sources = remove_inclusion(remove_duplicate(build_sources))
       end
 
       private

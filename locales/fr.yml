@@ -81,6 +81,7 @@ fronde:
       aborting: Annulation
       generating_indexes: 'Génération des fichiers d’index :'
       building_indexes: 'Compilation des fichiers d’index :'
+      publishing_feeds: 'Publication des flux Atom :'
       building: 'Compilation :'
       customizing: 'Décoration :'
       remove_orphan_file: 'Le supprimer ? [y/N]: '

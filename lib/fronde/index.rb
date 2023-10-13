@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'fileutils'
-require 'digest/md5'
 require_relative 'slug'
 require_relative 'config'
 require_relative 'org/file'
@@ -12,41 +10,22 @@ module Fronde
   class Index
     attr_reader :date
 
-    def initialize(publication_format = 'html')
-      @pub_format = publication_format
-      @sources = filter_sources
+    def initialize(project)
+      @project = project
       @index = { 'index' => [] }
-      @projects = {}
+      @entries = []
       @tags_names = {}
       @date = Time.now
-      generate_feeds
+      generate_feeds if @project.blog?
       sort_feeds!
     end
 
-    def entries
+    def all_tags
       @index.keys.reject { |tag| tag == 'index' }
-    end
-
-    def blog_homes
-      @sources.filter_map do |project|
-        next unless Dir.exist?(project['path'])
-        [format('%<root>s/index.org', root: project['path']),
-         project]
-      end.to_h
     end
 
     def empty?
       @index['index'].empty?
-    end
-
-    def write_all(verbose: true)
-      @index.each_key do |tag|
-        write_org(tag)
-        warn R18n.t.fronde.index.index_generated(tag: tag) if verbose
-        write_atom(tag)
-        warn R18n.t.fronde.index.atom_generated(tag: tag) if verbose
-      end
-      write_all_blog_home(verbose)
     end
 
     def sort_by(kind)
@@ -65,37 +44,38 @@ module Fronde
       raise ArgumentError, error_msg
     end
 
+    class << self
+      def all_html_blog_index(&block)
+        all_blogs = CONFIG.sources.filter_map do |project|
+          next unless project['type'] == 'html' && project.blog?
+
+          Index.new(project)
+        end
+        return all_blogs unless block
+
+        all_blogs.each(&block)
+      end
+    end
+
     private
 
-    def filter_sources
-      CONFIG.sources.select do |project|
-        project['type'] == @pub_format && project.blog?
-      end
-    end
-
     def generate_feeds
-      @sources.each do |project|
-        file_pattern = '*.org'
-        file_pattern = "**/#{file_pattern}" if project['recursive']
-        Dir.glob(file_pattern, base: project['path']).map do |index_file|
-          org_file = File.join(project['path'], index_file)
-          next if project.exclude_file? org_file
+      file_pattern = '*.org'
+      file_pattern = "**/#{file_pattern}" if @project['recursive']
+      Dir.glob(file_pattern, base: @project['path']).map do |index_file|
+        # Obviously don't parse tags
+        next if index_file.start_with?('tags/')
 
-          add_to_indexes(Org::File.new(org_file))
-        end
+        org_file = File.join(@project['path'], index_file)
+        next if @project.exclude_file? org_file
+
+        add_to_indexes(Org::File.new(org_file))
       end
-    end
-
-    def add_to_project_index(article)
-      project = article.project
-      project_name = project['name']
-      @projects[project_name] ||= []
-      @projects[project_name] << article
     end
 
     def add_to_indexes(article)
       @index['index'] << article
-      add_to_project_index article
+      @entries << article
       article.keywords.each do |tag|
         slug = Slug.slug tag
         @tags_names[slug] = tag # Overwrite is permitted
@@ -105,27 +85,18 @@ module Fronde
     end
 
     def sort_feeds!
-      sorter = proc { |tag, idx| [tag, idx.sort_by(&:timekey).reverse] }
-      @index = @index.to_h(&sorter)
-      @projects = @projects.to_h(&sorter)
+      @index.transform_values! do |articles|
+        articles.sort_by(&:timekey).reverse
+      end
+      @entries = @entries.sort_by(&:timekey).reverse
     end
 
     def sort_tags_by_name_and_weight
-      tags_sorted = {}
-      all_keys = entries
-      tags_sorted[:by_name] = all_keys.sort
-      tags_sorted[:by_weight] = all_keys.sort_by do |tag|
-        @index[tag].length
-      end.reverse
-      tags_sorted
-    end
-
-    def save?
-      return true unless empty?
-      @sources.each do |project|
-        return true if Dir.exist?(project['path'])
-      end
-      false
+      all_keys = all_tags
+      {
+        by_name: all_keys.sort,
+        by_weight: all_keys.sort_by { @index[_1].length }.reverse
+      }
     end
   end
 end

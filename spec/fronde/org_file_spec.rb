@@ -126,16 +126,16 @@ describe Fronde::Org::File do
       config = { 'sources' => [{ 'path' => 'data' }] }
       Fronde::CONFIG.load_test config
       o = described_class.new('data/test1.org')
-      expect(o.pub_file).to eq('data/test1.html')
+      expect(o.pub_file).to eq('/data/test1.html')
       o = described_class.new('data/content.org')
-      expect(o.pub_file).to eq('data/content.html')
+      expect(o.pub_file).to eq('/data/content.html')
 
       config['domain'] = 'http://perdu.com'
       Fronde::CONFIG.load_test config
       o = described_class.new('data/test1.org')
-      expect(o.pub_file).to eq('data/test1.html')
+      expect(o.pub_file).to eq('/data/test1.html')
       o = described_class.new('data/content.org')
-      expect(o.pub_file).to eq('data/content.html')
+      expect(o.pub_file).to eq('/data/content.html')
     end
 
     it 'computes the right url for existing sources', core: true do

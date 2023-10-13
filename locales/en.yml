@@ -74,6 +74,7 @@ fronde:
       aborting: Aborting
       generating_indexes: 'Generating index files:'
       building_indexes: 'Building index files:'
+      publishing_feeds: 'Publishing Atom feeds:'
       building: 'Building:'
       customizing: 'Customizing:'
       remove_orphan_file: 'Remove it? [y/N]: '

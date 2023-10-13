@@ -112,11 +112,10 @@ module Fronde
       node = @dom.css(source)
       # Do nothing if we don’t have a reliable content to work with
       unless node.any?
-        pub_folder = Fronde::CONFIG.get('html_public_folder')
-        pub_file = "#{pub_folder}/#{@org_file.pub_file}"
         warn(
           R18n.t.fronde.error.templater.no_element_found(
-            source: source, file: pub_file
+            source: source,
+            file: Fronde::CONFIG.get('html_public_folder') + @org_file.pub_file
           )
         )
         return ''

@@ -103,7 +103,7 @@ describe Fronde::CONFIG do
 
     it 'lists sources' do
       projects = described_class.sources
-      expect(projects.length).to eq(3)
+      expect(projects.length).to eq(2)
       expect(projects[0]['name']).to eq('src')
       expect(projects[0]['path']).to(
         eq(File.expand_path('src'))
@@ -121,15 +121,6 @@ describe Fronde::CONFIG do
       expect(projects[1]['is_blog']).to be(true)
       expect(projects[1].blog?).to be(true)
       expect(projects[1]['recursive']).to be(true)
-
-      expect(projects[2]['name']).to eq('tags')
-      expect(projects[2]['path']).to(
-        eq(File.expand_path('tags'))
-      )
-      expect(projects[2]['target']).to eq('tags')
-      expect(projects[2]['is_blog']).to be(false)
-      expect(projects[2].blog?).to be(false)
-      expect(projects[2]['recursive']).to be(false)
     end
 
     it 'generates lisp-config.el' do

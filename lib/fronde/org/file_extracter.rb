@@ -20,7 +20,7 @@ module Fronde
 
         @data[:updated] = ::File.mtime(@file)
         @data[:pub_file] = @project.target_for @file
-        @data[:url] = "#{Fronde::CONFIG.get('domain')}/#{@data[:pub_file]}"
+        @data[:url] = Fronde::CONFIG.get('domain') + @data[:pub_file]
       end
 
       def extract_date
@@ -80,8 +80,7 @@ module Fronde
         pub_file = @data[:pub_file]
         return '' unless pub_file
 
-        pub_folder = Fronde::CONFIG.get('html_public_folder')
-        file_name = "#{pub_folder}/#{pub_file}"
+        file_name = Fronde::CONFIG.get('html_public_folder') + pub_file
         return @data[:excerpt] unless ::File.exist? file_name
 
         dom = ::File.open(file_name, 'r') { |file| Nokogiri::HTML file }

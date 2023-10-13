@@ -84,9 +84,7 @@ module Fronde
       target.sub!(/\.org\z/, @config['ext'])
       project_relative_path = @config['path'].delete_prefix("#{Dir.pwd}/")
       target.delete_prefix! "#{project_relative_path}/"
-      return target if @config['target'] == '.'
-
-      "#{@config['target']}/#{target}"
+      public_absolute_path + target
     end
 
     def exclude_file?(file_name)
@@ -108,6 +106,43 @@ module Fronde
                   'attributes' => org_assets_config }
     end
 
+    # Return the publication absolute path on file system.
+    #
+    # The returned string never end with a slash (/).
+    #
+    # Use {Fronde::Source#public_absolute_path} to get the absolute path
+    # of this project, as seen from a web browser.
+    #
+    # @return [String] the absolute path to the target dir of this project
+    def publication_path
+      return @config['publication_path'] if @config['publication_path']
+
+      publish_in = [File.expand_path(@config['folder'])]
+      target_dir = @config['target']
+      publish_in << target_dir unless target_dir == '.'
+      @config['publication_path'] = publish_in.join('/')
+    end
+
+    # Return the absolute path as seen in User Agent.
+    #
+    # The returned string always end with a slash (/).
+    #
+    # Use {Fronde::Source#publication_path} to locate published file on
+    # the file system.
+    #
+    # @return [String] the absolute path to this project
+    def public_absolute_path
+      return @config['public_absolute_path'] if @config['public_absolute_path']
+
+      target_dir = @config['target']
+      if target_dir == '.'
+        abs_path = '/'
+      else
+        abs_path = "/#{target_dir}/"
+      end
+      @config['public_absolute_path'] = abs_path
+    end
+
     class << self
       def canonical_config(config)
         config = { 'path' => config } if config.is_a?(String)
@@ -124,25 +159,14 @@ module Fronde
 
     private
 
-    # Return the full path to the publication path of a given project
-    #   configuration.
-    #
-    # @param project [Hash] a project configuration (as extracted from
-    #   the ~sources~ key)
-    # @return [String] the full path to the target dir of this project
-    def publication_path
-      publish_in = [File.expand_path(@config['folder'])]
-      target = @config['target']
-      publish_in << target unless target == '.'
-      publish_in.join('/')
-    end
-
     def clean_config
       @config['name'] ||= File.basename(@config['path']).sub(/^\./, '')
       @config['title'] ||= @config['name']
       @config['target'] ||= @config['name']
       @config['path'] = File.expand_path(@config['path'])
       @config['theme'] ||= CONFIG.get('theme', 'default')
+      # Blog are necessarily recursive to allow publication of tags and feeds
+      @config['recursive'] = true if @config['is_blog']
     end
 
     def org_publish_options
