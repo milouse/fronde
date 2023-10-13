@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Fronde
-  class HtmlSource < Source
+  class Source::Html < Source
     def org_config
       config = super
       config[0]['theme'] = @config['theme']

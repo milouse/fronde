@@ -147,7 +147,7 @@ module Fronde
         return @sources if @sources
         sources = build_sources
         if sources.any?(&:blog?)
-          sources << Fronde::HtmlSource.new(
+          sources << Fronde::Source::Html.new(
             'path' => 'tags', 'recursive' => false,
             'has_assets' => false
           )

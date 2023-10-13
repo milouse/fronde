@@ -117,7 +117,7 @@ module Fronde
 
       def new_from_config(config)
         klass_name = config['type'].capitalize
-        klass = Kernel.const_get("::Fronde::#{klass_name}Source")
+        klass = Kernel.const_get("::Fronde::Source::#{klass_name}")
         klass.new(config)
       end
     end

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Fronde
-  class GeminiSource < Source
+  class Source::Gemini < Source
     def blog?
       # TODO: See how to support blog/indexes with gemini
       false
