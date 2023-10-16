@@ -10,6 +10,17 @@ Gem::Specification.new do |s|
     Fronde helps you to convert Org mode files into websites, giving you
     full control over the publication process.
   DESC
+  s.post_install_message = <<~POSTINST
+    Start your first fronde project with:
+
+        fronde new myproject
+
+    Update your existing projects with:
+
+        fronde update
+        fronde build -f
+
+  POSTINST
   s.authors     = ['Étienne Deparis']
   s.email       = 'etienne@depar.is'
   s.metadata    = {

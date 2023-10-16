@@ -9,7 +9,8 @@ require 'rake/clean'
 
 CLOBBER.push(
   'var/tmp/org.tar.gz', 'var/tmp/last_org_version',
-  'var/lib/org-config.el', '.dir-locals.el', 'lib/htmlize.el'
+  'var/lib/org-config.el', '.dir-locals.el', '.gitignore',
+  'lib/htmlize.el'
 )
 
 def make_org_cmd(org_dir, target)
@@ -85,8 +86,15 @@ namespace :org do
     Fronde::Config::Helpers.write_dir_locals
   end
 
+  file '.gitignore' do
+    upstream = File.expand_path(
+      '../fronde/cli/data/gitignore', __dir__
+    )
+    cp upstream, '.gitignore'
+  end
+
   desc 'Install Org'
-  task install: ['org:compile'] do
+  multitask install: ['org:compile', '.gitignore'] do
     # I need a fully installed org mode to correctly generate the lisp
     # config
     Rake::Task['.dir-locals.el'].invoke

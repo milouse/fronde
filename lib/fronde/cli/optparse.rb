@@ -9,25 +9,30 @@ module Fronde
       FRONDE_OPTIONS = {
         '-a' => { long: 'author' },
         '-f' => { long: 'force', boolean: true },
-        '-h' => { long: 'help', boolean: true, meth: :on_tail },
+        '-h' => { long: 'help', boolean: true, method: :on_tail },
         '-l' => { long: 'lang', keyword: 'LOCALE' },
         '-t' => { long: 'title' },
-        '-v' => { long: 'verbose', boolean: true, meth: :on_tail },
-        '-V' => { long: 'version', boolean: true, meth: :on_tail }
+        '-v' => { long: 'verbose', boolean: true, method: :on_tail },
+        '-V' => { long: 'version', boolean: true, method: :on_tail }
       }.freeze
+
+      # TODO: jekyll new [path] / jekyll build / jekyll clean / jekyll serve
+      # TODO: hugo new site [path] / hugo / hugo new content / hugo server
+      # TODO: zola init [path] / zola build --root path_to_project / zola serve
 
       # @return [Hash] the possible ~fronde~ subcommands and their
       #   configuration
       FRONDE_COMMANDS = {
-        'init' => { opts: ['-a', '-h', '-l', '-t', '-v'] },
-        'update' => { opts: ['-a', '-h', '-l', '-t', '-v'] },
+        'new' => { opts: ['-a', '-l', '-t', '-v'] },
+        'init' => { alias: 'new' },
+        'update' => {},
         'config' => { alias: 'update' },
-        'preview' => { opts: ['-h'] },
-        'open' => { opts: ['-a', '-h', '-l', '-t', '-v'] },
+        'preview' => {},
+        'open' => { opts: ['-a', '-l', '-t', '-v'] },
         'edit' => { alias: 'open' },
-        'build' => { opts: ['-f', '-h'] },
-        'publish' => { opts: ['-h'], with_args: true },
-        'help' => { opts: ['-h'] },
+        'build' => { opts: ['-f'] },
+        'publish' => {},
+        'help' => {},
         'basic' => { opts: ['-h', '-V'], label: '<command>' }
       }.freeze
 
@@ -59,7 +64,7 @@ module Fronde
         #   should be given
         # @return [String]
         def summarize_command(command)
-          FRONDE_COMMANDS[command][:opts].map do |k|
+          (FRONDE_COMMANDS[command][:opts] || []).map do |k|
             short, long = decorate_option(k)
             opt = FRONDE_OPTIONS[k]
             label = [short, long].join(', ')
@@ -71,18 +76,23 @@ module Fronde
           end.join("\n")
         end
 
-        def help_command_body(command)
-          body = [
+        def help_basic_body
+          [
             R18n.t.fronde.bin.options.cmd_title,
-            summarize_command(command)
-          ]
-          return body unless command == 'basic'
-
-          body + [
-            '',
+            summarize_command('basic'), '',
             R18n.t.fronde.bin.commands.cmd_title,
             list_commands
-          ]
+          ].join("\n")
+        end
+
+        def help_command_body(command)
+          command_opts_doc = summarize_command(command)
+          return '' if command_opts_doc == ''
+
+          [
+            R18n.t.fronde.bin.options.cmd_title,
+            command_opts_doc
+          ].join("\n")
         end
 
         # Returns a formatted list of available commands for ~fronde~.

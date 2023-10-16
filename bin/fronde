@@ -10,7 +10,7 @@ optparser = OptionParser.new
 optparser.version = Fronde::VERSION
 
 Fronde::CLI::OptParse::FRONDE_OPTIONS.each do |k, opt|
-  optparser.send(opt[:meth] || :on, *Fronde::CLI::OptParse.decorate_option(k))
+  optparser.send(opt[:method] || :on, *Fronde::CLI::OptParse.decorate_option(k))
 end
 
 params = {}
@@ -21,31 +21,5 @@ if params[:version]
   exit
 end
 
-if ARGV[0] == 'help'
-  params[:help] = true
-  ARGV.shift
-end
-command = ARGV[0]
-
 fronde = Fronde::CLI::App.new(params)
-method = "fronde_#{command}".to_sym
-cmd_err = !fronde.respond_to?(method)
-if params[:help] || cmd_err
-  cmd_err = false if params[:help] && !command
-  warn R18n.t.fronde.error.bin.no_command if cmd_err
-  fronde.fronde_help(command)
-  exit(cmd_err ? 1 : 0)
-end
-
-ARGV.shift
-
-init_cmds = %i[fronde_init fronde_config fronde_update]
-unless File.exist?('config.yml') || init_cmds.include?(method)
-  fronde.fronde_init
-end
-
-if Fronde::CLI::OptParse.command_options(command)[:with_args]
-  fronde.send method, *ARGV
-else
-  fronde.send method
-end
+exit fronde.run(ARGV)

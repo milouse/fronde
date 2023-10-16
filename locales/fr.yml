@@ -5,10 +5,10 @@ fronde:
     done: fait
     commands:
       cmd_title: Commandes
-      alias: Alias pour %1.
-      init: >-
-        Initialise votre instance de Fronde (vous ne devriez faire cela
-        qu'une fois).
+      alias: Alias pour ‘%1’.
+      new: >-
+        Initialise une nouvelle instance de Fronde (vous ne devriez
+        faire cela qu'une fois).
       update: >-
         Met à jour les dépendances de Fronde (à lancer une fois de temps
         à autre).
@@ -16,7 +16,7 @@ fronde:
         Démarre un serveur web de test pour prévisualiser votre site à
         l'adresse http://127.0.0.1:5000
       open: Ouvre ou crée un fichier org.
-      build: Compile vos fichiers org en HTML.
+      build: Compile vos fichiers org en HTML ou gemtext.
       publish: >-
         Pousse vos changements locaux vers votre serveur web public.
       help: Alias pour l'argument -h.

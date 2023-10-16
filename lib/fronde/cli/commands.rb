@@ -3,23 +3,31 @@
 require_relative 'helpers'
 require_relative 'optparse'
 require_relative '../slug'
+require_relative '../org/file'
 
 module Fronde
   module CLI
     # Fronde commands
     module Commands
+      def fronde_new
+        new_dir = @argv.first || 'my_fronde_website'
+        FileUtils.mkdir new_dir
+        Dir.chdir new_dir
+        Helpers.init_config_file @options
+        Fronde::CONFIG.reset # Correctly compute various path
+        Helpers.init_rakefile
+        init_rake
+        @rake.invoke_task('org:install')
+        @argv = ['src/index.org']
+        fronde_open
+      end
+
       def fronde_update
+        Helpers.init_rakefile
+        init_rake
         @rake.options.build_all = true
         @rake.invoke_task('org:upgrade')
-      end
-      alias_method :fronde_config, :fronde_update
-
-      def fronde_init
-        @rake.options.build_all = true
-        @rake.invoke_task('org:install')
-        return if File.exist? 'src/index.org'
-        Fronde::Org::File.new('src/index.org', @options).write
-        fronde_open 'src/index.org'
+        0
       end
 
       def fronde_build
@@ -27,6 +35,7 @@ module Fronde
         task = 'site:build'
         task = "#{task}[true]" if @options[:force]
         @rake.invoke_task task
+        0
       end
 
       def fronde_preview
@@ -36,12 +45,13 @@ module Fronde
           Helpers.launch_app_for_uri "http://127.0.0.1:#{port}/"
         end
         @rake.invoke_task('site:preview')
+        0
       end
 
-      def fronde_open(file_path = ARGV[0])
+      def fronde_open
         editor = ENV['EDITOR'] || ENV['VISUAL'] || 'emacs'
         cmd = [editor]
-        file_path ||= Dir.pwd
+        file_path = @argv.first || Dir.pwd
         unless File.file?(file_path)
           # file_path may be updated with title given in options
           file_path = create_new_file(file_path)
@@ -50,27 +60,31 @@ module Fronde
           cmd << '+6'
         end
         cmd << file_path
-        system(*cmd)
+        (system(cmd.join(' ')) && 0) || 1
       end
-      alias_method :fronde_edit, :fronde_open
 
-      # TODO
-      def fronde_publish(publication_format = 'html')
-        unless %w[html gemini].include?(publication_format)
-          publication_format = 'html'
-        end
+      def fronde_publish
         @rake.invoke_task('sync:push')
+        0
       end
 
-      def fronde_help(command = 'basic')
-        cmd_opt = OptParse.command_options(command)
-        label = cmd_opt[:label] || command
+      def fronde_help
+        # Try to find command in next argv, otherwise fallback again.
+        @command = @argv.shift || 'basic' if @command == 'help'
+        cmd_opt = OptParse.command_options(@command)
+        label = cmd_opt[:label] || @command
         warn format("%<label>s\n\n", label: R18n.t.fronde.bin.usage(label))
-        cmd = cmd_opt[:name] || command
+        cmd = cmd_opt[:name] || @command
         if R18n.t.fronde.bin.commands[cmd].translated?
           warn format("%<label>s\n\n", label: R18n.t.fronde.bin.commands[cmd])
         end
-        warn OptParse.help_command_body(cmd).join("\n")
+        if cmd == 'basic'
+          warn OptParse.help_basic_body
+        else
+          body = OptParse.help_command_body(cmd)
+          warn body unless body == ''
+        end
+        0
       end
 
       private
@@ -78,10 +92,8 @@ module Fronde
       def file_name_from_title
         title = @options[:title] || R18n.t.fronde.bin.options.default_title
         # No title, nor a reliable file_path? Better abort
-        if title == ''
-          warn R18n.t.fronde.error.bin.no_file
-          exit 1
-        end
+        raise R18n.t.fronde.error.bin.no_file if title == ''
+
         "#{Fronde::Slug.slug(title)}.org"
       end
 

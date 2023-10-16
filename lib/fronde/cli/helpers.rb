@@ -8,16 +8,22 @@ module Fronde
   module CLI
     # Various utilitaries methods
     module Helpers
-      def self.init_required_files
+      def self.init_config_file(config)
+        return if File.exist? 'config.yml'
+
+        author = config[:author]
+        lang = config[:lang]
+        lines = ['---']
+        lines << "author: #{author}" if author
+        lines << "lang: #{lang}" if lang
+        lines += ['sources:', '  - src', '']
+        File.write('config.yml', lines.join("\n"))
+      end
+
+      def self.init_rakefile
         FileUtils.cp(
           File.expand_path('./data/Rakefile', __dir__),
           'Rakefile'
-        )
-        return if File.exist? '.gitignore'
-
-        FileUtils.cp(
-          File.expand_path('./data/gitignore', __dir__),
-          '.gitignore'
         )
       end
 
