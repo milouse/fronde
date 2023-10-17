@@ -32,6 +32,7 @@ Gem::Specification.new do |s|
   s.files       = ['lib/fronde/cli/commands.rb',
                    'lib/fronde/cli/data/gitignore',
                    'lib/fronde/cli/data/Rakefile',
+                   'lib/fronde/cli/data/zsh_completion',
                    'lib/fronde/cli/helpers.rb',
                    'lib/fronde/cli/optparse.rb',
                    'lib/fronde/cli.rb',
@@ -63,6 +64,7 @@ Gem::Specification.new do |s|
                    'lib/ext/r18n.rb',
                    'lib/ext/time.rb',
                    # Rake tasks
+                   'lib/tasks/cli.rake',
                    'lib/tasks/org.rake',
                    'lib/tasks/site.rake',
                    'lib/tasks/sync.rake',
