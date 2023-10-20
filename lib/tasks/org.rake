@@ -98,9 +98,15 @@ namespace :org do
     # I need a fully installed org mode to correctly generate the lisp
     # config
     Rake::Task['.dir-locals.el'].invoke
-    mkdir_p "#{Fronde::CONFIG.get('html_public_folder')}/assets"
-    Fronde::CONFIG.sources.each do |s|
-      mkdir_p s['path']
+    sources = Fronde::CONFIG.sources
+    sources.each { mkdir_p _1['path'] }
+
+    outputs = sources.map { _1['type'] }.uniq
+    if outputs.include?('html')
+      mkdir_p "#{Fronde::CONFIG.get('html_public_folder')}/assets"
+    end
+    if outputs.include?('gemini')
+      mkdir_p Fronde::CONFIG.get('gemini_public_folder')
     end
   end
 

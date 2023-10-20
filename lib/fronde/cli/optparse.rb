@@ -11,6 +11,7 @@ module Fronde
         '-f' => { long: 'force', boolean: true },
         '-h' => { long: 'help', boolean: true, method: :on_tail },
         '-l' => { long: 'lang', keyword: 'LOCALE' },
+        '-o' => { long: 'output', keyword: 'FORMAT' },
         '-t' => { long: 'title' },
         '-v' => { long: 'verbose', boolean: true, method: :on_tail },
         '-V' => { long: 'version', boolean: true, method: :on_tail }
@@ -23,7 +24,7 @@ module Fronde
       # @return [Hash] the possible ~fronde~ subcommands and their
       #   configuration
       FRONDE_COMMANDS = {
-        'new' => { opts: ['-a', '-l', '-t', '-v'] },
+        'new' => { opts: ['-a', '-l', '-o', '-t', '-v'] },
         'init' => { alias: 'new' },
         'update' => {},
         'config' => { alias: 'update' },

@@ -30,6 +30,7 @@ Gem::Specification.new do |s|
     'funding_uri' => 'https://liberapay.com/milouse'
   }
   s.files       = ['lib/fronde/cli/commands.rb',
+                   'lib/fronde/cli/data/config.yml',
                    'lib/fronde/cli/data/gitignore',
                    'lib/fronde/cli/data/Rakefile',
                    'lib/fronde/cli/data/zsh_completion',

@@ -11,13 +11,16 @@ module Fronde
       def self.init_config_file(config)
         return if File.exist? 'config.yml'
 
-        author = config[:author]
-        lang = config[:lang]
-        lines = ['---']
-        lines << "author: #{author}" if author
-        lines << "lang: #{lang}" if lang
-        lines += ['sources:', '  - src', '']
-        File.write('config.yml', lines.join("\n"))
+        output = config[:output] || 'html'
+        output = 'gemini' if output == 'gmi'
+        data = {
+          'author' => config[:author],
+          'lang' => config[:lang],
+          'output' => output
+        }
+        source = File.expand_path './data/config.yml', __dir__
+        template = Liquid::Template.parse(File.read(source))
+        File.write('config.yml', template.render(data))
       end
 
       def self.init_rakefile
