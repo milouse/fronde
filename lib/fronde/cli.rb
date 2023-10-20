@@ -36,7 +36,7 @@ module Fronde
       def init_rake
         @rake = Rake.application
         Rake.verbose(false) unless @options[:verbose]
-        @rake.raw_load_rakefile
+        @rake.load_rakefile
       end
 
       def help_param_given?

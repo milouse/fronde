@@ -17,7 +17,7 @@ module Fronde
         Fronde::CONFIG.reset # Correctly compute various path
         Helpers.init_rakefile
         init_rake
-        @rake.invoke_task('org:install')
+        @rake['org:install'].invoke
         @argv = ['src/index.org']
         fronde_open
       end
@@ -26,15 +26,13 @@ module Fronde
         Helpers.init_rakefile
         init_rake
         @rake.options.build_all = true
-        @rake.invoke_task('org:upgrade')
+        @rake['org:upgrade'].invoke
         0
       end
 
       def fronde_build
         @rake.options.build_all = true
-        task = 'site:build'
-        task = "#{task}[true]" if @options[:force]
-        @rake.invoke_task task
+        @rake['site:build'].invoke @options[:force]
         0
       end
 
@@ -44,7 +42,7 @@ module Fronde
           port = Fronde::CONFIG.get(%w[preview server_port], 5000)
           Helpers.launch_app_for_uri "http://127.0.0.1:#{port}/"
         end
-        @rake.invoke_task('site:preview')
+        @rake['site:preview'].invoke
         0
       end
 
@@ -64,7 +62,7 @@ module Fronde
       end
 
       def fronde_publish
-        @rake.invoke_task('sync:push')
+        @rake['sync:push'].invoke
         0
       end
 
