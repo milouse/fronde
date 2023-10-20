@@ -53,6 +53,10 @@ Now you're ready to create your first fronde website.
 
 * Contributing
 
+#+html: <a href="./CODE_OF_CONDUCT.html"><img alt="Contributor Covenant" src="https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg"/></a>
+
+Fronde is proudly following the [[./CODE_OF_CONDUCT.org][Contributor Covenant Code of Conduct]].
+
 ** Translations
 
 You can fetch the yaml files directly from the [[./locales][source code tree]] and
