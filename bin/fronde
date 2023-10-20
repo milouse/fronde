@@ -13,8 +13,13 @@ Fronde::CLI::OptParse::FRONDE_OPTIONS.each do |k, opt|
   optparser.send(opt[:method] || :on, *Fronde::CLI::OptParse.decorate_option(k))
 end
 
-params = {}
-optparser.parse!(into: params)
+params = { verbose: false }
+begin
+  optparser.parse!(into: params)
+rescue OptionParser::InvalidArgument => e
+  warn e.message
+  params.merge!(help: true, recover_from_error: true)
+end
 
 if params[:version]
   warn optparser.ver

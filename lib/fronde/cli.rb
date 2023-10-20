@@ -18,7 +18,10 @@ module Fronde
       def run(argv)
         @argv = argv
         @command = OptParse.resolve_possible_alias(@argv.shift || 'basic')
-        return 0 if help_param_given?
+        if help_param_given?
+          return 2 if @options[:recover_from_error]
+          return 0
+        end
 
         init_rake if %w[build preview publish].include?(@command)
 

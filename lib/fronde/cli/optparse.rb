@@ -9,12 +9,14 @@ module Fronde
       FRONDE_OPTIONS = {
         '-a' => { long: 'author' },
         '-f' => { long: 'force', boolean: true },
-        '-h' => { long: 'help', boolean: true, method: :on_tail },
+        '-h' => { long: 'help', boolean: true, method: :on_tail,
+                  help: R18n.t.fronde.bin.options.help },
         '-l' => { long: 'lang', keyword: 'LOCALE' },
-        '-o' => { long: 'output', keyword: 'FORMAT' },
+        '-o' => { long: 'output', keyword: 'FORMAT', choices: %w[gemini html] },
         '-t' => { long: 'title' },
         '-v' => { long: 'verbose', boolean: true, method: :on_tail },
-        '-V' => { long: 'version', boolean: true, method: :on_tail }
+        '-V' => { long: 'version', boolean: true, method: :on_tail,
+                  help: R18n.t.fronde.bin.options.version }
       }.freeze
 
       # TODO: jekyll new [path] / jekyll build / jekyll clean / jekyll serve
@@ -53,10 +55,15 @@ module Fronde
         def decorate_option(short)
           opt = FRONDE_OPTIONS[short]
           long = "--#{opt[:long]}"
-          return [short, long] if opt[:boolean]
-
-          key = opt[:keyword] || opt[:long].upcase
-          [short + key, format('%<long>s %<key>s', long: long, key: key)]
+          if opt[:boolean]
+            config = [short, long]
+          else
+            key = opt[:keyword] || opt[:long].upcase
+            config = [short, format('%<long>s %<key>s', long: long, key: key)]
+          end
+          config << opt[:choices] if opt[:choices]
+          config << opt[:help] if opt[:help]
+          config
         end
 
         # Returns the ~fronde~ help summary for a given command.
@@ -70,9 +77,10 @@ module Fronde
             opt = FRONDE_OPTIONS[k]
             label = [short, long].join(', ')
             line = [format('    %<opt>s', opt: label).ljust(30)]
-            if R18n.t.fronde.bin.options[opt[:long]].translated?
-              line << R18n.t.fronde.bin.options[opt[:long]]
-            end
+            help = opt[:help]
+            line << help if help
+            choices = opt[:choices]
+            line << "(#{choices.join(', ')})" if choices
             line.join(' ')
           end.join("\n")
         end
