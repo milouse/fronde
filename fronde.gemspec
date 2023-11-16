@@ -64,6 +64,9 @@ Gem::Specification.new do |spec|
     'lib/fronde/source/gemini.rb',
     'lib/fronde/source/html.rb',
     'lib/fronde/source.rb',
+    'lib/fronde/sync/neocities.rb',
+    'lib/fronde/sync.rb',
+    'lib/fronde/sync/rsync.rb',
     'lib/fronde/templater.rb',
     'lib/fronde/version.rb',
     # Rake tasks

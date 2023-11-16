@@ -448,10 +448,10 @@ your project).
 :CUSTOM_ID: remote_setting
 :END:
 
-The ~gemini_remote~ or ~html_remote~ option contains an /rsync/ like
-destination string, which will be used to published your capsule or website
-when using the ~sync:push~ /rake/ task. For example
-~user@domain:/var/www/mywebsite/~
+The ~gemini_remote~ or ~html_remote~ option contains the destination of
+your capsule or website. This destination string define whether the
+[[https://neocities.org][Neocities]] or the default rsync backend must be used,
+and with what parameters.
 
 #+begin_noteblock
 There is no default value for ~gemini_remote~ or ~html_remote~. Publication of your
@@ -459,6 +459,56 @@ capsule will be skipped if there is no value for ~gemini_remote~. The
 same thing for your website, if there is no value for ~html_remote~, the
 publication of your website will be skipped.
 #+end_noteblock
+
+**** Rsync backend
+
+If you plan to use rsync to publish your website, you just have to give
+the destination target, as you would have done on the command line. For
+example ~user@domain:/var/www/mywebsite/~
+
+#+begin_importantblock
+The trailing slash is mandatory.
+#+end_importantblock
+
+Fronde will directly call Rsync in a synchronous process, thus if a
+password must be entered to either unlock an SSH key, or because your
+are trying to connect with a password, you will be able to manually
+enter it as usual.
+
+**** Neocities backend
+
+If you plan to publish your website on a Website offering the same API
+than Neocities, you can use the following value for this setting:
+~neocities:<website_name>@<server_name>~
+
+- ~<website_name>~ :: is your Neocities website name (the username you
+  use to log in)
+- ~<server_name>~ :: is the Neocities server you want to publish on
+  (Neocities is a free and open source software, thus one might want to
+  host it on a different server). This part is optional if you use the
+  official Neocities server.
+
+For example, if your Website name is /example/ and you wish to publish it
+on the official Neocities server, you can just set the ~html_remote~ to
+~neocities:example~ or ~neocities:example@neocities.org~ if you want to be
+precise (but again, ~neocities.org~ is the default value for the
+~server_name~, so you can skip it).
+
+To use the Neocities API, you also need to store your password. As you
+may want to track your fronde config file in git or other system, this
+secret value is not stored in the main config file. Instead, you have to
+put it in a specific ~.credentials~ file in the same folder as the
+config file. This ~.credentials~ file is a YAML file too. The
+credentials file is expected to contains one key per Neocities website,
+named ~<website_name>_neocities_pass~. For exemple, if your Neocities
+website name is /example/, you must have a key named
+~example_neocities_pass~ in this file.
+
+#+caption: Content of an example ~.credentials~ file
+#+begin_src yaml
+---
+example_neocities_pass: password
+#+end_src
 
 *** ~lang~
 :PROPERTIES:
