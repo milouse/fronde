@@ -96,7 +96,7 @@ SAMPLE_ATOM = <<~ATOM
             type="text/html"
             title="My third article"/>
       <id>urn:md5:8865383febd94ddf9df318267af5ae85</id>
-      <published>2019-06-11T23:42:10+02:00</published>
+      <published>2019-06-11T23:42:10%<expected_tz>s</published>
       <updated>%<mtime>s</updated>
       <author><name>Test</name></author>
       <dc:subject>toto</dc:subject>
@@ -110,7 +110,7 @@ SAMPLE_ATOM = <<~ATOM
             type="text/html"
             title="My second article"/>
       <id>urn:md5:123104bd8bb4c61e02a1e2a136e2fd6b</id>
-      <published>2019-06-11T00:00:00+02:00</published>
+      <published>2019-06-11T00:00:00%<expected_tz>s</published>
       <updated>%<mtime>s</updated>
       <author><name>Titi</name></author>
       <content type="html">Lorem ipsum</content>
@@ -202,10 +202,12 @@ describe Fronde::Index do
       now_str = Time.now.strftime('%Y-%m-%d %H:%M')
       index_date_str = index.date.strftime('%Y-%m-%d %H:%M')
       expect(index_date_str).to eq(now_str)
+      expected_tz = Time.new(2019, 6, 13).strftime('%:z')
       comp = format(
         SAMPLE_ATOM,
         date: index.date.xmlschema,
-        mtime: File.mtime('writings/test1.org').xmlschema
+        mtime: File.mtime('writings/test1.org').xmlschema,
+        expected_tz: expected_tz
       )
       expect(index.to_atom).to eq(comp)
     end
@@ -245,10 +247,12 @@ describe Fronde::Index do
       FileUtils.mkdir_p feeds_path
       index.write_atom('index')
       expect(File.exist?("#{feeds_path}/index.xml")).to be(true)
+      expected_tz = Time.new(2019, 6, 13).strftime('%:z')
       comp = format(
         SAMPLE_ATOM,
         date: index.date.xmlschema,
-        mtime: File.mtime('writings/test1.org').xmlschema
+        mtime: File.mtime('writings/test1.org').xmlschema,
+        expected_tz: expected_tz
       )
       expect(File.read("#{feeds_path}/index.xml")).to eq(comp)
     end

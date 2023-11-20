@@ -1,0 +1,18 @@
+image: ruby:3.2.2-alpine
+
+default:
+  before_script:
+    - apk add -U build-base
+    - bundle install -j $(nproc)
+
+rubocop:
+  stage: test
+  script:
+    - rubocop --fail-level W
+
+rspec:
+  stage: test
+  script:
+    - apk add -U emacs-nox ncurses
+    - rspec
+  coverage: '/\(\d+\.\d+\%\) covered./'

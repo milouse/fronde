@@ -66,10 +66,10 @@ prefer.
 ** Code
 
 The canonical repository is located at [[https://git.umaneti.net/fronde]].
-A mirror also exists on [[https://github.com/milouse/chwall][Github]].
+A mirror also exists on [[https://framagit.org/milouse/fronde][Framagit]] and [[https://github.com/milouse/chwall][Github]].
 
-Merge requests and issues are accepted on github or by mail to the
-main author.
+Merge requests and issues are accepted both on framagit and github, or
+by mail to the main author.
 
 ** Support
 

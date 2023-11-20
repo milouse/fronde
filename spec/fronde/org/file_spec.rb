@@ -58,7 +58,8 @@ describe Fronde::Org::File do
       expect(data['keywords']).to eq %w[test tata]
       expect(data['timekey']).to eq '20190613000000'
       expect(data['published']).to eq 'Thursday 13th of June'
-      expect(data['published_xml']).to eq '2019-06-13T00:00:00+02:00'
+      expected_tz = Time.new(2019, 6, 13).strftime('%:z')
+      expect(data['published_xml']).to eq "2019-06-13T00:00:00#{expected_tz}"
       # Not published
       expect(data['url']).to be_nil
       expect(data['published_body']).to(
