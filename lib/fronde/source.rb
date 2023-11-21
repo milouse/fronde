@@ -168,12 +168,16 @@ module Fronde
     end
 
     def render_heading
-      heading_key = "#{@config['type']}-head"
-      heading = @config.dig 'org-options', heading_key
-      @config['org-options'][heading_key] = \
-        Config::Helpers.render_liquid_template(
-          heading, to_h
-        )
+      %w[head head-extra preamble postamble].each do |kind|
+        heading_key = "#{@config['type']}-#{kind}"
+        heading = @config.dig 'org-options', heading_key
+        next unless heading
+
+        @config['org-options'][heading_key] = \
+          heading.gsub('%F', @config['atom_feed'])
+                 .gsub('%h', @config['domain'])
+                 .gsub('%o', @config['theme'])
+      end
     end
 
     def org_project_config

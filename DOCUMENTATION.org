@@ -665,29 +665,32 @@ be replaced by their corresponding content when you will build your
 website. The values are context sensitive, taken from the currently
 evaluated Org file, or by default from the config of your project.
 
-- %a :: the raw author name of the current Org file, or the one given
-        in the config file.
+- %a :: the raw author name.
 - %A :: the HTML rendering of the author name, equivalent to
         ~<span class="author">%a</span>~.
-- %d :: a short date HTML representation, equivalent to
-        ~<time datetime="%I">%i</time>~.
+- %d :: the short date HTML representation, equivalent
+        to ~<time datetime="%I">%i</time>~.
 - %D :: the full date and time HTML representation.
+- %F :: the ~link~ HTML tag for the main Atom feed of the current file
+        source.
+- %h :: the declared host/domain name.
 - %i :: the raw short date and time.
 - %I :: the raw ISO 8601 date and time.
 - %k :: the current Org file keywords separated by commas.
 - %K :: the HTML list rendering of the keywords.
-- %l :: the lang of the document, or the one given in the config file.
+- %l :: the lang of the current Org file.
 - %L :: the license information, taken from the config file.
 - %n :: the fronde name and version.
-- %N :: the fronde name and version with a link to the project
-        home.
+- %N :: the fronde name and version with a link to the project home on
+        the name.
+- %o :: the theme name (~o~ as in Outfit) of the current file source.
 - %s :: the subtitle of the current Org file (from ~#+subtitle:~).
 - %t :: the title of the current Org file (from ~#+title:~).
-- %u :: the web path to the related published HTML document.
+- %u :: the URL to the related published HTML document.
 - %x :: the raw description (~x~ as in eXcerpt) of the current Org file
         (from ~#+description:~).
-- %X :: the description, enclosed in an HTML ~p~ tag, equivalent to
-        ~<p>%x</p>~
+- %X :: the description, enclosed in an HTML ~p~ tag, equivalent
+        to ~<p>%x</p>~.
 
 ** Rake tasks
 
