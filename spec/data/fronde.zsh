@@ -32,7 +32,7 @@ __fronde_build(){
 (( $+functions[__fronde_help] )) ||
 __fronde_help(){
     _arguments \
-        "1:command:((new\:'Initialize your Fronde instance (you just need to do it once).' update\:'Update Fronde dependency (to be run once in a while).' preview\:'Start a test web server to preview your website on http://127.0.0.1:5000' open\:'Open or create an org file.' build\:'Compile your org files to HTML or gemtext.' publish\:'Push local changes to your public web server.' help\:'Alias for the -h switch.' ))"
+        "1:command:((new\:'Initialize a new Fronde instance.' update\:'Update Fronde configuration and dependency (to be run after each modification of the config.yml file and once in a while to stay up-to-date with Org).' preview\:'Start a test web server to preview the generated website.' open\:'Open or create an org file.' build\:'Compile all org files to HTML or gemtext.' publish\:'Push local changes to the public web server.' help\:'Alias for the -h switch.' ))"
 }
 
 local state
@@ -40,7 +40,7 @@ local state
 _arguments -C \
     '(-)-h[help]' \
     '(-)-V[version]' \
-    "1:command:((new\:'Initialize your Fronde instance (you just need to do it once).' update\:'Update Fronde dependency (to be run once in a while).' preview\:'Start a test web server to preview your website on http://127.0.0.1:5000' open\:'Open or create an org file.' build\:'Compile your org files to HTML or gemtext.' publish\:'Push local changes to your public web server.' help\:'Alias for the -h switch.' ))" \
+    "1:command:((new\:'Initialize a new Fronde instance.' update\:'Update Fronde configuration and dependency (to be run after each modification of the config.yml file and once in a while to stay up-to-date with Org).' preview\:'Start a test web server to preview the generated website.' open\:'Open or create an org file.' build\:'Compile all org files to HTML or gemtext.' publish\:'Push local changes to the public web server.' help\:'Alias for the -h switch.' ))" \
     '*::arg:->args'
 
 if [ "$state" = args ]; then

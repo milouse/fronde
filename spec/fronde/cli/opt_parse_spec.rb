@@ -3,15 +3,15 @@
 require_relative '../../../lib/fronde/cli/opt_parse'
 
 BASIC_CMDS = [
-  '    new        Initialize your Fronde instance (you just need to do it once).',
+  '    new        Initialize a new Fronde instance.',
   '    init       Alias for ‘new’.',
-  '    update     Update Fronde dependency (to be run once in a while).',
+  '    update     Update Fronde configuration and dependency (to be run after each modification of the config.yml file and once in a while to stay up-to-date with Org).',
   '    config     Alias for ‘update’.',
-  '    preview    Start a test web server to preview your website on http://127.0.0.1:5000',
+  '    preview    Start a test web server to preview the generated website.',
   '    open       Open or create an org file.',
   '    edit       Alias for ‘open’.',
-  '    build      Compile your org files to HTML or gemtext.',
-  '    publish    Push local changes to your public web server.',
+  '    build      Compile all org files to HTML or gemtext.',
+  '    publish    Push local changes to the public web server.',
   '    help       Alias for the -h switch.'
 ].join("\n")
 

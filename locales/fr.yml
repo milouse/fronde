@@ -6,19 +6,18 @@ fronde:
     commands:
       cmd_title: Commandes
       alias: Alias pour ‘%1’.
-      new: >-
-        Initialise une nouvelle instance de Fronde (vous ne devriez
-        faire cela qu'une fois).
+      new: Initialise une nouvelle instance de Fronde.
       update: >-
-        Met à jour les dépendances de Fronde (à lancer une fois de temps
-        à autre).
+        Met à jour la configuration et les dépendances de Fronde (à
+        lancer après chaque modification du fichier config.yml et une
+        fois de temps à autre pour rester à jour avec Org).
       preview: >-
-        Démarre un serveur web de test pour prévisualiser votre site à
-        l'adresse http://127.0.0.1:5000
+        Démarre un serveur web de test pour prévisualiser le site
+        généré.
       open: Ouvre ou crée un fichier org.
-      build: Compile vos fichiers org en HTML ou gemtext.
+      build: Compile les fichiers org en HTML ou gemtext.
       publish: >-
-        Pousse vos changements locaux vers votre serveur web public.
+        Pousse les changements locaux vers le serveur web public.
       help: Alias pour l'argument -h.
     options:
       cmd_title: Options

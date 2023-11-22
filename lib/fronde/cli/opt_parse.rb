@@ -26,12 +26,12 @@ module Fronde
       # @return [Hash] the possible ~fronde~ subcommands and their
       #   configuration
       FRONDE_COMMANDS = {
-        'new' => { opts: ['-a', '-l', '-o', '-t', '-v'] },
+        'new' => { opts: ['-a', '-l', '-o', '-t', '-v'], label: 'new <path>' },
         'init' => { alias: 'new' },
         'update' => {},
         'config' => { alias: 'update' },
         'preview' => {},
-        'open' => { opts: ['-a', '-l', '-t', '-v'] },
+        'open' => { opts: ['-a', '-l', '-t', '-v'], label: 'open <path>' },
         'edit' => { alias: 'open' },
         'build' => { opts: ['-f'] },
         'publish' => {},
