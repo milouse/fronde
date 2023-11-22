@@ -10,6 +10,7 @@ end
 def rsync_command(test = nil)
   rsync_command = Fronde::CONFIG.get('rsync')
   return rsync_command unless rsync_command.nil?
+
   optstring = []
   optstring << 'n' if test
   if verbose

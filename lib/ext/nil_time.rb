@@ -2,7 +2,7 @@
 
 # A time emulator to handle cases where no time is available
 class NilTime
-  def strftime(_)
+  def strftime(*)
     ''
   end
 
@@ -14,7 +14,7 @@ class NilTime
     ''
   end
 
-  def l18n_long_date_string(with_year: nil)
+  def l18n_long_date_string(*)
     ''
   end
 

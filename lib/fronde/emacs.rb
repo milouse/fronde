@@ -10,12 +10,6 @@ module Fronde
       @command = nil
     end
 
-    def publish_file(file_name)
-      path = File.expand_path file_name
-      build_command("(org-publish-file \"#{path}\")")
-      run_command
-    end
-
     def publish(project = 'website')
       build_command("(org-publish \"#{project}\")")
       run_command

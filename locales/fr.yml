@@ -47,8 +47,8 @@ fronde:
         Ignore %{source} comme elle apparaît au moins deux fois dans les
         sources de type %{type}.
       inclusion: >-
-        Ignore %{source} qui semble déjà inclue dans l’une de ces autres
-        sources %{possible_matchs} de type %{type}.
+        Ignore %{source} qui semble être déjà inclue dans l’autre source
+        %{other_source} de type %{type}.
     org_file:
       no_file_or_title: Aucun chemin de fichier ou titre donné.
       no_project: Aucun projet trouvé pour %{file}. Sa publication va échouer.
@@ -87,5 +87,8 @@ fronde:
     org:
       downloaded: La version %{version} de Org a été téléchargée.
       downloading: 'Téléchargement de Org :'
+      no_download: >-
+        Impossible de télécharger Org maintenant. Merci de réessayer
+        plus tard.
       installed: La version %{version} de Org a été installé localement.
       installing: 'Installation de Org :'

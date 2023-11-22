@@ -18,6 +18,7 @@ module Fronde
       def run(argv)
         @argv = argv
         @command = OptParse.resolve_possible_alias(@argv.shift || 'basic')
+
         if help_param_given?
           return 2 if @options[:recover_from_error]
           return 0

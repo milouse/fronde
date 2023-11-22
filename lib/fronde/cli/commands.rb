@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'helpers'
-require_relative 'optparse'
+require_relative 'opt_parse'
 require_relative '../slug'
 require_relative '../org/file'
 
@@ -58,7 +58,7 @@ module Fronde
           cmd << '+6'
         end
         cmd << file_path
-        (system(cmd.join(' ')) && 0) || 1
+        (system(*cmd) && 0) || 1
       end
 
       def fronde_publish
@@ -76,12 +76,8 @@ module Fronde
         if R18n.t.fronde.bin.commands[cmd].translated?
           warn format("%<label>s\n\n", label: R18n.t.fronde.bin.commands[cmd])
         end
-        if cmd == 'basic'
-          warn OptParse.help_basic_body
-        else
-          body = OptParse.help_command_body(cmd)
-          warn body unless body == ''
-        end
+        body = OptParse.help_command_body(cmd)
+        warn body unless body == ''
         0
       end
 
@@ -97,9 +93,11 @@ module Fronde
 
       def new_file_name(file_path)
         file_path = File.expand_path(file_path)
+
         if file_path[-4..] == '.org' && !File.directory?(file_path)
           return file_path
         end
+
         # file_path seems to be a dir path. Thus we have to create the new
         # filename from its title
         File.join file_path, file_name_from_title

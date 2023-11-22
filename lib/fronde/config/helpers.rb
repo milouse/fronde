@@ -25,8 +25,6 @@ module Fronde
       def self.ensure_expanded_paths(config)
         %w[html gemini].each do |what|
           key = "#{what}_public_folder"
-          next unless config.has_key? key
-
           config[key] = File.expand_path config[key]
         end
         config

@@ -8,51 +8,45 @@ require_relative '../fronde/cli/throbber'
 require 'rake/clean'
 
 CLOBBER.push(
-  'var/tmp/org.tar.gz', 'var/tmp/last_org_version',
-  'var/lib/org-config.el', '.dir-locals.el', '.gitignore',
+  'var/lib/org-config.el', '.dir-locals.el',
   'lib/htmlize.el'
 )
-
-def make_org_cmd(org_dir, target)
-  make = ['make', '-C', org_dir, target]
-  return make.join(' ') if verbose
-  make.insert(3, '-s')
-  make << 'EMACSQ="emacs -Q --eval \'(setq inhibit-message t)\'"'
-  make.join(' ')
-end
 
 namespace :org do
   directory 'var/tmp'
 
   desc 'Download last version of Org'
   file 'var/tmp/org.tar.gz' => 'var/tmp' do
-    download = Thread.new do
-      Thread.current[:org_version] = Fronde::Org.download
-    end
+    # Weird Rake issue, still executing the task even if the file exists
+    next if File.exist? 'var/tmp/org.tar.gz'
+
+    download = Thread.new { Fronde::Org.download }
     if verbose
-      download.join
-      warn R18n.t.fronde.tasks.org.downloaded(version: download[:org_version])
+      warn R18n.t.fronde.tasks.org.downloaded(version: download.value)
     else
       Fronde::CLI::Throbber.run(download, R18n.t.fronde.tasks.org.downloading)
     end
+  rescue RuntimeError
+    warn R18n.t.fronde.tasks.org.no_download if verbose
   end
 
   desc 'Compile Org'
   multitask compile: ['var/tmp/org.tar.gz', 'lib'] do |task|
-    org_version = Fronde::Org.last_version
+    begin
+      # No need to force fetch last version as it is only interesting as
+      # part of the upgrade task
+      org_version = Fronde::Org.last_version
+    rescue RuntimeError
+      next
+    end
     org_dir = "lib/org-#{org_version}"
     next if Dir.exist?("#{org_dir}/lisp")
+
     build = Thread.new do
-      sh "tar -C lib -xzf #{task.prerequisites[0]}"
-      mv "lib/org-mode-release_#{org_version}", org_dir
-      # Fix a weird unknown package version
-      File.write("#{org_dir}/mk/version.mk", "ORGVERSION ?= #{org_version}")
-      sh make_org_cmd(org_dir, 'compile')
-      sh make_org_cmd(org_dir, 'autoloads')
-      Dir.glob('lib/org-[0-9.]*').each do |ov|
-        next if ov == org_dir
-        rm_r ov
-      end
+      Fronde::Org.compile(
+        task.prerequisites[0], org_version, org_dir, verbose: verbose
+      )
+      Dir.glob('lib/org-[0-9.]*').each { rm_r _1 unless _1 == org_dir }
     end
     if verbose
       build.join
@@ -87,6 +81,8 @@ namespace :org do
   end
 
   file '.gitignore' do
+    next if File.exist? '.gitignore'
+
     upstream = File.expand_path(
       '../fronde/cli/data/gitignore', __dir__
     )
@@ -110,16 +106,20 @@ namespace :org do
     end
   end
 
-  # The following task only run the clobber task (not provided by us)
-  # and the org:install one, which is already tested. Thus, we can
-  # safely remove it from coverage.
-  # :nocov:
   desc 'Upgrade Org'
   task :upgrade do
-    next if Fronde::Org.current_version == Fronde::Org.last_version(force: true)
-
     Rake::Task['clobber'].execute
+    if File.exist? 'var/tmp/org.tar.gz'
+      # Cleanup cached tarball only if a new version is available.
+      # Also cached the new remote org version in the same time.
+      org_version = Fronde::Org.current_version
+      begin
+        last_version = Fronde::Org.last_version(force: true)
+      rescue RuntimeError
+        last_version = org_version
+      end
+      File.unlink 'var/tmp/org.tar.gz' unless org_version == last_version
+    end
     Rake::Task['org:install'].invoke
   end
-  # :nocov:
 end

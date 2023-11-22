@@ -19,6 +19,7 @@ module Fronde
         return 'y' if %w[ý ỳ ŷ ÿ ỹ].include?(char)
         return 'c' if char == 'ç'
         return 'n' if char == 'ñ'
+
         '-'
       end
     end

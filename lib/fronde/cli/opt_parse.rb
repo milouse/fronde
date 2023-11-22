@@ -85,23 +85,15 @@ module Fronde
           end.join("\n")
         end
 
-        def help_basic_body
-          [
-            R18n.t.fronde.bin.options.cmd_title,
-            summarize_command('basic'), '',
-            R18n.t.fronde.bin.commands.cmd_title,
-            list_commands
-          ].join("\n")
-        end
-
         def help_command_body(command)
           command_opts_doc = summarize_command(command)
           return '' if command_opts_doc == ''
 
-          [
-            R18n.t.fronde.bin.options.cmd_title,
-            command_opts_doc
-          ].join("\n")
+          body = [R18n.t.fronde.bin.options.cmd_title, command_opts_doc]
+          if command == 'basic'
+            body += ['', R18n.t.fronde.bin.commands.cmd_title, list_commands]
+          end
+          body.join("\n")
         end
 
         # Returns a formatted list of available commands for ~fronde~.
@@ -110,6 +102,7 @@ module Fronde
         def list_commands
           FRONDE_COMMANDS.filter_map do |cmd, opt|
             next if cmd == 'basic'
+
             line = ['   ', cmd.ljust(10)]
             if opt.has_key? :alias
               line << R18n.t.fronde.bin.commands.alias(opt[:alias])

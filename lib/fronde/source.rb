@@ -6,15 +6,12 @@ module Fronde
   class Source
     def initialize(source_config)
       @config = {
-        'recursive' => true, 'has_assets' => true, 'is_blog' => false,
+        'recursive' => true, 'is_blog' => false,
         'domain' => CONFIG.get('domain'), 'atom_feed' => '',
         'org-options' => {
-          'section-numbers' => 'nil',
-          'with-toc' => 'nil'
+          'section-numbers' => 'nil', 'with-toc' => 'nil'
         }
-      }
-      @config.merge! source_config
-      specific_config
+      }.merge(source_config)
       clean_config
       org_publish_options
       render_heading
@@ -99,11 +96,8 @@ module Fronde
 
     def org_config
       name = @config['name']
-      config = [{ 'name' => name, 'attributes' => org_project_config }]
-      return config unless @config['has_assets']
-
-      config << { 'name' => "#{name}-assets",
-                  'attributes' => org_assets_config }
+      [{ 'name' => name, 'attributes' => org_project_config },
+       { 'name' => "#{name}-assets", 'attributes' => org_assets_config }]
     end
 
     # Return the publication absolute path on file system.
@@ -117,10 +111,8 @@ module Fronde
     def publication_path
       return @config['publication_path'] if @config['publication_path']
 
-      publish_in = [File.expand_path(@config['folder'])]
-      target_dir = @config['target']
-      publish_in << target_dir unless target_dir == '.'
-      @config['publication_path'] = publish_in.join('/')
+      publish_in = [File.expand_path(@config['folder']), @config['target']]
+      @config['publication_path'] = publish_in.join('/').delete_suffix('/')
     end
 
     # Return the absolute path as seen in User Agent.
@@ -134,13 +126,7 @@ module Fronde
     def public_absolute_path
       return @config['public_absolute_path'] if @config['public_absolute_path']
 
-      target_dir = @config['target']
-      if target_dir == '.'
-        abs_path = '/'
-      else
-        abs_path = "/#{target_dir}/"
-      end
-      @config['public_absolute_path'] = abs_path
+      @config['public_absolute_path'] = "/#{@config['target']}/".squeeze('/')
     end
 
     class << self
@@ -160,9 +146,11 @@ module Fronde
     private
 
     def clean_config
-      @config['name'] ||= File.basename(@config['path']).sub(/^\./, '')
-      @config['title'] ||= @config['name']
-      @config['target'] ||= @config['name']
+      fill_in_specific_config
+      @config['name'] ||= @config['path'].sub(/^[.~]*\//, '').tr('/.', '-')
+      @config['title'] ||= @config['path']
+      @config['target'] ||= File.basename(@config['path']).delete_prefix '.'
+      @config['target'] = '' if @config['target'] == '.'
       @config['path'] = File.expand_path(@config['path'])
       @config['theme'] ||= CONFIG.get('theme', 'default')
       # Blog are necessarily recursive to allow publication of tags and feeds
@@ -170,15 +158,9 @@ module Fronde
     end
 
     def org_publish_options
-      options = @config['org-options']
       type = @config['type']
-      heading_key = "#{type}-head"
-      klass = self.class
-      options[heading_key] = klass.org_default_head
-      options["#{type}-postamble"] = klass.org_default_postamble
-
-      options.merge!(
-        org_default_options,
+      options = org_default_options.merge(
+        @config['org-options'],
         CONFIG.get("org-#{type}", {}),
         @config["org-#{type}"] || {}
       )
@@ -188,8 +170,6 @@ module Fronde
     def render_heading
       heading_key = "#{@config['type']}-head"
       heading = @config.dig 'org-options', heading_key
-      return unless heading
-
       @config['org-options'][heading_key] = \
         Config::Helpers.render_liquid_template(
           heading, to_h
@@ -220,4 +200,5 @@ module Fronde
   end
 end
 
-Dir['source/*.rb', base: __dir__].each { |f| require_relative f }
+require_relative 'source/gemini'
+require_relative 'source/html'

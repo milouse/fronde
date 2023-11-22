@@ -22,27 +22,29 @@ module Fronde
       def initialize(thread, message)
         @frames = select_frames
         @thread = thread
-        @thread.abort_on_exception = true
+        @thread.abort_on_exception = false
+        @thread.report_on_exception = false
         @message = message
       end
 
       def run
-        terminal_width = `tput cols`.strip.to_i - 1
+        term_width = terminal_width
         frames_len = @frames.length
         current = 0
         while @thread.alive?
           sleep 0.1
           frame = @frames[current % frames_len]
           message = "#{@message} #{frame}"
-          print "#{message.ljust(terminal_width)}\r"
+          print "#{message.ljust(term_width)}\r"
           current += 1
         end
+        @thread.join # Ensure any inner exception is re-raised
       rescue RuntimeError => e
         show_error
         raise e
       else
         done = Rainbow(R18n.t.fronde.bin.done).green
-        puts "#{@message} #{done}".ljust(terminal_width)
+        puts "#{@message} #{done}".ljust(term_width)
       end
 
       class << self
@@ -67,6 +69,13 @@ module Fronde
       end
 
       private
+
+      def terminal_width
+        # Not a tty. Docker?
+        return 0 unless system('test -t 0')
+
+        `stty size`.strip.split[1].to_i - 1
+      end
 
       def show_error
         warn(

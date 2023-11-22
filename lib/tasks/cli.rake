@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative '../fronde/cli/optparse'
+require_relative '../fronde/cli/opt_parse'
 
 namespace :cli do
   desc 'Generate an autocomplete file for zsh'

@@ -7,19 +7,10 @@ require:
 - rubocop-performance
 - rubocop-rspec
 
-Layout:
-  Severity: warning
-
-Layout/EmptyLineAfterGuardClause:
-  Enabled: no
-
 Layout/LineLength:
   Max: 80
   Exclude:
   - spec/**/*
-
-Metrics:
-  Severity: warning
 
 Metrics/AbcSize:
   Enabled: no
@@ -36,9 +27,6 @@ Metrics/MethodLength:
 
 Metrics/ModuleLength:
   Max: 120
-  Exclude:
-  - lib/fronde/config/lisp_config.rb
-  - lib/fronde/utils.rb
 
 Metrics/PerceivedComplexity:
   Max: 10
@@ -46,23 +34,23 @@ Metrics/PerceivedComplexity:
 Metrics/CyclomaticComplexity:
   Max: 10
 
+RSpec:
+  Severity: warning
+
 RSpec/ExampleLength:
   Enabled: no
 
 RSpec/MultipleExpectations:
   Enabled: no
 
-RSpec/NestedGroups:
-  Max: 4
+Style:
+  Severity: warning
 
 Style/Alias:
   EnforcedStyle: prefer_alias_method
 
 Style/ConditionalAssignment:
   EnforcedStyle: assign_inside_condition
-
-Style/HashSyntax:
-  EnforcedStyle: no_mixed_keys
 
 Style/PreferredHashMethods:
   EnforcedStyle: verbose

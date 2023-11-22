@@ -34,22 +34,20 @@ module Fronde
     end
 
     def in_head?
-      check_line = @config['check_line']
-      # Lie if we don’t have a valid check line in config
-      return true unless check_line
-
       @dom.xpath('//head').children.any? do |child|
         next false unless child.comment?
 
-        child.text == check_line
+        child.text == @config['check_line']
       end
     end
 
     def valid?(file_name)
       return false unless @config.has_key?('selector')
+
       unless @config.has_key?('content') || @config.has_key?('source')
         return false
       end
+
       check_path(file_name)
     end
 
@@ -57,24 +55,27 @@ module Fronde
       def customize_output(file_name)
         source = Fronde::Org::File.new(file_name)
         # Return if no org file found for this published file
-        return if source.file == file_name
+        return if source.file.end_with?(file_name)
 
         dom = open_dom(file_name)
-        updated = false
-        Fronde::CONFIG.get('templates', []).each do |config|
-          template = Fronde::Templater.new(source, dom, config)
-          next if !template.valid?(file_name) || template.in_head?
-
-          template.apply
-          updated = true
-        rescue NoHeadError
-          warn R18n.t.fronde.error.templater.no_head_element(file: file_name)
-          next
-        end
+        updated = apply_templates(source, dom, file_name)
         write_dom(file_name, dom) if updated
       end
 
       private
+
+      def apply_templates(source, dom, file_name)
+        Fronde::CONFIG.get('templates', []).map do |config|
+          template = Fronde::Templater.new(source, dom, config)
+          next if !template.valid?(file_name) || template.in_head?
+
+          template.apply
+          true
+        rescue NoHeadError
+          warn R18n.t.fronde.error.templater.no_head_element(file: file_name)
+          next
+        end.any?
+      end
 
       def open_dom(file_name)
         File.open(file_name, 'r') do |file|

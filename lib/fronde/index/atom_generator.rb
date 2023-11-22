@@ -46,7 +46,7 @@ module Fronde
         'tagurl' => tagurl,
         'upddate' => @date.xmlschema,
         'author' => Fronde::CONFIG.get('author'),
-        'publication_format' => @project['type'],
+        'publication_format' => @project['mime_type'],
         'entries' => entries
       )
     end
@@ -66,7 +66,7 @@ module Fronde
         'tagurl' => domain,
         'upddate' => @date.xmlschema,
         'author' => Fronde::CONFIG.get('author'),
-        'publication_format' => @project['type'],
+        'publication_format' => @project['mime_type'],
         'entries' => entries
       )
     end

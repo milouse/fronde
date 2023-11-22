@@ -8,7 +8,7 @@ require_relative '../fronde/cli/throbber'
 namespace :site do
   desc 'Build all your projects'
   task :build, [:force?] => ['var/lib/org-config.el'] do |_, args|
-    args.with_defaults(:force? => false)
+    args.with_defaults(force?: false)
     build_index = Thread.new do
       all_index = Fronde::Index.all_html_blog_index
       all_index.each do |index|
@@ -41,7 +41,7 @@ namespace :site do
 
     if all_indexes.any?
       if verbose
-        all_indexes.each { |index| index.write_all_feeds }
+        all_indexes.each(&:write_all_feeds)
       else
         publish_feed = Thread.new do
           all_indexes.each do |index|
@@ -87,6 +87,6 @@ namespace :site do
   desc 'Start a test server'
   task :preview do
     require_relative '../fronde/preview'
-    Fronde.start_preview
+    Fronde::Preview.start
   end
 end

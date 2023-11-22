@@ -76,12 +76,17 @@ module Fronde
         end.join(' ')
       end
 
-      def extract_html_body
+      def extract_published_body
         pub_file = @data[:pub_file]
-        return '' unless pub_file
+        # Always return something, even when not published yet
+        return @data[:excerpt] unless pub_file && @project
 
-        file_name = Fronde::CONFIG.get('html_public_folder') + pub_file
+        project_type = @project['type']
+        pub_folder = Fronde::CONFIG.get("#{project_type}_public_folder")
+        file_name = pub_folder + pub_file
         return @data[:excerpt] unless ::File.exist? file_name
+
+        return ::File.read(file_name) if project_type == 'gemini'
 
         dom = ::File.open(file_name, 'r') { |file| Nokogiri::HTML file }
         body = dom.css('div#content')

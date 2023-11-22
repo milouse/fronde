@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
+# Monkey patch to add some helpers
 module TimePatch
-  # Monkey patch to add some helpers
   refine Time do
     # Returns the current Time instance as a localized short string.
     #

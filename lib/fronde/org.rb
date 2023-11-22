@@ -1,6 +1,11 @@
 # frozen_string_literal: true
 
 module Fronde
+  # Everything related to Org mode
+  #
+  # The module itself wraps code necessary to download the last version
+  # of the Emacs package. It also serves as a namespace for the class
+  # responsible for handling Org files: {Fronde::Org::File}.
   module Org
     class << self
       def current_version
@@ -16,14 +21,18 @@ module Fronde
       #
       # @param force [Boolean] Whether we should first remove the guard
       #   file if it exists
+      # @param destination [String] Where to store the cookie file to
+      #   remember the last version number
       # @return [String] the new x.x.x version string of Org
-      def last_version(force: false)
-        if !force && ::File.exist?('var/tmp/last_org_version')
-          return ::File.read('var/tmp/last_org_version')
-        end
+      def last_version(force: false, cookie_dir: 'var/tmp')
+        cookie = "#{cookie_dir}/last_org_version"
+        return ::File.read cookie if !force && ::File.exist?(cookie)
+
         org_version = fetch_version_number
-        FileUtils.mkdir_p 'var/tmp'
-        ::File.write('var/tmp/last_org_version', org_version)
+        raise 'No remote Org version found' unless org_version
+
+        FileUtils.mkdir_p cookie_dir
+        ::File.write cookie, org_version
         org_version
       end
 
@@ -46,17 +55,10 @@ module Fronde
       # @param destination [String] where to save the org-mode tarball
       # @return [String] the downloaded org-mode version
       def download(destination = 'var/tmp')
-        org_last_version = last_version
-
-        # :nocov:
-        return if org_last_version.nil?
-
-        # :nocov:
         # Remove version number in dest file to allow easy rake file
         # task naming
         dest_file = ::File.expand_path('org.tar.gz', destination)
-        return org_last_version if ::File.exist?(dest_file)
-
+        org_last_version = last_version(force: false, cookie_dir: destination)
         tarball = "org-mode-release_#{org_last_version}.tar.gz"
         uri = URI("https://git.savannah.gnu.org/cgit/emacs/org-mode.git/snapshot/#{tarball}")
         # Will crash on purpose if anything goes wrong
@@ -70,6 +72,31 @@ module Fronde
           end
         end
         org_last_version
+      end
+
+      def make_org_cmd(org_dir, target, verbose: false)
+        make = ['make', '-C', org_dir, target]
+        return make.join(' ') if verbose
+
+        make.insert(3, '-s')
+        make << 'EMACSQ="emacs -Q --eval \'(setq inhibit-message t)\'"'
+        make.join(' ')
+      end
+
+      # Compile downloaded Org package
+      #
+      # @param source [String] path to the org-mode tarball to install
+      # @param version [String] version of the org package to install
+      # @param target [String] path to the final install directory
+      # @param verbose [Boolean] whether the process should be verbose
+      def compile(source, version, target, verbose: false)
+        untar_cmd = ['tar', '-xzf', source]
+        system(*untar_cmd)
+        FileUtils.mv "org-mode-release_#{version}", target
+        # Fix a weird unknown package version
+        ::File.write("#{target}/mk/version.mk", "ORGVERSION ?= #{version}")
+        system(*make_org_cmd(target, 'compile', verbose: verbose))
+        system(*make_org_cmd(target, 'autoloads', verbose: verbose))
       end
     end
   end

@@ -66,6 +66,43 @@ describe Fronde::CONFIG do
       expect(conf['html_public_folder']).to eq(File.expand_path('public_html'))
       expect(conf['domain']).to eq('')
     end
+
+    it 'warns about duplicate sources' do
+      config = {
+        'sources' => [
+          { 'path' => 'src', 'type' => 'html' },
+          { 'path' => 'src', 'type' => 'html' }
+        ]
+      }
+      expect { described_class.load_test(config) }.to(
+        output(/Skipping src as it appears at least twice/).to_stderr
+      )
+    end
+
+    it 'warns about embedded sources' do
+      config = {
+        'sources' => [
+          { 'path' => 'src/test', 'type' => 'html' },
+          { 'path' => 'src', 'type' => 'html' },
+          { 'path' => 'src/other_test', 'type' => 'html' } # for coverage
+        ]
+      }
+      expect { described_class.load_test(config) }.to(
+        output(
+          /Skipping src\/test as it might be already embedded into the other source/
+        ).to_stderr
+      )
+    end
+
+    it 'does not warn about embedded sources when no recursive' do
+      config = {
+        'sources' => [
+          { 'path' => 'src', 'type' => 'html', 'recursive' => false },
+          { 'path' => 'src/test', 'type' => 'html' }
+        ]
+      }
+      expect { described_class.load_test(config) }.to output('').to_stderr
+    end
   end
 
   context 'with a config file' do
@@ -87,6 +124,35 @@ describe Fronde::CONFIG do
       expect(conf['theme']).to eq('default')
       expect(conf['domain']).to eq('')
     end
+
+    it 'runs migrations' do
+      config_with_migrations_to_do = <<~CONF
+        ---
+        public_folder: public
+      CONF
+      File.write('config.yml', config_with_migrations_to_do)
+      expect { described_class.reset }.to(
+        output(/‘public_folder’ setting is deprecated./).to_stderr
+      )
+      conf = described_class.settings
+      expect(conf['public_folder']).to be_nil
+      expect(conf['html_public_folder']).to eq File.expand_path('public')
+    end
+
+    it 'cleans config file if needed' do
+      config_with_migrations_to_do = <<~CONF
+        ---
+        public_folder: old_public
+        html_public_folder: new_public
+      CONF
+      File.write('config.yml', config_with_migrations_to_do)
+      expect { described_class.reset }.to(
+        output(/‘public_folder’ setting is deprecated./).to_stderr
+      )
+      conf = described_class.settings
+      expect(conf['public_folder']).to be_nil
+      expect(conf['html_public_folder']).to eq File.expand_path('new_public')
+    end
   end
 
   context 'with a blog config file (config 3)' do
@@ -102,7 +168,9 @@ describe Fronde::CONFIG do
     end
 
     it 'lists sources' do
-      projects = described_class.sources
+      # for coverage testing, should not load sources twice and actually
+      # returns the already loaded sources
+      projects = described_class.load_sources
       expect(projects.length).to eq(2)
       expect(projects[0]['name']).to eq('src')
       expect(projects[0]['path']).to(
@@ -113,7 +181,7 @@ describe Fronde::CONFIG do
       expect(projects[0].blog?).to be(false)
       expect(projects[0]['recursive']).to be(false)
 
-      expect(projects[1]['name']).to eq('news')
+      expect(projects[1]['name']).to eq('src-news')
       expect(projects[1]['path']).to(
         eq(File.expand_path('src/news'))
       )

@@ -4,8 +4,15 @@ require 'rake'
 require 'open-uri'
 require 'net/http'
 
-def init_preview
-  copy_org_tarball_to_fake_tmp
+def fetch_test_content(path)
+  page_content = URI("http://localhost:5000/#{path}").open.read
+  page_content.gsub(
+    /[FMSTW][a-z]+ \d{1,2} of [ADFJMNOS][a-z]+, \d{4} at \d{2}:\d{2}/,
+    '__PUB_DATE__'
+  )
+end
+
+def init_preview # rubocop:disable Metrics/MethodLength
   config = <<~CONF
     ---
     author: Tata
@@ -21,9 +28,12 @@ def init_preview
       routes:
         /test: public_html/index.html
   CONF
-  File.write('config.yml', config)
+  File.write 'config.yml', config
+  # It is required to reload config now to have the right default author
+  # name
   Fronde::CONFIG.reset
-  rake.invoke_task('org:install')
+  Fronde::CONFIG.write_org_lisp_config
+  FileUtils.mkdir_p 'src' # Might already exists in first example
   FileUtils.cp(
     File.expand_path('../tigre.png', __dir__),
     'src/tigre.png'
@@ -40,31 +50,43 @@ def init_preview
 end
 
 context 'when trying preview mode' do
-  let!(:now_str) { Time.now.strftime('%A %-d of %B, %Y at %R') }
+  before(:all) do # rubocop:disable RSpec/BeforeAfterAll
+    @webrick_app = nil # init variable
+    init_testing_environment
+    Fronde::CONFIG.reset # Take into account dir change
+    init_fake_org_install
+    copy_org_tarball_to_fake_tmp
+    copy_org_lisp_files_to_fake_tmp
+    rake.invoke_task('org:install')
+  end
 
-  after { tear_down 'tmp/website_testing' }
+  after do
+    # rubocop:disable RSpec/InstanceVariable
+    @webrick_app.exit # Be sure to kill test server
+    @webrick_app.join # Be patient before quitting example
+    # rubocop:enable RSpec/InstanceVariable
+    clean_testing_environment
+  end
+
+  after(:all) do # rubocop:disable RSpec/BeforeAfterAll
+    tear_down 'tmp/website_testing'
+  end
 
   context 'without a domain name' do
-    around do |test|
-      init_testing_environment
+    before do
       init_preview
-
       rake.invoke_task('site:build')
 
-      webrick_app = Thread.new do
+      @webrick_app = Thread.new do
         rake.invoke_task('site:preview')
       end
-      sleep 1          # Necessary to let webrick start
-      test.run         # Actually run test case
-      webrick_app.exit # Be sure to kill test server
-      webrick_app.join # Be patient before quitting example
+      sleep 1 # Necessary to let webrick start
     end
 
-    it 'is viewable with preview', rake: true do
-      home_page = URI('http://localhost:5000/index.html').open.read
+    it 'is viewable with preview' do
+      home_page = fetch_test_content 'index.html'
       proof = File.expand_path('data/index_proof.html', __dir__)
-      proof_content = File.read(proof).gsub('__PUB_DATE__', now_str)
-      expect(home_page).to eq(proof_content)
+      expect(home_page).to eq(File.read(proof))
       tigre = URI('http://localhost:5000/tigre.png')
       res = Net::HTTP.get_response(tigre)
       expect(res).to be_a(Net::HTTPOK)
@@ -72,21 +94,19 @@ context 'when trying preview mode' do
       expect(res['content-length']).to eq(File.size('src/tigre.png').to_s)
     end
 
-    it 'serves index', rake: true do
-      home_page = URI('http://localhost:5000/').open.read
+    it 'serves index' do
+      home_page = fetch_test_content ''
       proof = File.expand_path('data/index_proof.html', __dir__)
-      proof_content = File.read(proof).gsub('__PUB_DATE__', now_str)
-      expect(home_page).to eq(proof_content)
+      expect(home_page).to eq(File.read(proof))
     end
 
-    it 'is viewable with routes testing', rake: true do
-      home_page = URI('http://localhost:5000/test').open.read
+    it 'is viewable with routes testing' do
+      test_page = fetch_test_content 'test'
       proof = File.expand_path('data/index_proof.html', __dir__)
-      proof_content = File.read(proof).gsub('__PUB_DATE__', now_str)
-      expect(home_page).to eq(proof_content)
+      expect(test_page).to eq(File.read(proof))
     end
 
-    it 'sends an error if a page is not found', rake: true do
+    it 'sends an error if a page is not found' do
       expect { URI('http://localhost:5000/not_found.html').open.read }.to(
         raise_error(/404 Not Found/)
       )
@@ -94,27 +114,24 @@ context 'when trying preview mode' do
   end
 
   context 'with a domain name' do
-    around do |test|
-      init_testing_environment
+    before do
       init_preview
+      Fronde::CONFIG.reset
       old_conf = Fronde::CONFIG.settings.merge
       old_conf['domain'] = 'http://mydomain.local'
       Fronde::CONFIG.load_test(old_conf)
+      Fronde::CONFIG.write_org_lisp_config
       rake.invoke_task('site:build')
-      webrick_app = Thread.new do
+      @webrick_app = Thread.new do
         rake.invoke_task('site:preview')
       end
       sleep 1
-      test.run # Actually run test
-      webrick_app.exit
-      webrick_app.join
     end
 
-    it 'replaces domain occurence by localhost URIs', rake: true do
-      home_page = URI('http://localhost:5000/index.html').open.read
+    it 'replaces domain occurence by localhost URIs' do
+      home_page = fetch_test_content 'index.html'
       proof = File.expand_path('data/index_proof.html', __dir__)
-      proof_content = File.read(proof).gsub('__PUB_DATE__', now_str)
-      proof_content.gsub!('mydomain.local', 'localhost:5000')
+      proof_content = File.read(proof).gsub('mydomain.local', 'localhost:5000')
       expect(home_page).to eq(proof_content)
     end
   end

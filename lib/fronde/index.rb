@@ -60,8 +60,7 @@ module Fronde
     private
 
     def generate_feeds
-      file_pattern = '*.org'
-      file_pattern = "**/#{file_pattern}" if @project['recursive']
+      file_pattern = '**/*.org'
       Dir.glob(file_pattern, base: @project['path']).map do |index_file|
         # Obviously don't parse tags
         next if index_file.start_with?('tags/')

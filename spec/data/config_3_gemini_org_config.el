@@ -28,10 +28,10 @@
          :publishing-directory "{{ test_dir }}/public_gmi/src"
          :publishing-function org-publish-attachment
          :recursive nil)
-        ("news"
+        ("src-news"
          :base-directory "{{ test_dir }}/src/news"
          :base-extension "org"
-         :html-head "<link rel=\"alternate\" type=\"application/atom+xml\" title=\"news\"
+         :html-head "<link rel=\"alternate\" type=\"application/atom+xml\" title=\"src/news\"
       href=\"/news/feeds/index.xml\" />"
          :html-head-include-default-style t
          :html-head-include-scripts t
@@ -44,13 +44,13 @@ with %c, and published with %N</p>
          :recursive t
          :section-numbers nil
          :with-toc nil)
-        ("news-assets"
+        ("src-news-assets"
          :base-directory "{{ test_dir }}/src/news"
          :base-extension "gif\\|jpg\\|png\\|svg\\|pdf"
          :publishing-directory "{{ test_dir }}/public_html/news"
          :publishing-function org-publish-attachment
          :recursive t)
-        ("website" :components ("src" "src-assets" "news" "news-assets"))))
+        ("website" :components ("src" "src-assets" "src-news" "src-news-assets"))))
 
 ;; Load fronde lib
 (load-file (expand-file-name "ox-gmi.el" "{{ test_dir }}/lib"))

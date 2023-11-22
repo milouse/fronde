@@ -9,8 +9,8 @@ require 'nokogiri'
 require 'fileutils'
 
 require_relative '../config'
-require_relative '../index'
 require_relative '../version'
+require_relative '../slug'
 require_relative 'file_extracter'
 
 module Fronde
@@ -181,6 +181,7 @@ module Fronde
           if @data[:title] == ''
             raise R18n.t.fronde.error.org_file.no_file_or_title
           end
+
           @file = ::File.join @file, "#{Slug.slug(@data[:title])}.org"
         else
           file_dir = ::File.dirname @file
@@ -211,12 +212,11 @@ module Fronde
       def to_h
         fields = %w[author excerpt keywords timekey title url]
         data = fields.to_h { |key| [key, send(key)] }
-        data['mime_type'] = @project['mime_type']
-        data['html_body'] = extract_html_body
+        data['published_body'] = extract_published_body
         pub_date = @data[:date]
         data['published'] = pub_date.l18n_long_date_string(with_year: false)
         data['published_xml'] = pub_date.xmlschema
-        data['updated_xml'] = @data[:updated].xmlschema
+        data['updated_xml'] = @data[:updated]&.xmlschema
         data
       end
 
@@ -249,15 +249,12 @@ module Fronde
 
       def init_empty_file
         @data = {
-          title: @options[:title] || '',
-          subtitle: '',
+          title: @options[:title] || '', subtitle: '', excerpt: '',
           date: Time.now,
           author: @options[:author] || Fronde::CONFIG.get('author'),
           keywords: [],
           lang: @options[:lang] || Fronde::CONFIG.get('lang'),
-          excerpt: '',
-          pub_file: nil,
-          url: nil
+          pub_file: nil, url: nil
         }
         body = @options[:content] || ''
         @data[:content] = @options[:raw_content] || <<~ORG

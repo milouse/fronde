@@ -16,7 +16,7 @@
   <entry>
     <title>{{ article.title | escape }}</title>
     <link href="{{ article.url }}" rel="alternate"
-          type="{{ article.mime_type }}"
+          type="{{ publication_format }}"
           title="{{ article.title }}"/>
     <id>urn:md5:{{ article.timekey | md5 }}</id>
     <published>{{ article.published_xml }}</published>
@@ -25,12 +25,12 @@
     {%- for keyword in article.keywords %}
     <dc:subject>{{ keyword | escape }}</dc:subject>
     {%- endfor %}
-    {%- if publication_format == 'gemini' %}
-    <content>
-    {%- else %}
+    {%- if publication_format == 'text/html' %}
     <content type="html">
+    {%- else %}
+    <content>
     {%- endif %}
-      {{- article.html_body | escape -}}
+      {{- article.published_body | escape -}}
     </content>
   </entry>
   {%- endfor %}

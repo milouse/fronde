@@ -158,7 +158,7 @@ module Fronde
           if check_paths[type].has_key?(path)
             warn(
               R18n.t.fronde.error.source.duplicate(
-                source: path, type: type
+                source: source['name'], type: type
               )
             )
             next
@@ -169,31 +169,35 @@ module Fronde
       end
 
       def remove_inclusion(check_paths)
-        check_paths.map do |type, paths|
-          paths.filter_map do |path, source|
-            # Ensure that the current source does not embed another one
-            # or is not embedde into another one.
-            possible_matchs = check_paths.select do |other_path, other_source|
-              # This is a problem only if the other source is recursive
-              other_path.start_with?(path) && other_source.recursive?
-            end.keys
-            # At this point we cannot have any duplicate, as they must
-            # have been removed in the previous filter_map. Thus we
-            # cannot have only one possible config per path. It is then
-            # safe to assume we can remove the current path from the
-            # possible_paths array as this item is the one currently
-            # checked.
-            possible_matchs.delete(path)
-            # We only keep the configuration if it is not recursive (so
-            # no problem to have other config targeting folder under
-            # it), or if no other config already target it.
-            next source if possible_matchs.empty? || !source.recursive?
+        check_paths.map do |type, sources_by_path|
+          skip_paths = []
 
-            warn(
-              R18n.t.fronde.error.source.inclusion(
-                source: source, possible_matchs: possible_matchs, type: type
+          # Check paths in the right order
+          sorted_paths = sources_by_path.keys.sort_by(&:length)
+          sorted_paths.filter_map do |path|
+            next if skip_paths.include?(path)
+
+            source = sources_by_path[path]
+            # If current source is not recursive, there is no possible
+            # issue
+            next source unless source.recursive?
+
+            # Ensure that the current source does not embed another one
+            possible_matchs = sorted_paths.select do |other_path|
+              path != other_path && other_path.start_with?(path)
+            end
+            next source if possible_matchs.empty?
+
+            skip_paths += possible_matchs
+            possible_matchs.each do |match|
+              other_source = sources_by_path[match]
+              warn(
+                R18n.t.fronde.error.source.inclusion(
+                  source: other_source['title'], type: type,
+                  other_source: source['title']
+                )
               )
-            )
+            end
           end
         end.flatten
       end

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
+# Monkey patch to add a little helper
 module R18nPatch
-  # Monkey patch to add a little helper
   refine R18n::Translation do
     def full_datetime_format
       date_fmt = fronde.index.full_date_format(
