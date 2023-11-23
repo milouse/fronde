@@ -101,7 +101,7 @@ For the following example configuration:
 #+end_src
 
 Feeds and tags will now be published under ~public_html/news/feeds/~ and
-~/public_html/news/tags/~ instead of ~public_html/feeds/~ and
+~public_html/news/tags/~ instead of ~public_html/feeds/~ and
 ~public_html/tags/~. Thus you might want to setup some redirections like
 the following for nginx:
 
@@ -130,7 +130,7 @@ prefer.
 ** Code
 
 The canonical repository is located at [[https://git.umaneti.net/fronde]].
-A mirror also exists on [[https://framagit.org/milouse/fronde][Framagit]] and [[https://github.com/milouse/chwall][Github]].
+A mirror also exists on [[https://github.com/milouse/fronde][Github]].
 
 Merge requests and issues are accepted both on framagit and github, or
 by mail to the main author.

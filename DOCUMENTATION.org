@@ -100,7 +100,7 @@ gem.
 ** Source code
 
 The canonical repository is located at [[https://git.umaneti.net/fronde]].
-A mirror also exists on [[https://github.com/milouse/chwall][Github]].
+A mirror also exists on [[https://github.com/milouse/fronde][Github]].
 
 * Getting started
 
@@ -323,7 +323,7 @@ HTML with the ~fronde build~ command.
 Because this building process makes a direct use of the org-mode
 publishing feature, it will rebuild only files changed since the last
 command invocation. If you want to force a full rebuild, you can pass
-the ~--force~ arguments to the command.
+the ~--force~ argument to the command.
 
 #+begin_src shell
   fronde build -f
