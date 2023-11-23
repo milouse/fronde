@@ -1,0 +1,13 @@
+---
+{%- if author %}
+author: {{ author }}
+{%- endif %}
+{%- if lang %}
+lang: {{ lang }}
+{%- endif %}
+sources:
+  - path: src
+    target: .
+{%- if output == 'gemini' %}
+    type: gemini
+{%- endif %}

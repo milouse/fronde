@@ -1,2 +1,2 @@
--I ./lib
--r ./spec/requirements.rb
+--require ./spec/requirements.rb
+--order random

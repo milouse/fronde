@@ -1,0 +1,7 @@
+.dir-locals.el
+.ruby-version
+Rakefile
+lib/
+public_gmi/
+public_html/
+var/

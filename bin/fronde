@@ -1,45 +1,30 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+require_relative '../lib/fronde/config'
+require_relative '../lib/fronde/version'
+require_relative '../lib/fronde/cli'
+
 require 'optparse'
-require 'r18n-core'
-require 'fronde/utils'
-require 'fronde/version'
-require 'fronde/cli'
-
-R18n.default_places = File.expand_path('../locales', __dir__)
-R18n.set Fronde::Config.get('lang')
-
 optparser = OptionParser.new
 optparser.version = Fronde::VERSION
 
-Fronde::Utils::FRONDE_OPTIONS.each do |k, opt|
-  optparser.send(opt[:meth] || :on, *Fronde::Utils.decorate_option(k))
+Fronde::CLI::OptParse::FRONDE_OPTIONS.each do |k, opt|
+  optparser.send(opt[:method] || :on, *Fronde::CLI::OptParse.decorate_option(k))
 end
 
-params = {}
-optparser.parse!(into: params)
+params = { verbose: false }
+begin
+  optparser.parse!(into: params)
+rescue OptionParser::InvalidArgument => e
+  warn e.message
+  params.merge!(help: true, recover_from_error: true)
+end
 
 if params[:version]
   warn optparser.ver
   exit
 end
 
-if ARGV[0] == 'help'
-  params[:help] = true
-  ARGV.shift
-end
-fronde = Fronde::CLI.new(params)
-command = "fronde_#{ARGV[0]}".to_sym
-cmd_err = !fronde.respond_to?(command)
-if params[:help] || cmd_err
-  cmd_err = false if params[:help] && !ARGV[0]
-  fronde.fronde_help(ARGV[0], error: cmd_err)
-end
-ARGV.shift
-
-init_cmds = [:fronde_init, :fronde_config, :fronde_update]
-unless File.exist?('config.yml') || init_cmds.include?(command)
-  fronde.fronde_init
-end
-fronde.send command
+fronde = Fronde::CLI::App.new(params)
+exit fronde.run(ARGV)

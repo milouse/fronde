@@ -1,114 +1,96 @@
 # frozen_string_literal: true
 
+using TimePatch
+
 module Fronde
-  # Embeds methods responsible for generating an org file for a given
-  #   index.
-  module IndexOrgGenerator
-    def to_org(index_name = 'index', is_project: false)
-      return project_home_page(index_name) if is_project
+  # Reopen Index class to embed methods responsible for generating an
+  #   org file for a given index.
+  class Index
+    def blog_home_page
+      org_index @project['title'], '__HOME_PAGE__', @entries.map(&:to_h)
+    end
+
+    def to_org(index_name = 'index')
       return all_tags_index if index_name == 'index'
-      [org_header(index_name),
-       org_articles(@index[index_name])].join("\n")
+
+      org_index(
+        @tags_names[index_name], index_name,
+        (@index[index_name] || []).map(&:to_h)
+      )
     end
     alias_method :to_s, :to_org
 
     def write_org(index_name)
-      return unless save?
-      slug = Fronde::OrgFile.slug index_name
-      FileUtils.mkdir 'tags' unless Dir.exist? 'tags'
-      content = to_org index_name
-      orgdest = "tags/#{slug}.org"
-      File.write(orgdest, content)
+      slug = Slug.slug index_name
+      orgdest = "#{@project['path']}/tags/#{slug}.org"
+      File.write orgdest, to_org(index_name)
+    end
+
+    def write_all_org(verbose: true)
+      FileUtils.mkdir_p "#{@project['path']}/tags"
+      @index.each_key do |tag|
+        write_org(tag)
+        warn R18n.t.fronde.index.index_generated(tag: tag) if verbose
+      end
+      write_blog_home_page(verbose)
     end
 
     private
 
-    def project_home_page(project_name)
-      content = [org_header(project_name, is_tag: false)]
-      if @projects[project_name]&.any?
-        content += org_articles(@projects[project_name])
+    # Render an Org index file.
+    #
+    # @param title [String] the title of the current org index
+    # @param slug [String] the slug of the current org index
+    # @param entries [Array] the article to list in this file
+    # @return [String] the org file content as a String
+    def org_index(title, slug, entries)
+      entries.map! do |article|
+        published = article['published']
+        unless published == ''
+          article['published'] = R18n.t.fronde.index.published_on published
+        end
+        article
       end
-      content.join("\n")
-    end
-
-    def write_all_blog_home(verbose)
-      Fronde::Config.sources.each do |project|
-        next unless project['is_blog']
-        next unless Dir.exist?(project['path'])
-        warn "Generated blog home for #{project['name']}" if verbose
-        orgdest = format('%<root>s/index.org', root: project['path'])
-        File.write(orgdest, to_org(project['name'], is_project: true))
-      end
+      Config::Helpers.render_liquid_template(
+        File.read(File.expand_path('./data/template.org', __dir__)),
+        'title' => title,
+        'slug' => slug,
+        'project_path' => @project.public_absolute_path,
+        'domain' => Fronde::CONFIG.get('domain'),
+        'lang' => Fronde::CONFIG.get('lang'),
+        'author' => Fronde::CONFIG.get('author'),
+        'unsorted' => R18n.t.fronde.index.unsorted,
+        'entries' => entries
+      )
     end
 
     def all_tags_index
-      content = [
-        org_header(R18n.t.fronde.index.all_tags, is_tag: false)
-      ]
-      sort_tags_by_name_and_weight.each do |t, tags|
-        content << ''
-        content << org_title(R18n.t.fronde.index.send(t), 'index-tags')
-        next if tags.empty?
-        tags.each do |k|
-          content << "- #{tag_published_url(k)} (#{@index[k].length})"
+      indexes = sort_tags_by_name_and_weight.map do |title, tags|
+        all_tags = tags.map do |tag|
+          {
+            'slug' => tag, 'title' => @tags_names[tag],
+            'weight' => @index[tag].length
+          }
         end
+        { 'title' => R18n.t.fronde.index.send(title), 'tags' => all_tags }
       end
-      content.join("\n")
+      Config::Helpers.render_liquid_template(
+        File.read(File.expand_path('./data/all_tags.org', __dir__)),
+        'title' => R18n.t.fronde.index.all_tags,
+        'lang' => Fronde::CONFIG.get('lang'),
+        'author' => Fronde::CONFIG.get('author'),
+        'domain' => Fronde::CONFIG.get('domain'),
+        'project_path' => @project.public_absolute_path,
+        'indexes' => indexes
+      )
     end
 
-    def tag_published_url(tag_name)
-      domain = Fronde::Config.get('domain')
-      title = @tags_names[tag_name]
-      tag_link = "#{domain}/tags/#{tag_name}.html"
-      "[[#{tag_link}][#{title}]]"
-    end
-
-    def org_header(title = nil, is_tag: true)
-      if is_tag
-        title = @tags_names[title]
-      elsif title.nil? || title == 'index'
-        title = Fronde::Config.get('title')
+    def write_blog_home_page(verbose)
+      orgdest = format('%<root>s/index.org', root: @project['path'])
+      if verbose
+        warn R18n.t.fronde.org.generate_blog_index(name: @project['name'])
       end
-      <<~HEADER.strip
-        #+title: #{title}
-        #+author: #{Fronde::Config.get('author')}
-        #+language: #{Fronde::Config.get('lang')}
-      HEADER
-    end
-
-    def org_articles(articles_list)
-      last_year = nil
-      articles_list.map do |article|
-        year_title = ''
-        year = article.timekey.slice(0, 4)
-        if year != last_year
-          year_title = format("\n%<title>s\n", title: org_title(year))
-          last_year = year
-        end
-        year_title + org_entry(article)
-      end
-    end
-
-    def org_entry(article)
-      line = "- *[[#{article.url}][#{article.title}]]*"
-      if article.date
-        art_date = article.datestring(:full, year: false)
-        published = R18n.t.fronde.index.published_on art_date
-        line += " / #{published}"
-      end
-      line += " \\\\\n  #{article.excerpt}" if article.excerpt != ''
-      line
-    end
-
-    def org_title(year, html_class = 'index-year')
-      year = R18n.t.fronde.index.unsorted if year == '0000'
-      <<~ENDPROP
-        * #{year}
-        :PROPERTIES:
-        :HTML_CONTAINER_CLASS: #{html_class}
-        :UNNUMBERED: notoc
-        :END:
-      ENDPROP
+      File.write(orgdest, blog_home_page)
     end
   end
 end

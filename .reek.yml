@@ -1,0 +1,15 @@
+---
+detectors:
+  DuplicateMethodCall:
+    allow_calls:
+      - R18n.t
+  NestedIterators:
+    max_allowed_nesting: 2
+#  TooManyInstanceVariables:
+#    max_instance_variables: 8
+  TooManyStatements:
+    max_statements: 10
+  UncommunicativeVariableName:
+    accept:
+      - _
+      - e

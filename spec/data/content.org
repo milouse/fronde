@@ -1,5 +1,8 @@
 #+title: My first blog post?
 #+subtitle: What to do with that
+#+description: An article stating whether this is
+#+description: my first blog post or not
+#+keywords: test, tata
 #+date: <2019-06-13 jeu.>
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec aliquet

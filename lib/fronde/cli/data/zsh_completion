@@ -1,0 +1,37 @@
+#compdef fronde
+#autoload
+
+{% for command in commands %}
+{%- for option in command.options %}
+{%- if forloop.first %}
+(( $+functions[__fronde_{{ command.name }}] )) ||
+__fronde_{{ command.name }}(){
+    _arguments \
+{%- endif %}
+        '({{ option.short }} {{ option.long }})'{{ '{' }}{{ option.short}},{{ option.long }}}
+        {%- if option.keyword %}':{{ option.keyword }}:'{% endif %}
+{%- if forloop.last %}
+{%- if command.name == 'open' %} \
+        '1:file:_files -g \*.org'
+{%- endif %}
+}
+{% else %} \{% endif %}
+{%- endfor %}{% endfor %}
+
+(( $+functions[__fronde_help] )) ||
+__fronde_help(){
+    _arguments \
+        "1:command:(({% for command in commands %}{{ command.name }}\:'{{ command.translation }}' {% endfor %}))"
+}
+
+local state
+
+_arguments -C \
+    '(-)-h[help]' \
+    '(-)-V[version]' \
+    "1:command:(({% for command in commands %}{{ command.name }}\:'{{ command.translation }}' {% endfor %}))" \
+    '*::arg:->args'
+
+if [ "$state" = args ]; then
+    _call_function ret __fronde_${words[1]}
+fi

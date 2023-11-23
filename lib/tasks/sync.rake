@@ -1,15 +1,16 @@
 # frozen_string_literal: true
 
-require 'fronde/config'
-require 'fronde/utils'
+require_relative '../fronde/config'
+require_relative '../fronde/cli/throbber'
 
 module Fronde
-  class SyncError < Error; end
+  class SyncError < ::StandardError; end
 end
 
 def rsync_command(test = nil)
-  rsync_command = Fronde::Config.get('rsync')
+  rsync_command = Fronde::CONFIG.get('rsync')
   return rsync_command unless rsync_command.nil?
+
   optstring = []
   optstring << 'n' if test
   if verbose
@@ -20,37 +21,56 @@ def rsync_command(test = nil)
   "rsync -#{optstring.join}rlt --delete"
 end
 
-def pull_or_push(direction, label, test)
-  unless [:pull, :push].include? direction
-    raise Fronde::SyncError, 'Not a valid direction'
-  end
-  remote_path = Fronde::Config.get('remote')
-  raise Fronde::SyncError, 'No remote path set' if remote_path.nil?
-  public_folder = Fronde::Config.get('public_folder')
+def pull_or_push(direction, type, test)
+  remote_path = Fronde::CONFIG.get("#{type}_remote")
+  raise Fronde::SyncError, "No #{type} remote path set" if remote_path.nil?
+
+  public_folder = Fronde::CONFIG.get("#{type}_public_folder")
   # Default is to push
   cmd = ["#{public_folder}/", remote_path]
   cmd.reverse! if direction == :pull
   rsync = rsync_command(test)
-  publish_thread = Thread.new do
+  Thread.new do
     sh "#{rsync} #{cmd.join(' ')}"
   end
-  Fronde::Utils.throbber(publish_thread, label)
+end
+
+def source_types
+  Fronde::CONFIG.sources.map(&:type).uniq
 end
 
 namespace :sync do
   desc 'Push changes to server'
   task :push, :test? do |_, args|
-    pull_or_push(:push, 'Publishing:', args[:test?])
-  rescue Fronde::SyncError => e
-    warn e
-    next
+    source_types.each do |type|
+      publish_thread = pull_or_push(:push, type, args[:test?])
+      if verbose
+        publish_thread.join
+      else
+        Fronde::CLI::Throbber.run(
+          publish_thread, format('Publishing %<fmt>s:', fmt: type)
+        )
+      end
+    rescue Fronde::SyncError => e
+      warn e
+      next
+    end
   end
 
   desc 'Pull changes from server'
   task :pull, :test? do |_, args|
-    pull_or_push(:pull, 'Pulling:', args[:test?])
-  rescue Fronde::SyncError => e
-    warn e
-    next
+    source_types.each do |type|
+      pull_thread = pull_or_push(:pull, type, args[:test?])
+      if verbose
+        pull_thread.join
+      else
+        Fronde::CLI::Throbber.run(
+          pull_thread, format('Pulling %<fmt>s:', fmt: type)
+        )
+      end
+    rescue Fronde::SyncError => e
+      warn e
+      next
+    end
   end
 end

@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
-SAMPLE_ALL_INDEX = <<~INDEX.strip
+require_relative '../../lib/fronde/index'
+
+SAMPLE_ALL_INDEX = <<~INDEX
   #+title: All tags
   #+author: Test
   #+language: en
@@ -24,8 +26,8 @@ SAMPLE_ALL_INDEX = <<~INDEX.strip
   - [[http://perdu.com/tags/toto.html][toto]] (1)
 INDEX
 
-SAMPLE_PROJECT_INDEX = <<~BLOG_IDX.strip
-  #+title: writings
+SAMPLE_PROJECT_INDEX = <<~BLOG_IDX
+  #+title: Blog
   #+author: Test
   #+language: en
 
@@ -48,9 +50,9 @@ SAMPLE_PROJECT_INDEX = <<~BLOG_IDX.strip
   - *[[http://perdu.com/test1.html][My sweet article]]*
 BLOG_IDX
 
-SAMPLE_NO_REC_INDEX = <<~INDEX.strip
+SAMPLE_EMPTY_INDEX = <<~INDEX
   #+title: All tags
-  #+author: Test
+  #+author: %<author>s
   #+language: en
 
   * By alphabetical order
@@ -59,7 +61,6 @@ SAMPLE_NO_REC_INDEX = <<~INDEX.strip
   :UNNUMBERED: notoc
   :END:
 
-  - [[http://perdu.com/tags/tutu.html][tutu]] (1)
 
   * By publication number
   :PROPERTIES:
@@ -67,415 +68,323 @@ SAMPLE_NO_REC_INDEX = <<~INDEX.strip
   :UNNUMBERED: notoc
   :END:
 
-  - [[http://perdu.com/tags/tutu.html][tutu]] (1)
 INDEX
 
-SAMPLE_PROJECT_NO_REC_INDEX = <<~BLOG_IDX.strip
-  #+title: writings
+SAMPLE_EMPTY_PROJECT_INDEX = <<~INDEX
+  #+title: Blog
   #+author: Test
   #+language: en
+INDEX
 
-  * 2019
-  :PROPERTIES:
-  :HTML_CONTAINER_CLASS: index-year
-  :UNNUMBERED: notoc
-  :END:
-
-  - *[[http://perdu.com/test2.html][My second article]]* / Published on Tuesday 11th of June \\\\
-    Lorem ipsum
-
-  * Unsorted
-  :PROPERTIES:
-  :HTML_CONTAINER_CLASS: index-year
-  :UNNUMBERED: notoc
-  :END:
-
-  - *[[http://perdu.com/test1.html][My sweet article]]*
-BLOG_IDX
-
-SAMPLE_ATOM = <<~ATOM.strip
+SAMPLE_ATOM = <<~ATOM
   <?xml version="1.0" encoding="utf-8"?>
   <feed xmlns="http://www.w3.org/2005/Atom"
         xmlns:dc="http://purl.org/dc/elements/1.1/"
-        xmlns:wfw="http://wellformedweb.org/CommentAPI/"
         xml:lang="en">
 
-  <title>Blog</title>
-  <link href="http://perdu.com/feeds/index.xml" rel="self" type="application/atom+xml"/>
-  <link href="http://perdu.com" rel="alternate" type="text/html" title="Blog"/>
-  <updated>%<date>s</updated>
-  <author><name>Test</name></author>
-  <id>urn:md5:75d53866bcb20465b3287cf237234464</id>
-  <generator uri="https://git.umaneti.net/fronde/about/">Fronde</generator>
-
-  <entry>
-    <title>My third article</title>
-    <link href="http://perdu.com/other/test3.html" rel="alternate" type="text/html"
-          title="My third article"/>
-    <id>urn:md5:8865383febd94ddf9df318267af5ae85</id>
-    <published>2019-06-11T23:42:10+00:00</published>
+    <title>Blog</title>
+    <link href="http://perdu.com/feeds/index.xml" rel="self" type="application/atom+xml"/>
+    <link href="http://perdu.com" rel="alternate" type="text/html" title="Blog"/>
+    <updated>%<date>s</updated>
     <author><name>Test</name></author>
-    <dc:subject>toto</dc:subject><dc:subject>tutu</dc:subject>
-    <content type="html"></content>
-  </entry>
+    <id>urn:md5:75d53866bcb20465b3287cf237234464</id>
+    <generator uri="https://git.umaneti.net/fronde/about/">Fronde</generator>
 
-  <entry>
-    <title>My second article</title>
-    <link href="http://perdu.com/test2.html" rel="alternate" type="text/html"
-          title="My second article"/>
-    <id>urn:md5:123104bd8bb4c61e02a1e2a136e2fd6b</id>
-    <published>2019-06-11T00:00:00+00:00</published>
-    <author><name>Titi</name></author>
-    <content type="html">Lorem ipsum</content>
-  </entry>
+    <entry>
+      <title>My third article</title>
+      <link href="http://perdu.com/other/test3.html" rel="alternate"
+            type="text/html"
+            title="My third article"/>
+      <id>urn:md5:8865383febd94ddf9df318267af5ae85</id>
+      <published>2019-06-11T23:42:10%<expected_tz>s</published>
+      <updated>%<mtime>s</updated>
+      <author><name>Test</name></author>
+      <dc:subject>toto</dc:subject>
+      <dc:subject>tutu</dc:subject>
+      <content type="html"></content>
+    </entry>
 
-  <entry>
-    <title>My sweet article</title>
-    <link href="http://perdu.com/test1.html" rel="alternate" type="text/html"
-          title="My sweet article"/>
-    <id>urn:md5:c47532bbb1e2883c902071591ae1ec9b</id>
-    <published></published>
-    <author><name>Test</name></author>
-    <dc:subject>tutu</dc:subject>
-    <content type="html"></content>
-  </entry>
+    <entry>
+      <title>My second article</title>
+      <link href="http://perdu.com/test2.html" rel="alternate"
+            type="text/html"
+            title="My second article"/>
+      <id>urn:md5:123104bd8bb4c61e02a1e2a136e2fd6b</id>
+      <published>2019-06-11T00:00:00%<expected_tz>s</published>
+      <updated>%<mtime>s</updated>
+      <author><name>Titi</name></author>
+      <content type="html">Lorem ipsum</content>
+    </entry>
+
+    <entry>
+      <title>My sweet article</title>
+      <link href="http://perdu.com/test1.html" rel="alternate"
+            type="text/html"
+            title="My sweet article"/>
+      <id>urn:md5:c47532bbb1e2883c902071591ae1ec9b</id>
+      <published></published>
+      <updated>%<mtime>s</updated>
+      <author><name>Test</name></author>
+      <dc:subject>tutu</dc:subject>
+      <content type="html"></content>
+    </entry>
+  </feed>
+ATOM
+
+SAMPLE_EMPTY_ATOM = <<~ATOM
+  <?xml version="1.0" encoding="utf-8"?>
+  <feed xmlns="http://www.w3.org/2005/Atom"
+        xmlns:dc="http://purl.org/dc/elements/1.1/"
+        xml:lang="en">
+
+    <title>%<title>s</title>
+    <link href="http://perdu.com/feeds/index.xml" rel="self" type="application/atom+xml"/>
+    <link href="http://perdu.com" rel="alternate" type="text/html" title="%<title>s"/>
+    <updated>%<date>s</updated>
+    <author><name>%<author>s</name></author>
+    <id>urn:md5:75d53866bcb20465b3287cf237234464</id>
+    <generator uri="https://git.umaneti.net/fronde/about/">Fronde</generator>
   </feed>
 ATOM
 
 describe Fronde::Index do
-  context 'with blog settings' do
-    context 'with working org files' do
-      before do
-        FileUtils.mkdir_p 'tmp/blog/writings/other'
-        FileUtils.mkdir_p 'tmp/blog/output'
-        FileUtils.cp(
-          ['data/test1.org',
-           'data/test2.org'],
-          'tmp/blog/writings'
-        )
-        FileUtils.cp 'data/test3.org', 'tmp/blog/writings/other'
-        Dir.chdir 'tmp/blog'
-      end
+  let(:index) { described_class.new Fronde::CONFIG.sources.first }
+  let(:tags_path) { "#{Fronde::CONFIG.sources.first['path']}/tags" }
+  let(:feeds_path) { "#{Fronde::CONFIG.sources.first.publication_path}/feeds" }
 
-      after do
-        tear_down 'tmp/blog'
-      end
-
-      context 'with recursive config' do
-        before do
-          Fronde::Config.load_test(
+  context 'with blog settings and working org files' do
+    before do
+      FileUtils.mkdir_p 'tmp/blog/writings/other'
+      FileUtils.mkdir_p 'tmp/blog/output'
+      FileUtils.cp(
+        ['data/test1.org',
+         'data/test2.org'],
+        'tmp/blog/writings'
+      )
+      FileUtils.cp 'data/test3.org', 'tmp/blog/writings/other'
+      Dir.chdir 'tmp/blog'
+      Fronde::CONFIG.load_test(
+        'author' => 'Test',
+        'html_public_folder' => 'output',
+        'domain' => 'http://perdu.com',
+        'sources' => [
+          { 'path' => 'writings',
             'title' => 'Blog',
-            'author' => 'Test',
-            'public_folder' => 'output',
-            'domain' => 'http://perdu.com',
-            'sources' => [
-              { 'path' => 'writings',
-                'target' => '.',
-                'is_blog' => true }
-            ]
-          )
-        end
-
-        it 'has generated two indexes', core: true do
-          index = described_class.new
-          expect(index.entries.length).to eq(2)
-          expect(index.empty?).to be(false)
-        end
-
-        it 'excludes specified pattern from indexes', core: true do
-          old_conf = Fronde::Config.settings.dup
-          old_conf['sources'][0]['exclude'] = 'test3\.org$'
-          Fronde::Config.load_test(old_conf)
-          index = described_class.new
-          expect(index.entries.length).to eq(1)
-          expect(index.entries.include?('toto')).to be(false)
-        end
-
-        it 'generates a main index', core: true do
-          index = described_class.new
-          expect(index.to_s).to eq(SAMPLE_ALL_INDEX)
-          expect(index.to_s('writings', is_project: true)).to(
-            eq(SAMPLE_PROJECT_INDEX)
-          )
-        end
-
-        it 'generates an atom feed', core: true do
-          now_str = DateTime.now.strftime('%Y-%m-%d %H:%M')
-          index = described_class.new
-          index_date_str = index.date.strftime('%Y-%m-%d %H:%M')
-          expect(index_date_str).to eq(now_str)
-          expect(index.to_atom).to(
-            eq(format(SAMPLE_ATOM, date: index.date.rfc3339))
-          )
-        end
-
-        it 'generates the right org-header' do
-          index = described_class.new
-          header = ['#+title: ', '#+author: Test', '#+language: en'].join("\n").strip
-          expect(index.send(:org_header)).to eq(header)
-          expect(index.send(:org_header, 'index')).to eq(header)
-          expect(index.send(:org_header, 'Test', is_tag: true)).to eq(header)
-
-          header = ['#+title: Blog', '#+author: Test', '#+language: en'].join("\n").strip
-          expect(index.send(:org_header, is_tag: false)).to eq(header)
-          expect(index.send(:org_header, 'index', is_tag: false)).to eq(header)
-
-          header = ['#+title: Test', '#+author: Test', '#+language: en'].join("\n")
-          expect(index.send(:org_header, 'Test', is_tag: false)).to eq(header.strip)
-
-          header = ['#+title: tutu', '#+author: Test', '#+language: en'].join("\n").strip
-          expect(index.send(:org_header, 'tutu')).to eq(header)
-          expect(index.send(:org_header, 'tutu', is_tag: true)).to eq(header)
-        end
-
-        it 'lists tags by name', core: true do
-          list = described_class.new.sort_by :name
-          expect(list).to eql(['tutu (2)', 'toto (1)'])
-        end
-
-        it 'lists tags by weight', core: true do
-          list = described_class.new.sort_by :weight
-          expect(list).to eql(['toto (1)', 'tutu (2)'])
-        end
-
-        it 'raises an error if sort_by is called with bad argument', core: true do
-          index = described_class.new
-          expect { index.sort_by(:test) }.to raise_error(ArgumentError)
-        end
-
-        it 'correctly saves one index', core: true do
-          described_class.new.write_org('index')
-          expect(File.exist?('tags/index.org')).to be(true)
-          expect(File.read('tags/index.org')).to eq(SAMPLE_ALL_INDEX)
-        end
-
-        it 'correctly saves one blog index', core: true do
-          described_class.new.send(:write_all_blog_home, false)
-          expect(File.exist?('writings/index.org')).to be(true)
-          expect(File.read('writings/index.org')).to eq(SAMPLE_PROJECT_INDEX)
-        end
-
-        it 'correctly saves one blog index, even verbosely', core: true do
-          described_class.new.send(:write_all_blog_home, true)
-          expect(File.exist?('writings/index.org')).to be(true)
-          expect(File.read('writings/index.org')).to eq(SAMPLE_PROJECT_INDEX)
-        end
-
-        it 'correctly saves one atom feed', core: true do
-          index = described_class.new
-          index.write_atom('index')
-          expect(File.exist?('output/feeds/index.xml')).to be(true)
-          expect(File.read('output/feeds/index.xml')).to(
-            eq(format(SAMPLE_ATOM, date: index.date.rfc3339))
-          )
-        end
-
-        it 'writes them all', core: true do
-          described_class.new.write_all
-          expect(File.exist?('writings/index.org')).to be(true)
-          expect(File.exist?('tags/index.org')).to be(true)
-          expect(File.exist?('tags/toto.org')).to be(true)
-          expect(File.exist?('tags/tutu.org')).to be(true)
-          expect(File.exist?('output/feeds/index.xml')).to be(true)
-          expect(File.exist?('output/feeds/toto.xml')).to be(true)
-          expect(File.exist?('output/feeds/tutu.xml')).to be(true)
-        end
-      end
-
-      context 'without recursive config' do
-        before do
-          Fronde::Config.load_test(
-            'title' => 'Blog',
-            'author' => 'Test',
-            'public_folder' => 'output',
-            'domain' => 'http://perdu.com',
-            'sources' => [
-              { 'path' => 'writings',
-                'target' => '.',
-                'recursive' => false,
-                'is_blog' => true }
-            ]
-          )
-        end
-
-        it 'has generated one index', core: true do
-          index = described_class.new
-          expect(index.entries.length).to eq(1)
-          expect(index.empty?).to be(false)
-        end
-
-        it 'generates a main index', core: true do
-          index = described_class.new
-          expect(index.to_s).to eq(SAMPLE_NO_REC_INDEX)
-          expect(index.to_s('writings', is_project: true)).to(
-            eq(SAMPLE_PROJECT_NO_REC_INDEX)
-          )
-        end
-
-        it 'writes them all', core: true do
-          described_class.new.write_all
-          expect(File.exist?('writings/index.org')).to be(true)
-          expect(File.exist?('tags/index.org')).to be(true)
-          expect(File.exist?('tags/toto.org')).to be(false)
-          expect(File.exist?('tags/tutu.org')).to be(true)
-          expect(File.exist?('output/feeds/index.xml')).to be(true)
-          expect(File.exist?('output/feeds/toto.xml')).to be(false)
-          expect(File.exist?('output/feeds/tutu.xml')).to be(true)
-        end
-      end
+            'target' => '.',
+            'is_blog' => true }
+        ]
+      )
     end
 
-    context 'without org files' do
+    after do
+      tear_down 'tmp/blog'
+    end
+
+    it 'has generated two indexes' do
+      expect(index.all_tags.length).to eq(2)
+      expect(index.empty?).to be(false)
+    end
+
+    it 'excludes specified pattern from indexes' do
+      old_conf = Fronde::CONFIG.settings.merge
+      old_conf['sources'][0]['exclude'] = 'test3\.org$'
+      Fronde::CONFIG.load_test(old_conf)
+      expect(index.all_tags.length).to eq(1)
+      expect(index.all_tags.include?('toto')).to be(false)
+    end
+
+    it 'generates a main index' do
+      expect(index.to_s).to eq(SAMPLE_ALL_INDEX)
+      expect(index.blog_home_page).to eq(SAMPLE_PROJECT_INDEX)
+    end
+
+    it 'generates an atom feed' do
+      now_str = Time.now.strftime('%Y-%m-%d %H:%M')
+      index_date_str = index.date.strftime('%Y-%m-%d %H:%M')
+      expect(index_date_str).to eq(now_str)
+      expected_tz = Time.new(2019, 6, 13).strftime('%:z')
+      comp = format(
+        SAMPLE_ATOM,
+        date: index.date.xmlschema,
+        mtime: File.mtime('writings/test1.org').xmlschema,
+        expected_tz: expected_tz
+      )
+      expect(index.to_atom).to eq(comp)
+    end
+
+    it 'lists tags by name' do
+      expect(index.sort_by(:name)).to eql(['tutu (2)', 'toto (1)'])
+    end
+
+    it 'lists tags by weight' do
+      expect(index.sort_by(:weight)).to eql(['toto (1)', 'tutu (2)'])
+    end
+
+    it 'raises an error if sort_by is called with bad argument' do
+      expect { index.sort_by(:test) }.to raise_error(ArgumentError)
+    end
+
+    it 'correctly saves one index' do
+      FileUtils.mkdir_p tags_path
+      index.write_org('index')
+      expect(File.exist?("#{tags_path}/index.org")).to be(true)
+      expect(File.read("#{tags_path}/index.org")).to eq(SAMPLE_ALL_INDEX)
+    end
+
+    it 'correctly saves one blog index' do
+      index.send(:write_blog_home_page, false)
+      expect(File.exist?('writings/index.org')).to be(true)
+      expect(File.read('writings/index.org')).to eq(SAMPLE_PROJECT_INDEX)
+    end
+
+    it 'correctly saves one blog index, even verbosely' do
+      index.send(:write_blog_home_page, true)
+      expect(File.exist?('writings/index.org')).to be(true)
+      expect(File.read('writings/index.org')).to eq(SAMPLE_PROJECT_INDEX)
+    end
+
+    it 'correctly saves one atom feed' do
+      FileUtils.mkdir_p feeds_path
+      index.write_atom('index')
+      expect(File.exist?("#{feeds_path}/index.xml")).to be(true)
+      expected_tz = Time.new(2019, 6, 13).strftime('%:z')
+      comp = format(
+        SAMPLE_ATOM,
+        date: index.date.xmlschema,
+        mtime: File.mtime('writings/test1.org').xmlschema,
+        expected_tz: expected_tz
+      )
+      expect(File.read("#{feeds_path}/index.xml")).to eq(comp)
+    end
+
+    it 'writes them all' do
+      index.write_all_org
+      expect(File.exist?('writings/index.org')).to be(true)
+      expect(File.exist?("#{tags_path}/index.org")).to be(true)
+      expect(File.exist?("#{tags_path}/toto.org")).to be(true)
+      expect(File.exist?("#{tags_path}/tutu.org")).to be(true)
+
+      index.write_all_feeds
+      expect(File.exist?("#{feeds_path}/index.xml")).to be(true)
+      expect(File.exist?("#{feeds_path}/toto.xml")).to be(true)
+      expect(File.exist?("#{feeds_path}/tutu.xml")).to be(true)
+    end
+
+    it 'does not attempt to include tags into feeds' do
+      # Run it once to ensure index is instanciated a first time and
+      # index files are generated
+      index.write_all_org
+      entries = index.instance_variable_get(:@entries)
+      expect(entries.length).to eq(3)
+      # Run a second time to check that it does not parse previously
+      # generated tags
+      second_index = described_class.new Fronde::CONFIG.sources.first
+      entries = second_index.instance_variable_get(:@entries)
+      expect(entries.length).to eq(3)
+    end
+
+    context 'without recursive config' do
       before do
-        FileUtils.mkdir_p 'tmp/blog/writings'
-        FileUtils.mkdir_p 'tmp/blog/output'
-        Dir.chdir 'tmp/blog'
-        Fronde::Config.load_test(
-          'title' => 'Blog',
-          'author' => 'Test',
-          'public_folder' => 'output',
-          'domain' => 'http://perdu.com',
-          'sources' => [
-            { 'path' => 'writings',
-              'target' => '.',
-              'is_blog' => true }
-          ]
-        )
+        # This config will generate the same result as if it was
+        # recursive: true as is_blog necessarily requires the project
+        # to be recursive
+        old_conf = Fronde::CONFIG.settings
+        old_conf['sources'][0]['recursive'] = false
+        Fronde::CONFIG.load_test old_conf
       end
 
-      after do
-        tear_down 'tmp/blog'
+      it 'has generated two index' do
+        expect(index.all_tags.length).to eq(2)
+        expect(index.empty?).to be(false)
       end
 
-      it 'has generated no index', core: true do
-        index = described_class.new
-        expect(index.entries.length).to eq(0)
-        expect(index.empty?).to be(true)
+      it 'generates a main index' do
+        expect(index.to_s).to eq(SAMPLE_ALL_INDEX)
+        expect(index.blog_home_page).to eq(SAMPLE_PROJECT_INDEX)
       end
+    end
+  end
 
-      it 'generates a main index', core: true do
-        index = described_class.new
-        empty_index = <<~INDEX
-          #+title: All tags
-          #+author: Test
-          #+language: en
+  context 'with blog settings and without org files' do
+    before do
+      FileUtils.mkdir_p 'tmp/blog/writings'
+      FileUtils.mkdir_p 'tmp/blog/output'
+      Dir.chdir 'tmp/blog'
+      Fronde::CONFIG.load_test(
+        'author' => 'Test',
+        'html_public_folder' => 'output',
+        'domain' => 'http://perdu.com',
+        'sources' => [
+          { 'path' => 'writings',
+            'title' => 'Blog',
+            'target' => '.',
+            'is_blog' => true }
+        ]
+      )
+    end
 
-          * By alphabetical order
-          :PROPERTIES:
-          :HTML_CONTAINER_CLASS: index-tags
-          :UNNUMBERED: notoc
-          :END:
+    after do
+      tear_down 'tmp/blog'
+    end
 
+    it 'has generated no index' do
+      expect(index.all_tags.length).to eq(0)
+      expect(index.empty?).to be(true)
+    end
 
-          * By publication number
-          :PROPERTIES:
-          :HTML_CONTAINER_CLASS: index-tags
-          :UNNUMBERED: notoc
-          :END:
-        INDEX
-        expect(index.to_s).to eq(empty_index)
-        empty_project_index = <<~INDEX.strip
-          #+title: writings
-          #+author: Test
-          #+language: en
-        INDEX
-        expect(index.to_s('writings', is_project: true)).to(
-          eq(empty_project_index)
-        )
-      end
+    it 'generates a main index' do
+      expect(index.to_s).to eq(format(SAMPLE_EMPTY_INDEX, author: 'Test'))
+      expect(index.blog_home_page).to eq(SAMPLE_EMPTY_PROJECT_INDEX)
+    end
 
-      it 'generates an atom feed', core: true do
-        now_str = DateTime.now.strftime('%Y-%m-%d %H:%M')
-        index = described_class.new
-        index_date_str = index.date.strftime('%Y-%m-%d %H:%M')
-        expect(index_date_str).to eq(now_str)
-        empty_atom = <<~ATOM.strip
-          <?xml version="1.0" encoding="utf-8"?>
-          <feed xmlns="http://www.w3.org/2005/Atom"
-                xmlns:dc="http://purl.org/dc/elements/1.1/"
-                xmlns:wfw="http://wellformedweb.org/CommentAPI/"
-                xml:lang="en">
+    it 'generates an atom feed' do
+      now_str = Time.now.strftime('%Y-%m-%d %H:%M')
+      index_date_str = index.date.strftime('%Y-%m-%d %H:%M')
+      expect(index_date_str).to eq(now_str)
+      comp = format(
+        SAMPLE_EMPTY_ATOM,
+        date: index.date.xmlschema,
+        author: 'Test', title: 'Blog'
+      )
+      expect(index.to_atom).to eq(comp)
+    end
 
-          <title>Blog</title>
-          <link href="http://perdu.com/feeds/index.xml" rel="self" type="application/atom+xml"/>
-          <link href="http://perdu.com" rel="alternate" type="text/html" title="Blog"/>
-          <updated>%<date>s</updated>
-          <author><name>Test</name></author>
-          <id>urn:md5:75d53866bcb20465b3287cf237234464</id>
-          <generator uri="https://git.umaneti.net/fronde/about/">Fronde</generator>
-          </feed>
-        ATOM
-        expect(index.to_atom).to(
-          eq(format(empty_atom, date: index.date.rfc3339))
-        )
-      end
+    it 'correctly saves one index' do
+      FileUtils.mkdir_p tags_path
+      index.write_org('index')
+      expect(File.exist?("#{tags_path}/index.org")).to be(true)
+      expect(File.read("#{tags_path}/index.org")).to(
+        eq(format(SAMPLE_EMPTY_INDEX, author: 'Test'))
+      )
+    end
 
-      it 'correctly saves one index', core: true do
-        described_class.new.write_org('index')
-        expect(File.exist?('tags/index.org')).to be(true)
-        empty_index = <<~INDEX
-          #+title: All tags
-          #+author: Test
-          #+language: en
+    it 'correctly saves one blog index' do
+      index.send(:write_blog_home_page, false)
+      expect(File.exist?('writings/index.org')).to be(true)
+      expect(File.read('writings/index.org')).to(
+        eq(SAMPLE_EMPTY_PROJECT_INDEX)
+      )
+    end
 
-          * By alphabetical order
-          :PROPERTIES:
-          :HTML_CONTAINER_CLASS: index-tags
-          :UNNUMBERED: notoc
-          :END:
+    it 'correctly saves one atom feed' do
+      FileUtils.mkdir_p feeds_path
+      index.write_atom('index')
+      expect(File.exist?("#{feeds_path}/index.xml")).to be(true)
+      comp = format(
+        SAMPLE_EMPTY_ATOM,
+        date: index.date.xmlschema,
+        author: 'Test', title: 'Blog'
+      )
+      expect(File.read("#{feeds_path}/index.xml")).to eq(comp)
+    end
 
+    it 'writes them all' do
+      index.write_all_org
+      expect(File.exist?('writings/index.org')).to be(true)
+      expect(File.exist?("#{tags_path}/index.org")).to be(true)
 
-          * By publication number
-          :PROPERTIES:
-          :HTML_CONTAINER_CLASS: index-tags
-          :UNNUMBERED: notoc
-          :END:
-        INDEX
-        expect(File.read('tags/index.org')).to eq(empty_index)
-      end
-
-      it 'correctly saves one blog index', core: true do
-        described_class.new.send(:write_all_blog_home, false)
-        expect(File.exist?('writings/index.org')).to be(true)
-        empty_project_index = <<~INDEX.strip
-          #+title: writings
-          #+author: Test
-          #+language: en
-        INDEX
-        expect(File.read('writings/index.org')).to eq(empty_project_index)
-      end
-
-      it 'correctly saves one atom feed', core: true do
-        index = described_class.new
-        index.write_atom('index')
-        expect(File.exist?('output/feeds/index.xml')).to be(true)
-        empty_atom = <<~ATOM.strip
-          <?xml version="1.0" encoding="utf-8"?>
-          <feed xmlns="http://www.w3.org/2005/Atom"
-                xmlns:dc="http://purl.org/dc/elements/1.1/"
-                xmlns:wfw="http://wellformedweb.org/CommentAPI/"
-                xml:lang="en">
-
-          <title>Blog</title>
-          <link href="http://perdu.com/feeds/index.xml" rel="self" type="application/atom+xml"/>
-          <link href="http://perdu.com" rel="alternate" type="text/html" title="Blog"/>
-          <updated>%<date>s</updated>
-          <author><name>Test</name></author>
-          <id>urn:md5:75d53866bcb20465b3287cf237234464</id>
-          <generator uri="https://git.umaneti.net/fronde/about/">Fronde</generator>
-          </feed>
-        ATOM
-        expect(File.read('output/feeds/index.xml')).to(
-          eq(format(empty_atom, date: index.date.rfc3339))
-        )
-      end
-
-      it 'writes them all', core: true do
-        described_class.new.write_all
-        expect(File.exist?('writings/index.org')).to be(true)
-        expect(File.exist?('tags/index.org')).to be(true)
-        expect(File.exist?('output/feeds/index.xml')).to be(true)
-      end
+      index.write_all_feeds
+      expect(File.exist?("#{feeds_path}/index.xml")).to be(true)
     end
   end
 
@@ -490,12 +399,14 @@ describe Fronde::Index do
         'tmp/txt/writings'
       )
       Dir.chdir 'tmp/txt'
-      Fronde::Config.load_test(
-        'title' => 'My site',
+      Fronde::CONFIG.load_test(
         'author' => 'Test',
-        'public_folder' => 'output',
+        'html_public_folder' => 'output',
         'domain' => 'http://perdu.com',
-        'sources' => [{ 'path' => 'writings', 'target' => '.' }]
+        'sources' => [
+          { 'path' => 'writings',
+            'target' => '.' }
+        ]
       )
     end
 
@@ -503,79 +414,28 @@ describe Fronde::Index do
       tear_down 'tmp/txt'
     end
 
-    it 'does not have generated any indexes', core: true do
-      index = described_class.new
-      expect(index.entries.length).to eq(0)
+    it 'does not have generated any indexes' do
+      expect(index.all_tags.length).to eq(0)
       expect(index.empty?).to be(true)
     end
 
-    it 'generates an empty main index', core: true do
-      empty_index = <<~EMPTY_INDEX
-        #+title: All tags
-        #+author: Test
-        #+language: en
-
-        * By alphabetical order
-        :PROPERTIES:
-        :HTML_CONTAINER_CLASS: index-tags
-        :UNNUMBERED: notoc
-        :END:
-
-
-        * By publication number
-        :PROPERTIES:
-        :HTML_CONTAINER_CLASS: index-tags
-        :UNNUMBERED: notoc
-        :END:
-      EMPTY_INDEX
-      expect(described_class.new.to_s).to eq(empty_index)
-    end
-
-    it 'generates an empty atom feed', core: true do
-      now_str = DateTime.now.strftime('%Y-%m-%d %H:%M')
-      index = described_class.new
-      index_date_str = index.date.strftime('%Y-%m-%d %H:%M')
-      expect(index_date_str).to eq(now_str)
-      empty_atom = <<~EMPTY_ATOM.strip
-        <?xml version="1.0" encoding="utf-8"?>
-        <feed xmlns="http://www.w3.org/2005/Atom"
-              xmlns:dc="http://purl.org/dc/elements/1.1/"
-              xmlns:wfw="http://wellformedweb.org/CommentAPI/"
-              xml:lang="en">
-
-        <title>My site</title>
-        <link href="http://perdu.com/feeds/index.xml" rel="self" type="application/atom+xml"/>
-        <link href="http://perdu.com" rel="alternate" type="text/html" title="My site"/>
-        <updated>%<date>s</updated>
-        <author><name>Test</name></author>
-        <id>urn:md5:75d53866bcb20465b3287cf237234464</id>
-        <generator uri="https://git.umaneti.net/fronde/about/">Fronde</generator>
-        </feed>
-      EMPTY_ATOM
-      expect(index.to_atom).to(
-        eq(format(empty_atom, date: index.date.rfc3339))
+    it 'generates an empty main index' do
+      expect(index.to_s).to(
+        eq(format(SAMPLE_EMPTY_INDEX, author: 'Test'))
       )
     end
 
-    it 'does not save one index', core: true do
-      described_class.new.write_org('index')
-      expect(File.exist?('tags/index.org')).to be(false)
-    end
-
-    it 'does not save one atom feed', core: true do
-      described_class.new.write_atom('index')
-      expect(File.exist?('output/feeds/index.xml')).to be(false)
-    end
-
-    it 'does not write it all', core: true do
-      described_class.new.write_all
-      expect(File.exist?('writings/index.org')).to be(false)
-      expect(File.exist?('tags/index.org')).to be(false)
-      expect(File.exist?('tags/toto.org')).to be(false)
-      expect(File.exist?('tags/tutu.org')).to be(false)
-      expect(File.exist?('output/feeds/index.xml')).to be(false)
-      expect(File.exist?('output/feeds/toto.xml')).to be(false)
-      expect(File.exist?('output/feeds/tutu.xml')).to be(false)
+    it 'generates an empty atom feed' do
+      now_str = Time.now.strftime('%Y-%m-%d %H:%M')
+      index_date_str = index.date.strftime('%Y-%m-%d %H:%M')
+      expect(index_date_str).to eq(now_str)
+      comp = format(
+        SAMPLE_EMPTY_ATOM,
+        date: index.date.xmlschema,
+        author: 'Test',
+        title: 'writings'
+      )
+      expect(index.to_atom).to eq(comp)
     end
   end
 
@@ -585,8 +445,8 @@ describe Fronde::Index do
       FileUtils.mkdir_p 'tmp/txt/output'
       FileUtils.cp 'data/test1.org', 'tmp/txt/writings'
       Dir.chdir 'tmp/txt'
-      Fronde::Config.load_test(
-        'public_folder' => 'output',
+      Fronde::CONFIG.load_test(
+        'html_public_folder' => 'output',
         'domain' => 'http://perdu.com',
         'sources' => [{ 'path' => 'writings', 'target' => '.' }]
       )
@@ -596,66 +456,28 @@ describe Fronde::Index do
       tear_down 'tmp/txt'
     end
 
-    it 'does not have generated any indexes', core: true do
-      index = described_class.new
-      expect(index.entries.length).to eq(0)
+    it 'does not have generated any indexes' do
+      expect(index.all_tags.length).to eq(0)
       expect(index.empty?).to be(true)
     end
 
-    it 'generates an empty main index', core: true do
-      empty_index = <<~EMPTY_INDEX
-        #+title: All tags
-        #+author: alice
-        #+language: en
-
-        * By alphabetical order
-        :PROPERTIES:
-        :HTML_CONTAINER_CLASS: index-tags
-        :UNNUMBERED: notoc
-        :END:
-
-
-        * By publication number
-        :PROPERTIES:
-        :HTML_CONTAINER_CLASS: index-tags
-        :UNNUMBERED: notoc
-        :END:
-      EMPTY_INDEX
-      expect(described_class.new.to_s).to eq(empty_index)
-    end
-
-    it 'generates an empty atom feed', core: true do
-      now_str = DateTime.now.strftime('%Y-%m-%d %H:%M')
-      index = described_class.new
-      index_date_str = index.date.strftime('%Y-%m-%d %H:%M')
-      expect(index_date_str).to eq(now_str)
-      empty_atom = <<~EMPTY_ATOM.strip
-        <?xml version="1.0" encoding="utf-8"?>
-        <feed xmlns="http://www.w3.org/2005/Atom"
-              xmlns:dc="http://purl.org/dc/elements/1.1/"
-              xmlns:wfw="http://wellformedweb.org/CommentAPI/"
-              xml:lang="en">
-
-        <title>All tags</title>
-        <link href="http://perdu.com/feeds/index.xml" rel="self" type="application/atom+xml"/>
-        <link href="http://perdu.com" rel="alternate" type="text/html" title="All tags"/>
-        <updated>%<date>s</updated>
-        <author><name>alice</name></author>
-        <id>urn:md5:75d53866bcb20465b3287cf237234464</id>
-        <generator uri="https://git.umaneti.net/fronde/about/">Fronde</generator>
-        </feed>
-      EMPTY_ATOM
-      expect(index.to_atom).to(
-        eq(format(empty_atom, date: index.date.rfc3339))
+    it 'generates an empty main index' do
+      expect(index.to_s).to(
+        eq(format(SAMPLE_EMPTY_INDEX, author: 'alice'))
       )
     end
 
-    it 'does not save any index', core: true do
-      index = described_class.new
-      index.write_org('index')
-      expect(File.exist?('tags/index.org')).to be(false)
-      index.write_atom('index')
-      expect(File.exist?('output/feeds/index.xml')).to be(false)
+    it 'generates an empty atom feed' do
+      now_str = Time.now.strftime('%Y-%m-%d %H:%M')
+      index_date_str = index.date.strftime('%Y-%m-%d %H:%M')
+      expect(index_date_str).to eq(now_str)
+      comp = format(
+        SAMPLE_EMPTY_ATOM,
+        date: index.date.xmlschema,
+        author: 'alice',
+        title: 'writings'
+      )
+      expect(index.to_atom).to eq(comp)
     end
   end
 end

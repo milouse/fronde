@@ -1,60 +1,59 @@
 # frozen_string_literal: true
 
 require 'rake'
-require 'fronde/cli/commands'
+require_relative 'cli/commands'
 
 module Fronde
-  # Fronde CLI app
-  class CLI
-    def initialize(opts = {})
-      @options = { verbose: false }.merge(opts)
-      init_required_files
-      init_rake
-    end
+  module CLI
+    # Fronde CLI app
+    class App
+      def initialize(opts = {})
+        @options = { verbose: false }.merge(opts)
+        @command = @rake = nil
+        @argv = []
+      end
 
-    include Fronde::CLICommands
+      include Commands
 
-    private
+      def run(argv)
+        @argv = argv
+        @command = OptParse.resolve_possible_alias(@argv.shift || 'basic')
 
-    def init_required_files
-      init_rakefile unless File.exist?('Rakefile')
-      init_gitignore unless File.exist?('.gitignore')
-    end
+        if help_param_given?
+          return 2 if @options[:recover_from_error]
+          return 0
+        end
 
-    def init_rake
-      @rake = Rake.application
-      Rake.verbose(false) unless @options[:verbose]
-      @rake.raw_load_rakefile
-    end
+        init_rake if %w[build preview publish].include?(@command)
 
-    def init_rakefile
-      rakefile = <<~RAKE
-        # frozen_string_literal: true
+        method = "fronde_#{@command}".to_sym
+        return 2 if method_unknown?(method)
 
-        require 'fronde/config'
-        require 'r18n-core'
+        send method
+      end
 
-        fronde_spec = Gem::Specification.find_by_name 'fronde'
-        R18n.default_places = "\#{fronde_spec.gem_dir}/locales"
-        R18n.set(Fronde::Config.get('lang', 'en'))
-        R18n::Filters.on(:named_variables)
+      private
 
-        Dir.glob("\#{fronde_spec.gem_dir}/lib/tasks/*.rake").each { |r| import r }
+      def init_rake
+        @rake = Rake.application
+        Rake.verbose(false) unless @options[:verbose]
+        @rake.load_rakefile
+      end
 
-        task default: 'site:build'
-      RAKE
-      File.write 'Rakefile', rakefile
-    end
+      def help_param_given?
+        return false unless @options[:help]
 
-    def init_gitignore
-      gitignore = <<~GITIGNORE
-        .dir-locals.el
-        Rakefile
-        lib
-        public_html
-        var
-      GITIGNORE
-      File.write '.gitignore', gitignore
+        fronde_help
+        true
+      end
+
+      def method_unknown?(method)
+        return false if respond_to?(method)
+
+        warn R18n.t.fronde.error.bin.no_command
+        fronde_help
+        true
+      end
     end
   end
 end

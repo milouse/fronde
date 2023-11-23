@@ -1,8 +1,13 @@
 #+title: Fronde Documentation
 #+author: Étienne Deparis
-#+lang: en
+#+language: en
 #+description: Glossary of all possible configuration options for Fronde
 #+options: ^:{} toc:3 num:3 H:4
+#+latex_header: \usepackage{minted}
+#+latex_header: \usepackage{awesomebox}
+#+latex_header: \usepackage{libertinus-otf}
+#+latex_header: \defaultfontfeatures{Ligatures=TeX, Scale=MatchLowercase}
+#+latex_header: \setmonofont{InconsolataLGC}[Ligatures=TeXReset, Scale=0.75]
 
 * Introduction
 
@@ -67,8 +72,8 @@ generator should be, and more specifically, what should it be for Org.
   as convenient as Markdown's. That's why fronde will never support any
   other markup language.
 - However Org HTML export should be more easily expandable. That’s why
-  fronde gives you the [[#templates_setting][templates feature]] and introduces [[#formatting_tags][new formatting
-  tags]] for the preamble and postamble sections.
+  fronde gives you the [[#templates_setting][templates feature]] and introduces [[#formatting_tags][new formatting tags]]
+  for the preamble and postamble sections.
 - Org writers should already be Emacs users, that’s why fronde will
   directly call Emacs to convert your Org files to HTML. There is no
   need to use Pandoc or org-ruby if you already have Emacs.
@@ -82,11 +87,11 @@ generator should be, and more specifically, what should it be for Org.
 
 We are already aware of some limitations we would like to remove:
 
-**** TODO Allow theme to provide configuration options
+**** TODO Allow themes to provide configuration options
 Themes should be able to declare a set of default ~templates~ or
 specific Org export options
 
-**** TODO Better protect upgrade
+**** TODO Better protected upgrade
 For example, Rakefile should only be overwritten after upgrade of the
 gem.
 
@@ -94,14 +99,16 @@ gem.
 
 ** Source code
 
-You can access the source code at: https://git.umaneti.net/fronde
+The canonical repository is located at [[https://git.umaneti.net/fronde]].
+A mirror also exists on [[https://github.com/milouse/chwall][Github]].
 
 * Getting started
 
 ** Installation
 
 Fronde is a [[https://rubygems.org/][Ruby gem]] and thus you need a working Ruby environment to use
-it. Fronde requires at least ruby 2.6 to work.
+it. Fronde requires at least ruby 2.7 to work (though this version is no
+more maintained, you should really move to ruby 3.1 as soon as possible).
 
 You may already have Ruby installed on your computer. You can check
 inside a terminal emulator by typing: ~ruby -v~. You also need the
@@ -118,7 +125,7 @@ Some operating systems already package the right ruby version to use:
 **** Archlinux-like
 
 On Archlinux, Manjaro or Parabola, you just have to install the packages
-~ruby~ and ~rubygems~:
+~rubygems~ (which will install ~ruby~ as a dependency):
 
 #+caption: Ruby installation procedure on Archlinux-like system
 #+begin_src shell
@@ -127,18 +134,18 @@ On Archlinux, Manjaro or Parabola, you just have to install the packages
 
 **** Debian-like
 
-Ruby 2.6 does not seem to be available at all. However, on Ubuntu at
-least, ruby 2.7 is available. Thus you should try the following command:
+On Debian, Ubuntu, Mint… you just have to install the package ~ruby~
+(which will install ~ruby-rubygems~ as a dependency):
 
 #+caption: Ruby installation procedure on Debian-like system
 #+begin_src shell
-  sudo apt install ruby2.7
+  sudo apt install ruby
 #+end_src
 
 **** Others
 
-Ruby 2.7 seems to be already well packaged for Fedora, Red Hat or
-OpenMandriva, thus it should not be a problem for you to install it.
+Ruby seems to be well packaged for Fedora, Red Hat or OpenMandriva, thus
+it should not be a problem for you to install it.
 
 *** Install ruby with RVM
 
@@ -151,7 +158,8 @@ polluting your other projects.
 #+caption: Ruby installation procedure with RVM
 #+begin_src shell
   rvm get latest
-  rvm use ruby-2.7.2@fronde --create
+  rvm install ruby-3.2.2
+  rvm use ruby-3.2.2@fronde --create
 #+end_src
 
 *** Install Fronde
@@ -187,7 +195,7 @@ number you just built):
 
 #+caption: Fronde installation procedure from local gem file
 #+begin_src shell
-  gem install fronde-0.3.0.gem
+  gem install fronde-0.4.0.gem
 #+end_src
 
 ** Creation of a website
@@ -215,13 +223,13 @@ Now, you can run the ~fronde init~ command with some arguments:
   fronde init -t "My brand new website"
 #+end_src
 
-#+begin_note
+#+begin_noteblock
 The following arguments are allowed:
 
 - -a (--author) :: Set up the default author name (see the [[#author_setting][~author~ config key]])
 - -l (--lang) :: Set up the default lang of your website (see the [[#lang_setting][~lang~ config key]])
-- -t (--title) :: Set up the title of your website (see the [[#title_setting][~title~ config key]])
-#+end_note
+- -t (--title) :: Set up the title of your first page
+#+end_noteblock
 
 At the end of the init process, fronde will automatically open Emacs on
 the first page of your website. You can directly write in it or close it
@@ -243,10 +251,10 @@ yourproject/
 └── var/            # variable files used during operation
 #+end_example
 
-#+begin_caution
+#+begin_cautionblock
 Fronde relies a lot on files stored in the ~lib~ and ~var~ folders. You
 should never try to remove them by yourself.
-#+end_caution
+#+end_cautionblock
 
 ** Creation or edition of a page
 
@@ -311,7 +319,7 @@ HTML with the ~fronde build~ command.
   fronde build
 #+end_src
 
-#+begin_tip
+#+begin_tipblock
 Because this building process makes a direct use of the org-mode
 publishing feature, it will rebuild only files changed since the last
 command invocation. If you want to force a full rebuild, you can pass
@@ -320,7 +328,7 @@ the ~--force~ arguments to the command.
 #+begin_src shell
   fronde build -f
 #+end_src
-#+end_tip
+#+end_tipblock
 
 To review what you just built, you can use the ~fronde preview~ command,
 which will start a local webserver and open your default web browser on
@@ -366,10 +374,10 @@ atom feed.
   author: Alice Doe
 #+end_src
 
-#+begin_note
+#+begin_noteblock
 The default ~author~ setting is your user name on your current computer
 session.
-#+end_note
+#+end_noteblock
 
 *** ~domain~
 
@@ -377,11 +385,11 @@ The domain name pointing to where your static website is expected to be
 hosted. This value is used to generate absolute path to your files on
 your expected host name (for example in the Atom feeds).
 
-#+begin_caution
+#+begin_cautionblock
 Its value is expected to *not* end with a slash. That is to say
 ~https://example.com~ is *valid*, whereas ~https://example.com/~ is
 *not*.
-#+end_caution
+#+end_cautionblock
 
 By default, your static website is expected to be hosted at the root of
 your domain name (like ~https://example.com/index.html~). If it is not
@@ -396,9 +404,51 @@ are *valid* values too.
   domain: https://alice.doe.name
 #+end_src
 
-#+begin_note
+#+begin_noteblock
 The default ~domain~ value is an empty string.
-#+end_note
+#+end_noteblock
+
+*** ~gemini_public_folder~
+
+The ~gemini_public_folder~ option stores the path to the folder, which
+will contains the generated gemtext files, ready for Gemini publication.
+
+#+begin_noteblock
+The default ~gemini_public_folder~ value is ~public_gmi~ (at the root of
+your project).
+#+end_noteblock
+
+*** ~gemini_remote~
+
+The ~gemini_remote~ option contains an /rsync/ like destination string,
+which will be used to published your capsule when using the ~sync:push~
+/rake/ task. For example ~user@domain:/var/www/mycapsule/~
+
+#+begin_noteblock
+There is no default value for ~gemini_remote~. Publication of your
+capsule will be skipped if there is no value for ~gemini_remote~.
+#+end_noteblock
+
+*** ~html_public_folder~
+
+The ~html_public_folder~ option stores the path to the folder, which
+will contains the HTML generated files, ready for Web publication.
+
+#+begin_noteblock
+The default ~html_public_folder~ value is ~public_html~ (at the root of
+your project).
+#+end_noteblock
+
+*** ~html_remote~
+
+The ~html_remote~ option contains an /rsync/ like destination string,
+which will be used to published your website when using the ~sync:push~
+/rake/ task. For example ~user@domain:/var/www/mywebsite/~
+
+#+begin_noteblock
+There is no default value for ~html_remote~. Publication of your website
+will be skipped if there is no value for ~html_remote~.
+#+end_noteblock
 
 *** ~lang~
 :PROPERTIES:
@@ -414,47 +464,9 @@ with the [[https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes][ISO 639-1]] st
   lang: en
 #+end_src
 
-#+begin_note
+#+begin_noteblock
 The default ~lang~ setting is that of your current computer.
-#+end_note
-
-*** ~public_folder~
-
-The ~public_folder~ option stores the path to the folder, which will
-contains the generated files, ready for publication.
-
-#+begin_note
-The default ~public_folder~ value is ~public_html~ (at the root of your
-project).
-#+end_note
-
-*** ~remote~
-
-The ~remote~ option contains an /rsync/ like destination string, which
-will be used to published your website when using the ~sync:push~ /rake/
-task. For example ~user@domain:/var/www/mywebsite/~
-
-#+begin_note
-There is no default value for ~remote~. Publication of your website will
-be skipped if there is no value for ~remote~.
-#+end_note
-
-*** ~title~
-:PROPERTIES:
-:CUSTOM_ID: title_setting
-:END:
-
-The ~title~ option stores the default title of your org files. This
-value is used when you create a new file with the ~fronde~ command.
-
-#+begin_warning
-*This setting is not used by the regular org mode publishing process*.
-You must ensure that your org files contain a ~#+title:~ metadata field
-before publishing them.
-#+end_warning
-
-This value is also used in the generation of the blog index page and the
-main atom feed as the website title.
+#+end_noteblock
 
 *** ~sources~
 :PROPERTIES:
@@ -473,24 +485,28 @@ following keys:
 - name :: [string, optional] key used to generate the [[https://orgmode.org/org.html#Project-alist][Org “project”
   name]]. This name never appears in a generated file, it is more like an
   internal id. Defaults to the last dirname of the path value.
+- title :: TODO
 - recursive :: [boolean, optional] whether the path should be exported
   recursively. Defaults to True
 - exclude :: [string, optional] Regexp of files to not export for this
   source. Default to nothing (no files to exclude).
 - target :: [string, optional] Path where to put the exported files,
-  relative to the ~public_folder~ folder. Defaults to the source name at
-  the root of the ~public_folder~ folder.
+  relative to the ~html_public_folder~ or ~gemini_public_folder~
+  folder. Defaults to the source name at the root of the /public/
+  folder.
 - is_blog :: [boolean, optional] Whether this source should be
   considered as a blog and thus, serves to generate blog index, tags
   indexes and atom feeds.
 - theme :: [string, optional] Theme name to use for this source.
   Defaults to “default”.
+- type :: [string, optional] Type of the exporter to use. Fronde
+  currently supports only “html” and “gemini”. Defaults to “html”.
 
-#+begin_tip
+#+begin_tipblock
 If one of your sources is expected to use all default settings, instead
 of an object, you can just provide the source path as a string. Look at
 the ~src~ source in the example bellow.
-#+end_tip
+#+end_tipblock
 
 #+caption: Example of a sources array setting
 #+begin_src yaml
@@ -515,7 +531,7 @@ if the ~sources~ option has been:
     recursive: yes
 #+end_src
 
-#+begin_warning
+#+begin_warningblock
 Not setting the ~sources~ option is different from giving it the
 following exact value:
 
@@ -527,15 +543,15 @@ following exact value:
 
 In the first case, as nothing as been given for the ~sources~ option,
 its default value will use ~.~ as its target directory, which means to
-put generated HTML files directly at the root of the ~public_folder~
+put generated HTML files directly at the root of the ~html_public_folder~
 (which defaults to ~public_html~). But in the later case, the generated
-target will be the ~src~ folder /inside/ the ~public_folder~, which will
-be, by default, ~public_html/src~.
+target will be the ~src~ folder /inside/ the ~html_public_folder~, which
+will be, by default, ~public_html/src~.
 
 Thus, if you have a very simple website with only one source, you should
 avoid setting the ~sources~ options, or be very precise in what you
 specify.
-#+end_warning
+#+end_warningblock
 
 *** ~templates~
 :PROPERTIES:
@@ -573,14 +589,14 @@ object, which must use the following keys:
   a CSS selector, any part of the HTML document, in order to move it
   elsewhere. See example below.
 
-#+begin_warning
+#+begin_warningblock
 The ~content~ and the ~source~ options are incompatible: either you have
 a ~content~ or a ~source~, never both of them. This is because either
 you want to /add/ a new content to your document (using ~content~) or
 you want to /move/ an existing content of your document (using
 ~source~). In both case, the destination is taken from the ~selector~
 option.
-#+end_warning
+#+end_warningblock
 
 For example, if you want to hide social media ~meta~ tags in the /head/
 of your generated HTML files, you can use the following ~templates~
@@ -628,7 +644,7 @@ option, this replacement occurs only for HTML documents under the
   path: "/docs/*.html"
 #+end_src
 
-** Preamble/Postamble/Templates formatting tags
+** Preamble, Postamble, and Templates formatting tags
 :PROPERTIES:
 :CUSTOM_ID: formatting_tags
 :END:
@@ -647,7 +663,7 @@ evaluated Org file, or by default from the config of your project.
         ~<time datetime="%I">%i</time>~.
 - %D :: the full date and time HTML representation.
 - %i :: the raw short date and time.
-- %I :: the raw rfc3339 date and time.
+- %I :: the raw ISO 8601 date and time.
 - %k :: the current Org file keywords separated by commas.
 - %K :: the HTML list rendering of the keywords.
 - %l :: the lang of the document, or the one given in the config file.
@@ -667,3 +683,13 @@ evaluated Org file, or by default from the config of your project.
 
 Like a lot of ruby project, fronde exposes some [[https://ruby.github.io/rake/][Rake]] tasks. You can
 discover them with the ~rake -T~ command.
+
+# Compile this file with:
+# latexmk -norc -xelatex -halt-on-error -shell-escape DOCUMENTATION
+# Clean folder with:
+# rm -rf _minted-DOCUMENTATION
+# latexmk -e "push @generated_exts, 'nav', 'snm', 'vrb';" -c DOCUMENTATION
+
+# Local Variables:
+# org-latex-src-block-backend: minted
+# End:

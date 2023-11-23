@@ -1,6 +1,9 @@
-.byebug_history
 .ruby-*
+.yardoc
 fronde-*.gem
 doc
 coverage
-.yardoc
+_minted-DOCUMENTATION
+DOCUMENTATION.*
+!DOCUMENTATION.org
+!DOCUMENTATION.pdf

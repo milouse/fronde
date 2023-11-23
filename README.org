@@ -1,6 +1,6 @@
 #+title: Fronde
 #+author: Étienne Deparis
-#+lang: en
+#+language: en
 #+keywords: static website generator, ruby, gem, org mode, emacs
 #+description: Fronde is a ruby gem, which helps you to manage your
 #+description: static website generated with Org mode
@@ -35,22 +35,107 @@ with a global ruby installation too.
 
 #+caption: Installation procedure with RVM
 #+begin_src shell
-rvm get latest
-rvm use ruby-2.7.2@fronde --create
-gem install fronde
+  rvm get latest
+  rvm install ruby-3.2.2
+  rvm use ruby-3.2.2@fronde --create
+  gem install fronde
 #+end_src
 
 Now you're ready to create your first fronde website.
 
 #+begin_src shell
-mkdir mywebite
-cd mywebsite
-fronde init -t "My first fronde website"
-fronde build
-fronde preview
+  mkdir mywebite
+  cd mywebsite
+  fronde init -t "My first fronde website"
+  fronde build
+  fronde preview
 #+end_src
 
-* Support
+* Announcements
+
+** Nov. 2023 - v0.4 release
+
+The version 0.4 of fronde is made available for all. This new release
+brings a lot of stability improvements and inner refactoring. Even if
+the visible changes list might look a bit poor, this release is a big
+step forward and will help a lot to develop new features in the
+future. Some parts of the software were poorly designed and we worked
+hard to improve the coding.
+
+#+begin_noteblock
+After the update, you will need to update your installations and force a
+full publication of your websites (because the way templates are
+inserted inside published files changed). Actually, this will become
+the new standard routine after any fronde upgrade.
+
+#+begin_src shell
+  fronde update
+  fronde build -f
+#+end_src
+#+end_noteblock
+
+Here is the list of the most visible changes:
+
+- Improve Gemini support
+- Translate all console messages
+- Introduce a new onboarding command (~new~ instead of ~init~) to follow
+  other static website generator habbits
+- Rework tags and Atom feeds publication
+  + Output full article body in Atom feeds
+  + Announce each Atom feed in its related tag page
+  + Move tag pages and Atom feeds /inside/ the related blog source. They
+    are not shared anymore but specific to their source.
+
+#+begin_warningblock
+As tags and feeds are now published under their related source public
+path and no more directly at the root of the publication folder, you
+might want to setup some redirections in your web server configuration.
+
+For the following example configuration:
+
+#+begin_src yaml
+  ---
+  sources:
+  - path: src/news
+    is_blog: true
+#+end_src
+
+Feeds and tags will now be published under ~public_html/news/feeds/~ and
+~/public_html/news/tags/~ instead of ~public_html/feeds/~ and
+~public_html/tags/~. Thus you might want to setup some redirections like
+the following for nginx:
+
+#+begin_src
+  location ~ ^/tags/(?<slug>.*)$ {
+      return 301 /news/tags/$slug;
+  }
+  location ~ ^/feeds/(?<slug>.*)$ {
+      return 301 /news/feeds/$slug;
+  }
+#+end_src
+#+end_warningblock
+
+* Contributing
+
+#+html: <a href="./CODE_OF_CONDUCT.html"><img alt="Contributor Covenant" src="https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg"/></a>
+
+Fronde is proudly following the [[./CODE_OF_CONDUCT.org][Contributor Covenant Code of Conduct]].
+
+** Translations
+
+You can fetch the yaml files directly from the [[./locales][source code tree]] and
+send your changes as a pull request (see bellow) or by email, as you
+prefer.
+
+** Code
+
+The canonical repository is located at [[https://git.umaneti.net/fronde]].
+A mirror also exists on [[https://framagit.org/milouse/fronde][Framagit]] and [[https://github.com/milouse/chwall][Github]].
+
+Merge requests and issues are accepted both on framagit and github, or
+by mail to the main author.
+
+** Support
 
 #+html: <a href="https://liberapay.com/milouse/donate"><img alt="Support using Liberapay" src="https://img.shields.io/badge/Liberapay-Support_me-yellow?logo=liberapay"/></a>
 #+html: <a href="https://paypal.me/milouse"><img alt="Support using Paypal" src="https://img.shields.io/badge/Paypal-Support_me-00457C?logo=paypal&labelColor=lightgray"/></a>

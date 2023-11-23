@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"
+      xmlns:dc="http://purl.org/dc/elements/1.1/"
+      xml:lang="{{ lang }}">
+
+  <title>{{ title | escape }}</title>
+  <link href="{{ domain }}/feeds/{{ slug }}.xml" rel="self" type="application/atom+xml"/>
+  <link href="{{ tagurl }}" rel="alternate" type="text/html" title="{{ title }}"/>
+  <updated>{{ upddate }}</updated>
+  <author><name>{{ author }}</name></author>
+  <id>urn:md5:{{ domain | md5 }}</id>
+  <generator uri="https://git.umaneti.net/fronde/about/">Fronde</generator>
+
+  {%- for article in entries %}
+
+  <entry>
+    <title>{{ article.title | escape }}</title>
+    <link href="{{ article.url }}" rel="alternate"
+          type="{{ publication_format }}"
+          title="{{ article.title }}"/>
+    <id>urn:md5:{{ article.timekey | md5 }}</id>
+    <published>{{ article.published_xml }}</published>
+    <updated>{{ article.updated_xml }}</updated>
+    <author><name>{{ article.author | escape }}</name></author>
+    {%- for keyword in article.keywords %}
+    <dc:subject>{{ keyword | escape }}</dc:subject>
+    {%- endfor %}
+    {%- if publication_format == 'text/html' %}
+    <content type="html">
+    {%- else %}
+    <content>
+    {%- endif %}
+      {{- article.published_body | escape -}}
+    </content>
+  </entry>
+  {%- endfor %}
+</feed>

@@ -1,0 +1,8 @@
+# frozen_string_literal: true
+
+require 'fronde/config'
+
+fronde_spec = Gem::Specification.find_by_name 'fronde'
+Dir.glob("#{fronde_spec.gem_dir}/lib/tasks/*.rake").each { |r| import r }
+
+task default: 'site:build'

@@ -1,85 +1,74 @@
 # frozen_string_literal: true
 
-require 'cgi'
-require 'fronde/config'
+require_relative '../config'
 
 module Fronde
-  # Embeds Atom feeds sepecific methods
-  module IndexAtomGenerator
+  # Reopen Index class to embed Atom feeds sepecific methods
+  class Index
     def to_atom(index_name = 'index')
-      content = [atom_header(index_name)]
-      @index[index_name][0...10].each do |article|
-        content << atom_entry(article)
-      end
-      format '%<content>s</feed>', content: content.join("\n")
+      entries = @index[index_name][0...10].map(&:to_h)
+      return atom_index(entries) if index_name == 'index'
+
+      atom_file(index_name, entries)
     end
 
     def write_atom(index_name)
-      return unless save?
-      slug = Fronde::OrgFile.slug index_name
-      FileUtils.mkdir_p "#{@pubdir}/feeds"
-      atomdest = "#{@pubdir}/feeds/#{slug}.xml"
-      File.write(atomdest, to_atom(index_name))
+      slug = Slug.slug index_name
+      atomdest = "#{@project.publication_path}/feeds/#{slug}.xml"
+      File.write atomdest, to_atom(index_name)
+    end
+
+    def write_all_feeds(verbose: true)
+      FileUtils.mkdir_p "#{@project.publication_path}/feeds"
+      @index.each_key do |tag|
+        write_atom(tag)
+        warn R18n.t.fronde.index.atom_generated(tag: tag) if verbose
+      end
     end
 
     private
 
-    # Render the Atom feed header.
+    # Render an Atom feed file.
     #
-    # @param title [String] the title of the current atom feed
-    # @return [String] the Atom header as a String
-    def atom_header(title)
-      domain = Fronde::Config.get('domain')
-      upddate = @date.rfc3339
-      if title == 'index'
-        slug = 'index'
-        tagurl = domain
-        title = Fronde::Config.get('title', R18n.t.fronde.index.all_tags)
-      else
-        slug = Fronde::OrgFile.slug(title)
-        tagurl = "#{domain}/tags/#{slug}.html"
-        title = @tags_names[title]
-      end
-      title = CGI.escapeHTML(title)
-      <<~ENDATOM
-        <?xml version="1.0" encoding="utf-8"?>
-        <feed xmlns="http://www.w3.org/2005/Atom"
-              xmlns:dc="http://purl.org/dc/elements/1.1/"
-              xmlns:wfw="http://wellformedweb.org/CommentAPI/"
-              xml:lang="#{Fronde::Config.get('lang')}">
-
-        <title>#{title}</title>
-        <link href="#{domain}/feeds/#{slug}.xml" rel="self" type="application/atom+xml"/>
-        <link href="#{tagurl}" rel="alternate" type="text/html" title="#{title}"/>
-        <updated>#{upddate}</updated>
-        <author><name>#{Fronde::Config.get('author', '')}</name></author>
-        <id>urn:md5:#{Digest::MD5.hexdigest(domain)}</id>
-        <generator uri="https://git.umaneti.net/fronde/about/">Fronde</generator>
-      ENDATOM
+    # @param tag_name [String] the tag name of the current atom feed
+    # @param entries [Array] the article to list in this file
+    # @return [String] the Atom feed as a String
+    def atom_file(tag_name, entries)
+      domain = Fronde::CONFIG.get('domain')
+      slug = Slug.slug(tag_name)
+      tagurl = "#{domain}#{@project.public_absolute_path}tags/#{slug}.html"
+      Config::Helpers.render_liquid_template(
+        File.read(File.expand_path('./data/template.xml', __dir__)),
+        'title' => @tags_names[tag_name],
+        'lang' => Fronde::CONFIG.get('lang'),
+        'domain' => domain,
+        'slug' => slug,
+        'tagurl' => tagurl,
+        'upddate' => @date.xmlschema,
+        'author' => Fronde::CONFIG.get('author'),
+        'publication_format' => @project['mime_type'],
+        'entries' => entries
+      )
     end
 
-    # Render an Atom feed entry.
+    # Render the main/index Atom feed.
     #
-    # @param article [Fronde::OrgFile] the related org document for this
-    #   entry
-    # @return [String] the Atom entry as a String
-    def atom_entry(article)
-      keywords = article.keywords.map do |k|
-        "<dc:subject>#{CGI.escapeHTML(k)}</dc:subject>"
-      end.join
-      keywords += "\n  " if keywords != ''
-      title = CGI.escapeHTML(article.title)
-      <<~ENDENTRY
-        <entry>
-          <title>#{title}</title>
-          <link href="#{article.url}" rel="alternate" type="text/html"
-                title="#{title}"/>
-          <id>urn:md5:#{Digest::MD5.hexdigest(article.timekey)}</id>
-          <published>#{article.datestring(:rfc3339)}</published>
-          <author><name>#{CGI.escapeHTML(article.author)}</name></author>
-          #{keywords}<content type="html">#{CGI.escapeHTML(article.excerpt)}</content>
-        </entry>
-      ENDENTRY
+    # @param entries [Array] the article to list in this file
+    # @return [String] the Atom feed as a String
+    def atom_index(entries)
+      domain = Fronde::CONFIG.get('domain')
+      Config::Helpers.render_liquid_template(
+        File.read(File.expand_path('./data/template.xml', __dir__)),
+        'title' => @project['title'],
+        'lang' => Fronde::CONFIG.get('lang'),
+        'domain' => domain,
+        'slug' => 'index',
+        'tagurl' => domain,
+        'upddate' => @date.xmlschema,
+        'author' => Fronde::CONFIG.get('author'),
+        'publication_format' => @project['mime_type'],
+        'entries' => entries
+      )
     end
   end
 end
