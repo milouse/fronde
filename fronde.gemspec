@@ -75,6 +75,13 @@ Gem::Specification.new do |spec|
     # Translations
     'locales/en.yml',
     'locales/fr.yml',
+    # Themes
+    'lib/fronde/config/data/themes/umaneti/css/htmlize.css',
+    'lib/fronde/config/data/themes/umaneti/css/style.css',
+    'lib/fronde/config/data/themes/umaneti/img/bottom.png',
+    'lib/fronde/config/data/themes/umaneti/img/content.png',
+    'lib/fronde/config/data/themes/umaneti/img/tic.png',
+    'lib/fronde/config/data/themes/umaneti/img/top.png',
     # Others
     'LICENSE'
   ]

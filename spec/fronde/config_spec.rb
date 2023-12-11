@@ -218,7 +218,7 @@ describe Fronde::CONFIG do
 
   context 'with a blog and a custom domain (config 4)' do
     before do
-      FileUtils.mkdir_p 'tmp/config'
+      FileUtils.mkdir_p 'tmp/config/themes/my-theme'
       Dir.chdir 'tmp/config'
       File.write('config.yml', SAMPLE_CONFIG_4)
       described_class.reset
@@ -251,7 +251,7 @@ describe Fronde::CONFIG do
 
   context 'without a blog and with default theme (config 5)' do
     before do
-      FileUtils.mkdir_p 'tmp/config'
+      FileUtils.mkdir_p 'tmp/config/themes/my-theme'
       Dir.chdir 'tmp/config'
       File.write('config.yml', SAMPLE_CONFIG_5)
       described_class.reset
@@ -267,6 +267,54 @@ describe Fronde::CONFIG do
       expect(File.file?(lisp_config)).to be(true)
       proof = proof_content('config_5_org_config.el')
       expect(File.read(lisp_config)).to eq(proof)
+    end
+  end
+
+  context 'with various theme configuration' do
+    before do
+      FileUtils.mkdir_p 'tmp/config/themes/my-theme'
+      Dir.chdir 'tmp/config'
+    end
+
+    after do
+      tear_down 'tmp/config'
+    end
+
+    it 'fails with unknown theme' do
+      File.write 'config.yml', ['---', 'theme: unknown'].join("\n")
+      described_class.reset
+      expect { described_class.write_org_lisp_config }.to(
+        raise_error(
+          Errno::ENOENT,
+          'No such file or directory - Theme unknown not found'
+        )
+      )
+    end
+
+    it 'generates lisp-config.el with packaged theme' do
+      File.write 'config.yml', ['---', 'theme: umaneti'].join("\n")
+      described_class.reset
+      described_class.write_org_lisp_config
+      content = File.read File.expand_path('var/lib/org-config.el')
+      theme_dir = File.expand_path(
+        '../../lib/fronde/config/data/themes', __dir__
+      )
+      path_rx = /"theme-umaneti"\n {9}:base-directory "(?<path>[^"]+)\/umaneti"$/m
+      match = path_rx.match(content)
+      expect(match).not_to be_nil
+      expect(match[:path]).to eq theme_dir
+    end
+
+    it 'generates lisp-config.el with local theme' do
+      File.write 'config.yml', ['---', 'theme: my-theme'].join("\n")
+      described_class.reset
+      described_class.write_org_lisp_config
+      content = File.read File.expand_path('var/lib/org-config.el')
+      theme_dir = File.expand_path 'themes'
+      path_rx = /"theme-my-theme"\n {9}:base-directory "(?<path>[^"]+)\/my-theme"$/m
+      match = path_rx.match(content)
+      expect(match).not_to be_nil
+      expect(match[:path]).to eq theme_dir
     end
   end
 end
