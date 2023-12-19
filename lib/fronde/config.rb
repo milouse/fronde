@@ -46,9 +46,9 @@ module Fronde
           'gemini_public_folder' => 'public_gmi',
           'templates' => [], 'theme' => 'default'
         }.freeze
-        @org_version = @sources = nil
-        @config = load_settings
         # Do not load sources now to avoid dependency loop on config
+        @sources = nil
+        @config = load_settings
       end
 
       include Fronde::Config::Lisp
@@ -93,7 +93,7 @@ module Fronde
       def reset
         # Reload config, taking default settings into account
         @config = load_settings
-        @org_version = @sources = nil
+        @sources = nil
         @sources = load_sources
       end
 
@@ -109,7 +109,7 @@ module Fronde
       # @return [Fronde::Config::Store] self
       def load_test(config)
         @config = @default_settings.merge config
-        @org_version = @sources = nil
+        @sources = nil
         @sources = load_sources
         self
       end
