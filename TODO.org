@@ -32,3 +32,7 @@ See https://www.emadelsaid.com/ActivityPub/ and
 https://s3lph.me/activitypub-static-site.html, and
 https://blog.joinmastodon.org/2018/06/how-to-implement-a-basic-activitypub-server/
 to begin with
+
+#+begin_src
+  /.well-known/webfinger?resource=acct:handle@domain
+#+end_src
