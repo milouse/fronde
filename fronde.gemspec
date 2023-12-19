@@ -87,6 +87,7 @@ Gem::Specification.new do |spec|
     'lib/fronde/config/data/themes/umaneti/img/content.png',
     'lib/fronde/config/data/themes/umaneti/img/tic.png',
     'lib/fronde/config/data/themes/umaneti/img/top.png',
+    'lib/fronde/config/data/themes/umaneti/theme.yml',
     # Others
     'LICENSE'
   ]

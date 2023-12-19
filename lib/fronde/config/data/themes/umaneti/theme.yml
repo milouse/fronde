@@ -1,0 +1,5 @@
+---
+templates:
+  - type: before
+    selector: div#content
+    source: nav#table-of-contents

@@ -121,6 +121,8 @@ module Fronde
         return @sources if @sources
 
         @sources = remove_inclusion(remove_duplicate(build_sources))
+        # TODO: integrate theme settings per source
+        @sources
       end
 
       private
