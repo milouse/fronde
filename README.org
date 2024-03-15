@@ -27,6 +27,10 @@ the publication process.
 - Can use different themes for different sources
 - Supports tags and [[https://en.wikipedia.org/wiki/Atom_(Web_standard)][ATOM feeds]]
 
+* Announcements
+
+See the [[./NEWS.org]] file.
+
 * Quick install
 
 Fronde is a [[https://rubygems.org/][Ruby gem]]. You need a working Ruby environment to use it. We
@@ -50,70 +54,6 @@ Now you're ready to create your first fronde website.
   fronde build
   fronde preview
 #+end_src
-
-* Announcements
-
-** Nov. 2023 - v0.4 release
-
-The version 0.4 of fronde is made available for all. This new release
-brings a lot of stability improvements and inner refactoring. Even if
-the visible changes list might look a bit poor, this release is a big
-step forward and will help a lot to develop new features in the
-future. Some parts of the software were poorly designed and we worked
-hard to improve the coding.
-
-#+begin_noteblock
-After the update, you will need to update your installations and force a
-full publication of your websites (because the way templates are
-inserted inside published files changed). Actually, this will become
-the new standard routine after any fronde upgrade.
-
-#+begin_src shell
-  fronde update
-  fronde build -f
-#+end_src
-#+end_noteblock
-
-Here is the list of the most visible changes:
-
-- Improve Gemini support
-- Translate all console messages
-- Introduce a new onboarding command (~new~ instead of ~init~) to follow
-  other static website generator habbits
-- Rework tags and Atom feeds publication
-  + Output full article body in Atom feeds
-  + Announce each Atom feed in its related tag page
-  + Move tag pages and Atom feeds /inside/ the related blog source. They
-    are not shared anymore but specific to their source.
-
-#+begin_warningblock
-As tags and feeds are now published under their related source public
-path and no more directly at the root of the publication folder, you
-might want to setup some redirections in your web server configuration.
-
-For the following example configuration:
-
-#+begin_src yaml
-  ---
-  sources:
-  - path: src/news
-    is_blog: true
-#+end_src
-
-Feeds and tags will now be published under ~public_html/news/feeds/~ and
-~public_html/news/tags/~ instead of ~public_html/feeds/~ and
-~public_html/tags/~. Thus you might want to setup some redirections like
-the following for nginx:
-
-#+begin_src
-  location ~ ^/tags/(?<slug>.*)$ {
-      return 301 /news/tags/$slug;
-  }
-  location ~ ^/feeds/(?<slug>.*)$ {
-      return 301 /news/feeds/$slug;
-  }
-#+end_src
-#+end_warningblock
 
 * Contributing
 
@@ -146,4 +86,4 @@ You can help me a lot by giving me some tip, either through [[https://liberapay.
 
 * Going further
 
-Please refer to the [[./DOCUMENTATION.org][documentation]].
+Please refer to the [[./DOCUMENTATION.org]] file.
