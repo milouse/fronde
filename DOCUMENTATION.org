@@ -341,6 +341,25 @@ the home page of your project.
 
 ** Publishing the website
 
+To publish your website, just use the following command:
+
+#+caption: Publish a fronde project
+#+begin_src shell
+  fronde publish
+#+end_src
+
+You can give the ~--verbose~ argument to display more detail on the
+operation.
+
+#+caption: Publish verbosely a fronde project
+#+begin_src shell
+  fronde publish -v
+#+end_src
+
+The publication target must be defined using one of the two settings
+[[#remote_setting][gemini_remote or html_remote]]. If none of those setting is set, the
+~publish~ command will do nothing.
+
 * Advanced usage
 
 ** Config File
@@ -408,46 +427,37 @@ are *valid* values too.
 The default ~domain~ value is an empty string.
 #+end_noteblock
 
-*** ~gemini_public_folder~
+*** ~gemini_public_folder~ or ~html_public_folder~
 
-The ~gemini_public_folder~ option stores the path to the folder, which
-will contains the generated gemtext files, ready for Gemini publication.
+The ~gemini_public_folder~ or ~html_public_folder~ option stores the
+path to the folder, which will respectively contains the generated
+gemtext or HTML files, ready for Gemini or Web publication.
 
 #+begin_noteblock
 The default ~gemini_public_folder~ value is ~public_gmi~ (at the root of
 your project).
 #+end_noteblock
 
-*** ~gemini_remote~
-
-The ~gemini_remote~ option contains an /rsync/ like destination string,
-which will be used to published your capsule when using the ~sync:push~
-/rake/ task. For example ~user@domain:/var/www/mycapsule/~
-
-#+begin_noteblock
-There is no default value for ~gemini_remote~. Publication of your
-capsule will be skipped if there is no value for ~gemini_remote~.
-#+end_noteblock
-
-*** ~html_public_folder~
-
-The ~html_public_folder~ option stores the path to the folder, which
-will contains the HTML generated files, ready for Web publication.
-
 #+begin_noteblock
 The default ~html_public_folder~ value is ~public_html~ (at the root of
 your project).
 #+end_noteblock
 
-*** ~html_remote~
+*** ~gemini_remote~ or ~html_remote~
+:PROPERTIES:
+:CUSTOM_ID: remote_setting
+:END:
 
-The ~html_remote~ option contains an /rsync/ like destination string,
-which will be used to published your website when using the ~sync:push~
-/rake/ task. For example ~user@domain:/var/www/mywebsite/~
+The ~gemini_remote~ or ~html_remote~ option contains an /rsync/ like
+destination string, which will be used to published your capsule or website
+when using the ~sync:push~ /rake/ task. For example
+~user@domain:/var/www/mywebsite/~
 
 #+begin_noteblock
-There is no default value for ~html_remote~. Publication of your website
-will be skipped if there is no value for ~html_remote~.
+There is no default value for ~gemini_remote~ or ~html_remote~. Publication of your
+capsule will be skipped if there is no value for ~gemini_remote~. The
+same thing for your website, if there is no value for ~html_remote~, the
+publication of your website will be skipped.
 #+end_noteblock
 
 *** ~lang~
@@ -683,6 +693,11 @@ evaluated Org file, or by default from the config of your project.
 
 Like a lot of ruby project, fronde exposes some [[https://ruby.github.io/rake/][Rake]] tasks. You can
 discover them with the ~rake -T~ command.
+
+Those rake task offer fine grained control over some operation, like
+featuring a "dry-run" mode for the ~sync:push~ task used by the
+~publish~ command, and even a ~sync:pull~ task to retrieve any content
+currently exposed on your website or capsule.
 
 # Compile this file with:
 # latexmk -norc -xelatex -halt-on-error -shell-escape DOCUMENTATION
