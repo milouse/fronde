@@ -74,7 +74,7 @@ INFO is a plist used as a communication channel."
 
 (defun fronde/org-i18n-export (link description format)
   "Export a i18n link"
-  (let* ((splitted-link (split-string link "|"))
+  (let* ((splitted-link (split-string link "::"))
          (path (car splitted-link))
          (desc (or description path))
          (lang (cadr splitted-link)))
@@ -88,7 +88,7 @@ INFO is a plist used as a communication channel."
 
 (defun fronde/org-i18n-follow (link)
   "Visit a i18n link"
-  (browse-url (car (split-string link "|"))))
+  (browse-url (car (split-string link "::"))))
 
 (org-link-set-parameters "i18n"
   :export #'fronde/org-i18n-export
