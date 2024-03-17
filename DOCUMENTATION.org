@@ -195,7 +195,7 @@ number you just built):
 
 #+caption: Fronde installation procedure from local gem file
 #+begin_src shell
-  gem install fronde-0.4.0.gem
+  gem install fronde-x.y.z.gem
 #+end_src
 
 ** Creation of a website
