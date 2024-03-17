@@ -1,4 +1,3 @@
-.dir-locals.el
 .ruby-version
 Rakefile
 lib/

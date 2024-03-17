@@ -14,7 +14,7 @@ context 'when managing Org installation' do
 
   after do
     Dir.glob('lib/org-[0-9.]*').each { |ov| FileUtils.rm_r(ov, force: true) }
-    FileUtils.rm ['.dir-locals.el', 'var/lib/org-config.el'], force: true
+    FileUtils.rm 'var/lib/org-config.el', force: true
     tear_down 'tmp/website_testing'
   end
 
@@ -23,15 +23,6 @@ context 'when managing Org installation' do
     expect(File.exist?('var/lib/org-config.el')).to be true
     proof = proof_content 'org-config-proof.el'
     expect(File.read('var/lib/org-config.el')).to eq(proof)
-  end
-
-  it 'creates .dir-locals.el' do
-    rake.invoke_task('.dir-locals.el')
-    expect(File.exist?('.dir-locals.el')).to be true
-    proof = File.expand_path('var/lib/org-config.el')
-    expect(File.read('.dir-locals.el')).to(
-      eq("((org-mode . ((eval . (load-file \"#{proof}\")))))")
-    )
   end
 
   it 'tries to download Org verbosely' do
@@ -69,7 +60,6 @@ context 'when managing Org installation' do
     copy_org_tarball_to_fake_tmp
     rake(verbose: false).invoke_task('org:install')
     expect(File.exist?('var/lib/org-config.el')).to be true
-    expect(File.exist?('.dir-locals.el')).to be true
     expect(File.exist?("#{org_dir}/lisp/org-loaddefs.el")).to be true
   end
 
@@ -77,7 +67,6 @@ context 'when managing Org installation' do
     copy_org_tarball_to_fake_tmp
     rake(verbose: true).invoke_task('org:install')
     expect(File.exist?('var/lib/org-config.el')).to be true
-    expect(File.exist?('.dir-locals.el')).to be true
     expect(File.exist?("#{org_dir}/lisp/org-loaddefs.el")).to be true
   end
 
@@ -157,7 +146,6 @@ context 'when managing Org installation' do
     copy_org_lisp_files_to_fake_tmp
     rake.invoke_task 'org:install'
     config_time = File.mtime 'var/lib/org-config.el'
-    locals_time = File.mtime '.dir-locals.el'
     orgball_time = File.mtime 'var/tmp/org.tar.gz'
     org_version = Fronde::Org.current_version
     orglisp_time = File.mtime "lib/org-#{org_version}/lisp/org-loaddefs.el"
@@ -166,7 +154,6 @@ context 'when managing Org installation' do
     sleep 1 # To change mtimes
     rake.invoke_task 'org:upgrade'
     expect(File.mtime('var/lib/org-config.el')).not_to eq config_time
-    expect(File.mtime('.dir-locals.el')).not_to eq locals_time
     expect(Fronde::Org).not_to have_received(:download)
     expect(File.mtime('var/tmp/org.tar.gz')).to eq orgball_time
     expect(Fronde::Org).not_to have_received(:compile)
@@ -180,7 +167,6 @@ context 'when managing Org installation' do
     copy_org_lisp_files_to_fake_tmp
     rake.invoke_task 'org:install'
     config_time = File.mtime 'var/lib/org-config.el'
-    locals_time = File.mtime '.dir-locals.el'
     org_version = Fronde::Org.current_version
     FileUtils.mv "lib/org-#{org_version}", 'lib/org-2.3'
     expect(Dir.exist?("lib/org-#{org_version}")).to be false
@@ -189,7 +175,6 @@ context 'when managing Org installation' do
     sleep 1 # To change mtimes
     rake.invoke_task('org:upgrade')
     expect(File.mtime('var/lib/org-config.el')).not_to eq config_time
-    expect(File.mtime('.dir-locals.el')).not_to eq locals_time
     # Removed by upgrade
     expect(File.exist?('var/tmp/org.tar.gz')).to be false
     expect(Dir.exist?('lib/org-2.3')).to be false

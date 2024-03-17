@@ -241,7 +241,6 @@ Your project now consist of the following file hierarchy:
 #+begin_example
 yourproject/
 ├── config.yml      # main config file
-├── .dir-locals.el  # Emacs per-directory local variables file
 ├── lib/            # required dependencies
 ├── public_html/    # output folder
 │   └── assets/
