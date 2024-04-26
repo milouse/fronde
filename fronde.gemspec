@@ -83,6 +83,8 @@ Gem::Specification.new do |spec|
   spec.license     = 'WTFPL'
 
   spec.required_ruby_version = '>= 2.7'
+  spec.add_runtime_dependency 'base64', '~> 0.2'
+  spec.add_runtime_dependency 'bigdecimal', '~> 3.1'
   spec.add_runtime_dependency 'liquid', '~> 5.5'
   spec.add_runtime_dependency 'nokogiri', '~> 1.16'
   spec.add_runtime_dependency 'r18n-core', '~> 5.0'
