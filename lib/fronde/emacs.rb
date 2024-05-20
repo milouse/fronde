@@ -23,7 +23,7 @@ module Fronde
         warn cmd
         return system(cmd, exception: true)
       end
-      system cmd, out: '/dev/null', err: '/dev/null', exception: true
+      system cmd, out: File::NULL, err: File::NULL, exception: true
     end
 
     def build_command(org_action)
