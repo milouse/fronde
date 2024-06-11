@@ -21,7 +21,7 @@ module Fronde
 
         if help_param_given?
           return 2 if @options[:recover_from_error]
-          return 0
+          return true
         end
 
         init_rake if %w[build preview publish].include?(@command)

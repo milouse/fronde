@@ -27,13 +27,13 @@ module Fronde
         init_rake
         @rake.options.build_all = true
         @rake['org:upgrade'].invoke
-        0
+        true
       end
 
       def fronde_build
         @rake.options.build_all = true
         @rake['site:build'].invoke @options[:force]
-        0
+        true
       end
 
       def fronde_preview
@@ -43,7 +43,7 @@ module Fronde
           Helpers.launch_app_for_uri "http://127.0.0.1:#{port}/"
         end
         @rake['site:preview'].invoke
-        0
+        true
       end
 
       def fronde_open
@@ -58,12 +58,12 @@ module Fronde
           cmd << '+6'
         end
         cmd << file_path
-        (system(*cmd) && 0) || 1
+        system(*cmd)
       end
 
       def fronde_publish
         @rake['sync:push'].invoke
-        0
+        true
       end
 
       def fronde_help
@@ -78,7 +78,7 @@ module Fronde
         end
         body = OptParse.help_command_body(cmd)
         warn body unless body == ''
-        0
+        true
       end
 
       private
