@@ -241,8 +241,10 @@ module Fronde
         else
           source = find_source_for_publication_file
         end
-        warn R18n.t.fronde.error.org_file.no_project(file: @file) unless source
-        source
+        return source if source
+
+        short_file = @file.sub(/^#{Dir.pwd}/, '.')
+        warn R18n.t.fronde.error.org_file.no_project(file: short_file)
       end
 
       def find_source_for_org_file

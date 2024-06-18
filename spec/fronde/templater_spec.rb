@@ -71,8 +71,8 @@ describe Fronde::Templater do
 
     it 'skips file on unknown source' do
       FileUtils.mkdir 'public_html/customize'
-      File.write 'public_html/customize/test.html', html_base
-      test_path = "#{Dir.pwd}/public_html/customize/test.html"
+      test_path = './public_html/customize/test.html'
+      File.write test_path, html_base
       expect do
         described_class.customize_output('public_html/customize/test.html')
       end.to(
