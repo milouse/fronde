@@ -25,19 +25,16 @@ namespace :org do
     else
       Fronde::CLI::Throbber.run(download, R18n.t.fronde.tasks.org.downloading)
     end
-  rescue RuntimeError
+  rescue RuntimeError, Interrupt
     warn R18n.t.fronde.tasks.org.no_download if verbose
   end
 
   desc 'Compile Org'
   multitask compile: ['var/tmp/org.tar.gz', 'lib'] do |task|
-    begin
-      # No need to force fetch last version as it is only interesting as
-      # part of the upgrade task
-      org_version = Fronde::Org.last_version
-    rescue RuntimeError
-      next
-    end
+    # No need to force fetch last version as it is only interesting as
+    # part of the upgrade task
+    org_version = Fronde::Org.last_version
+
     org_dir = "lib/org-#{org_version}"
     next if Dir.exist?("#{org_dir}/lisp")
 
@@ -53,6 +50,8 @@ namespace :org do
     else
       Fronde::CLI::Throbber.run(build, R18n.t.fronde.tasks.org.installing)
     end
+  rescue RuntimeError, Interrupt
+    next
   end
 
   directory 'lib'

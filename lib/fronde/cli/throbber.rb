@@ -21,6 +21,7 @@ module Fronde
 
       def initialize(thread, message)
         @frames = select_frames
+        @term_width = terminal_width
         @thread = thread
         @thread.abort_on_exception = false
         @thread.report_on_exception = false
@@ -28,23 +29,17 @@ module Fronde
       end
 
       def run
-        term_width = terminal_width
-        frames_len = @frames.length
-        current = 0
-        while @thread.alive?
-          sleep 0.1
-          frame = @frames[current % frames_len]
-          message = "#{@message} #{frame}"
-          print "#{message.ljust(term_width)}\r"
-          current += 1
-        end
-        @thread.join # Ensure any inner exception is re-raised
+        thread_loop
       rescue RuntimeError => e
         show_error
         raise e
+        # :nocov: not sure how to emulate a Ctrl+c in rspec
+      rescue Interrupt => e
+        show_message Rainbow(R18n.t.fronde.bin.interrupted).red, "\n"
+        raise e
+        # :nocov:
       else
-        done = Rainbow(R18n.t.fronde.bin.done).green
-        puts "#{@message} #{done}".ljust(term_width)
+        show_message Rainbow(R18n.t.fronde.bin.done).green, "\n"
       end
 
       class << self
@@ -70,11 +65,27 @@ module Fronde
 
       private
 
+      def thread_loop
+        frames_len = @frames.length
+        current = 0
+        while @thread.alive?
+          sleep 0.1
+          show_message @frames[current % frames_len]
+          current += 1
+        end
+        @thread.join # Ensure any inner exception is re-raised
+      end
+
       def terminal_width
         # Not a tty. Docker?
         return 0 unless system('test -t 0')
 
         `stty size`.strip.split[1].to_i - 1
+      end
+
+      def show_message(suffix, end_of_line = "\r")
+        message = "#{@message} #{suffix}".ljust(@term_width)
+        print "#{message}#{end_of_line}"
       end
 
       def show_error

@@ -26,6 +26,8 @@ namespace :sync do
       warn e
       next
     end
+  rescue RuntimeError, Interrupt
+    next
   end
 
   desc 'Pull changes from server'
@@ -45,5 +47,7 @@ namespace :sync do
       warn e
       next
     end
+  rescue RuntimeError, Interrupt
+    next
   end
 end

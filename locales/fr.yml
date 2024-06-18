@@ -3,6 +3,7 @@ fronde:
   bin:
     usage: 'Usage : fronde %1 [options]'
     done: fait
+    interrupted: arrêté
     commands:
       cmd_title: Commandes
       alias: Alias pour ‘%1’.

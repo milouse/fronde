@@ -25,19 +25,11 @@ namespace :site do
     end
     all_indexes = build_index[:all_indexes]
 
-    begin
-      build_html = Thread.new do
-        rm_r 'var/tmp/timestamps', force: true if args[:force?]
-        Fronde::Emacs.new(verbose: verbose).publish
-      end
-      Fronde::CLI::Throbber.run(build_html, R18n.t.fronde.tasks.site.building)
-
-    # :nocov:
-    rescue RuntimeError
-      warn R18n.t.fronde.tasks.site.aborting
-      next
+    build_html = Thread.new do
+      rm_r 'var/tmp/timestamps', force: true if args[:force?]
+      Fronde::Emacs.new(verbose: verbose).publish
     end
-    # :nocov:
+    Fronde::CLI::Throbber.run(build_html, R18n.t.fronde.tasks.site.building)
 
     if all_indexes.any?
       if verbose
@@ -65,6 +57,11 @@ namespace :site do
     Fronde::CLI::Throbber.run(
       customize_html, R18n.t.fronde.tasks.site.customizing
     )
+    # :nocov:
+  rescue RuntimeError, Interrupt
+    warn R18n.t.fronde.tasks.site.aborting
+    next
+    # :nocov:
   end
 
   desc 'Cleanup orphaned published files'
