@@ -2,6 +2,8 @@
 
 using TimePatch
 
+require_relative '../../ext/time_no_time'
+
 module Fronde
   module Org
     # This module holds extracter methods for the {Fronde::Org::File}
@@ -29,15 +31,12 @@ module Fronde
         match = daterx.match(@data[:content])
         return NilTime.new if match.nil?
 
-        notime = match[2].nil?
-        if notime
-          time = '00:00:00'
-        else
-          time = "#{match[2]}:#{match[3] || '00'}"
-        end
-        date = Time.strptime("#{match[1]} #{time}", '%Y-%m-%d %H:%M:%S')
-        date.no_time = notime
-        date
+        return TimeNoTime.parse_no_time(match[1]) if match[2].nil?
+
+        Time.strptime(
+          "#{match[1]} #{match[2]}:#{match[3] || '00'}",
+          '%Y-%m-%d %H:%M:%S'
+        )
       end
 
       def extract_title

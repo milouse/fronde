@@ -33,6 +33,7 @@ Gem::Specification.new do |spec|
     # Monkey patches / extensions
     'lib/ext/nil_time.rb',
     'lib/ext/r18n.rb',
+    'lib/ext/time_no_time.rb',
     'lib/ext/time.rb',
     # Core files
     'lib/fronde/cli/commands.rb',
