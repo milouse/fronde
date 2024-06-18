@@ -30,18 +30,17 @@ module Fronde
 
     def sort_by(kind)
       accepted_values = %i[name weight]
-      if accepted_values.include?(kind)
-        tags_sorted = sort_tags_by_name_and_weight["by_#{kind}".to_sym]
-        # Reverse in order to have most important or A near next prompt
-        # and avoid to scroll to find the beginning of the list.
-        return tags_sorted.map do |tag|
-          @tags_names[tag] + " (#{@index[tag].length})"
-        end.reverse
+      unless accepted_values.include?(kind)
+        error_msg = R18n.t.fronde.error.index.wrong_sort_kind(
+          kind: kind, accepted_values: accepted_values.inspect
+        )
+        raise ArgumentError, error_msg
       end
-      error_msg = R18n.t.fronde.error.index.wrong_sort_kind(
-        kind: kind, accepted_values: accepted_values.inspect
-      )
-      raise ArgumentError, error_msg
+      sort_tags_by_name_and_weight[:"by_#{kind}"].map do |tag|
+        @tags_names[tag] + " (#{@index[tag].length})"
+      end.reverse
+      # Reverse in order to have most important or A near next prompt
+      # and avoid to scroll to find the beginning of the list.
     end
 
     class << self

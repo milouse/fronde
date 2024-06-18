@@ -152,10 +152,9 @@ module Fronde
       #     => "Article written by Alice Smith the Wednesday 3rd July"
       #
       # @return [String] the given ~string~ after replacement occurs
-      # rubocop:disable Metrics/MethodLength
       # rubocop:disable Layout/LineLength
       def format(string)
-        project_data = @project&.to_h || {}
+        project_data = @project.to_h
         # NOTE: The following keycode are reserved by Org itself:
         #       %a (author), %c (creator), %C (input-file), %d (date),
         #       %e (email), %s (subtitle), %t (title), %T (timestamp),
@@ -182,7 +181,6 @@ module Fronde
               .gsub('%X', "<p>#{@data[:excerpt]}</p>")
       end
       # rubocop:enable Layout/LineLength
-      # rubocop:enable Metrics/MethodLength
 
       # Writes the current Org::File content to the underlying file.
       #
@@ -229,6 +227,7 @@ module Fronde
         data['published_body'] = extract_published_body
         pub_date = @data[:date]
         data['published'] = pub_date.l18n_long_date_string(with_year: false)
+        data['published_gemini_index'] = pub_date.strftime('%Y-%m-%d')
         data['published_xml'] = pub_date.xmlschema
         data['updated_xml'] = @data[:updated]&.xmlschema
         data
@@ -264,20 +263,17 @@ module Fronde
       def init_empty_file
         @data = {
           title: @options[:title] || '', subtitle: '', excerpt: '',
-          date: Time.now,
           author: @options[:author] || Fronde::CONFIG.get('author'),
-          keywords: [],
           lang: @options[:lang] || Fronde::CONFIG.get('lang'),
-          pub_file: nil, url: nil
+          date: Time.now, keywords: [], pub_file: nil, url: nil
         }
-        body = @options[:content] || ''
         @data[:content] = @options[:raw_content] || <<~ORG
           #+title: #{@data[:title]}
           #+date: <#{@data[:date].strftime('%Y-%m-%d %a. %H:%M:%S')}>
           #+author: #{@data[:author]}
           #+language: #{@data[:lang]}
 
-          #{body}
+          #{@options[:content]}
         ORG
       end
 

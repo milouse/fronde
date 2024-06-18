@@ -5,7 +5,9 @@ require_relative '../../../lib/fronde/cli/opt_parse'
 BASIC_CMDS = [
   '    new        Initialize a new Fronde instance.',
   '    init       Alias for ‘new’.',
-  '    update     Update Fronde configuration and dependency (to be run after each modification of the config.yml file and once in a while to stay up-to-date with Org).',
+  '    update     Update Fronde configuration and dependency ' \
+  '(to be run after each modification of the config.yml file and ' \
+  'once in a while to stay up-to-date with Org).',
   '    config     Alias for ‘update’.',
   '    preview    Start a test web server to preview the generated website.',
   '    open       Open or create an org file.',
@@ -31,16 +33,21 @@ NEW_OPTS = [
 describe Fronde::CLI::OptParse do
   context 'with theoritical fronde arguments' do
     it 'resolves alias' do
-      expect(described_class.resolve_possible_alias('new')).to eq('new')
-      expect(described_class.resolve_possible_alias('init')).to eq('new')
-      expect(described_class.resolve_possible_alias('update')).to eq('update')
-      expect(described_class.resolve_possible_alias('config')).to eq('update')
-      expect(described_class.resolve_possible_alias('build')).to eq('build')
-      expect(described_class.resolve_possible_alias('edit')).to eq('open')
-      expect(described_class.resolve_possible_alias('wrong')).to eq('basic')
+      {
+        'new' => 'new',
+        'init' => 'new',
+        'update' => 'update',
+        'config' => 'update',
+        'build' => 'build',
+        'edit' => 'open',
+        'wrong' => 'basic'
+      }.each do |command, alias_name|
+        expect(described_class.resolve_possible_alias(command)).to \
+          eq alias_name
+      end
     end
 
-    it 'returns possible options for a command' do
+    it 'returns possible options for a command', :aggregate_failures do
       init_opts = described_class.command_options('new')
       expect(init_opts).to have_key(:name)
       expect(init_opts[:name]).to eq('new')
@@ -57,18 +64,15 @@ describe Fronde::CLI::OptParse do
     end
 
     it 'returns decorated options' do
-      expect(described_class.decorate_option('-a')).to(
-        eq(['-a', '--author AUTHOR'])
-      )
-      expect(described_class.decorate_option('-l')).to(
-        eq(['-l', '--lang LOCALE'])
-      )
-      expect(described_class.decorate_option('-v')).to(
-        eq(['-v', '--verbose'])
-      )
-      expect(described_class.decorate_option('-o')).to(
-        eq(['-o', '--output FORMAT', %w[gemini html]])
-      )
+      {
+        '-a' => ['-a', '--author AUTHOR'],
+        '-l' => ['-l', '--lang LOCALE'],
+        '-v' => ['-v', '--verbose'],
+        '-o' => ['-o', '--output FORMAT', %w[gemini html]]
+      }.each do |option, output|
+        expect(described_class.decorate_option(option)).to \
+          eq output
+      end
     end
 
     it 'lists possible commands' do
@@ -99,10 +103,13 @@ describe Fronde::CLI::OptParse do
     end
 
     it 'displays help for other commands' do
-      expect(described_class.help_command_body('new')).to(
-        eq "Options\n#{NEW_OPTS}"
-      )
-      expect(described_class.help_command_body('update')).to eq ''
+      {
+        'new' => "Options\n#{NEW_OPTS}",
+        'update' => ''
+      }.each do |command, help_message|
+        expect(described_class.help_command_body(command)).to \
+          eq help_message
+      end
     end
   end
 end

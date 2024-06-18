@@ -74,13 +74,13 @@ context 'with a testing website' do
 
     it 'builds something' do
       rake(verbose: false).invoke_task('site:build')
-      expect(File.exist?('public_html/index.html')).to be(true)
+      expect(File.exist?('public_html/index.html')).to be true
     end
 
     it 'builds something even in verbose mode' do
       # For coverage
       rake(verbose: true).invoke_task('site:build')
-      expect(File.exist?('public_html/index.html')).to be(true)
+      expect(File.exist?('public_html/index.html')).to be true
     end
 
     it 'build something for gemini projects' do
@@ -92,10 +92,10 @@ context 'with a testing website' do
       Fronde::CONFIG.load_test(old_conf)
       Fronde::CONFIG.write_org_lisp_config
       rake.invoke_task('site:build')
-      expect(File.exist?('public_gmi/index.gmi')).to be(true)
+      expect(File.exist?('public_gmi/index.gmi')).to be true
     end
 
-    it 'extracts html body' do
+    it 'extracts html body', :aggregate_failures do
       # No source file
       o = Fronde::Org::File.new(
         'test/test.org', title: 'No source', content: 'Test'
@@ -121,7 +121,7 @@ context 'with a testing website' do
       expect(data['published_body']).to eq(content)
     end
 
-    it 'extracts gemini body' do
+    it 'extracts gemini body', :aggregate_failures do # rubocop:disable RSpec/ExampleLength
       old_conf = Fronde::CONFIG.settings.merge
       old_conf['sources'] = [
         { 'name' => 'org', 'path' => 'src', 'target' => '.',
@@ -149,13 +149,12 @@ context 'with a testing website' do
         📝 Written by alice with __VERSION__
 
       CONTENT
+      version_rx = 'GNU/Emacs [0-9.]+ \(Org mode [0-9.]+\), ' \
+                   'and published with Fronde [0-9.]+'
       page_content = data['published_body'].gsub(
         /[FMSTW][a-z]+ \d{1,2} of [ADFJMNOS][a-z]+, \d{4} at \d{2}:\d{2}/,
         '__PUB_DATE__'
-      ).gsub(
-        /GNU\/Emacs [0-9.]+ \(Org mode [0-9.]+\), and published with Fronde [0-9.]+/,
-        '__VERSION__'
-      )
+      ).gsub(/#{version_rx}/, '__VERSION__')
       expect(page_content).to eq(content)
     end
 
@@ -200,12 +199,12 @@ context 'with a testing website' do
       File.write('public_html/orphan.html', 'Orphan content')
       expect { rake.invoke_task('site:build') }.to(
         output(
-          /No project found for .+\/orphan.html. Publication will fail./
+          %r{No project found for .+/orphan.html. Publication will fail.}
         ).to_stderr
       )
     end
 
-    it 'cleans orphaned files' do
+    it 'cleans orphaned files', :aggregate_failures do
       allow($stdin).to receive(:gets).and_return("y\n")
       FileUtils.mkdir_p 'public_html'
       File.write('public_html/orphan.html', 'Orphan content')
@@ -215,7 +214,7 @@ context 'with a testing website' do
       expect(File.exist?('public_html/orphan.html')).to be false
     end
 
-    it 'skips cleaning if answer is not y' do
+    it 'skips cleaning if answer is not y', :aggregate_failures do
       allow($stdin).to receive(:gets).and_return("nope\n")
       FileUtils.mkdir_p 'public_html'
       File.write('public_html/orphan.html', 'Orphan content')
@@ -229,6 +228,21 @@ context 'with a testing website' do
   context 'when generating indexes' do
     before { write_base_files }
 
+    let(:whole_file_list) do
+      ['src/news/index.org',
+       'src/news/tags/index.org',
+       'src/news/tags/toto.org',
+       'src/news/tags/titi.org',
+       'public_html/news/index.html',
+       'public_html/news/tags/index.html',
+       'public_html/news/tags/index.html',
+       'public_html/news/tags/toto.html',
+       'public_html/news/tags/titi.html',
+       'public_html/news/feeds/index.xml',
+       'public_html/news/feeds/toto.xml',
+       'public_html/news/feeds/titi.xml']
+    end
+
     context 'without blog setting' do
       before do
         old_conf = Fronde::CONFIG.settings.merge
@@ -239,23 +253,13 @@ context 'with a testing website' do
 
       it 'does not generate index' do
         rake.invoke_task('site:build')
-        expect(File.exist?('src/news/index.org')).to be(false)
-        expect(File.exist?('src/news/tags/index.org')).to be(false)
-        expect(File.exist?('src/news/tags/toto.org')).to be(false)
-        expect(File.exist?('src/news/tags/titi.org')).to be(false)
-        expect(File.exist?('public_html/news/index.html')).to be(false)
-        expect(File.exist?('public_html/news/tags/index.html')).to be(false)
-        expect(File.exist?('public_html/news/tags/index.html')).to be(false)
-        expect(File.exist?('public_html/news/tags/toto.html')).to be(false)
-        expect(File.exist?('public_html/news/tags/titi.html')).to be(false)
-        expect(File.exist?('public_html/news/feeds/index.xml')).to be(false)
-        expect(File.exist?('public_html/news/feeds/toto.xml')).to be(false)
-        expect(File.exist?('public_html/news/feeds/titi.xml')).to be(false)
+        whole_file_list.each { |path| expect(File.exist?(path)).to be false }
       end
 
       it 'does not list tags' do
-        expect { rake.invoke_task('tags:name') }.to output('').to_stdout
-        expect { rake.invoke_task('tags:weight') }.to output('').to_stdout
+        ['tags:name', 'tags:weight'].each do |task_name|
+          expect { rake.invoke_task(task_name) }.not_to output.to_stdout
+        end
       end
     end
 
@@ -267,56 +271,38 @@ context 'with a testing website' do
         Fronde::CONFIG.write_org_lisp_config
       end
 
-      it 'still generates some index' do
+      it 'still generates some index', :aggregate_failures do
         rake.invoke_task('site:build')
-        expect(File.exist?('src/test/index.org')).to be(true)
-        expect(File.exist?('src/test/tags/index.org')).to be(true)
+        ['src/test/index.org',
+         'src/test/tags/index.org',
+         'public_html/test/index.html',
+         'public_html/test/tags/index.html',
+         'public_html/test/feeds/index.xml'].each do |path|
+          expect(File.exist?(path)).to be true
+        end
         # The 2 following does not exist are there was nothing to parse
-        expect(File.exist?('src/test/tags/toto.org')).to be(false)
-        expect(File.exist?('src/test/tags/titi.org')).to be(false)
-        expect(File.exist?('public_html/test/index.html')).to be(true)
-        expect(File.exist?('public_html/test/tags/index.html')).to be(true)
-        expect(File.exist?('public_html/test/feeds/index.xml')).to be(true)
+        ['src/test/tags/toto.org', 'src/test/tags/titi.org'].each do |path|
+          expect(File.exist?(path)).to be false
+        end
       end
 
       it 'does not list tags' do
-        expect { rake.invoke_task('tags:name') }.to output('').to_stdout
-        expect { rake.invoke_task('tags:weight') }.to output('').to_stdout
+        ['tags:name', 'tags:weight'].each do |task_name|
+          expect { rake.invoke_task(task_name) }.not_to output.to_stdout
+        end
       end
     end
 
     context 'with a correct blog path' do
       it 'generates indexes' do
         rake(verbose: false).invoke_task('site:build')
-        expect(File.exist?('src/news/index.org')).to be(true)
-        expect(File.exist?('src/news/tags/index.org')).to be(true)
-        expect(File.exist?('src/news/tags/toto.org')).to be(true)
-        expect(File.exist?('src/news/tags/titi.org')).to be(true)
-        expect(File.exist?('public_html/news/index.html')).to be(true)
-        expect(File.exist?('public_html/news/tags/index.html')).to be(true)
-        expect(File.exist?('public_html/news/tags/index.html')).to be(true)
-        expect(File.exist?('public_html/news/tags/toto.html')).to be(true)
-        expect(File.exist?('public_html/news/tags/titi.html')).to be(true)
-        expect(File.exist?('public_html/news/feeds/index.xml')).to be(true)
-        expect(File.exist?('public_html/news/feeds/toto.xml')).to be(true)
-        expect(File.exist?('public_html/news/feeds/titi.xml')).to be(true)
+        whole_file_list.each { |path| expect(File.exist?(path)).to be true }
       end
 
       it 'generates indexes in verbose mode' do
         # For coverage
         rake(verbose: true).invoke_task('site:build')
-        expect(File.exist?('src/news/index.org')).to be(true)
-        expect(File.exist?('src/news/tags/index.org')).to be(true)
-        expect(File.exist?('src/news/tags/toto.org')).to be(true)
-        expect(File.exist?('src/news/tags/titi.org')).to be(true)
-        expect(File.exist?('public_html/news/index.html')).to be(true)
-        expect(File.exist?('public_html/news/tags/index.html')).to be(true)
-        expect(File.exist?('public_html/news/tags/index.html')).to be(true)
-        expect(File.exist?('public_html/news/tags/toto.html')).to be(true)
-        expect(File.exist?('public_html/news/tags/titi.html')).to be(true)
-        expect(File.exist?('public_html/news/feeds/index.xml')).to be(true)
-        expect(File.exist?('public_html/news/feeds/toto.xml')).to be(true)
-        expect(File.exist?('public_html/news/feeds/titi.xml')).to be(true)
+        whole_file_list.each { |path| expect(File.exist?(path)).to be true }
       end
 
       it 'lists all tags by name' do

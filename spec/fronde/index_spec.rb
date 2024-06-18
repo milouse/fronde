@@ -180,12 +180,12 @@ describe Fronde::Index do
       tear_down 'tmp/blog'
     end
 
-    it 'has generated two indexes' do
+    it 'has generated two indexes', :aggregate_failures do
       expect(index.all_tags.length).to eq(2)
       expect(index.empty?).to be(false)
     end
 
-    it 'excludes specified pattern from indexes' do
+    it 'excludes specified pattern from indexes', :aggregate_failures do
       old_conf = Fronde::CONFIG.settings.merge
       old_conf['sources'][0]['exclude'] = 'test3\.org$'
       Fronde::CONFIG.load_test(old_conf)
@@ -193,15 +193,18 @@ describe Fronde::Index do
       expect(index.all_tags.include?('toto')).to be(false)
     end
 
-    it 'generates a main index' do
+    it 'generates a main index', :aggregate_failures do
       expect(index.to_s).to eq(SAMPLE_ALL_INDEX)
       expect(index.blog_home_page).to eq(SAMPLE_PROJECT_INDEX)
     end
 
-    it 'generates an atom feed' do
+    it 'displays the right date for the index' do
       now_str = Time.now.strftime('%Y-%m-%d %H:%M')
       index_date_str = index.date.strftime('%Y-%m-%d %H:%M')
       expect(index_date_str).to eq(now_str)
+    end
+
+    it 'generates an atom feed' do
       expected_tz = Time.new(2019, 6, 13).strftime('%:z')
       comp = format(
         SAMPLE_ATOM,
@@ -224,26 +227,26 @@ describe Fronde::Index do
       expect { index.sort_by(:test) }.to raise_error(ArgumentError)
     end
 
-    it 'correctly saves one index' do
+    it 'correctly saves one index', :aggregate_failures do
       FileUtils.mkdir_p tags_path
       index.write_org('index')
       expect(File.exist?("#{tags_path}/index.org")).to be(true)
       expect(File.read("#{tags_path}/index.org")).to eq(SAMPLE_ALL_INDEX)
     end
 
-    it 'correctly saves one blog index' do
+    it 'correctly saves one blog index', :aggregate_failures do
       index.send(:write_blog_home_page, false)
       expect(File.exist?('writings/index.org')).to be(true)
       expect(File.read('writings/index.org')).to eq(SAMPLE_PROJECT_INDEX)
     end
 
-    it 'correctly saves one blog index, even verbosely' do
+    it 'correctly saves one blog index, even verbosely', :aggregate_failures do
       index.send(:write_blog_home_page, true)
       expect(File.exist?('writings/index.org')).to be(true)
       expect(File.read('writings/index.org')).to eq(SAMPLE_PROJECT_INDEX)
     end
 
-    it 'correctly saves one atom feed' do
+    it 'correctly saves one atom feed', :aggregate_failures do
       FileUtils.mkdir_p feeds_path
       index.write_atom('index')
       expect(File.exist?("#{feeds_path}/index.xml")).to be(true)
@@ -257,7 +260,7 @@ describe Fronde::Index do
       expect(File.read("#{feeds_path}/index.xml")).to eq(comp)
     end
 
-    it 'writes them all' do
+    it 'writes them all', :aggregate_failures do
       index.write_all_org
       expect(File.exist?('writings/index.org')).to be(true)
       expect(File.exist?("#{tags_path}/index.org")).to be(true)
@@ -270,7 +273,7 @@ describe Fronde::Index do
       expect(File.exist?("#{feeds_path}/tutu.xml")).to be(true)
     end
 
-    it 'does not attempt to include tags into feeds' do
+    it 'does not attempt to include tags into feeds', :aggregate_failures do
       # Run it once to ensure index is instanciated a first time and
       # index files are generated
       index.write_all_org
@@ -293,12 +296,12 @@ describe Fronde::Index do
         Fronde::CONFIG.load_test old_conf
       end
 
-      it 'has generated two index' do
+      it 'has generated two index', :aggregate_failures do
         expect(index.all_tags.length).to eq(2)
         expect(index.empty?).to be(false)
       end
 
-      it 'generates a main index' do
+      it 'generates a main index', :aggregate_failures do
         expect(index.to_s).to eq(SAMPLE_ALL_INDEX)
         expect(index.blog_home_page).to eq(SAMPLE_PROJECT_INDEX)
       end
@@ -327,17 +330,17 @@ describe Fronde::Index do
       tear_down 'tmp/blog'
     end
 
-    it 'has generated no index' do
+    it 'has generated no index', :aggregate_failures do
       expect(index.all_tags.length).to eq(0)
       expect(index.empty?).to be(true)
     end
 
-    it 'generates a main index' do
+    it 'generates a main index', :aggregate_failures do
       expect(index.to_s).to eq(format(SAMPLE_EMPTY_INDEX, author: 'Test'))
       expect(index.blog_home_page).to eq(SAMPLE_EMPTY_PROJECT_INDEX)
     end
 
-    it 'generates an atom feed' do
+    it 'generates an atom feed', :aggregate_failures do
       now_str = Time.now.strftime('%Y-%m-%d %H:%M')
       index_date_str = index.date.strftime('%Y-%m-%d %H:%M')
       expect(index_date_str).to eq(now_str)
@@ -349,7 +352,7 @@ describe Fronde::Index do
       expect(index.to_atom).to eq(comp)
     end
 
-    it 'correctly saves one index' do
+    it 'correctly saves one index', :aggregate_failures do
       FileUtils.mkdir_p tags_path
       index.write_org('index')
       expect(File.exist?("#{tags_path}/index.org")).to be(true)
@@ -358,7 +361,7 @@ describe Fronde::Index do
       )
     end
 
-    it 'correctly saves one blog index' do
+    it 'correctly saves one blog index', :aggregate_failures do
       index.send(:write_blog_home_page, false)
       expect(File.exist?('writings/index.org')).to be(true)
       expect(File.read('writings/index.org')).to(
@@ -366,7 +369,7 @@ describe Fronde::Index do
       )
     end
 
-    it 'correctly saves one atom feed' do
+    it 'correctly saves one atom feed', :aggregate_failures do
       FileUtils.mkdir_p feeds_path
       index.write_atom('index')
       expect(File.exist?("#{feeds_path}/index.xml")).to be(true)
@@ -378,7 +381,7 @@ describe Fronde::Index do
       expect(File.read("#{feeds_path}/index.xml")).to eq(comp)
     end
 
-    it 'writes them all' do
+    it 'writes them all', :aggregate_failures do
       index.write_all_org
       expect(File.exist?('writings/index.org')).to be(true)
       expect(File.exist?("#{tags_path}/index.org")).to be(true)
@@ -414,7 +417,7 @@ describe Fronde::Index do
       tear_down 'tmp/txt'
     end
 
-    it 'does not have generated any indexes' do
+    it 'does not have generated any indexes', :aggregate_failures do
       expect(index.all_tags.length).to eq(0)
       expect(index.empty?).to be(true)
     end
@@ -425,10 +428,13 @@ describe Fronde::Index do
       )
     end
 
-    it 'generates an empty atom feed' do
+    it 'displays the right date for the empty index' do
       now_str = Time.now.strftime('%Y-%m-%d %H:%M')
       index_date_str = index.date.strftime('%Y-%m-%d %H:%M')
       expect(index_date_str).to eq(now_str)
+    end
+
+    it 'generates an empty atom feed' do
       comp = format(
         SAMPLE_EMPTY_ATOM,
         date: index.date.xmlschema,
@@ -456,7 +462,7 @@ describe Fronde::Index do
       tear_down 'tmp/txt'
     end
 
-    it 'does not have generated any indexes' do
+    it 'does not have generated any indexes', :aggregate_failures do
       expect(index.all_tags.length).to eq(0)
       expect(index.empty?).to be(true)
     end
@@ -467,10 +473,13 @@ describe Fronde::Index do
       )
     end
 
-    it 'generates an empty atom feed' do
+    it 'displays the right date for the empty feed' do
       now_str = Time.now.strftime('%Y-%m-%d %H:%M')
       index_date_str = index.date.strftime('%Y-%m-%d %H:%M')
       expect(index_date_str).to eq(now_str)
+    end
+
+    it 'generates an empty atom feed' do
       comp = format(
         SAMPLE_EMPTY_ATOM,
         date: index.date.xmlschema,

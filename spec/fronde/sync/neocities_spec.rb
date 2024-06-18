@@ -118,7 +118,7 @@ describe Fronde::Sync::Neocities do
       'Basic dGVzdDpzdXBlciBzZWNyZXQ='
   end
 
-  it 'connects to neocities' do
+  it 'connects to neocities', :aggregate_failures do
     fake_http.started = true
     fake_http.request = build_fake_http_response(info: { sitename: 'youpi' })
 
@@ -146,7 +146,7 @@ describe Fronde::Sync::Neocities do
     expect(info['sitename']).to eq 'youpi'
   end
 
-  it 'lists local files' do
+  it 'lists local files', :aggregate_failures do
     generate_public_dir_content
     neocities = described_class.new('test@example.org', './test')
     file_list = neocities.local_list
@@ -156,7 +156,7 @@ describe Fronde::Sync::Neocities do
       eq([false, true, false])
   end
 
-  it 'lists remote files' do
+  it 'lists remote files', :aggregate_failures do
     neocities = described_class.new('test@example.org', './test')
     file_list = neocities.remote_list
     expect(file_list.map { _1['path'] }).to \
@@ -165,7 +165,7 @@ describe Fronde::Sync::Neocities do
       eq([false, true, false, false])
   end
 
-  it 'computes orphans' do
+  it 'computes orphans', :aggregate_failures do
     generate_public_dir_content
     neocities = described_class.new('test@example.org', './test')
     # pictures/bird.jpg is only on remote and should appear as orphan
@@ -183,7 +183,7 @@ describe Fronde::Sync::Neocities do
     expect(file_list).to eq([])
   end
 
-  it 'saves a new file with content' do
+  it 'saves a new file with content', :aggregate_failures do
     generate_public_dir_content
     neocities = described_class.new('test@example.org', './test')
     expect(neocities.local_list.length).to eq 3
@@ -214,7 +214,7 @@ describe Fronde::Sync::Neocities do
     expect(content).to eq '>>/<<'
   end
 
-  it 'fails to download a file if checksum differ' do
+  it 'fails to download a file if checksum differ', :aggregate_failures do
     neocities = described_class.new('test@example.org', './test')
     content = neocities.send(
       :fetch_file_content, fake_http, '/hello.html',

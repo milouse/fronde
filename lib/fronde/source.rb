@@ -147,7 +147,7 @@ module Fronde
 
     def clean_config
       fill_in_specific_config
-      @config['name'] ||= @config['path'].sub(/^[.~]*\//, '').tr('/.', '-')
+      @config['name'] ||= @config['path'].sub(%r{^[.~]*/}, '').tr('/.', '-')
       @config['title'] ||= @config['path']
       @config['target'] ||= File.basename(@config['path']).delete_prefix '.'
       @config['target'] = '' if @config['target'] == '.'
@@ -173,7 +173,7 @@ module Fronde
         heading = @config.dig 'org-options', heading_key
         next unless heading
 
-        @config['org-options'][heading_key] = \
+        @config['org-options'][heading_key] =
           heading.gsub('%F', @config['atom_feed'])
                  .gsub('%h', @config['domain'])
                  .gsub('%o', @config['theme'])

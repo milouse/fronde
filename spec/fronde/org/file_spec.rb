@@ -6,7 +6,7 @@ describe Fronde::Org::File do
   before { Fronde::CONFIG.reset }
 
   context 'with working org files' do
-    it 'parses without date' do
+    it 'parses without date', :aggregate_failures do
       o = described_class.new('data/test1.org')
       expect(o.title).to eq('My sweet article')
       expect(o.date).to be_an_instance_of(NilTime)
@@ -15,67 +15,71 @@ describe Fronde::Org::File do
       expect(o.format('%i - (%t)')).to eq(' - (My sweet article)')
     end
 
-    it 'parses with a partial date' do
-      o = described_class.new('data/test2.org')
-      expect(o.title).to eq('My second article')
-      expect(o.date).to eq(Time.strptime('2019-06-11 00:00:00', '%Y-%m-%d %H:%M:%S'))
-      expect(o.date.strftime('%Y-%m-%d')).to eq('2019-06-11')
-      expect(o.timekey).to eq('20190611000000')
-      expect(o.format('%i - (%t)')).to eq('2019-06-11 - (My second article)')
-      expect(o.lang).to eq('es')
+    it 'parses with a partial date', :aggregate_failures do
+      o = described_class.new 'data/test2.org'
+      expect(o.title).to eq 'My second article'
+      expect(o.date).to eq \
+        Time.strptime('2019-06-11 00:00:00', '%Y-%m-%d %H:%M:%S')
+      expect(o.date.strftime('%Y-%m-%d')).to eq '2019-06-11'
+      expect(o.timekey).to eq '20190611000000'
+      expect(o.format('%i - (%t)')).to eq '2019-06-11 - (My second article)'
+      expect(o.lang).to eq 'es'
     end
 
-    it 'parses with a complete date' do
-      o = described_class.new('data/test3.org')
-      expect(o.title).to eq('My third article')
-      expect(o.date).to eq(Time.strptime('2019-06-11 23:42:10', '%Y-%m-%d %H:%M:%S'))
-      expect(o.timekey).to eq('20190611234210')
-      expect(o.format('%i - (%t)')).to eq('2019-06-11 - (My third article)')
+    it 'parses with a complete date', :aggregate_failures do
+      o = described_class.new 'data/test3.org'
+      expect(o.title).to eq 'My third article'
+      expect(o.date).to eq \
+        Time.strptime('2019-06-11 23:42:10', '%Y-%m-%d %H:%M:%S')
+      expect(o.timekey).to eq '20190611234210'
+      expect(o.format('%i - (%t)')).to eq '2019-06-11 - (My third article)'
     end
 
-    it 'parses with a complete date, but partial time' do
-      o = described_class.new('data/test4.org')
-      expect(o.title).to eq('Fourth test')
-      expect(o.date).to eq(Time.strptime('2019-07-25 20:45:00', '%Y-%m-%d %H:%M:%S'))
-      expect(o.timekey).to eq('20190725204500')
-      expect(o.format('%i - (%t)')).to eq('2019-07-25 - (Fourth test)')
+    it 'parses with a complete date, but partial time', :aggregate_failures do
+      o = described_class.new 'data/test4.org'
+      expect(o.title).to eq 'Fourth test'
+      expect(o.date).to eq \
+        Time.strptime('2019-07-25 20:45:00', '%Y-%m-%d %H:%M:%S')
+      expect(o.timekey).to eq '20190725204500'
+      expect(o.format('%i - (%t)')).to eq '2019-07-25 - (Fourth test)'
     end
 
     it 'finds a subtitle' do
       o = described_class.new('data/content.org')
-      expect(o.title).to eq('My first blog post?')
-      expect(o.subtitle).to eq('What to do with that')
+      {
+        title: 'My first blog post?',
+        subtitle: 'What to do with that'
+      }.each { |method, value| expect(o.send(method)).to eq value }
     end
 
     it 'can be cast to a Hash' do
-      o = described_class.new('data/content.org')
-      data = o.to_h
-      expect(data['author']).to eq 'alice'
-      expect(data['title']).to eq 'My first blog post?'
-      expect(data['excerpt']).to(
-        eq('An article stating whether this is my first blog post or not')
-      )
-      expect(data['keywords']).to eq %w[test tata]
-      expect(data['timekey']).to eq '20190613000000'
-      expect(data['published']).to eq 'Thursday 13th of June'
       expected_tz = Time.new(2019, 6, 13).strftime('%:z')
-      expect(data['published_xml']).to eq "2019-06-13T00:00:00#{expected_tz}"
-      # Not published
-      expect(data['url']).to be_nil
-      expect(data['published_body']).to(
-        eq('An article stating whether this is my first blog post or not')
-      )
-      expect(data['updated_xml']).to be_nil
+      data = described_class.new('data/content.org').to_h
+      {
+        'author' => 'alice',
+        'title' => 'My first blog post?',
+        'excerpt' => 'An article stating whether this is my ' \
+                     'first blog post or not',
+        'keywords' => %w[test tata],
+        'timekey' => '20190613000000',
+        'published' => 'Thursday 13th of June',
+        'published_xml' => "2019-06-13T00:00:00#{expected_tz}",
+        'published_body' => 'An article stating whether this is ' \
+                            'my first blog post or not',
+        # Not published
+        'url' => nil,
+        'updated_xml' => nil
+      }.each { |key, value| expect(data[key]).to eq value }
     end
 
-    it 'accepts dynamic setters' do
+    it 'accepts dynamic setters', :aggregate_failures do
       o = described_class.new('data/content.org')
       expect(o.title).to eq('My first blog post?')
       o.title = 'Actually not my first one'
       expect(o.title).to eq('Actually not my first one')
     end
 
-    it 'raises NameError if it cannot resolves a method' do
+    it 'raises NameError if it cannot resolve a method', :aggregate_failures do
       o = described_class.new('data/content.org')
       expect { o.not_a_key }.to raise_error(NameError)
       expect { o.not_a_key = 'test' }.to raise_error(NameError)
@@ -83,10 +87,12 @@ describe Fronde::Org::File do
 
     it 'answers correctly to respond_to_missing?' do
       o = described_class.new('data/content.org')
-      expect(o.respond_to?(:title)).to be true
-      expect(o.respond_to?(:title=)).to be true
-      expect(o.respond_to?(:not_a_key)).to be false
-      expect(o.respond_to?(:not_a_key=)).to be false
+      {
+        title: true,
+        'title=': true,
+        not_a_key: false,
+        'not_a_key=': false
+      }.each { |method, value| expect(o.respond_to?(method)).to be value }
     end
   end
 
@@ -101,11 +107,14 @@ describe Fronde::Org::File do
     end
 
     it 'raises if file_name is nil and try to write' do
-      expect { described_class.new(nil).write }.to raise_error(RuntimeError)
-      expect { described_class.new('').write }.to raise_error(RuntimeError)
+      [nil, ''].each do |empty_title|
+        expect { described_class.new(empty_title).write }.to \
+          raise_error(RuntimeError)
+      end
     end
 
-    it 'does not raise without file_name, but with a title' do
+    it 'does not raise without file_name, but with a title',
+       :aggregate_failures do
       expect { described_class.new(nil, title: 'Test 1').write }.not_to(
         raise_error
       )
@@ -116,7 +125,7 @@ describe Fronde::Org::File do
       expect(File.exist?('test-2.org')).to be true
     end
 
-    it 'returns a new org file structure' do
+    it 'returns a new org file structure', :aggregate_failures do
       now_str = Time.now.strftime('%Y-%m-%d %H:%M')
       o = described_class.new('__test__.org', title: 'test')
       expect(o.title).to eq('test')
@@ -138,7 +147,7 @@ describe Fronde::Org::File do
       expect(File.read('__test__.org')).to eq(empty_content)
     end
 
-    it 'creates new Org file, even in a new folder' do
+    it 'creates new Org file, even in a new folder', :aggregate_failures do
       o = described_class.new(
         'not/existing/test.org',
         title: 'My Test', content: 'Lorem ipsum'
@@ -157,7 +166,7 @@ describe Fronde::Org::File do
       expect(File.read('not/existing/test.org')).to eq(content)
     end
 
-    it 'uses file name as title when title is empty' do
+    it 'uses file name as title when title is empty', :aggregate_failures do
       FileUtils.mkdir 'src'
       File.write 'src/no_title.org', 'Lorem ipsum.'
       o = described_class.new('src/no_title.org')
@@ -168,15 +177,18 @@ describe Fronde::Org::File do
   context 'with configuration' do
     it 'respects author name' do
       Fronde::CONFIG.load_test('author' => 'Test')
-      o = described_class.new('data/test1.org')
-      expect(o.author).to eq('Test')
-      o = described_class.new('data/test2.org')
-      expect(o.author).to eq('Titi')
-      o = described_class.new('data/test3.org')
-      expect(o.author).to eq('Test')
+      {
+        'data/test1.org' => 'Test',
+        'data/test2.org' => 'Titi',
+        'data/test3.org' => 'Test'
+      }.each do |path, value|
+        o = described_class.new path
+        expect(o.author).to eq value
+      end
     end
 
-    it 'computes the right pub_file path for existing sources' do
+    it 'computes the right pub_file path for existing sources',
+       :aggregate_failures do
       o = described_class.new('data/test1.org')
       expect(o.pub_file).to be_nil # No source match
 
@@ -195,7 +207,7 @@ describe Fronde::Org::File do
       expect(o.pub_file).to eq('/data/content.html')
     end
 
-    it 'computes the right url for existing sources' do
+    it 'computes the right url for existing sources', :aggregate_failures do
       o = described_class.new('data/test1.org')
       expect(o.url).to be_nil # No source match
 
@@ -235,27 +247,30 @@ describe Fronde::Org::File do
     end
 
     it 'computes the right source path' do
-      o = described_class.new('public_html/test.html')
-      expect(o.file).to eq(File.expand_path('src/test.org'))
-      o = described_class.new('public_html/blog/test.html')
-      expect(o.file).to eq(File.expand_path('src/blog/test.org'))
-      o = described_class.new(
-        'public_html/blog/toto/tata.html'
-      )
-      expect(o.file).to eq(File.expand_path('src/blog/toto/tata.org'))
-      o = described_class.new(
-        'public_html/blog/toto/content.html'
-      )
-      expect(o.file).to eq(File.expand_path('src/blog/toto/content.org'))
+      {
+        'public_html/test.html' => 'src/test.org',
+        'public_html/blog/test.html' => 'src/blog/test.org',
+        'public_html/blog/toto/tata.html' => 'src/blog/toto/tata.org',
+        'public_html/blog/toto/content.html' => 'src/blog/toto/content.org'
+      }.each do |target, source|
+        o = described_class.new target
+        expect(o.file).to eq File.expand_path(source)
+      end
     end
 
-    it 'identifies a source for a given published file' do
-      o = described_class.new('public_html/writings/notes.html')
-      expect(o.file).to eq(File.expand_path('writings/notes.org'))
-      expect(o.project).not_to be_nil
-      o = described_class.new('public_html/test.html')
-      expect(o.file).to eq(File.expand_path('src/test.org'))
-      expect(o.project).not_to be_nil
+    it 'identifies a source for a given published file', :aggregate_failures do
+      {
+        'public_html/writings/notes.html' => 'writings/notes.org',
+        'public_html/test.html' => 'src/test.org'
+      }.each do |target, source|
+        o = described_class.new target
+        expect(o.file).to eq File.expand_path(source)
+        expect(o.project).not_to be_nil
+      end
+    end
+
+    it 'does not identify a source for an unknown published file',
+       :aggregate_failures do
       o = described_class.new('public_html/not/known.html')
       expect(o.file).to eq(File.expand_path('public_html/not/known.html'))
       expect(o.project).to be_nil

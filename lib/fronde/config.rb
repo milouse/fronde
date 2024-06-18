@@ -39,7 +39,7 @@ module Fronde
 
       def initialize
         @default_settings = {
-          'author' => (ENV['USER'] || ''),
+          'author' => ENV['USER'] || '',
           'domain' => '',
           'lang' => Fronde::Config::Helpers.extract_lang_from_env('en'),
           'html_public_folder' => 'public_html',
@@ -148,24 +148,46 @@ module Fronde
         end
       end
 
+      def check_duplicate_and_warn(collection, source, type)
+        path = source['path']
+        return path unless collection[type].has_key?(path)
+
+        warn(
+          R18n.t.fronde.error.source.duplicate(
+            source: source['name'], type: type
+          )
+        )
+      end
+
       def remove_duplicate(sources)
         check_paths = {}
         sources.each do |source|
           type = source.type
           check_paths[type] ||= {}
-          path = source['path']
+          path = check_duplicate_and_warn check_paths, source, type
           # Avoid duplicate
-          if check_paths[type].has_key?(path)
-            warn(
-              R18n.t.fronde.error.source.duplicate(
-                source: source['name'], type: type
-              )
-            )
-            next
-          end
+          next unless path
+
           check_paths[type][path] = source
         end
         check_paths
+      end
+
+      def filter_possible_matchs(path, other_paths_list)
+        other_paths_list.select do |other_path|
+          path != other_path && other_path.start_with?(path)
+        end
+      end
+
+      def warn_on_existing_inclusion(type, other, possible_matchs, sources)
+        possible_matchs.each do |match|
+          warn(
+            R18n.t.fronde.error.source.inclusion(
+              source: sources[match]['title'],
+              other_source: other, type: type
+            )
+          )
+        end
       end
 
       def remove_inclusion(check_paths)
@@ -183,21 +205,13 @@ module Fronde
             next source unless source.recursive?
 
             # Ensure that the current source does not embed another one
-            possible_matchs = sorted_paths.select do |other_path|
-              path != other_path && other_path.start_with?(path)
-            end
+            possible_matchs = filter_possible_matchs path, sorted_paths
             next source if possible_matchs.empty?
 
             skip_paths += possible_matchs
-            possible_matchs.each do |match|
-              other_source = sources_by_path[match]
-              warn(
-                R18n.t.fronde.error.source.inclusion(
-                  source: other_source['title'], type: type,
-                  other_source: source['title']
-                )
-              )
-            end
+            warn_on_existing_inclusion(
+              type, source['title'], possible_matchs, sources_by_path
+            )
           end
         end.flatten
       end

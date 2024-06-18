@@ -71,17 +71,21 @@ module Fronde
         @command = @argv.shift || 'basic' if @command == 'help'
         cmd_opt = OptParse.command_options(@command)
         label = cmd_opt[:label] || @command
-        warn format("%<label>s\n\n", label: R18n.t.fronde.bin.usage(label))
+        output = [format_label(R18n.t.fronde.bin.usage(label))]
         cmd = cmd_opt[:name] || @command
-        if R18n.t.fronde.bin.commands[cmd].translated?
-          warn format("%<label>s\n\n", label: R18n.t.fronde.bin.commands[cmd])
-        end
-        body = OptParse.help_command_body(cmd)
-        warn body unless body == ''
+        output << format_label(R18n.t.fronde.bin.commands[cmd])
+        output << OptParse.help_command_body(cmd)
+        warn output.join
         true
       end
 
       private
+
+      def format_label(label)
+        return '' if label == '' || label.is_a?(R18n::Untranslated)
+
+        format("%<label>s\n\n", label: label)
+      end
 
       def file_name_from_title
         title = @options[:title] || R18n.t.fronde.bin.options.default_title

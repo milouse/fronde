@@ -61,9 +61,8 @@ module Fronde
             key = opt[:keyword] || opt[:long].upcase
             config = [short, format('%<long>s %<key>s', long: long, key: key)]
           end
-          config << opt[:choices] if opt[:choices]
-          config << opt[:help] if opt[:help]
-          config
+          config.push opt[:choices], opt[:help]
+          config.compact
         end
 
         # Returns the ~fronde~ help summary for a given command.
@@ -76,12 +75,10 @@ module Fronde
             short, long = decorate_option(k)
             opt = FRONDE_OPTIONS[k]
             label = [short, long].join(', ')
-            line = [format('    %<opt>s', opt: label).ljust(30)]
-            help = opt[:help]
-            line << help if help
+            line = [format('    %<opt>s', opt: label).ljust(30), opt[:help]]
             choices = opt[:choices]
             line << "(#{choices.join(', ')})" if choices
-            line.join(' ')
+            line.compact.join(' ')
           end.join("\n")
         end
 

@@ -85,7 +85,7 @@ context 'when trying preview mode' do
       sleep 1 # Necessary to let webrick start
     end
 
-    it 'is viewable with preview' do
+    it 'is viewable with preview', :aggregate_failures do
       home_page = fetch_test_content 'index.html'
       proof = File.expand_path('data/index_proof.html', __dir__)
       expect(home_page).to eq(File.read(proof))

@@ -4,13 +4,11 @@ AllCops:
   TargetRubyVersion: 2.7
 
 require:
-- rubocop-performance
-- rubocop-rspec
+  - rubocop-performance
+  - rubocop-rspec
 
 Layout/LineLength:
   Max: 80
-  Exclude:
-  - spec/**/*
 
 Metrics/AbcSize:
   Enabled: no
@@ -18,30 +16,32 @@ Metrics/AbcSize:
 Metrics/BlockLength:
   Max: 30
   Exclude:
-  - spec/**/*
-  - lib/tasks/*
-  - fronde.gemspec
+    - spec/**/*
+    - lib/tasks/*
+    - fronde.gemspec
+
+Metrics/ClassLength:
+  CountAsOne:
+    - hash
+    - method_call
 
 Metrics/MethodLength:
-  Max: 10
+  CountAsOne:
+    - hash
+    - method_call
 
 Metrics/ModuleLength:
   Max: 120
-
-Metrics/PerceivedComplexity:
-  Max: 10
-
-Metrics/CyclomaticComplexity:
-  Max: 10
 
 RSpec:
   Severity: warning
 
 RSpec/ExampleLength:
-  Enabled: no
-
-RSpec/MultipleExpectations:
-  Enabled: no
+  Max: 14
+  CountAsOne:
+    - hash
+    - heredoc
+    - method_call
 
 Style:
   Severity: warning
@@ -54,7 +54,3 @@ Style/ConditionalAssignment:
 
 Style/PreferredHashMethods:
   EnforcedStyle: verbose
-
-Style/RegexpLiteral:
-  EnforcedStyle: slashes
-  AllowInnerSlashes: yes

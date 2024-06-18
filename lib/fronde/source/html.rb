@@ -40,7 +40,7 @@ module Fronde
         super
       end
 
-      def org_default_options # rubocop:disable Metrics/MethodLength
+      def org_default_options
         defaults = {
           'publishing-function' => 'org-html-publish-to-html',
           'html-head-include-default-style' => 't',

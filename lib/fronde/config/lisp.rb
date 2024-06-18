@@ -22,7 +22,6 @@ module Fronde
       #
       # @return [Integer] the length written (as returned by the
       #   underlying ~File.write~ method call)
-      # rubocop:disable Metrics/MethodLength
       def write_org_lisp_config
         workdir = Dir.pwd
         all_projects = sources.map(&:org_config).flatten
@@ -41,7 +40,6 @@ module Fronde
         )
         File.write("#{workdir}/var/lib/org-config.el", content)
       end
-      # rubocop:enable Metrics/MethodLength
 
       private
 

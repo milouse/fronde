@@ -16,7 +16,7 @@ module Fronde
       def extract_data
         @data = { content: ::File.read(@file), pub_file: nil, url: nil }
         %i[title subtitle date author keywords lang excerpt].each do |param|
-          @data[param] = send("extract_#{param}".to_sym)
+          @data[param] = send(:"extract_#{param}")
         end
         return unless @project
 
@@ -43,7 +43,7 @@ module Fronde
         match = /^#\+title:(.+)$/i.match(@data[:content])
         if match.nil?
           # Avoid to leak absolute path
-          project_relative_path = @file.sub(/^#{Dir.pwd}\//, '')
+          project_relative_path = @file.sub %r{^#{Dir.pwd}/}, ''
           return project_relative_path
         end
         match[1].strip
@@ -87,6 +87,10 @@ module Fronde
 
         return ::File.read(file_name) if project_type == 'gemini'
 
+        read_html_body file_name
+      end
+
+      def read_html_body(file_name)
         dom = ::File.open(file_name, 'r') { |file| Nokogiri::HTML file }
         body = dom.css('div#content')
         body.css('header').unlink # Remove the main title
