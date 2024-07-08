@@ -80,7 +80,7 @@ module Fronde
         # Always return something, even when not published yet
         return @data[:excerpt] unless pub_file && @project
 
-        project_type = @project['type']
+        project_type = @project.type
         pub_folder = Fronde::CONFIG.get("#{project_type}_public_folder")
         file_name = pub_folder + pub_file
         return @data[:excerpt] unless ::File.exist? file_name

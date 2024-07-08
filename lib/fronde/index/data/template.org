@@ -1,22 +1,26 @@
 #+title: {{ title }}
 #+author: {{ author }}
 #+language: {{ lang }}
-{%- unless slug == '__HOME_PAGE__' %}
+{%- if project_type == 'html' and slug != '__HOME_PAGE__' %}
 #+html_head_extra: <link rel="alternate" type="application/atom+xml" title="{{ title }}" href="{{ domain }}{{ project_path }}feeds/{{ slug }}.xml" />
-{% endunless -%}
+{% endif -%}
 {%- assign last_year = 0 -%}
 {% for article in entries %}
 {% assign cur_year = article.timekey | slice: 0, 4 %}
 {%- unless cur_year == last_year %}
 * {% if cur_year == "0000" %}{{ unsorted }}{% else %}{{ cur_year }}{% endif %}
 :PROPERTIES:
-:HTML_CONTAINER_CLASS: index-year
+{%- if project_type == 'html' %}
+:HTML_CONTAINER_CLASS: index-year{% endif %}
 :UNNUMBERED: notoc
 :END:
 {% assign last_year = cur_year %}
 {% endunless -%}
+{%- if project_type == 'gemini' -%}
+[[{{ article.url }}][{% if article.published != '' %}{{ article.published_gemini_index }} {% endif %}{{ article.title }}]]
+{%- else -%}
 - *[[{{ article.url }}][{{ article.title }}]]*
 {%- if article.published != '' %} / {{ article.published }}{% endif -%}
 {%- if article.excerpt != '' %} \\
-  {{ article.excerpt }}{% endif %}
+  {{ article.excerpt }}{% endif %}{% endif %}
 {%- endfor %}

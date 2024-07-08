@@ -10,7 +10,7 @@ namespace :site do
   task :build, [:force?] => ['var/lib/org-config.el'] do |_, args|
     args.with_defaults(force?: false)
     build_index = Thread.new do
-      all_index = Fronde::Index.all_html_blog_index
+      all_index = Fronde::Index.all_blog_index
       all_index.each do |index|
         index.write_all_org(verbose: verbose)
       end

@@ -26,7 +26,29 @@ SAMPLE_ALL_INDEX = <<~INDEX
   - [[http://perdu.com/tags/toto.html][toto]] (1)
 INDEX
 
-SAMPLE_PROJECT_INDEX = <<~BLOG_IDX
+SAMPLE_ALL_INDEX_GEMINI = <<~INDEX
+  #+title: All tags
+  #+author: Test
+  #+language: en
+
+  * By alphabetical order
+  :PROPERTIES:
+  :UNNUMBERED: notoc
+  :END:
+
+  [[http://perdu.com/tags/toto.gmi][toto (1)]]
+  [[http://perdu.com/tags/tutu.gmi][tutu (2)]]
+
+  * By publication number
+  :PROPERTIES:
+  :UNNUMBERED: notoc
+  :END:
+
+  [[http://perdu.com/tags/tutu.gmi][tutu (2)]]
+  [[http://perdu.com/tags/toto.gmi][toto (1)]]
+INDEX
+
+SAMPLE_PROJECT_INDEX = <<~BLOG_INDEX
   #+title: Blog
   #+author: Test
   #+language: en
@@ -48,7 +70,28 @@ SAMPLE_PROJECT_INDEX = <<~BLOG_IDX
   :END:
 
   - *[[http://perdu.com/test1.html][My sweet article]]*
-BLOG_IDX
+BLOG_INDEX
+
+SAMPLE_PROJECT_INDEX_GEMINI = <<~BLOG_INDEX
+  #+title: Blog
+  #+author: Test
+  #+language: en
+
+  * 2019
+  :PROPERTIES:
+  :UNNUMBERED: notoc
+  :END:
+
+  [[http://perdu.com/other/test3.gmi][2019-06-11 My third article]]
+  [[http://perdu.com/test2.gmi][2019-06-11 My second article]]
+
+  * Unsorted
+  :PROPERTIES:
+  :UNNUMBERED: notoc
+  :END:
+
+  [[http://perdu.com/test1.gmi][My sweet article]]
+BLOG_INDEX
 
 SAMPLE_EMPTY_INDEX = <<~INDEX
   #+title: All tags
@@ -196,6 +239,14 @@ describe Fronde::Index do
     it 'generates a main index', :aggregate_failures do
       expect(index.to_s).to eq(SAMPLE_ALL_INDEX)
       expect(index.blog_home_page).to eq(SAMPLE_PROJECT_INDEX)
+    end
+
+    it 'generates a main index for gemini sources', :aggregate_failures do
+      old_conf = Fronde::CONFIG.settings
+      old_conf['sources'][0]['type'] = 'gemini'
+      Fronde::CONFIG.load_test old_conf
+      expect(index.to_s).to eq(SAMPLE_ALL_INDEX_GEMINI)
+      expect(index.blog_home_page).to eq(SAMPLE_PROJECT_INDEX_GEMINI)
     end
 
     it 'displays the right date for the index' do

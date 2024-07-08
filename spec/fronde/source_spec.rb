@@ -15,13 +15,6 @@ describe Fronde::Source do
     expect(project['test']).to eq('Lorem ipsum')
   end
 
-  it 'always says no for gemini blog' do
-    project = described_class.new_from_config(
-      'path' => 'src', 'type' => 'gemini', 'is_blog' => true
-    )
-    expect(project.blog?).to be(false)
-  end
-
   it 'computes the right name' do
     test_cases = {
       'src' => 'src',

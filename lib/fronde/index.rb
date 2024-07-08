@@ -44,11 +44,9 @@ module Fronde
     end
 
     class << self
-      def all_html_blog_index(&block)
+      def all_blog_index(&block)
         all_blogs = CONFIG.sources.filter_map do |project|
-          next unless project['type'] == 'html' && project.blog?
-
-          Index.new(project)
+          Index.new(project) if project.blog?
         end
         return all_blogs unless block
 

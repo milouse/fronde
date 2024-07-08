@@ -56,6 +56,7 @@ module Fronde
         'title' => title,
         'slug' => slug,
         'project_path' => @project.public_absolute_path,
+        'project_type' => @project.type,
         'domain' => Fronde::CONFIG.get('domain'),
         'lang' => Fronde::CONFIG.get('lang'),
         'author' => Fronde::CONFIG.get('author'),
@@ -81,6 +82,7 @@ module Fronde
         'author' => Fronde::CONFIG.get('author'),
         'domain' => Fronde::CONFIG.get('domain'),
         'project_path' => @project.public_absolute_path,
+        'project_type' => @project.type,
         'indexes' => indexes
       )
     end
