@@ -83,8 +83,7 @@ INFO is a plist used as a communication channel."
                  (format "<a href=\"%s\" hreflang=\"%s\">%s</a>"
                          path lang desc)
                (format "<a href=\"%s\">%s</a>" path desc)))
-      (`latex (format "\\href{%s}{%s}" path desc))
-      (_ (format "%s (%s)" desc path)))))
+      (_ nil))))
 
 (defun fronde/org-i18n-follow (link)
   "Visit a i18n link"
