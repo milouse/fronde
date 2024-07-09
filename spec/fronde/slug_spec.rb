@@ -10,6 +10,8 @@ describe Fronde::Slug do
         'TotO' => 'toto',
         'Tôto' => 'toto',
         'Tôto tata' => 'toto-tata',
+        'TÆŒẞt€œæß' => 'taeoessteoeaess',
+        '™©®' => 'tmcr',
         'ÀùéïỸç/+*= truñlu°`' => 'aueiyc-trunlu'
       }.each do |title, slug|
         expect(described_class.slug(title)).to eq slug
