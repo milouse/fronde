@@ -15,6 +15,7 @@
       `(("src"
          :base-directory "{{ test_dir }}/src"
          :base-extension "org"
+         :fronde-base-uri "/src/"
          :html-head ""
          :html-head-include-default-style t
          :html-head-include-scripts t
@@ -36,6 +37,7 @@ with %c, and published with %N</p>
         ("src-news"
          :base-directory "{{ test_dir }}/src/news"
          :base-extension "org"
+         :fronde-base-uri "/news/"
          :html-head "<link rel=\"alternate\" type=\"application/atom+xml\" title=\"src/news\"
       href=\"/news/feeds/index.xml\" />"
          :html-head-include-default-style t

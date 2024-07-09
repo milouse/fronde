@@ -15,6 +15,7 @@
       `(("src"
          :base-directory "{{ test_dir }}/src"
          :base-extension "org"
+         :fronde-base-uri "/src/"
          :gemini-head ""
          :gemini-postamble "📅 Last modification on %C
 📝 Written by %a with %c, and published with %n"
@@ -32,6 +33,7 @@
         ("src-news"
          :base-directory "{{ test_dir }}/src/news"
          :base-extension "org"
+         :fronde-base-uri "/news/"
          :html-head "<link rel=\"alternate\" type=\"application/atom+xml\" title=\"src/news\"
       href=\"/news/feeds/index.xml\" />"
          :html-head-include-default-style t

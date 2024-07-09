@@ -15,6 +15,7 @@
       `(("src"
          :base-directory "{{ test_dir }}/src"
          :base-extension "org"
+         :fronde-base-uri "/"
          :html-head ""
          :html-head-include-default-style t
          :html-head-include-scripts t

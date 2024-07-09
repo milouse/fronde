@@ -47,6 +47,32 @@
   "Location of the local Org temporary directory.
 This is where to place org timestamps and id locations.")
 
+(defun fronde//format-rich-keywords (info function)
+  "Extract keywords from INFO and apply FUNCTION on them.
+FUNCTION is expected to format each keyword for a rich display for the
+current export backend.  FUNCTION must receive 3 arguments: the current
+KEYWORD, its related SLUG and the current project BASE-URI."
+  (let ((base-uri (plist-get info :fronde-base-uri))
+        (current-path (symbol-file 'fronde//format-rich-keywords))
+        sluglib)
+    (when current-path
+      (setq sluglib
+        (expand-file-name
+          (format "%s../../slug" (file-name-directory current-path)))))
+    (mapcar
+      (lambda (k)
+        (let ((slug (if sluglib
+                      (string-trim-right
+                        (shell-command-to-string
+                          (format "ruby -r %s -e \"puts Fronde::Slug.slug '%s'\""
+                            (shell-quote-argument sluglib)
+                            (shell-quote-argument k))))
+                      k)))
+          (funcall function k slug base-uri)))
+      (split-string
+        (org-export-data (plist-get info :keywords) info)
+        ",+ *"))))
+
 (defun fronde/org-html-format-spec (upstream info)
   "Advise UPSTREAM to return format specification for preamble and postamble.
 INFO is a plist used as a communication channel."
@@ -55,11 +81,13 @@ INFO is a plist used as a communication channel."
                     (org-export-data (plist-get info :author) info)))
       output)
     (push `(?k . ,(org-export-data (plist-get info :keywords) info)) output)
-    (push `(?K . ,(format "<ul class=\"keywords-list\">%s</ul>"
-                    (mapconcat
-	                    (lambda (k) (format "<li class=\"keyword\">%s</li>" k))
-	                    (split-string (or (plist-get info :keywords) "")  ",+ *")
-	                    "\n")))
+    (push `(?K . ,(format "<ul class=\"keywords-list\">\n%s</ul>"
+                    (apply #'concat
+                      (fronde//format-rich-keywords
+                        info
+	                      (lambda (k slug base-uri)
+                          (format "<li class=\"keyword\"><a href=\"%stags/%s.html\">%s</a></li>\n"
+                            base-uri slug k))))))
       output)
     (push `(?l . ,(org-export-data (plist-get info :language) info)) output)
     (push `(?n . ,(format "Fronde %s" fronde/version)) output)
@@ -73,6 +101,13 @@ INFO is a plist used as a communication channel."
   "Advise UPSTREAM to return format specification for gemini postamble.
 INFO is a plist used as a communication channel."
   (let ((output (funcall upstream info)))
+    (push `(?K . ,(org-gmi--build-links-list
+                    (fronde//format-rich-keywords
+                      info
+                      (lambda (k slug base-uri)
+                        (list (format "%stags/%s.gmi" base-uri slug)
+                          (format "🏷️ %s" k))))))
+      output)
     (push `(?n . ,(format "Fronde %s" fronde/version)) output)))
 
 (defun fronde/org-i18n-export (link description backend)

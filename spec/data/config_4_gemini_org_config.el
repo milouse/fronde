@@ -15,6 +15,7 @@
       `(("src"
          :base-directory "{{ test_dir }}/src"
          :base-extension "org"
+         :fronde-base-uri "https://test.com/src/"
          :gemini-head ""
          :gemini-postamble "📅 Last modification on %C
 📝 Written by %a with %c, and published with %n"
@@ -32,6 +33,7 @@
         ("news"
          :base-directory "{{ test_dir }}/news"
          :base-extension "org"
+         :fronde-base-uri "https://test.com/news/"
          :html-head "<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\"
       href=\"https://test.com/assets/my-theme/css/style.css\">
 <link rel=\"stylesheet\" type=\"text/css\" media=\"screen\"
@@ -58,6 +60,7 @@ with %c, and published with %N</p>
         ("other"
          :base-directory "{{ test_dir }}/other"
          :base-extension "org"
+         :fronde-base-uri "https://test.com/other/"
          :html-head "<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\"
       href=\"https://test.com/assets/my-theme/css/style.css\">
 <link rel=\"stylesheet\" type=\"text/css\" media=\"screen\"

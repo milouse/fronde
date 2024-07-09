@@ -185,7 +185,8 @@ module Fronde
         'base-directory' => @config['path'],
         'base-extension' => 'org',
         'publishing-directory' => publication_path,
-        'recursive' => @config['recursive']
+        'recursive' => @config['recursive'],
+        'fronde-base-uri' => "#{@config['domain']}#{public_absolute_path}"
       }.merge(@config['org-options'])
       exclude = @config['exclude']
       attributes['exclude'] = exclude if exclude
