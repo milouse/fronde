@@ -7,7 +7,8 @@
 
 * What's fronde for?
 
-#+attr_html: :style width:150px;float:right;margin-top:-4.5em;margin-left:2em;
+#+attr_gmi: :alt A stylized picture of a tiger
+#+attr_html: :alt A stylized picture of a tiger head :style width:150px;float:right;margin-top:-4.5em;margin-left:2em;
 [[file:./tigre.png]]
 
 Fronde is an opinionated static website generator for [[https://orgmode.org][Org]]. It helps you
@@ -29,7 +30,9 @@ the publication process.
 
 * Announcements
 
-See the [[./NEWS.org]] file.
+See the following NEWS.org file:
+
+[[./NEWS.org][Latest news]]
 
 * Quick install
 
@@ -59,7 +62,10 @@ Now you're ready to create your first fronde website.
 
 #+html: <a href="./CODE_OF_CONDUCT.html"><img alt="Contributor Covenant" src="https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg"/></a>
 
-Fronde is proudly following the [[./CODE_OF_CONDUCT.org][Contributor Covenant Code of Conduct]].
+Fronde is proudly following the Contributor Covenant Code of
+Conduct. You can read it here:
+
+[[./CODE_OF_CONDUCT.org][Code of Conduct]]
 
 ** Translations
 
@@ -86,4 +92,6 @@ You can help me a lot by giving me some tip, either through [[https://liberapay.
 
 * Going further
 
-Please refer to the [[./DOCUMENTATION.org]] file.
+Please refer to the DOCUMENTATION.org file:
+
+[[./DOCUMENTATION.org][Fronde Documentation]]
