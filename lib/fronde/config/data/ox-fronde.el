@@ -40,6 +40,9 @@
 (defvar fronde/current-work-dir nil
   "Location of the current fronde website base directory.")
 
+(defvar fronde/domain ""
+  "Target domain with scheme of the current fronde installation.")
+
 (defvar fronde/org-temp-dir nil
   "Location of the local Org temporary directory.
 This is where to place org timestamps and id locations.")

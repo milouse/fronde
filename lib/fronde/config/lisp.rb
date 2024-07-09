@@ -36,6 +36,7 @@ module Fronde
           'long_date_fmt' => R18n.t.full_datetime_format.to_s,
           'author' => { 'email' => get('author_email', ''),
                         'name' => get('author') },
+          'domain' => get('domain'),
           'all_projects' => all_projects + all_themes
         )
         File.write("#{workdir}/var/lib/org-config.el", content)
