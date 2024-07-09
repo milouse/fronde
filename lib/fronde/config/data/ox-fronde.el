@@ -35,17 +35,17 @@
 ;;; Function Declarations
 
 (defvar fronde/version ""
-  "Version of the current fronde installation")
+  "Version of the current fronde installation.")
 
 (defvar fronde/current-work-dir nil
   "Location of the current fronde website base directory.")
 
 (defvar fronde/org-temp-dir nil
-  "Location of the local Org temporary directory (where to place
-org timestamps and id locations).")
+  "Location of the local Org temporary directory.
+This is where to place org timestamps and id locations.")
 
 (defun fronde/org-html-format-spec (upstream info)
-  "Return format specification for preamble and postamble.
+  "Advise UPSTREAM to return format specification for preamble and postamble.
 INFO is a plist used as a communication channel."
   (let ((output (funcall upstream info)))
     (push `(?A . ,(format "<span class=\"author\">%s</span>"
@@ -67,18 +67,18 @@ INFO is a plist used as a communication channel."
       output)))
 
 (defun fronde/org-gmi-format-spec (upstream info)
-  "Return format specification for gemini postamble.
+  "Advise UPSTREAM to return format specification for gemini postamble.
 INFO is a plist used as a communication channel."
   (let ((output (funcall upstream info)))
     (push `(?n . ,(format "Fronde %s" fronde/version)) output)))
 
-(defun fronde/org-i18n-export (link description format)
-  "Export a i18n link"
+(defun fronde/org-i18n-export (link description backend)
+  "Export the given i18n LINK with its DESCRIPTION for the current BACKEND."
   (let* ((splitted-link (split-string link "::"))
          (path (car splitted-link))
          (desc (or description path))
          (lang (cadr splitted-link)))
-    (pcase format
+    (pcase backend
       (`html (if lang
                  (format "<a href=\"%s\" hreflang=\"%s\">%s</a>"
                          path lang desc)
@@ -86,7 +86,7 @@ INFO is a plist used as a communication channel."
       (_ nil))))
 
 (defun fronde/org-i18n-follow (link)
-  "Visit a i18n link"
+  "Visit the given i18n LINK."
   (browse-url (car (split-string link "::"))))
 
 (org-link-set-parameters "i18n"
