@@ -5,28 +5,50 @@ module Fronde
   module Slug
     class << self
       def slug(title)
-        title.downcase.tr(' ', '-')
+        title.downcase
              .encode('ascii', fallback: ->(k) { translit(k) })
-             .gsub(/[^\w-]/, '').delete_suffix('-')
+             .encode('utf-8') # Convert back to utf-8 string
+             .gsub(/[^\w-]/, '-')
+             .squeeze('-')
+             .delete_suffix('-')
       end
 
+      # rubocop:disable Metrics/CyclomaticComplexity
+      # rubocop:disable Metrics/MethodLength
       def translit(char)
-        return 'a' if %w[á à â ä ǎ ã å].include?(char)
-        return 'ae' if char == 'æ'
-        return 'e' if %w[é è ê ë ě ẽ €].include?(char)
-        return 'i' if %w[í ì î ï ǐ ĩ].include?(char)
-        return 'o' if %w[ó ò ô ö ǒ õ ø].include?(char)
-        return 'oe' if char == 'œ'
-        return 'u' if %w[ú ù û ü ǔ ũ].include?(char)
-        return 'y' if %w[ý ỳ ŷ ÿ ỹ].include?(char)
-        return 'c' if %w[ç © 🄯].include?(char)
-        return 'n' if char == 'ñ'
-        return 'ss' if char == 'ß'
-        return 'r' if char == '®'
-        return 'tm' if char == '™'
-
-        '-'
+        case char
+        when 'á', 'à', 'â', 'ä', 'ǎ', 'ã', 'å'
+          'a'
+        when 'é', 'è', 'ê', 'ë', 'ě', 'ẽ', '€'
+          'e'
+        when 'í', 'ì', 'î', 'ï', 'ǐ', 'ĩ'
+          'i'
+        when 'ó', 'ò', 'ô', 'ö', 'ǒ', 'õ', 'ø'
+          'o'
+        when 'ú', 'ù', 'û', 'ü', 'ǔ', 'ũ'
+          'u'
+        when 'ý', 'ỳ', 'ŷ', 'ÿ', 'ỹ'
+          'y'
+        when 'ç', '©', '🄯'
+          'c'
+        when 'ñ'
+          'n'
+        when 'ß'
+          'ss'
+        when 'œ'
+          'oe'
+        when 'æ'
+          'ae'
+        when '®'
+          'r'
+        when '™'
+          'tm'
+        else
+          '-'
+        end
       end
+      # rubocop:enable Metrics/CyclomaticComplexity
+      # rubocop:enable Metrics/MethodLength
     end
   end
 end
