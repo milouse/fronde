@@ -1,4 +1,4 @@
-#+title: Fronde
+#+title: News from Fronde
 #+language: en
 
 * Nov. 2023 - v0.4 release
