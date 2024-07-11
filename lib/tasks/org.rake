@@ -8,8 +8,7 @@ require_relative '../fronde/cli/throbber'
 require 'rake/clean'
 
 CLOBBER.push(
-  'var/lib/org-config.el', '.dir-locals.el',
-  'lib/htmlize.el'
+  'var/lib/org-config.el', 'lib/htmlize.el'
 )
 
 namespace :org do
@@ -26,19 +25,16 @@ namespace :org do
     else
       Fronde::CLI::Throbber.run(download, R18n.t.fronde.tasks.org.downloading)
     end
-  rescue RuntimeError
+  rescue RuntimeError, Interrupt
     warn R18n.t.fronde.tasks.org.no_download if verbose
   end
 
   desc 'Compile Org'
   multitask compile: ['var/tmp/org.tar.gz', 'lib'] do |task|
-    begin
-      # No need to force fetch last version as it is only interesting as
-      # part of the upgrade task
-      org_version = Fronde::Org.last_version
-    rescue RuntimeError
-      next
-    end
+    # No need to force fetch last version as it is only interesting as
+    # part of the upgrade task
+    org_version = Fronde::Org.last_version
+
     org_dir = "lib/org-#{org_version}"
     next if Dir.exist?("#{org_dir}/lisp")
 
@@ -54,6 +50,8 @@ namespace :org do
     else
       Fronde::CLI::Throbber.run(build, R18n.t.fronde.tasks.org.installing)
     end
+  rescue RuntimeError, Interrupt
+    next
   end
 
   directory 'lib'
@@ -76,10 +74,6 @@ namespace :org do
     Fronde::CONFIG.write_org_lisp_config
   end
 
-  file '.dir-locals.el' => 'var/lib/org-config.el' do
-    Fronde::Config::Helpers.write_dir_locals
-  end
-
   file '.gitignore' do
     next if File.exist? '.gitignore'
 
@@ -91,9 +85,10 @@ namespace :org do
 
   desc 'Install Org'
   multitask install: ['org:compile', '.gitignore'] do
-    # I need a fully installed org mode to correctly generate the lisp
-    # config
-    Rake::Task['.dir-locals.el'].invoke
+    # lib/htmlize.el and lib/ox-gmi.el cannot be generated in parallel
+    # of org:compilation, as it will leads to a weird SSL error. Thus
+    # finishing file generation "manually" here.
+    Rake::Task['var/lib/org-config.el'].invoke
     sources = Fronde::CONFIG.sources
     sources.each { mkdir_p _1['path'] }
 

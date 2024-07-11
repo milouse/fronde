@@ -100,7 +100,7 @@ gem.
 ** Source code
 
 The canonical repository is located at [[https://git.umaneti.net/fronde]].
-A mirror also exists on [[https://github.com/milouse/chwall][Github]].
+A mirror also exists on [[https://github.com/milouse/fronde][Github]].
 
 * Getting started
 
@@ -195,7 +195,7 @@ number you just built):
 
 #+caption: Fronde installation procedure from local gem file
 #+begin_src shell
-  gem install fronde-0.4.0.gem
+  gem install fronde-x.y.z.gem
 #+end_src
 
 ** Creation of a website
@@ -241,7 +241,6 @@ Your project now consist of the following file hierarchy:
 #+begin_example
 yourproject/
 ├── config.yml      # main config file
-├── .dir-locals.el  # Emacs per-directory local variables file
 ├── lib/            # required dependencies
 ├── public_html/    # output folder
 │   └── assets/
@@ -323,7 +322,7 @@ HTML with the ~fronde build~ command.
 Because this building process makes a direct use of the org-mode
 publishing feature, it will rebuild only files changed since the last
 command invocation. If you want to force a full rebuild, you can pass
-the ~--force~ arguments to the command.
+the ~--force~ argument to the command.
 
 #+begin_src shell
   fronde build -f
@@ -340,6 +339,25 @@ the home page of your project.
 #+end_src
 
 ** Publishing the website
+
+To publish your website, just use the following command:
+
+#+caption: Publish a fronde project
+#+begin_src shell
+  fronde publish
+#+end_src
+
+You can give the ~--verbose~ argument to display more detail on the
+operation.
+
+#+caption: Publish verbosely a fronde project
+#+begin_src shell
+  fronde publish -v
+#+end_src
+
+The publication target must be defined using one of the two settings
+[[#remote_setting][gemini_remote or html_remote]]. If none of those setting is set, the
+~publish~ command will do nothing.
 
 * Advanced usage
 
@@ -408,47 +426,88 @@ are *valid* values too.
 The default ~domain~ value is an empty string.
 #+end_noteblock
 
-*** ~gemini_public_folder~
+*** ~gemini_public_folder~ or ~html_public_folder~
 
-The ~gemini_public_folder~ option stores the path to the folder, which
-will contains the generated gemtext files, ready for Gemini publication.
+The ~gemini_public_folder~ or ~html_public_folder~ option stores the
+path to the folder, which will respectively contains the generated
+gemtext or HTML files, ready for Gemini or Web publication.
 
 #+begin_noteblock
 The default ~gemini_public_folder~ value is ~public_gmi~ (at the root of
 your project).
 #+end_noteblock
 
-*** ~gemini_remote~
-
-The ~gemini_remote~ option contains an /rsync/ like destination string,
-which will be used to published your capsule when using the ~sync:push~
-/rake/ task. For example ~user@domain:/var/www/mycapsule/~
-
-#+begin_noteblock
-There is no default value for ~gemini_remote~. Publication of your
-capsule will be skipped if there is no value for ~gemini_remote~.
-#+end_noteblock
-
-*** ~html_public_folder~
-
-The ~html_public_folder~ option stores the path to the folder, which
-will contains the HTML generated files, ready for Web publication.
-
 #+begin_noteblock
 The default ~html_public_folder~ value is ~public_html~ (at the root of
 your project).
 #+end_noteblock
 
-*** ~html_remote~
+*** ~gemini_remote~ or ~html_remote~
+:PROPERTIES:
+:CUSTOM_ID: remote_setting
+:END:
 
-The ~html_remote~ option contains an /rsync/ like destination string,
-which will be used to published your website when using the ~sync:push~
-/rake/ task. For example ~user@domain:/var/www/mywebsite/~
+The ~gemini_remote~ or ~html_remote~ option contains the destination of
+your capsule or website. This destination string define whether the
+[[https://neocities.org][Neocities]] or the default rsync backend must be used,
+and with what parameters.
 
 #+begin_noteblock
-There is no default value for ~html_remote~. Publication of your website
-will be skipped if there is no value for ~html_remote~.
+There is no default value for ~gemini_remote~ or ~html_remote~. Publication of your
+capsule will be skipped if there is no value for ~gemini_remote~. The
+same thing for your website, if there is no value for ~html_remote~, the
+publication of your website will be skipped.
 #+end_noteblock
+
+**** Rsync backend
+
+If you plan to use rsync to publish your website, you just have to give
+the destination target, as you would have done on the command line. For
+example ~user@domain:/var/www/mywebsite/~
+
+#+begin_importantblock
+The trailing slash is mandatory.
+#+end_importantblock
+
+Fronde will directly call Rsync in a synchronous process, thus if a
+password must be entered to either unlock an SSH key, or because your
+are trying to connect with a password, you will be able to manually
+enter it as usual.
+
+**** Neocities backend
+
+If you plan to publish your website on a Website offering the same API
+than Neocities, you can use the following value for this setting:
+~neocities:<website_name>@<server_name>~
+
+- ~<website_name>~ :: is your Neocities website name (the username you
+  use to log in)
+- ~<server_name>~ :: is the Neocities server you want to publish on
+  (Neocities is a free and open source software, thus one might want to
+  host it on a different server). This part is optional if you use the
+  official Neocities server.
+
+For example, if your Website name is /example/ and you wish to publish it
+on the official Neocities server, you can just set the ~html_remote~ to
+~neocities:example~ or ~neocities:example@neocities.org~ if you want to be
+precise (but again, ~neocities.org~ is the default value for the
+~server_name~, so you can skip it).
+
+To use the Neocities API, you also need to store your password. As you
+may want to track your fronde config file in git or other system, this
+secret value is not stored in the main config file. Instead, you have to
+put it in a specific ~.credentials~ file in the same folder as the
+config file. This ~.credentials~ file is a YAML file too. The
+credentials file is expected to contains one key per Neocities website,
+named ~<website_name>_neocities_pass~. For exemple, if your Neocities
+website name is /example/, you must have a key named
+~example_neocities_pass~ in this file.
+
+#+caption: Content of an example ~.credentials~ file
+#+begin_src yaml
+---
+example_neocities_pass: password
+#+end_src
 
 *** ~lang~
 :PROPERTIES:
@@ -655,34 +714,42 @@ be replaced by their corresponding content when you will build your
 website. The values are context sensitive, taken from the currently
 evaluated Org file, or by default from the config of your project.
 
-- %a :: the raw author name of the current Org file, or the one given
-        in the config file.
+- %a :: the raw author name.
 - %A :: the HTML rendering of the author name, equivalent to
         ~<span class="author">%a</span>~.
-- %d :: a short date HTML representation, equivalent to
-        ~<time datetime="%I">%i</time>~.
+- %d :: the short date HTML representation, equivalent
+        to ~<time datetime="%I">%i</time>~.
 - %D :: the full date and time HTML representation.
+- %F :: the ~link~ HTML tag for the main Atom feed of the current file
+        source.
+- %h :: the declared host/domain name.
 - %i :: the raw short date and time.
 - %I :: the raw ISO 8601 date and time.
 - %k :: the current Org file keywords separated by commas.
 - %K :: the HTML list rendering of the keywords.
-- %l :: the lang of the document, or the one given in the config file.
+- %l :: the lang of the current Org file.
 - %L :: the license information, taken from the config file.
 - %n :: the fronde name and version.
-- %N :: the fronde name and version with a link to the project
-        home.
+- %N :: the fronde name and version with a link to the project home on
+        the name.
+- %o :: the theme name (~o~ as in Outfit) of the current file source.
 - %s :: the subtitle of the current Org file (from ~#+subtitle:~).
 - %t :: the title of the current Org file (from ~#+title:~).
-- %u :: the web path to the related published HTML document.
+- %u :: the URL to the related published HTML document.
 - %x :: the raw description (~x~ as in eXcerpt) of the current Org file
         (from ~#+description:~).
-- %X :: the description, enclosed in an HTML ~p~ tag, equivalent to
-        ~<p>%x</p>~
+- %X :: the description, enclosed in an HTML ~p~ tag, equivalent
+        to ~<p>%x</p>~.
 
 ** Rake tasks
 
 Like a lot of ruby project, fronde exposes some [[https://ruby.github.io/rake/][Rake]] tasks. You can
 discover them with the ~rake -T~ command.
+
+Those rake task offer fine grained control over some operation, like
+featuring a "dry-run" mode for the ~sync:push~ task used by the
+~publish~ command, and even a ~sync:pull~ task to retrieve any content
+currently exposed on your website or capsule.
 
 # Compile this file with:
 # latexmk -norc -xelatex -halt-on-error -shell-escape DOCUMENTATION

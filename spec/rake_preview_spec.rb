@@ -6,6 +6,8 @@ require 'net/http'
 
 def fetch_test_content(path)
   page_content = URI("http://localhost:5000/#{path}").open.read
+  # Ensure tests always pass, whatever charset is generated
+  page_content.gsub!('charset=UTF-8', 'charset=utf-8')
   page_content.gsub(
     /[FMSTW][a-z]+ \d{1,2} of [ADFJMNOS][a-z]+, \d{4} at \d{2}:\d{2}/,
     '__PUB_DATE__'
@@ -83,7 +85,7 @@ context 'when trying preview mode' do
       sleep 1 # Necessary to let webrick start
     end
 
-    it 'is viewable with preview' do
+    it 'is viewable with preview', :aggregate_failures do
       home_page = fetch_test_content 'index.html'
       proof = File.expand_path('data/index_proof.html', __dir__)
       expect(home_page).to eq(File.read(proof))

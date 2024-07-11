@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 
 describe Fronde::Source do
-  it 'can not be instantiated directly' do
-    expect { described_class.new({}) }.to raise_error(NameError)
-    expect { described_class.new({}) }.to raise_error(/`fill_in_specific_config'/)
+  it 'can not be instantiated directly', :aggregate_failures do
+    expect { described_class.new({}) }.to raise_error NameError
+    expect { described_class.new({}) }.to \
+      raise_error(/`fill_in_specific_config'/)
   end
 
   it 'stores new settings' do
@@ -12,13 +13,6 @@ describe Fronde::Source do
     )
     project['test'] = 'Lorem ipsum'
     expect(project['test']).to eq('Lorem ipsum')
-  end
-
-  it 'always says no for gemini blog' do
-    project = described_class.new_from_config(
-      'path' => 'src', 'type' => 'gemini', 'is_blog' => true
-    )
-    expect(project.blog?).to be(false)
   end
 
   it 'computes the right name' do
@@ -75,23 +69,31 @@ describe Fronde::Source do
     end
   end
 
-  it 'computes the right pub_file path for theoritical sources' do
-    config = described_class.canonical_config('path' => 'src', 'target' => '.')
+  it 'computes the right pub_file path for theoritical relative sources' do
+    config = described_class.canonical_config(
+      'path' => 'src', 'target' => '.'
+    )
     project = described_class.new_from_config(config)
-    target = project.target_for 'src/test.org'
-    expect(target).to eq('/test.html')
-    target = project.target_for 'src/blog/test.org'
-    expect(target).to eq('/blog/test.html')
-    target = project.target_for 'src/blog/toto/tata.org'
-    expect(target).to eq('/blog/toto/tata.html')
-    target = project.target_for 'src/blog/toto/content.org'
-    expect(target).to eq('/blog/toto/content.html')
+    {
+      'src/test.org' => '/test.html',
+      'src/blog/test.org' => '/blog/test.html',
+      'src/blog/toto/tata.org' => '/blog/toto/tata.html',
+      'src/blog/toto/content.org' => '/blog/toto/content.html'
+    }.each do |target, value|
+      expect(project.target_for(target)).to eq(value)
+    end
+  end
 
-    config = described_class.canonical_config('path' => '~/tata', 'target' => '.')
+  it 'computes the right pub_file path for theoritical home-based sources' do
+    config = described_class.canonical_config(
+      'path' => '~/tata', 'target' => '.'
+    )
     project = described_class.new_from_config(config)
-    target = project.target_for '~/tata/tutu/content.org'
-    expect(target).to eq('/tutu/content.html')
-    target = project.target_for '~/tata/blog/content.org'
-    expect(target).to eq('/blog/content.html')
+    {
+      '~/tata/tutu/content.org' => '/tutu/content.html',
+      '~/tata/blog/content.org' => '/blog/content.html'
+    }.each do |target, value|
+      expect(project.target_for(target)).to eq(value)
+    end
   end
 end

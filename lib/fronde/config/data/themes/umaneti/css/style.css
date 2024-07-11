@@ -1,0 +1,250 @@
+body {
+    font-size: 10pt;
+    color: #000000;
+    font-family: sans-serif;
+    margin: 0;
+}
+
+h1 {color: #ffba53;}
+
+h2 {color: #68a5c3;}
+
+h3 {color:#ffba53;}
+
+a[hreflang]:after {
+    content: "\00a0[" attr(hreflang) "]";
+    color: #cccccc;
+    background: transparent;
+}
+
+a, a:visited {color: #666666;}
+a:hover {text-decoration: none;}
+
+img {border: 0;}
+
+blockquote {
+    font-style: italic;
+    border-left: 4px solid #666666;
+    padding-left: 1em;
+}
+
+acronym {
+    border-bottom:dotted 1px #666666;
+    cursor:help;
+}
+
+code {
+    font-family: monospace;
+    color: #bb1111;
+}
+h2 code {color: #68a5c3;}
+h3 code {color: #ffba53;}
+h4 code {color: #000000;}
+
+ul {
+    list-style: url('/assets/umaneti/img/tic.png');
+    padding-left: 2em;
+}
+
+ol {padding-left: 2em;}
+
+p, li {
+    text-align: justify;
+    line-height: 1.75em;
+}
+
+dt {
+    font-weight: bold;
+}
+
+.underline {
+    text-decoration: underline;
+}
+
+.org-center {
+    text-align: center;
+}
+
+fieldset {border: 0;}
+
+input, textarea {
+    border: 1px solid #cccccc;
+    margin: 3px 0px;
+    background: #ffffff;
+}
+input:hover,
+input:focus,
+textarea:hover,
+textarea:focus {
+    border: 1px solid #ffba53;
+    background: #ffffff;
+}
+
+/* Sidebar */
+
+nav#table-of-contents {
+    width: 300px;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    padding: 1em 10px;
+    height: 100%;
+    height: calc(100% - 2em);
+    overflow: auto;
+    background-color: #666666;
+    color: #cccccc;
+}
+nav#table-of-contents a,
+nav#table-of-contents a:hover,
+nav#table-of-contents a:visited {
+    color: #cccccc;
+    text-decoration: none;
+    display: inline-block;
+    padding: .2em .5em;
+    width: 100%;
+    width: calc(100% - 1em);
+}
+nav#table-of-contents a code { color: #cccccc; }
+
+#text-table-of-contents ul { padding-left: 0; }
+#text-table-of-contents li {
+    font-weight: bold;
+    list-style: none;
+    line-height: 2em;
+}
+#text-table-of-contents li:hover {
+    background-color: #444444;
+}
+#text-table-of-contents li li {
+    font-weight: normal;
+}
+#text-table-of-contents li li:hover {
+    background-color: #222222;
+}
+#text-table-of-contents li li li:hover {
+    background-color: #000000;
+}
+
+/* Main content */
+
+#content, #postamble {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 1.5em;
+    background-image: url('/assets/umaneti/img/top.png');
+    background-position: top left;
+    background-repeat: repeat-x;
+}
+
+nav#table-of-contents ~ #content,
+nav#table-of-contents ~ #postamble {
+    margin: 0 0 0 320px;
+}
+
+div.tipblock,
+div.warningblock,
+div.cautionblock,
+div.noteblock {
+    border-width: 1px;
+    border-style: solid;
+    margin: 1.2em;
+    padding: 0 1em;
+    box-shadow: 3px 3px 3px #eeeeee;
+}
+div.tipblock::before,
+div.warningblock::before,
+div.cautionblock::before,
+div.noteblock::before {
+    font-size: 2em;
+    margin-top: 0.3em;
+    padding-right: .5em;
+    position: absolute;
+}
+div.tipblock > *,
+div.warningblock > *,
+div.cautionblock > *,
+div.noteblock > * {
+    margin-left: 4em;
+}
+
+div.warningblock {
+    border-color: #ffba53;
+}
+div.warningblock::before {
+    content: "⚠️";
+    border-right: 1px solid #ffba53;
+}
+div.noteblock {
+    border-color: #68a5c3;
+}
+div.noteblock::before {
+    content: "ℹ️";
+    border-right: 1px solid #68a5c3;
+}
+div.tipblock {
+    border-color: #87C25D;
+}
+div.tipblock::before {
+    content: "💡";
+    border-right: 1px solid #87C25D;
+}
+div.cautionblock {
+    border-color: #ff5555;
+}
+div.cautionblock::before {
+    content: "🔥";
+    border-right: 1px solid #ff5555;
+}
+
+
+@media screen and (max-width: 660px) {
+    nav#table-of-contents {
+        display: none;
+    }
+    #content, #postamble {
+        max-width: 95%;
+        margin: 0;
+    }
+    nav#table-of-contents ~ #content,
+    nav#table-of-contents ~ #postamble {
+        max-width: 95%;
+        margin: 0;
+    }
+}
+
+#postamble {
+    border-top: 1px solid #cccccc;
+    font-size: .8em;
+    text-align: center;
+    line-height: 1.5em;
+    padding: 1em 1.5em;
+}
+
+.post-meta {
+    font-size: .9em;
+    font-style: italic;
+}
+
+/* Header */
+#content header {
+    padding: 1em;
+    padding-bottom: 1.5em;
+}
+#content header h1 {
+    text-align: center;
+}
+
+#preamble nav ul {
+    list-style: none;
+    padding-left: 0;
+}
+#preamble li {
+    display: inline;
+    line-height: 1em;
+}
+#preamble li::before {
+    content: " · ";
+}
+#preamble li:first-child::before {
+    content: "";
+}

@@ -4,11 +4,16 @@
 {% for index in indexes %}
 * {{ index.title }}
 :PROPERTIES:
-:HTML_CONTAINER_CLASS: index-tags
+{%- if project_type == 'html' %}
+:HTML_CONTAINER_CLASS: index-tags{% endif %}
 :UNNUMBERED: notoc
 :END:
 
 {% for tag in index.tags -%}
+{%- if project_type == 'gemini' -%}
+[[{{ domain }}{{ project_path }}tags/{{ tag.slug }}.gmi][{{ tag.title }} ({{ tag.weight }})]]
+{%- else -%}
 - [[{{ domain }}{{ project_path }}tags/{{ tag.slug }}.html][{{ tag.title }}]] ({{ tag.weight }})
+{%- endif %}
 {% endfor %}
 {%- endfor -%}

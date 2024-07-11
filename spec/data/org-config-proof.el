@@ -4,8 +4,9 @@
 (load-file (expand-file-name "htmlize.el" "{{ test_dir }}/lib"))
 
 ;; Current project options
-(setq fronde/version "{{ version }}"
-      fronde/current-work-dir "{{ test_dir }}"
+(setq fronde-version "{{ version }}"
+      fronde-current-work-dir "{{ test_dir }}"
+      fronde-domain ""
       user-mail-address ""
       user-full-name "alice"
       org-html-metadata-timestamp-format "%A %-d of %B, %Y at %R"
@@ -14,6 +15,7 @@
       `(("src"
          :base-directory "{{ test_dir }}/src"
          :base-extension "org"
+         :fronde-base-uri "/"
          :html-head ""
          :html-head-include-default-style t
          :html-head-include-scripts t

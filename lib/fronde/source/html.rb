@@ -40,12 +40,12 @@ module Fronde
         super
       end
 
-      def org_default_options # rubocop:disable Metrics/MethodLength
+      def org_default_options
         defaults = {
           'publishing-function' => 'org-html-publish-to-html',
           'html-head-include-default-style' => 't',
           'html-head-include-scripts' => 't',
-          'html-head' => '{{ atom_feed }}',
+          'html-head' => '%F',
           'html-postamble' => Html.org_default_postamble
         }
         return defaults if @config['theme'] == 'default'
@@ -55,10 +55,10 @@ module Fronde
           'html-head-include-scripts' => 'nil',
           'html-head' => <<~HTMLHEAD
             <link rel="stylesheet" type="text/css" media="screen"
-                  href="{{ domain }}/assets/{{ theme }}/css/style.css">
+                  href="%h/assets/%o/css/style.css">
             <link rel="stylesheet" type="text/css" media="screen"
-                  href="{{ domain }}/assets/{{ theme }}/css/htmlize.css">
-            {{ atom_feed }}
+                  href="%h/assets/%o/css/htmlize.css">
+            %F
           HTMLHEAD
         )
       end

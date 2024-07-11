@@ -118,41 +118,53 @@ module Fronde
       #
       # *** Format:
       #
-      # - %a :: the raw author name
+      # - %a :: the raw author name.
       # - %A :: the HTML rendering of the author name, equivalent to
-      #         ~<span class="author">%a</span>~
+      #         ~<span class="author">%a</span>~.
       # - %d :: the ~:short~ date HTML representation, equivalent
-      #         to ~<time datetime="%I">%i</time>~
-      # - %D :: the ~:full~ date and time HTML representation
-      # - %i :: the raw ~:short~ date and time
-      # - %I :: the raw ~:iso8601~ date and time
-      # - %k :: the keywords separated by a comma
-      # - %K :: the HTML list rendering of the keywords
-      # - %l :: the lang of the document
+      #         to ~<time datetime="%I">%i</time>~.
+      # - %D :: the ~:full~ date and time HTML representation.
+      # - %F :: the ~link~ HTML tag for the main Atom feed of the
+      #         current file source.
+      # - %h :: the declared host/domain name, taken from the
+      #         {Fronde::Config#settings}.
+      # - %i :: the raw ~:short~ date and time.
+      # - %I :: the raw ~:iso8601~ date and time.
+      # - %k :: the document keywords separated by commas.
+      # - %K :: the HTML list rendering of the keywords.
+      # - %l :: the lang of the document.
       # - %L :: the license information, taken from the
-      #         {Fronde::Config#settings}
-      # - %n :: the Fronde name and version
-      # - %N :: the Fronde name and version with a link to the project
-      #         home on the name
-      # - %s :: the subtitle of the document
-      # - %t :: the title of the document
-      # - %u :: the URL to the related published HTML document
-      # - %x :: the raw description (eXcerpt)
+      #         {Fronde::Config#settings}.
+      # - %n :: the fronde name and version.
+      # - %N :: the fronde name and version with a link to the project
+      #         home on the name.
+      # - %o :: the theme name (~o~ as in Outfit) of the current file source.
+      # - %s :: the subtitle of the document (from ~#+subtitle:~).
+      # - %t :: the title of the document (from ~#+title:~).
+      # - %u :: the URL to the related published HTML document.
+      # - %x :: the raw description (~x~ as in eXcerpt) of the document
+      #         (from ~#+description:~).
       # - %X :: the description, enclosed in an HTML ~p~ tag, equivalent
-      #         to ~<p>%x</p>~
+      #         to ~<p>%x</p>~.
       #
       # @example
       #     org_file.format("Article written by %a the %d")
       #     => "Article written by Alice Smith the Wednesday 3rd July"
       #
       # @return [String] the given ~string~ after replacement occurs
-      # rubocop:disable Metrics/MethodLength
       # rubocop:disable Layout/LineLength
       def format(string)
+        project_data = @project.to_h
+        # NOTE: The following keycode are reserved by Org itself:
+        #       %a (author), %c (creator), %C (input-file), %d (date),
+        #       %e (email), %s (subtitle), %t (title), %T (timestamp),
+        #       %v (html validation link)
         string.gsub('%a', @data[:author])
               .gsub('%A', "<span class=\"author\">#{@data[:author]}</span>")
               .gsub('%d', @data[:date].l18n_short_date_html)
               .gsub('%D', @data[:date].l18n_long_date_html)
+              .gsub('%F', project_data['atom_feed'] || '')
+              .gsub('%h', project_data['domain'] || '')
               .gsub('%i', @data[:date].l18n_short_date_string)
               .gsub('%I', @data[:date].xmlschema)
               .gsub('%k', @data[:keywords].join(', '))
@@ -161,6 +173,7 @@ module Fronde
               .gsub('%L', Fronde::CONFIG.get('license', '').gsub(/\s+/, ' ').strip)
               .gsub('%n', "Fronde #{Fronde::VERSION}")
               .gsub('%N', "<a href=\"https://git.umaneti.net/fronde/about/\">Fronde</a> #{Fronde::VERSION}")
+              .gsub('%o', project_data['theme'] || '')
               .gsub('%s', @data[:subtitle])
               .gsub('%t', @data[:title])
               .gsub('%u', @data[:url] || '')
@@ -168,7 +181,6 @@ module Fronde
               .gsub('%X', "<p>#{@data[:excerpt]}</p>")
       end
       # rubocop:enable Layout/LineLength
-      # rubocop:enable Metrics/MethodLength
 
       # Writes the current Org::File content to the underlying file.
       #
@@ -215,6 +227,7 @@ module Fronde
         data['published_body'] = extract_published_body
         pub_date = @data[:date]
         data['published'] = pub_date.l18n_long_date_string(with_year: false)
+        data['published_gemini_index'] = pub_date.strftime('%Y-%m-%d')
         data['published_xml'] = pub_date.xmlschema
         data['updated_xml'] = @data[:updated]&.xmlschema
         data
@@ -228,8 +241,10 @@ module Fronde
         else
           source = find_source_for_publication_file
         end
-        warn R18n.t.fronde.error.org_file.no_project(file: @file) unless source
-        source
+        return source if source
+
+        short_file = @file.sub(/^#{Dir.pwd}/, '.')
+        warn R18n.t.fronde.error.org_file.no_project(file: short_file)
       end
 
       def find_source_for_org_file
@@ -250,20 +265,17 @@ module Fronde
       def init_empty_file
         @data = {
           title: @options[:title] || '', subtitle: '', excerpt: '',
-          date: Time.now,
           author: @options[:author] || Fronde::CONFIG.get('author'),
-          keywords: [],
           lang: @options[:lang] || Fronde::CONFIG.get('lang'),
-          pub_file: nil, url: nil
+          date: Time.now, keywords: [], pub_file: nil, url: nil
         }
-        body = @options[:content] || ''
         @data[:content] = @options[:raw_content] || <<~ORG
           #+title: #{@data[:title]}
           #+date: <#{@data[:date].strftime('%Y-%m-%d %a. %H:%M:%S')}>
           #+author: #{@data[:author]}
           #+language: #{@data[:lang]}
 
-          #{body}
+          #{@options[:content]}
         ORG
       end
 

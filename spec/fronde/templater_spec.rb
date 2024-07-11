@@ -71,8 +71,8 @@ describe Fronde::Templater do
 
     it 'skips file on unknown source' do
       FileUtils.mkdir 'public_html/customize'
-      File.write 'public_html/customize/test.html', html_base
-      test_path = "#{Dir.pwd}/public_html/customize/test.html"
+      test_path = './public_html/customize/test.html'
+      File.write test_path, html_base
       expect do
         described_class.customize_output('public_html/customize/test.html')
       end.to(
@@ -90,7 +90,8 @@ describe Fronde::Templater do
         described_class.customize_output('public_html/customize_test.html')
       end.to(
         output(
-          "No element found with the selector h2 in public_html/customize_test.html.\n"
+          'No element found with the selector h2 in ' \
+          "public_html/customize_test.html.\n"
         ).to_stderr
       )
     end
@@ -334,7 +335,7 @@ describe Fronde::Templater do
 
     after { FileUtils.rm_r %w[public_html src] }
 
-    it 'customizes a file on a specific path' do
+    it 'customizes a file on a specific path', :aggregate_failures do
       described_class.customize_output('public_html/customize_test.html')
       expect(File.read('public_html/customize_test.html')).to eq(html_base)
       # Run it a second time
@@ -344,7 +345,7 @@ describe Fronde::Templater do
       )
     end
 
-    it 'does not customize twice a file' do
+    it 'does not customize twice a file', :aggregate_failures do
       described_class.customize_output('public_html/customize/test.html')
       expect(File.read('public_html/customize/test.html')).to(
         eq(template_proof('d310e02360415c4ddd995a0fcb104057'))
@@ -356,7 +357,7 @@ describe Fronde::Templater do
       )
     end
 
-    it 'does not remove moving elements' do
+    it 'does not remove moving elements', :aggregate_failures do
       other_html_base = <<~HTML
         <!DOCTYPE html>
         <html>
@@ -428,7 +429,7 @@ describe Fronde::Templater do
 
     after { FileUtils.rm_r %w[public_html src] }
 
-    it 'customizes a file on a specific path' do
+    it 'customizes a file on a specific path', :aggregate_failures do
       described_class.customize_output('public_html/customize_test.html')
       expect(File.read('public_html/customize_test.html')).to eq(html_base)
       described_class.customize_output('public_html/customize/test.html')

@@ -22,7 +22,6 @@ module Fronde
       #
       # @return [Integer] the length written (as returned by the
       #   underlying ~File.write~ method call)
-      # rubocop:disable Metrics/MethodLength
       def write_org_lisp_config
         workdir = Dir.pwd
         all_projects = sources.map(&:org_config).flatten
@@ -37,16 +36,27 @@ module Fronde
           'long_date_fmt' => R18n.t.full_datetime_format.to_s,
           'author' => { 'email' => get('author_email', ''),
                         'name' => get('author') },
+          'domain' => get('domain'),
           'all_projects' => all_projects + all_themes
         )
         File.write("#{workdir}/var/lib/org-config.el", content)
       end
-      # rubocop:enable Metrics/MethodLength
 
       private
 
+      def theme_directory(theme)
+        # User theme first to allow overwriting
+        directory = File.expand_path("themes/#{theme}")
+        return directory if Dir.exist? directory
+
+        directory = File.expand_path("data/themes/#{theme}", __dir__)
+        return directory if Dir.exist? directory
+
+        raise Errno::ENOENT, "Theme #{theme} not found"
+      end
+
       def org_theme_config(theme)
-        { 'base-directory' => File.expand_path("themes/#{theme}"),
+        { 'base-directory' => theme_directory(theme),
           # rubocop:disable Layout/LineLength
           'base-extension' => %w[css js gif jpg png svg otf ttf woff2?].join('\\\\|'),
           'publishing-directory' => "#{get('html_public_folder')}/assets/#{theme}",

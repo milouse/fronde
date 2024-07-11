@@ -1,0 +1,99 @@
+#+title: News from Fronde
+#+language: en
+
+* Jul. 2024 - v0.5 release
+
+This new release continues the stability work.
+
+The biggest improvement has been in the Gemini protocol handling, now
+allowing you to publish Gemlog with the same features as for the HTML
+blogs.
+
+It also comes with two new features, which should open new ways of
+improvement in the future:
+
+- Add support for packaged themes. This release comes with one original
+  theme named "umaneti". More theme may be packaged in the future.
+- Add support for publishing website on [[https://neocities.org][Neocities]]. This comes with a
+  full rewrite of the publishing code. You can now use either the rsync
+  backend or this new Neocities backend if you want to benefit from
+  their nice and cheap static website hosting solution. You can read
+  more about publication options in [[./DOCUMENTATION.org::#remote_setting][the documentation]].
+
+#+begin_warningblock
+This release changes the way ~i18n:~ links are parsed by our private Org
+extension. Previously, they were stored as ~i18n:https://example.com|en~, but
+must now be stored as ~i18n:https://example.com::en~ (~::~ replacing ~|~ to
+separate the URI from the lang tag). This is to be more homogeneous with
+~file:~, ~attachment:~, and ~id:~ links, which also accept a suffix separated
+with ~::~.
+#+end_warningblock
+
+#+begin_warningblock
+This release removes the support of Liquid tags while rendering custom
+org-options settings. This is to stay homogeneous with other org
+placeholders. Liquid tags are only expected to render internal/private
+templates.
+#+end_warningblock
+
+
+* Nov. 2023 - v0.4 release
+
+This new release brings a lot of stability improvements and inner
+refactoring. Even if the visible changes list might look a bit poor,
+this release is a big step forward and will help a lot to develop new
+features in the future. Some parts of the software were poorly designed
+and we worked hard to improve the coding.
+
+#+begin_noteblock
+After the update, you will need to update your installations and force a
+full publication of your websites (because the way templates are
+inserted inside published files changed). Actually, this will become
+the new standard routine after any fronde upgrade.
+
+#+begin_src shell
+  fronde update
+  fronde build -f
+#+end_src
+#+end_noteblock
+
+Here is the list of the most visible changes:
+
+- Improve Gemini support
+- Translate all console messages
+- Introduce a new onboarding command (~new~ instead of ~init~) to follow
+  other static website generator habbits
+- Rework tags and Atom feeds publication
+  + Output full article body in Atom feeds
+  + Announce each Atom feed in its related tag page
+  + Move tag pages and Atom feeds /inside/ the related blog source. They
+    are not shared anymore but specific to their source.
+
+#+begin_warningblock
+As tags and feeds are now published under their related source public
+path and no more directly at the root of the publication folder, you
+might want to setup some redirections in your web server configuration.
+
+For the following example configuration:
+
+#+begin_src yaml
+  ---
+  sources:
+  - path: src/news
+    is_blog: true
+#+end_src
+
+Feeds and tags will now be published under ~public_html/news/feeds/~ and
+~public_html/news/tags/~ instead of ~public_html/feeds/~ and
+~public_html/tags/~. Thus you might want to setup some redirections like
+the following for nginx:
+
+#+begin_src
+  location ~ ^/tags/(?<slug>.*)$ {
+      return 301 /news/tags/$slug;
+  }
+  location ~ ^/feeds/(?<slug>.*)$ {
+      return 301 /news/feeds/$slug;
+  }
+#+end_src
+#+end_warningblock

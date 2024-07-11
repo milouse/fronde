@@ -7,7 +7,7 @@ describe Fronde::CLI::Throbber do
 
   before { Fronde::CONFIG.reset }
 
-  it 'selects the right throbber' do
+  it 'selects the right throbber', :aggregate_failures do
     throbber = described_class.new(thread, 'Test')
     expect(throbber.instance_variable_get(:@frames)).to(
       eq(['⠁ ⠂ ⠄ ⡀ ⠄ ⠂ ⠁', '⠂ ⠁ ⠂ ⠄ ⡀ ⠄ ⠂', '⠄ ⠂ ⠁ ⠂ ⠄ ⡀ ⠄',

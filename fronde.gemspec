@@ -2,15 +2,15 @@
 
 require './lib/fronde/version'
 
-Gem::Specification.new do |s|
-  s.name        = 'fronde'
-  s.version     = Fronde::VERSION
-  s.summary     = 'An opinionated static website generator for Org'
-  s.description = <<~DESC
+Gem::Specification.new do |spec|
+  spec.name        = 'fronde'
+  spec.version     = Fronde::VERSION
+  spec.summary     = 'An opinionated static website generator for Org'
+  spec.description = <<~DESC
     Fronde helps you to convert Org mode files into websites, giving you
     full control over the publication process.
   DESC
-  s.post_install_message = <<~POSTINST
+  spec.post_install_message = <<~POSTINST
     Start your first fronde project with:
 
         fronde new myproject
@@ -21,18 +21,19 @@ Gem::Specification.new do |s|
         fronde build -f
 
   POSTINST
-  s.authors     = ['Étienne Deparis']
-  s.email       = 'etienne@depar.is'
-  s.metadata    = {
+  spec.authors  = ['Étienne Deparis']
+  spec.email    = 'etienne@depar.is'
+  spec.metadata = {
     'rubygems_mfa_required' => 'true',
     'source_code_uri' => 'https://git.umaneti.net/fronde',
     'homepage_uri' => 'https://etienne.depar.is/fronde/',
     'funding_uri' => 'https://liberapay.com/milouse'
   }
-  s.files = [
+  spec.files = [
     # Monkey patches / extensions
     'lib/ext/nil_time.rb',
     'lib/ext/r18n.rb',
+    'lib/ext/time_no_time.rb',
     'lib/ext/time.rb',
     # Core files
     'lib/fronde/cli/commands.rb',
@@ -64,6 +65,9 @@ Gem::Specification.new do |s|
     'lib/fronde/source/gemini.rb',
     'lib/fronde/source/html.rb',
     'lib/fronde/source.rb',
+    'lib/fronde/sync/neocities.rb',
+    'lib/fronde/sync.rb',
+    'lib/fronde/sync/rsync.rb',
     'lib/fronde/templater.rb',
     'lib/fronde/version.rb',
     # Rake tasks
@@ -75,18 +79,29 @@ Gem::Specification.new do |s|
     # Translations
     'locales/en.yml',
     'locales/fr.yml',
+    # Themes
+    'lib/fronde/config/data/themes/umaneti/css/htmlize.css',
+    'lib/fronde/config/data/themes/umaneti/css/style.css',
+    'lib/fronde/config/data/themes/umaneti/img/bottom.png',
+    'lib/fronde/config/data/themes/umaneti/img/content.png',
+    'lib/fronde/config/data/themes/umaneti/img/tic.png',
+    'lib/fronde/config/data/themes/umaneti/img/top.png',
     # Others
     'LICENSE'
   ]
-  s.executables = ['fronde']
-  s.homepage    = 'https://git.umaneti.net/fronde/about/'
-  s.license     = 'WTFPL'
+  spec.executables = ['fronde']
+  spec.homepage    = 'https://git.umaneti.net/fronde/about/'
+  spec.license     = 'WTFPL'
 
-  s.required_ruby_version = '>= 2.7'
-  s.add_runtime_dependency 'liquid', '~> 5.4'
-  s.add_runtime_dependency 'nokogiri', '~> 1.15'
-  s.add_runtime_dependency 'r18n-core', '~> 5.0'
-  s.add_runtime_dependency 'rainbow', '~> 3.1'
-  s.add_runtime_dependency 'rake', '~> 13.0'
-  s.add_runtime_dependency 'webrick', '~> 1.8'
+  spec.required_ruby_version = '>= 2.7'
+  spec.add_dependency 'base64', '~> 0.2'
+  spec.add_dependency 'bigdecimal', '~> 3.1'
+  spec.add_dependency 'liquid', '~> 5.5'
+  spec.add_dependency 'nokogiri', '~> 1.16'
+  spec.add_dependency 'r18n-core', '~> 5.0'
+  spec.add_dependency 'rainbow', '~> 3.1'
+  spec.add_dependency 'rake', '~> 13.2'
+  spec.add_dependency 'webrick', '~> 1.8'
+
+  spec.requirements << 'emacs'
 end

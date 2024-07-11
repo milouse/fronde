@@ -30,24 +30,6 @@ module Fronde
         config
       end
 
-      # Generate emacs directory variables file.
-      #
-      # This method generate the file ~.dir-locals.el~, which is
-      # responsible to load fronde Org settings when visiting an Org file
-      # of this fronde instance.
-      #
-      # @return [Integer] the length written (as returned by the
-      #   underlying ~File.write~ method call)
-      def self.write_dir_locals
-        workdir = Dir.pwd
-        # rubocop:disable Layout/LineLength
-        File.write(
-          "#{workdir}/.dir-locals.el",
-          "((org-mode . ((eval . (load-file \"#{workdir}/var/lib/org-config.el\")))))"
-        )
-        # rubocop:enable Layout/LineLength
-      end
-
       def self.render_liquid_template(content, data)
         template = Liquid::Template.parse(content)
         template.render(data)

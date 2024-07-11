@@ -4,8 +4,9 @@
 (load-file (expand-file-name "htmlize.el" "{{ test_dir }}/lib"))
 
 ;; Current project options
-(setq fronde/version "{{ version }}"
-      fronde/current-work-dir "{{ test_dir }}"
+(setq fronde-version "{{ version }}"
+      fronde-current-work-dir "{{ test_dir }}"
+      fronde-domain "https://test.com"
       user-mail-address ""
       user-full-name "Tata"
       org-html-metadata-timestamp-format "%A %-d of %B, %Y at %R"
@@ -14,6 +15,7 @@
       `(("src"
          :base-directory "{{ test_dir }}/src"
          :base-extension "org"
+         :fronde-base-uri "https://test.com/src/"
          :html-head "<link rel=\"stylesheet\" type=\"text/css\" media=\"screen\"
       href=\"https://test.com/assets/my-theme/css/style.css\">
 <link rel=\"stylesheet\" type=\"text/css\" media=\"screen\"
@@ -38,6 +40,7 @@ with %c, and published with %N</p>
         ("news"
          :base-directory "{{ test_dir }}/news"
          :base-extension "org"
+         :fronde-base-uri "https://test.com/news/"
          :html-head ""
          :html-head-include-default-style t
          :html-head-include-scripts t

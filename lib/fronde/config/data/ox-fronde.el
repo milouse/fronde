@@ -34,72 +34,109 @@
 
 ;;; Function Declarations
 
-(defvar fronde/version ""
-  "Version of the current fronde installation")
+(defvar fronde-version ""
+  "Version of the current fronde installation.")
 
-(defvar fronde/current-work-dir nil
+(defvar fronde-current-work-dir nil
   "Location of the current fronde website base directory.")
 
-(defvar fronde/org-temp-dir nil
-  "Location of the local Org temporary directory (where to place
-org timestamps and id locations).")
+(defvar fronde-domain ""
+  "Target domain with scheme of the current fronde installation.")
 
-(defun fronde/org-html-format-spec (upstream info)
-  "Return format specification for preamble and postamble.
+(defvar fronde-org-temp-dir nil
+  "Location of the local Org temporary directory.
+This is where to place org timestamps and id locations.")
+
+(defun fronde--format-rich-keywords (info function)
+  "Extract keywords from INFO and apply FUNCTION on them.
+FUNCTION is expected to format each keyword for a rich display for the
+current export backend.  FUNCTION must receive 3 arguments: the current
+KEYWORD, its related SLUG and the current project BASE-URI."
+  (let ((base-uri (plist-get info :fronde-base-uri))
+        (current-path (symbol-file 'fronde--format-rich-keywords))
+        sluglib)
+    (when current-path
+      (setq sluglib
+        (expand-file-name
+          (format "%s../../slug" (file-name-directory current-path)))))
+    (mapcar
+      (lambda (k)
+        (let ((slug (if sluglib
+                      (string-trim-right
+                        (shell-command-to-string
+                          (format "ruby -r %s -e \"puts Fronde::Slug.slug '%s'\""
+                            (shell-quote-argument sluglib)
+                            (shell-quote-argument k))))
+                      k)))
+          (funcall function k slug base-uri)))
+      (split-string
+        (org-export-data (plist-get info :keywords) info)
+        ",+ *"))))
+
+(defun fronde--org-html-format-spec (upstream info)
+  "Advise UPSTREAM to return format specification for preamble and postamble.
 INFO is a plist used as a communication channel."
   (let ((output (funcall upstream info)))
     (push `(?A . ,(format "<span class=\"author\">%s</span>"
                     (org-export-data (plist-get info :author) info)))
       output)
     (push `(?k . ,(org-export-data (plist-get info :keywords) info)) output)
-    (push `(?K . ,(format "<ul class=\"keywords-list\">%s</ul>"
-                    (mapconcat
-	                    (lambda (k) (format "<li class=\"keyword\">%s</li>" k))
-	                    (split-string (or (plist-get info :keywords) "")  ",+ *")
-	                    "\n")))
+    (push `(?K . ,(format "<ul class=\"keywords-list\">\n%s</ul>"
+                    (apply #'concat
+                      (fronde--format-rich-keywords
+                        info
+	                      (lambda (k slug base-uri)
+                          (format "<li class=\"keyword\"><a href=\"%stags/%s.html\">%s</a></li>\n"
+                            base-uri slug k))))))
       output)
     (push `(?l . ,(org-export-data (plist-get info :language) info)) output)
-    (push `(?n . ,(format "Fronde %s" fronde/version)) output)
-    (push `(?N . ,(format "<a href=\"https://etienne.depar.is/fronde/\">Fronde</a> %s" fronde/version)) output)
+    (push `(?n . ,(format "Fronde %s" fronde-version)) output)
+    (push `(?N . ,(format "<a href=\"https://etienne.depar.is/fronde/\">Fronde</a> %s" fronde-version)) output)
     (push `(?x . ,(org-export-data (plist-get info :description) info)) output)
     (push `(?X . ,(format "<p>%s</p>"
                     (org-export-data (plist-get info :description) info)))
       output)))
 
-(defun fronde/org-gmi-format-spec (upstream info)
-  "Return format specification for gemini postamble.
+(defun fronde--org-gmi-format-spec (upstream info)
+  "Advise UPSTREAM to return format specification for gemini postamble.
 INFO is a plist used as a communication channel."
   (let ((output (funcall upstream info)))
-    (push `(?n . ,(format "Fronde %s" fronde/version)) output)))
+    (push `(?K . ,(org-gmi--build-links-list
+                    (fronde--format-rich-keywords
+                      info
+                      (lambda (k slug base-uri)
+                        (list (format "%stags/%s.gmi" base-uri slug)
+                          (format "🏷️ %s" k))))))
+      output)
+    (push `(?n . ,(format "Fronde %s" fronde-version)) output)))
 
-(defun fronde/org-i18n-export (link description format)
-  "Export a i18n link"
-  (let* ((splitted-link (split-string link "|"))
+(defun fronde--org-i18n-export (link description backend)
+  "Export the given i18n LINK with its DESCRIPTION for the current BACKEND."
+  (let* ((splitted-link (split-string link "::"))
          (path (car splitted-link))
          (desc (or description path))
          (lang (cadr splitted-link)))
-    (pcase format
+    (pcase backend
       (`html (if lang
                  (format "<a href=\"%s\" hreflang=\"%s\">%s</a>"
                          path lang desc)
                (format "<a href=\"%s\">%s</a>" path desc)))
-      (`latex (format "\\href{%s}{%s}" path desc))
-      (_ (format "%s (%s)" desc path)))))
+      (_ nil))))
 
-(defun fronde/org-i18n-follow (link)
-  "Visit a i18n link"
-  (browse-url (car (split-string link "|"))))
+(defun fronde--org-i18n-follow (link)
+  "Visit the given i18n LINK."
+  (browse-url (car (split-string link "::"))))
 
 (org-link-set-parameters "i18n"
-  :export #'fronde/org-i18n-export
-  :follow #'fronde/org-i18n-follow)
+  :export #'fronde--org-i18n-export
+  :follow #'fronde--org-i18n-follow)
 
 
 ;;; Set configuration options
 
-(setq fronde/org-temp-dir (expand-file-name "var/tmp" fronde/current-work-dir)
-      org-publish-timestamp-directory (expand-file-name "timestamps/" fronde/org-temp-dir)
-      org-id-locations-file (expand-file-name "id-locations.el" fronde/org-temp-dir)
+(setq fronde-org-temp-dir (expand-file-name "var/tmp" fronde-current-work-dir)
+      org-publish-timestamp-directory (expand-file-name "timestamps/" fronde-org-temp-dir)
+      org-id-locations-file (expand-file-name "id-locations.el" fronde-org-temp-dir)
       make-backup-files nil
       enable-local-variables :all
       org-confirm-babel-evaluate nil
@@ -113,8 +150,8 @@ INFO is a plist used as a communication channel."
                                     (strike-through . "<del>%s</del>")
                                     (underline . "<span class=\"underline\">%s</span>")
                                     (verbatim . "<code>%s</code>")))
-(advice-add 'org-html-format-spec :around #'fronde/org-html-format-spec)
-(advice-add 'org-gmi--format-spec :around #'fronde/org-gmi-format-spec)
+(advice-add 'org-html-format-spec :around #'fronde--org-html-format-spec)
+(advice-add 'org-gmi--format-spec :around #'fronde--org-gmi-format-spec)
 
 (provide 'ox-fronde)
 

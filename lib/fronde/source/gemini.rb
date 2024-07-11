@@ -4,11 +4,6 @@ module Fronde
   class Source
     # Specific settings for Gemini {Fronde::Source}
     class Gemini < Source
-      def blog?
-        # TODO: See how to support blog/indexes with gemini
-        false
-      end
-
       class << self
         def org_default_postamble
           format(

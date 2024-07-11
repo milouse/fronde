@@ -147,7 +147,7 @@ module Fronde
 
     def clean_config
       fill_in_specific_config
-      @config['name'] ||= @config['path'].sub(/^[.~]*\//, '').tr('/.', '-')
+      @config['name'] ||= @config['path'].sub(%r{^[.~]*/}, '').tr('/.', '-')
       @config['title'] ||= @config['path']
       @config['target'] ||= File.basename(@config['path']).delete_prefix '.'
       @config['target'] = '' if @config['target'] == '.'
@@ -168,12 +168,16 @@ module Fronde
     end
 
     def render_heading
-      heading_key = "#{@config['type']}-head"
-      heading = @config.dig 'org-options', heading_key
-      @config['org-options'][heading_key] = \
-        Config::Helpers.render_liquid_template(
-          heading, to_h
-        )
+      %w[head head-extra preamble postamble].each do |kind|
+        heading_key = "#{@config['type']}-#{kind}"
+        heading = @config.dig 'org-options', heading_key
+        next unless heading
+
+        @config['org-options'][heading_key] =
+          heading.gsub('%F', @config['atom_feed'])
+                 .gsub('%h', @config['domain'])
+                 .gsub('%o', @config['theme'])
+      end
     end
 
     def org_project_config
@@ -181,7 +185,8 @@ module Fronde
         'base-directory' => @config['path'],
         'base-extension' => 'org',
         'publishing-directory' => publication_path,
-        'recursive' => @config['recursive']
+        'recursive' => @config['recursive'],
+        'fronde-base-uri' => "#{@config['domain']}#{public_absolute_path}"
       }.merge(@config['org-options'])
       exclude = @config['exclude']
       attributes['exclude'] = exclude if exclude

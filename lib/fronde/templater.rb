@@ -103,6 +103,18 @@ module Fronde
       end
     end
 
+    def warn_no_element(source)
+      pub_folder = Fronde::CONFIG.get('html_public_folder').sub(
+        /^#{Dir.pwd}/, '.'
+      )
+      warn(
+        R18n.t.fronde.error.templater.no_element_found(
+          source: source, file: "#{pub_folder}#{@org_file.pub_file}"
+        )
+      )
+      '' # Return empty string
+    end
+
     def extract_content
       # We must either have a source or a content key
       source = @config.delete 'source'
@@ -111,19 +123,14 @@ module Fronde
       end
 
       node = @dom.css(source)
-      # Do nothing if we don’t have a reliable content to work with
-      unless node.any?
-        warn(
-          R18n.t.fronde.error.templater.no_element_found(
-            source: source,
-            file: Fronde::CONFIG.get('html_public_folder') + @org_file.pub_file
-          )
-        )
-        return ''
+      if node.any?
+        # Put it back in config
+        @config['source'] = node
+        return node.to_s
       end
 
-      @config['source'] = node
-      node.to_s
+      # Do nothing if we don’t have a reliable content to work with
+      warn_no_element source
     end
 
     def check_path(file_name)

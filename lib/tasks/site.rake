@@ -10,7 +10,7 @@ namespace :site do
   task :build, [:force?] => ['var/lib/org-config.el'] do |_, args|
     args.with_defaults(force?: false)
     build_index = Thread.new do
-      all_index = Fronde::Index.all_html_blog_index
+      all_index = Fronde::Index.all_blog_index
       all_index.each do |index|
         index.write_all_org(verbose: verbose)
       end
@@ -25,19 +25,11 @@ namespace :site do
     end
     all_indexes = build_index[:all_indexes]
 
-    begin
-      build_html = Thread.new do
-        rm_r 'var/tmp/timestamps', force: true if args[:force?]
-        Fronde::Emacs.new(verbose: verbose).publish
-      end
-      Fronde::CLI::Throbber.run(build_html, R18n.t.fronde.tasks.site.building)
-
-    # :nocov:
-    rescue RuntimeError
-      warn R18n.t.fronde.tasks.site.aborting
-      next
+    build_html = Thread.new do
+      rm_r 'var/tmp/timestamps', force: true if args[:force?]
+      Fronde::Emacs.new(verbose: verbose).publish
     end
-    # :nocov:
+    Fronde::CLI::Throbber.run(build_html, R18n.t.fronde.tasks.site.building)
 
     if all_indexes.any?
       if verbose
@@ -65,6 +57,11 @@ namespace :site do
     Fronde::CLI::Throbber.run(
       customize_html, R18n.t.fronde.tasks.site.customizing
     )
+    # :nocov:
+  rescue RuntimeError, Interrupt
+    warn R18n.t.fronde.tasks.site.aborting
+    next
+    # :nocov:
   end
 
   desc 'Cleanup orphaned published files'
