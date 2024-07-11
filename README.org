@@ -1,5 +1,4 @@
 #+title: Fronde
-#+author: Étienne Deparis
 #+language: en
 #+keywords: static website generator, ruby, gem, org mode, emacs
 #+description: Fronde is a ruby gem, which helps you to manage your

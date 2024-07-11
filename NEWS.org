@@ -1,5 +1,4 @@
 #+title: Fronde
-#+author: Étienne Deparis
 #+language: en
 
 * Nov. 2023 - v0.4 release
