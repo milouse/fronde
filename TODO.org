@@ -1,0 +1,34 @@
+#+title: Fronde Backlog
+#+language: en
+
+* TODO Lister les articles pour un tag
+* TODO Automatically remove published pages
+
+If an article, a tag index, etc. got removed, it's published counterpart
+should be also removed.
+
+Currently we have only a rake task for that (~rake site:clean~), which is not
+advertized, nor automatic (actually it’s even an interactive task).
+
+* Around themes/templates
+** TODO Allow themes to provide configuration options
+
+Themes should be able to declare a set of default ~templates~ or
+specific Org export options
+
+** TODO Create a themes portfolio
+
+* TODO Better protected upgrade
+
+For example, Rakefile should only be overwritten after upgrade of the
+gem.
+
+This means we should always keep a flag in the tmp folder to remember
+what was the old fronde version
+
+* TODO Support activity pub
+
+See https://www.emadelsaid.com/ActivityPub/ and
+https://s3lph.me/activitypub-static-site.html, and
+https://blog.joinmastodon.org/2018/06/how-to-implement-a-basic-activitypub-server/
+to begin with
