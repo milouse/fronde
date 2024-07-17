@@ -11,6 +11,9 @@ CLOBBER.push(
   'var/lib/org-config.el', 'lib/htmlize.el'
 )
 
+HTMLIZE_TAG = 'release/1.58'
+OX_GMI_TAG = 'v0.2'
+
 namespace :org do
   directory 'var/tmp'
 
@@ -58,14 +61,14 @@ namespace :org do
 
   file 'lib/htmlize.el' => 'lib' do
     htmlize = URI(
-      'https://raw.githubusercontent.com/hniksic/emacs-htmlize/master/htmlize.el'
+      "https://raw.githubusercontent.com/hniksic/emacs-htmlize/refs/tags/#{HTMLIZE_TAG}/htmlize.el"
     ).open.read
     File.write 'lib/htmlize.el', htmlize
   end
 
   file 'lib/ox-gmi.el' => 'lib' do
     ox_gmi = URI(
-      'https://git.umaneti.net/ox-gmi/plain/ox-gmi.el'
+      "https://git.umaneti.net/ox-gmi/plain/ox-gmi.el?h=#{OX_GMI_TAG}"
     ).open.read
     File.write 'lib/ox-gmi.el', ox_gmi
   end
