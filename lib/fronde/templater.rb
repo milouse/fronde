@@ -5,8 +5,6 @@ require 'digest/md5'
 require_relative 'org/file'
 
 module Fronde
-  class NoHeadError < ::StandardError; end
-
   # Insert custom part inside generated HTML files.
   class Templater
     def initialize(source, dom, config = {})
@@ -19,10 +17,8 @@ module Fronde
 
     def apply
       # Flag the file for this template
-      head = @dom.xpath('//head').first
-      raise NoHeadError, self unless head
-
-      head.prepend_child("<!--#{@config['check_line']}-->")
+      html = @dom.xpath('//html').first
+      html.add_child("<!--#{@config['check_line']}-->\n")
       content = @org_file.format extract_content
       # Remove source element if necessary to avoid doubling it during
       # the insert action
@@ -33,8 +29,8 @@ module Fronde
       end
     end
 
-    def in_head?
-      @dom.xpath('//head').children.any? do |child|
+    def applied?
+      @dom.xpath('//html').children.any? do |child|
         next false unless child.comment?
 
         child.text == @config['check_line']
@@ -67,13 +63,10 @@ module Fronde
       def apply_templates(source, dom, file_name)
         Fronde::CONFIG.get('templates', []).map do |config|
           template = Fronde::Templater.new(source, dom, config)
-          next if !template.valid?(file_name) || template.in_head?
+          next if !template.valid?(file_name) || template.applied?
 
           template.apply
           true
-        rescue NoHeadError
-          warn R18n.t.fronde.error.templater.no_head_element(file: file_name)
-          next
         end.any?
       end
 

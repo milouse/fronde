@@ -57,7 +57,6 @@ fronde:
     templater:
       no_element_found: >-
         Aucun élément trouvé avec le sélecteur %{source} dans %{file}.
-      no_head_element: Aucun élément head trouvé dans le fichier %{file}.
   index:
     unsorted: Non triés
     published_on: Publié le %1
