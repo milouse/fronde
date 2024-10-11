@@ -79,35 +79,35 @@ INFO is a plist used as a communication channel."
   (let ((output (funcall upstream info)))
     (push `(?A . ,(format "<span class=\"author\">%s</span>"
                     (org-export-data (plist-get info :author) info)))
-      output)
+          output)
     (push `(?k . ,(org-export-data (plist-get info :keywords) info)) output)
     (push `(?K . ,(format "<ul class=\"keywords-list\">\n%s</ul>"
                     (apply #'concat
                       (fronde--format-rich-keywords
                         info
-	                      (lambda (k slug base-uri)
+	                    (lambda (k slug base-uri)
                           (format "<li class=\"keyword\"><a href=\"%stags/%s.html\">%s</a></li>\n"
                             base-uri slug k))))))
-      output)
+          output)
     (push `(?l . ,(org-export-data (plist-get info :language) info)) output)
     (push `(?n . ,(format "Fronde %s" fronde-version)) output)
     (push `(?N . ,(format "<a href=\"https://etienne.depar.is/fronde/\">Fronde</a> %s" fronde-version)) output)
     (push `(?x . ,(org-export-data (plist-get info :description) info)) output)
     (push `(?X . ,(format "<p>%s</p>"
                     (org-export-data (plist-get info :description) info)))
-      output)))
+          output)))
 
 (defun fronde--org-gmi-format-spec (upstream info)
   "Advise UPSTREAM to return format specification for gemini postamble.
 INFO is a plist used as a communication channel."
   (let ((output (funcall upstream info)))
     (push `(?K . ,(org-gmi--build-links-list
-                    (fronde--format-rich-keywords
-                      info
-                      (lambda (k slug base-uri)
-                        (list (format "%stags/%s.gmi" base-uri slug)
-                          (format "🏷️ %s" k))))))
-      output)
+                   (fronde--format-rich-keywords
+                    info
+                    (lambda (k slug base-uri)
+                      (list (format "%stags/%s.gmi" base-uri slug)
+                            (format "🏷️ %s" k))))))
+          output)
     (push `(?n . ,(format "Fronde %s" fronde-version)) output)))
 
 (defun fronde--org-i18n-export (link description backend)
@@ -145,11 +145,11 @@ INFO is a plist used as a communication channel."
       org-html-html5-fancy t
       org-html-htmlize-output-type 'css
       org-html-text-markup-alist '((bold . "<strong>%s</strong>")
-                                    (code . "<code>%s</code>")
-                                    (italic . "<em>%s</em>")
-                                    (strike-through . "<del>%s</del>")
-                                    (underline . "<span class=\"underline\">%s</span>")
-                                    (verbatim . "<code>%s</code>")))
+                                   (code . "<code>%s</code>")
+                                   (italic . "<em>%s</em>")
+                                   (strike-through . "<del>%s</del>")
+                                   (underline . "<span class=\"underline\">%s</span>")
+                                   (verbatim . "<code>%s</code>")))
 (advice-add 'org-html-format-spec :around #'fronde--org-html-format-spec)
 (advice-add 'org-gmi--format-spec :around #'fronde--org-gmi-format-spec)
 
