@@ -1,4 +1,4 @@
-image: ruby:3.2.2-alpine
+image: ruby:3.3-alpine
 
 default:
   before_script:
