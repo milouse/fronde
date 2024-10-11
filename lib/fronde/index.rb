@@ -43,6 +43,10 @@ module Fronde
       # and avoid to scroll to find the beginning of the list.
     end
 
+    def emacs_keywords
+      @tags_names.map { |slug, title| "#{title}\x1f#{slug}" }.join("\x1e")
+    end
+
     class << self
       def all_blog_index(&block)
         all_blogs = CONFIG.sources.filter_map do |project|

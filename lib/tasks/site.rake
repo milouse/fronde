@@ -9,10 +9,14 @@ namespace :site do
   desc 'Build all your projects'
   task :build, [:force?] => ['var/lib/org-config.el'] do |_, args|
     args.with_defaults(force?: false)
+
+    FileUtils.rm_f 'var/tmp/keywords'
     build_index = Thread.new do
       all_index = Fronde::Index.all_blog_index
+      offset = 0
       all_index.each do |index|
         index.write_all_org(verbose: verbose)
+        offset = File.write('var/tmp/keywords', index.emacs_keywords, offset)
       end
       Thread.current[:all_indexes] = all_index
     end

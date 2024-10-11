@@ -47,31 +47,37 @@
   "Location of the local Org temporary directory.
 This is where to place org timestamps and id locations.")
 
+(defvar fronde--keywords-slugs-alist nil
+  "A list associating each keywords to its related slug.
+
+Can be hydrated with `fronde--build-keywords-list'.")
+
+(defun fronde--build-keywords-list ()
+  (let ((keywords-file (format "%s/keywords" fronde-org-temp-dir))
+        keywords-slugs)
+    (when (file-readable-p keywords-file)
+      (let ((content (with-temp-buffer
+                       (insert-file-contents keywords-file)
+                       (string-trim-right (buffer-string)))))
+        (mapcar
+         (lambda (line)
+           (push (split-string line "\x1f") keywords-slugs))
+         (split-string content "\x1e"))))
+    keywords-slugs))
+
 (defun fronde--format-rich-keywords (info function)
   "Extract keywords from INFO and apply FUNCTION on them.
 FUNCTION is expected to format each keyword for a rich display for the
 current export backend.  FUNCTION must receive 3 arguments: the current
 KEYWORD, its related SLUG and the current project BASE-URI."
-  (let ((base-uri (plist-get info :fronde-base-uri))
-        (current-path (symbol-file 'fronde--format-rich-keywords))
-        sluglib)
-    (when current-path
-      (setq sluglib
-        (expand-file-name
-          (format "%s../../slug" (file-name-directory current-path)))))
+  (let ((base-uri (plist-get info :fronde-base-uri)))
     (mapcar
-      (lambda (k)
-        (let ((slug (if sluglib
-                      (string-trim-right
-                        (shell-command-to-string
-                          (format "ruby -r %s -e \"puts Fronde::Slug.slug '%s'\""
-                            (shell-quote-argument sluglib)
-                            (shell-quote-argument k))))
-                      k)))
-          (funcall function k slug base-uri)))
-      (split-string
-        (org-export-data (plist-get info :keywords) info)
-        ",+ *"))))
+     (lambda (k)
+       (let ((slug (cadr (assoc k fronde--keywords-slugs-alist))))
+         (funcall function k slug base-uri)))
+     (split-string
+      (org-export-data (plist-get info :keywords) info)
+      ",+ *"))))
 
 (defun fronde--org-html-format-spec (upstream info)
   "Advise UPSTREAM to return format specification for preamble and postamble.
@@ -135,6 +141,7 @@ INFO is a plist used as a communication channel."
 ;;; Set configuration options
 
 (setq fronde-org-temp-dir (expand-file-name "var/tmp" fronde-current-work-dir)
+      fronde--keywords-slugs-alist (fronde--build-keywords-list)
       org-publish-timestamp-directory (expand-file-name "timestamps/" fronde-org-temp-dir)
       org-id-locations-file (expand-file-name "id-locations.el" fronde-org-temp-dir)
       make-backup-files nil
