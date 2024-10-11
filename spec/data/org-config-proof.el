@@ -9,8 +9,8 @@
       fronde-domain ""
       user-mail-address ""
       user-full-name "alice"
-      org-html-metadata-timestamp-format "%A %-d of %B, %Y at %R"
-      org-gmi-timestamp-format "%A %-d of %B, %Y at %R"
+      org-html-metadata-timestamp-format "%A, %B %-d, %Y at %R"
+      org-gmi-timestamp-format "%A, %B %-d, %Y at %R"
       org-publish-project-alist
       `(("src"
          :base-directory "{{ test_dir }}/src"

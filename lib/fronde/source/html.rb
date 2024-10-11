@@ -13,9 +13,9 @@ module Fronde
       class << self
         def org_default_postamble
           <<~POSTAMBLE
-            <p><span class="author">#{R18n.t.fronde.org.postamble.written_by}</span>
-            #{R18n.t.fronde.org.postamble.with_emacs_html}</p>
-            <p class="date">#{R18n.t.fronde.org.postamble.last_modification}</p>
+            <p><span class="author">#{I18n.t('fronde.org.postamble.written_by')}</span>
+            #{I18n.t('fronde.org.postamble.with_emacs_html')}</p>
+            <p class="date">#{I18n.t('fronde.org.postamble.last_modification')}</p>
             <p class="validation">%v</p>
           POSTAMBLE
         end

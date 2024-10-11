@@ -1,93 +1,146 @@
 ---
-fronde:
-  bin:
-    usage: 'Usage : fronde %1 [options]'
-    done: fait
-    interrupted: arrêté
-    commands:
-      cmd_title: Commandes
-      alias: Alias pour ‘%1’.
-      new: Initialise une nouvelle instance de Fronde.
-      update: >-
-        Met à jour la configuration et les dépendances de Fronde (à
-        lancer après chaque modification du fichier config.yml et une
-        fois de temps à autre pour rester à jour avec Org).
-      preview: >-
-        Démarre un serveur web de test pour prévisualiser le site
-        généré.
-      open: Ouvre ou crée un fichier org.
-      build: Compile les fichiers org en HTML ou gemtext.
-      publish: >-
-        Pousse les changements locaux vers le serveur web public.
-      help: Alias pour l'argument -h.
-    options:
-      cmd_title: Options
-      help: Affiche l'aide pour une commande et quitte.
-      version: Affiche la version de Fronde et quitte.
-      default_title: Nouvel article
-  error:
+fr:
+  fronde:
     bin:
-      label: Une erreur est survenue
-      explanation: >-
-        Pour voir le détail, lancez de nouveau la commande avec plus de
-        verbosité, par exemple fronde build -v
-      no_command: 'ERREUR : Aucune commande ou commande inconnue donnée.'
-      no_file: >-
-        Attention : Aucun chemin de fichier donné. Utilisation du
-        fichier par défaut.
-    config:
-      deprecated_public_folder: >-
-        La clé de configuration ‘public_folder’ est dépréciée. Merci
-        d’utiliser ‘html_public_folder’ ou ‘gemini_public_folder’ à la
-        place.
-    source:
-      no_path: >-
-        Ignore %{source} comme sa clé ‘path’ est manquante.
-      duplicate: >-
-        Ignore %{source} comme elle apparaît au moins deux fois dans les
-        sources de type %{type}.
-      inclusion: >-
-        Ignore %{source} qui semble être déjà inclue dans l’autre source
-        %{other_source} de type %{type}.
-    org_file:
-      no_file_or_title: Aucun chemin de fichier ou titre donné.
-      no_project: Aucun projet trouvé pour %{file}. Sa publication va échouer.
+      usage: 'Usage : fronde %{label} [options]'
+      done: fait
+      interrupted: arrêté
+      commands:
+        cmd_title: Commandes
+        alias: Alias pour ‘%{alias}’.
+        new: Initialise une nouvelle instance de Fronde.
+        update: >-
+          Met à jour la configuration et les dépendances de Fronde (à
+          lancer après chaque modification du fichier config.yml et une
+          fois de temps à autre pour rester à jour avec Org).
+        preview: >-
+          Démarre un serveur web de test pour prévisualiser le site
+          généré.
+        open: Ouvre ou crée un fichier org.
+        build: Compile les fichiers org en HTML ou gemtext.
+        publish: >-
+          Pousse les changements locaux vers le serveur web public.
+        help: Alias pour l'argument -h.
+      options:
+        cmd_title: Options
+        help: Affiche l'aide pour une commande et quitte.
+        version: Affiche la version de Fronde et quitte.
+        default_title: Nouvel article
+    error:
+      bin:
+        label: Une erreur est survenue
+        explanation: >-
+          Pour voir le détail, lancez de nouveau la commande avec plus de
+          verbosité, par exemple fronde build -v
+        no_command: 'ERREUR : Aucune commande ou commande inconnue donnée.'
+        no_file: >-
+          Attention : Aucun chemin de fichier donné. Utilisation du
+          fichier par défaut.
+      config:
+        deprecated_public_folder: >-
+          La clé de configuration ‘public_folder’ est dépréciée. Merci
+          d’utiliser ‘html_public_folder’ ou ‘gemini_public_folder’ à la
+          place.
+      source:
+        no_path: >-
+          Ignore %{source} comme sa clé ‘path’ est manquante.
+        duplicate: >-
+          Ignore %{source} comme elle apparaît au moins deux fois dans les
+          sources de type %{type}.
+        inclusion: >-
+          Ignore %{source} qui semble être déjà inclue dans l’autre source
+          %{other_source} de type %{type}.
+      org_file:
+        no_file_or_title: Aucun chemin de fichier ou titre donné.
+        no_project: Aucun projet trouvé pour %{file}. Sa publication va échouer.
+      index:
+        wrong_sort_kind: '%{kind} n’est pas dans %{accepted_values}'
+      templater:
+        no_element_found: >-
+          Aucun élément trouvé avec le sélecteur %{source} dans %{file}.
     index:
-      wrong_sort_kind: '%{kind} n’est pas dans %{accepted_values}'
-    templater:
-      no_element_found: >-
-        Aucun élément trouvé avec le sélecteur %{source} dans %{file}.
-  index:
-    unsorted: Non triés
-    published_on: Publié le %1
-    all_tags: Toutes les étiquettes
-    by_name: Par ordre alphabétique
-    by_weight: Par nombre de publication
-    full_date_format: '%A %{date}'
-    full_date_with_time_format: '%{date} à %{time}'
-    index_generated: Fichier d’index généré pour %{tag}.
-    atom_generated: Flux Atom généré pour %{tag}.
-  org:
-    generate_blog_index: Génération de la page d’accueil du blog pour %{name}
-    postamble:
-      written_by: Écrit par %a
-      last_modification: dernière modification le %C
-      with_emacs: avec %c et publié avec %n
-      with_emacs_html: avec %c et publié avec %N
-  tasks:
-    site:
-      aborting: Annulation
-      generating_indexes: 'Génération des fichiers d’index :'
-      building_indexes: 'Compilation des fichiers d’index :'
-      publishing_feeds: 'Publication des flux Atom :'
-      building: 'Compilation :'
-      customizing: 'Décoration :'
-      remove_orphan_file: 'Le supprimer ? [y/N]: '
+      unsorted: Non triés
+      published_on: Publié le %{date}
+      all_tags: Toutes les étiquettes
+      by_name: Par ordre alphabétique
+      by_weight: Par nombre de publication
+      index_generated: Fichier d’index généré pour %{tag}.
+      atom_generated: Flux Atom généré pour %{tag}.
     org:
-      downloaded: La version %{version} de Org a été téléchargée.
-      downloading: 'Téléchargement de Org :'
-      no_download: >-
-        Impossible de télécharger Org maintenant. Merci de réessayer
-        plus tard.
-      installed: La version %{version} de Org a été installé localement.
-      installing: 'Installation de Org :'
+      generate_blog_index: Génération de la page d’accueil du blog pour %{name}
+      postamble:
+        written_by: Écrit par %a
+        last_modification: dernière modification le %C
+        with_emacs: avec %c et publié avec %n
+        with_emacs_html: avec %c et publié avec %N
+    tasks:
+      site:
+        aborting: Annulation
+        generating_indexes: 'Génération des fichiers d’index :'
+        building_indexes: 'Compilation des fichiers d’index :'
+        publishing_feeds: 'Publication des flux Atom :'
+        building: 'Compilation :'
+        customizing: 'Décoration :'
+        remove_orphan_file: 'Le supprimer ? [y/N]: '
+      org:
+        downloaded: La version %{version} de Org a été téléchargée.
+        downloading: 'Téléchargement de Org :'
+        no_download: >-
+          Impossible de télécharger Org maintenant. Merci de réessayer
+          plus tard.
+        installed: La version %{version} de Org a été installé localement.
+        installing: 'Installation de Org :'
+  time:
+    formats:
+      default: '%A %-d %B %Y %R'
+      long: '%A %-d %B %Y à %R'
+      long_no_year: '%A %-d %B à %R'
+      long_no_time: '%A %-d %B %Y'
+      long_no_time_no_year: '%A %-d %B'
+  date:
+    abbr_day_names:
+    - dim
+    - lun
+    - mar
+    - mer
+    - jeu
+    - ven
+    - sam
+    abbr_month_names:
+    -
+    - jan.
+    - fév.
+    - mars
+    - avr.
+    - mai
+    - juin
+    - juil.
+    - août
+    - sept.
+    - oct.
+    - nov.
+    - déc.
+    day_names:
+    - dimanche
+    - lundi
+    - mardi
+    - mercredi
+    - jeudi
+    - vendredi
+    - samedi
+    formats:
+      default: '%d/%m/%Y'
+    month_names:
+    -
+    - janvier
+    - février
+    - mars
+    - avril
+    - mai
+    - juin
+    - juillet
+    - août
+    - septembre
+    - octobre
+    - novembre
+    - décembre

@@ -32,7 +32,6 @@ Gem::Specification.new do |spec|
   spec.files = [
     # Monkey patches / extensions
     'lib/ext/nil_time.rb',
-    'lib/ext/r18n.rb',
     'lib/ext/time_no_time.rb',
     'lib/ext/time.rb',
     # Core files
@@ -96,9 +95,9 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = '>= 2.7'
   spec.add_dependency 'base64', '~> 0.2'
   spec.add_dependency 'bigdecimal', '~> 3.1'
+  spec.add_dependency 'i18n', '~> 1.14'
   spec.add_dependency 'liquid', '~> 5.5'
   spec.add_dependency 'nokogiri', '~> 1.16'
-  spec.add_dependency 'r18n-core', '~> 5.0'
   spec.add_dependency 'rainbow', '~> 3.1'
   spec.add_dependency 'rake', '~> 13.2'
   spec.add_dependency 'webrick', '~> 1.8'

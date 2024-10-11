@@ -22,7 +22,7 @@ module Fronde
       FileUtils.mkdir_p "#{@project.publication_path}/feeds"
       @index.each_key do |tag|
         write_atom(tag)
-        warn R18n.t.fronde.index.atom_generated(tag: tag) if verbose
+        warn I18n.t('fronde.index.atom_generated', tag: tag) if verbose
       end
     end
 

@@ -14,7 +14,7 @@ module Fronde
       def self.migrate(config)
         return config unless config.has_key?('public_folder')
 
-        warn R18n.t.fronde.error.config.deprecated_public_folder
+        warn I18n.t('fronde.error.config.deprecated_public_folder')
         old_pub_folder = config.delete('public_folder')
         return config if config.has_key?('html_public_folder')
 

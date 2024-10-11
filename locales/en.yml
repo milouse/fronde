@@ -1,85 +1,138 @@
 ---
-fronde:
-  bin:
-    usage: 'Usage: fronde %1 [options]'
-    done: done
-    interrupted: interrupted
-    commands:
-      cmd_title: Commands
-      alias: Alias for ‘%1’.
-      new: Initialize a new Fronde instance.
-      update: >-
-        Update Fronde configuration and dependency (to be run after each
-        modification of the config.yml file and once in a while to stay
-        up-to-date with Org).
-      preview: Start a test web server to preview the generated website.
-      open: Open or create an org file.
-      build: Compile all org files to HTML or gemtext.
-      publish: Push local changes to the public web server.
-      help: Alias for the -h switch.
-    options:
-      cmd_title: Options
-      help: Display help for a command and exit.
-      version: Display Fronde version and exit.
-      default_title: New article
-  error:
+en:
+  fronde:
     bin:
-      label: An error occurred.
-      explanation: >-
-        To see the error, run the same command again with more
-        verbosity, for example, fronde build -v
-      no_command: 'ERROR: no command or unknown command given.'
-      no_file: >-
-        Warning: No file path given. Default file will be used.
-    config:
-      deprecated_public_folder: >-
-        ‘public_folder’ setting is deprecated. Please use either
-        ‘html_public_folder’ or ‘gemini_public_folder’.
-    source:
-      no_path: Skipping %{source} as its ‘path’ key is missing.
-      duplicate: >-
-        Skipping %{source} as it appears at least twice in the sources
-        of type %{type}.
-      inclusion: >-
-        Skipping %{source} as it might be already embedded into the
-        other source %{other_source} of type %{type}.
-    org_file:
-      no_file_or_title: No file or title given.
-      no_project: No project found for %{file}. Publication will fail.
+      usage: 'Usage: fronde %{label} [options]'
+      done: done
+      interrupted: interrupted
+      commands:
+        cmd_title: Commands
+        alias: Alias for ‘%{alias}’.
+        new: Initialize a new Fronde instance.
+        update: >-
+          Update Fronde configuration and dependency (to be run after each
+          modification of the config.yml file and once in a while to stay
+          up-to-date with Org).
+        preview: Start a test web server to preview the generated website.
+        open: Open or create an org file.
+        build: Compile all org files to HTML or gemtext.
+        publish: Push local changes to the public web server.
+        help: Alias for the -h switch.
+      options:
+        cmd_title: Options
+        help: Display help for a command and exit.
+        version: Display Fronde version and exit.
+        default_title: New article
+    error:
+      bin:
+        label: An error occurred.
+        explanation: >-
+          To see the error, run the same command again with more
+          verbosity, for example, fronde build -v
+        no_command: 'ERROR: no command or unknown command given.'
+        no_file: >-
+          Warning: No file path given. Default file will be used.
+      config:
+        deprecated_public_folder: >-
+          ‘public_folder’ setting is deprecated. Please use either
+          ‘html_public_folder’ or ‘gemini_public_folder’.
+      source:
+        no_path: Skipping %{source} as its ‘path’ key is missing.
+        duplicate: >-
+          Skipping %{source} as it appears at least twice in the sources
+          of type %{type}.
+        inclusion: >-
+          Skipping %{source} as it might be already embedded into the
+          other source %{other_source} of type %{type}.
+      org_file:
+        no_file_or_title: No file or title given.
+        no_project: No project found for %{file}. Publication will fail.
+      index:
+        wrong_sort_kind: '%{kind} not in %{accepted_values}'
+      templater:
+        no_element_found: >-
+          No element found with the selector %{source} in %{file}.
     index:
-      wrong_sort_kind: '%{kind} not in %{accepted_values}'
-    templater:
-      no_element_found: >-
-        No element found with the selector %{source} in %{file}.
-  index:
-    unsorted: Unsorted
-    published_on: Published on %1
-    all_tags: All tags
-    by_name: By alphabetical order
-    by_weight: By publication number
-    full_date_format: '%A %{date}'
-    full_date_with_time_format: '%{date} at %{time}'
-    index_generated: Generated index file for %{tag}.
-    atom_generated: Generated Atom feed for %{tag}.
-  org:
-    generate_blog_index: Generating blog home page for %{name}
-    postamble:
-      written_by: Written by %a
-      last_modification: Last modification on %C
-      with_emacs: with %c, and published with %n
-      with_emacs_html: with %c, and published with %N
-  tasks:
-    site:
-      aborting: Aborting
-      generating_indexes: 'Generating index files:'
-      building_indexes: 'Building index files:'
-      publishing_feeds: 'Publishing Atom feeds:'
-      building: 'Building:'
-      customizing: 'Customizing:'
-      remove_orphan_file: 'Remove it? [y/N]: '
+      unsorted: Unsorted
+      published_on: Published on %{date}
+      all_tags: All tags
+      by_name: By alphabetical order
+      by_weight: By publication number
+      index_generated: Generated index file for %{tag}.
+      atom_generated: Generated Atom feed for %{tag}.
     org:
-      downloaded: Org version %{version} has been downloaded.
-      downloading: 'Downloading Org:'
-      no_download: Impossible to download Org now. Please try again later.
-      installed: Org version %{version} has been locally installed.
-      installing: 'Installing Org:'
+      generate_blog_index: Generating blog home page for %{name}
+      postamble:
+        written_by: Written by %a
+        last_modification: Last modification on %C
+        with_emacs: with %c, and published with %n
+        with_emacs_html: with %c, and published with %N
+    tasks:
+      site:
+        aborting: Aborting
+        generating_indexes: 'Generating index files:'
+        building_indexes: 'Building index files:'
+        publishing_feeds: 'Publishing Atom feeds:'
+        building: 'Building:'
+        customizing: 'Customizing:'
+        remove_orphan_file: 'Remove it? [y/N]: '
+      org:
+        downloaded: Org version %{version} has been downloaded.
+        downloading: 'Downloading Org:'
+        no_download: Impossible to download Org now. Please try again later.
+        installed: Org version %{version} has been locally installed.
+        installing: 'Installing Org:'
+  time:
+    formats:
+      default: '%a, %b %-d, %Y %H:%M:%S %z'
+      long: '%A, %B %-d, %Y at %R'
+      long_no_year: '%A, %B %-d at %R'
+      long_no_time: '%A, %B %-d, %Y'
+      long_no_time_no_year: '%A, %B %-d'
+  date:
+    abbr_day_names:
+    - Sun
+    - Mon
+    - Tue
+    - Wed
+    - Thu
+    - Fri
+    - Sat
+    abbr_month_names:
+    -
+    - Jan
+    - Feb
+    - Mar
+    - Apr
+    - May
+    - Jun
+    - Jul
+    - Aug
+    - Sep
+    - Oct
+    - Nov
+    - Dec
+    day_names:
+    - Sunday
+    - Monday
+    - Tuesday
+    - Wednesday
+    - Thursday
+    - Friday
+    - Saturday
+    formats:
+      default: '%Y-%m-%d'
+    month_names:
+    -
+    - January
+    - February
+    - March
+    - April
+    - May
+    - June
+    - July
+    - August
+    - September
+    - October
+    - November
+    - December

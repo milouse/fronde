@@ -31,7 +31,8 @@ module Fronde
     def sort_by(kind)
       accepted_values = %i[name weight]
       unless accepted_values.include?(kind)
-        error_msg = R18n.t.fronde.error.index.wrong_sort_kind(
+        error_msg = I18n.t(
+          'fronde.error.index.wrong_sort_kind',
           kind: kind, accepted_values: accepted_values.inspect
         )
         raise ArgumentError, error_msg

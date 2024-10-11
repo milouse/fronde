@@ -101,7 +101,8 @@ module Fronde
         /^#{Dir.pwd}/, '.'
       )
       warn(
-        R18n.t.fronde.error.templater.no_element_found(
+        I18n.t(
+          'fronde.error.templater.no_element_found',
           source: source, file: "#{pub_folder}#{@org_file.pub_file}"
         )
       )

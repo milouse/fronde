@@ -24,7 +24,7 @@ namespace :site do
       build_index.join
     else
       Fronde::CLI::Throbber.run(
-        build_index, R18n.t.fronde.tasks.site.generating_indexes
+        build_index, I18n.t('fronde.tasks.site.generating_indexes')
       )
     end
     all_indexes = build_index[:all_indexes]
@@ -33,7 +33,7 @@ namespace :site do
       rm_r 'var/tmp/timestamps', force: true if args[:force?]
       Fronde::Emacs.new(verbose: verbose).publish
     end
-    Fronde::CLI::Throbber.run(build_html, R18n.t.fronde.tasks.site.building)
+    Fronde::CLI::Throbber.run(build_html, I18n.t('fronde.tasks.site.building'))
 
     if all_indexes.any?
       if verbose
@@ -45,7 +45,7 @@ namespace :site do
           end
         end
         Fronde::CLI::Throbber.run(
-          publish_feed, R18n.t.fronde.tasks.site.publishing_feeds
+          publish_feed, I18n.t('fronde.tasks.site.publishing_feeds')
         )
       end
     end
@@ -59,11 +59,11 @@ namespace :site do
       end
     end
     Fronde::CLI::Throbber.run(
-      customize_html, R18n.t.fronde.tasks.site.customizing
+      customize_html, I18n.t('fronde.tasks.site.customizing')
     )
     # :nocov:
   rescue RuntimeError, Interrupt
-    warn R18n.t.fronde.tasks.site.aborting
+    warn I18n.t('fronde.tasks.site.aborting')
     next
     # :nocov:
   end
@@ -77,7 +77,7 @@ namespace :site do
       # Return if an org file has been found for this published file
       next unless source.file == file_name
 
-      print R18n.t.fronde.tasks.site.remove_orphan_file
+      print I18n.t('fronde.tasks.site.remove_orphan_file')
       action = $stdin.gets.strip.downcase
       next unless action == 'y'
 

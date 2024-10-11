@@ -159,13 +159,18 @@ module Fronde
         #       %a (author), %c (creator), %C (input-file), %d (date),
         #       %e (email), %s (subtitle), %t (title), %T (timestamp),
         #       %v (html validation link)
+        localized_dates = I18n.with_locale(@data[:lang]) do
+          { short: @data[:date].l18n_short_date_string,
+            short_html: @data[:date].l18n_short_date_html,
+            long_html: @data[:date].l18n_long_date_html }
+        end
         string.gsub('%a', @data[:author])
               .gsub('%A', "<span class=\"author\">#{@data[:author]}</span>")
-              .gsub('%d', @data[:date].l18n_short_date_html)
-              .gsub('%D', @data[:date].l18n_long_date_html)
+              .gsub('%d', localized_dates[:short_html])
+              .gsub('%D', localized_dates[:long_html])
               .gsub('%F', project_data['atom_feed'] || '')
               .gsub('%h', project_data['domain'] || '')
-              .gsub('%i', @data[:date].l18n_short_date_string)
+              .gsub('%i', localized_dates[:short])
               .gsub('%I', @data[:date].xmlschema)
               .gsub('%k', @data[:keywords].join(', '))
               .gsub('%K', keywords_to_html)
@@ -191,7 +196,7 @@ module Fronde
       def write
         if ::File.directory? @file
           if @data[:title] == ''
-            raise R18n.t.fronde.error.org_file.no_file_or_title
+            raise I18n.t('fronde.error.org_file.no_file_or_title')
           end
 
           @file = ::File.join @file, "#{Slug.slug(@data[:title])}.org"
@@ -222,11 +227,13 @@ module Fronde
       end
 
       def to_h
-        fields = %w[author excerpt keywords timekey title url]
+        fields = %w[author excerpt keywords lang timekey title url]
         data = fields.to_h { |key| [key, send(key)] }
         data['published_body'] = extract_published_body
         pub_date = @data[:date]
-        data['published'] = pub_date.l18n_long_date_string(with_year: false)
+        data['published'] = I18n.with_locale(@data[:lang]) do
+          pub_date.l18n_long_date_no_year_string
+        end
         data['published_gemini_index'] = pub_date.strftime('%Y-%m-%d')
         data['published_xml'] = pub_date.xmlschema
         data['updated_xml'] = @data[:updated]&.xmlschema
@@ -244,7 +251,7 @@ module Fronde
         return source if source
 
         short_file = @file.sub(/^#{Dir.pwd}/, '.')
-        warn R18n.t.fronde.error.org_file.no_project(file: short_file)
+        warn I18n.t('fronde.error.org_file.no_project', file: short_file)
       end
 
       def find_source_for_org_file

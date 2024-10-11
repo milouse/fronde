@@ -21,7 +21,7 @@ namespace :cli do
           'keyword' => keyword }
       end
 
-      translation = R18n.t.fronde.bin.commands[command].tr("'", '’')
+      translation = I18n.t("fronde.bin.commands.#{command}").tr("'", '’')
       { 'name' => command,
         'translation' => translation,
         'options' => opts }

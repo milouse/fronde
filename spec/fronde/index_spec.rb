@@ -59,8 +59,8 @@ SAMPLE_PROJECT_INDEX = <<~BLOG_INDEX
   :UNNUMBERED: notoc
   :END:
 
-  - *[[http://perdu.com/other/test3.html][My third article]]* / Published on Tuesday 11th of June at 23:42
-  - *[[http://perdu.com/test2.html][My second article]]* / Published on Tuesday 11th of June \\\\
+  - *[[http://perdu.com/other/test3.html][My third article]]* / Published on Tuesday, June 11 at 23:42
+  - *[[http://perdu.com/test2.html][My second article]]* / Publié le mardi 11 juin \\\\
     Lorem ipsum
 
   * Unsorted

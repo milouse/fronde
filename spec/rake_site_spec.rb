@@ -152,7 +152,7 @@ context 'with a testing website' do
       version_rx = 'GNU/Emacs [0-9.]+ \(Org mode [0-9.]+\), ' \
                    'and published with Fronde [0-9.]+'
       page_content = data['published_body'].gsub(
-        /[FMSTW][a-z]+ \d{1,2} of [ADFJMNOS][a-z]+, \d{4} at \d{2}:\d{2}/,
+        /[FMSTW][a-z]+, [ADFJMNOS][a-z]+ \d{1,2}, \d{4} at \d{2}:\d{2}/,
         '__PUB_DATE__'
       ).gsub(/#{version_rx}/, '__VERSION__')
       expect(page_content).to eq(content)

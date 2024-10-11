@@ -8,9 +8,9 @@ module Fronde
         def org_default_postamble
           format(
             "📅 %<date>s\n📝 %<author>s %<creator>s",
-            author: R18n.t.fronde.org.postamble.written_by,
-            creator: R18n.t.fronde.org.postamble.with_emacs,
-            date: R18n.t.fronde.org.postamble.last_modification
+            author: I18n.t('fronde.org.postamble.written_by'),
+            creator: I18n.t('fronde.org.postamble.with_emacs'),
+            date: I18n.t('fronde.org.postamble.last_modification')
           )
         end
       end

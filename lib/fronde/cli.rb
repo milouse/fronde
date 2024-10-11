@@ -51,7 +51,7 @@ module Fronde
       def method_unknown?(method)
         return false if respond_to?(method)
 
-        warn R18n.t.fronde.error.bin.no_command
+        warn I18n.t('fronde.error.bin.no_command')
         fronde_help
         true
       end

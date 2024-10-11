@@ -9,7 +9,7 @@ def fetch_test_content(path)
   # Ensure tests always pass, whatever charset is generated
   page_content.gsub!('charset=UTF-8', 'charset=utf-8')
   page_content.gsub(
-    /[FMSTW][a-z]+ \d{1,2} of [ADFJMNOS][a-z]+, \d{4} at \d{2}:\d{2}/,
+    /[FMSTW][a-z]+, [ADFJMNOS][a-z]+ \d{1,2}, \d{4} at \d{2}:\d{2}/,
     '__PUB_DATE__'
   )
 end

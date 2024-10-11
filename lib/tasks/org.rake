@@ -24,12 +24,14 @@ namespace :org do
 
     download = Thread.new { Fronde::Org.download }
     if verbose
-      warn R18n.t.fronde.tasks.org.downloaded(version: download.value)
+      warn I18n.t('fronde.tasks.org.downloaded', version: download.value)
     else
-      Fronde::CLI::Throbber.run(download, R18n.t.fronde.tasks.org.downloading)
+      Fronde::CLI::Throbber.run(
+        download, I18n.t('fronde.tasks.org.downloading')
+      )
     end
   rescue RuntimeError, Interrupt
-    warn R18n.t.fronde.tasks.org.no_download if verbose
+    warn I18n.t('fronde.tasks.org.no_download') if verbose
   end
 
   desc 'Compile Org'
@@ -49,9 +51,9 @@ namespace :org do
     end
     if verbose
       build.join
-      warn R18n.t.fronde.tasks.org.installed(version: org_version)
+      warn I18n.t('fronde.tasks.org.installed', version: org_version)
     else
-      Fronde::CLI::Throbber.run(build, R18n.t.fronde.tasks.org.installing)
+      Fronde::CLI::Throbber.run(build, I18n.t('fronde.tasks.org.installing'))
     end
   rescue RuntimeError, Interrupt
     next

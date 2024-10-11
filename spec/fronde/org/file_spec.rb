@@ -22,8 +22,8 @@ describe Fronde::Org::File do
         Time.strptime('2019-06-11 00:00:00', '%Y-%m-%d %H:%M:%S')
       expect(o.date.strftime('%Y-%m-%d')).to eq '2019-06-11'
       expect(o.timekey).to eq '20190611000000'
-      expect(o.format('%i - (%t)')).to eq '2019-06-11 - (My second article)'
-      expect(o.lang).to eq 'es'
+      expect(o.format('%i - (%t)')).to eq '11/06/2019 - (My second article)'
+      expect(o.lang).to eq 'fr'
     end
 
     it 'parses with a complete date', :aggregate_failures do
@@ -62,7 +62,7 @@ describe Fronde::Org::File do
                      'first blog post or not',
         'keywords' => %w[test tata],
         'timekey' => '20190613000000',
-        'published' => 'Thursday 13th of June',
+        'published' => 'Thursday, June 13',
         'published_xml' => "2019-06-13T00:00:00#{expected_tz}",
         'published_body' => 'An article stating whether this is ' \
                             'my first blog post or not',
