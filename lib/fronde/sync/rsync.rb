@@ -13,11 +13,11 @@ module Fronde
       end
 
       def pull(test: false)
-        run command(test: test) + [@remote_path, @local_path]
+        run command(test:) + [@remote_path, @local_path]
       end
 
       def push(test: false)
-        run command(test: test) + [@local_path, @remote_path]
+        run command(test:) + [@local_path, @remote_path]
       end
 
       private

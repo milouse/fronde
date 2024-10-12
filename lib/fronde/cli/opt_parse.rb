@@ -59,7 +59,7 @@ module Fronde
             config = [short, long]
           else
             key = opt[:keyword] || opt[:long].upcase
-            config = [short, format('%<long>s %<key>s', long: long, key: key)]
+            config = [short, format('%<long>s %<key>s', long:, key:)]
           end
           config.push opt[:choices], opt[:help]
           config.compact

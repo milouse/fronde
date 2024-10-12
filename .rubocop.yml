@@ -1,7 +1,7 @@
 ---
 AllCops:
   NewCops: enable
-  TargetRubyVersion: 2.7
+  TargetRubyVersion: 3.1
 
 require:
   - rubocop-performance
@@ -15,6 +15,11 @@ Metrics/AbcSize:
 
 Metrics/BlockLength:
   Max: 30
+  CountAsOne:
+    - array
+    - hash
+    - heredoc
+    - method_call
   Exclude:
     - spec/**/*
     - lib/tasks/*
@@ -22,16 +27,25 @@ Metrics/BlockLength:
 
 Metrics/ClassLength:
   CountAsOne:
+    - array
     - hash
+    - heredoc
     - method_call
 
 Metrics/MethodLength:
   CountAsOne:
+    - array
     - hash
+    - heredoc
     - method_call
 
 Metrics/ModuleLength:
   Max: 120
+  CountAsOne:
+    - array
+    - hash
+    - heredoc
+    - method_call
 
 RSpec:
   Severity: warning
@@ -51,6 +65,9 @@ Style/Alias:
 
 Style/ConditionalAssignment:
   EnforcedStyle: assign_inside_condition
+
+Style/HashSyntax:
+  EnforcedShorthandSyntax: consistent
 
 Style/PreferredHashMethods:
   EnforcedStyle: verbose

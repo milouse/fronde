@@ -45,7 +45,7 @@ namespace :org do
 
     build = Thread.new do
       Fronde::Org.compile(
-        task.prerequisites[0], org_version, org_dir, verbose: verbose
+        task.prerequisites[0], org_version, org_dir, verbose:
       )
       Dir.glob('lib/org-[0-9.]*').each { rm_r _1 unless _1 == org_dir }
     end

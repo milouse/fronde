@@ -14,7 +14,7 @@ def fetch_test_content(path)
   )
 end
 
-def init_preview # rubocop:disable Metrics/MethodLength
+def init_preview
   config = <<~CONF
     ---
     author: Tata

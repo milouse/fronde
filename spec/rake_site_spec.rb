@@ -2,7 +2,7 @@
 
 require 'rake'
 
-def write_base_files # rubocop:disable Metrics/MethodLength
+def write_base_files
   config = <<~CONF
     ---
     sources:

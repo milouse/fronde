@@ -15,7 +15,7 @@ namespace :site do
       all_index = Fronde::Index.all_blog_index
       offset = 0
       all_index.each do |index|
-        index.write_all_org(verbose: verbose)
+        index.write_all_org(verbose:)
         offset = File.write('var/tmp/keywords', index.emacs_keywords, offset)
       end
       Thread.current[:all_indexes] = all_index
@@ -31,7 +31,7 @@ namespace :site do
 
     build_html = Thread.new do
       rm_r 'var/tmp/timestamps', force: true if args[:force?]
-      Fronde::Emacs.new(verbose: verbose).publish
+      Fronde::Emacs.new(verbose:).publish
     end
     Fronde::CLI::Throbber.run(build_html, I18n.t('fronde.tasks.site.building'))
 

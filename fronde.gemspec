@@ -92,7 +92,7 @@ Gem::Specification.new do |spec|
   spec.homepage    = 'https://git.umaneti.net/fronde/about/'
   spec.license     = 'WTFPL'
 
-  spec.required_ruby_version = '>= 2.7'
+  spec.required_ruby_version = '>= 3.1'
   spec.add_dependency 'base64', '~> 0.1'
   spec.add_dependency 'bigdecimal', '~> 3.1'
   spec.add_dependency 'i18n', '~> 1.14'

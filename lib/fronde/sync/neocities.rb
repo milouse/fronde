@@ -57,14 +57,14 @@ module Fronde
           "#{@public_folder}/#{path}"
         end
         File.unlink(*orphans) unless test
-        download_all file_list, test: test
+        download_all(file_list, test:)
         nil # Mute this method
       end
 
       def push(test: false)
         file_list = local_list
-        remove_remote_orphans file_list, test: test
-        upload_all file_list, test: test
+        remove_remote_orphans(file_list, test:)
+        upload_all(file_list, test:)
         finish
       end
 
@@ -84,10 +84,10 @@ module Fronde
         data
       end
 
-      def select_orphans(to_apply, current_list, &block)
+      def select_orphans(to_apply, current_list, &)
         paths_to_apply = to_apply.map { _1['path'] }
         current_paths = current_list.map { _1['path'] }
-        (current_paths - paths_to_apply).filter_map(&block)
+        (current_paths - paths_to_apply).filter_map(&)
       end
 
       def remove_remote_orphans(file_list, test: false)
@@ -114,7 +114,7 @@ module Fronde
             file_list.each do |file_data|
               path = file_data['path']
               file_data['uri'] = "https://#{publish_domain}/#{path}"
-              download_file http, file_data, test: test
+              download_file http, file_data, test:
             end
           end
         end

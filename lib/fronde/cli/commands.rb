@@ -71,7 +71,7 @@ module Fronde
         @command = @argv.shift || 'basic' if @command == 'help'
         cmd_opt = OptParse.command_options(@command)
         label = cmd_opt[:label] || @command
-        output = [format_label(I18n.t('fronde.bin.usage', label: label))]
+        output = [format_label(I18n.t('fronde.bin.usage', label:))]
         cmd = cmd_opt[:name] || @command
         output << format_label(I18n.t("fronde.bin.commands.#{cmd}"))
         output << OptParse.help_command_body(cmd)
@@ -84,7 +84,7 @@ module Fronde
       def format_label(label)
         return '' if label == '' || label.start_with?('Translation missing:')
 
-        format("%<label>s\n\n", label: label)
+        format("%<label>s\n\n", label:)
       end
 
       def file_name_from_title

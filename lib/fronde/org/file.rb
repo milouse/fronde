@@ -151,6 +151,7 @@ module Fronde
       #     org_file.format("Article written by %a the %d")
       #     => "Article written by Alice Smith the Wednesday 3rd July"
       #
+      # @param string [String] the template text to edit
       # @return [String] the given ~string~ after replacement occurs
       # rubocop:disable Layout/LineLength
       def format(string)
@@ -201,13 +202,12 @@ module Fronde
 
           @file = ::File.join @file, "#{Slug.slug(@data[:title])}.org"
         else
-          file_dir = ::File.dirname @file
-          FileUtils.mkdir_p file_dir
+          FileUtils.mkdir_p ::File.dirname(@file)
         end
         ::File.write @file, @data[:content]
       end
 
-      def method_missing(method_name, *args, &block)
+      def method_missing(method_name, *args, &)
         reader_method = method_name.to_s.delete_suffix('=').to_sym
         if @data.has_key? reader_method
           return @data[reader_method] if reader_method == method_name
@@ -255,9 +255,7 @@ module Fronde
       end
 
       def find_source_for_org_file
-        Fronde::CONFIG.sources.find do |project|
-          project.source_for? @file
-        end
+        Fronde::CONFIG.sources.find { _1.source_for? @file }
       end
 
       def find_source_for_publication_file

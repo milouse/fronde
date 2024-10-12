@@ -97,8 +97,8 @@ module Fronde
         FileUtils.mv "org-mode-release_#{version}", target
         # Fix a weird unknown package version
         ::File.write("#{target}/mk/version.mk", "ORGVERSION ?= #{version}")
-        system(*make_org_cmd(target, 'compile', verbose: verbose))
-        system(*make_org_cmd(target, 'autoloads', verbose: verbose))
+        system(*make_org_cmd(target, 'compile', verbose:))
+        system(*make_org_cmd(target, 'autoloads', verbose:))
       end
     end
   end
