@@ -20,10 +20,10 @@ fr:
         build: Compile les fichiers org en HTML ou gemtext.
         publish: >-
           Pousse les changements locaux vers le serveur web public.
-        help: Alias pour l'argument -h.
+        help: Alias pour l’argument -h.
       options:
         cmd_title: Options
-        help: Affiche l'aide pour une commande et quitte.
+        help: Affiche l’aide pour une commande et quitte.
         version: Affiche la version de Fronde et quitte.
         default_title: Nouvel article
     error:

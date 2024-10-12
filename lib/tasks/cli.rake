@@ -21,9 +21,8 @@ namespace :cli do
           'keyword' => keyword }
       end
 
-      translation = I18n.t("fronde.bin.commands.#{command}").tr("'", '’')
       { 'name' => command,
-        'translation' => translation,
+        'translation' => I18n.t("fronde.bin.commands.#{command}"),
         'options' => opts }
     end
     source = File.expand_path '../fronde/cli/data/zsh_completion', __dir__
