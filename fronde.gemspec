@@ -93,13 +93,13 @@ Gem::Specification.new do |spec|
   spec.license     = 'WTFPL'
 
   spec.required_ruby_version = '>= 2.7'
-  spec.add_dependency 'base64', '~> 0.2'
+  spec.add_dependency 'base64', '~> 0.1'
   spec.add_dependency 'bigdecimal', '~> 3.1'
   spec.add_dependency 'i18n', '~> 1.14'
   spec.add_dependency 'liquid', '~> 5.5'
   spec.add_dependency 'nokogiri', '~> 1.16'
   spec.add_dependency 'rainbow', '~> 3.1'
-  spec.add_dependency 'rake', '~> 13.2'
+  spec.add_dependency 'rake', '~> 13.1'
   spec.add_dependency 'webrick', '~> 1.8'
 
   spec.requirements << 'emacs'
