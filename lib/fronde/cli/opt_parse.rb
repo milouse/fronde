@@ -28,13 +28,13 @@ module Fronde
       FRONDE_COMMANDS = {
         'new' => { opts: ['-a', '-l', '-o', '-t', '-v'], label: 'new <path>' },
         'init' => { alias: 'new' },
-        'update' => {},
+        'update' => { opts: ['-v'] },
         'config' => { alias: 'update' },
         'preview' => {},
-        'open' => { opts: ['-a', '-l', '-t', '-v'], label: 'open <path>' },
+        'open' => { opts: ['-a', '-l', '-t'], label: 'open <path>' },
         'edit' => { alias: 'open' },
-        'build' => { opts: ['-f'] },
-        'publish' => {},
+        'build' => { opts: ['-f', '-v'] },
+        'publish' => { opts: ['-v'] },
         'help' => {},
         'basic' => { opts: ['-h', '-V'], label: '<command>' }
       }.freeze

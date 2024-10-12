@@ -24,10 +24,12 @@ complete -c fronde -n 'contains new (__fish_print_cmd_args_without_options)' -s 
 complete -c fronde -n 'contains new (__fish_print_cmd_args_without_options)' -s o -l output -r -a 'gemini html' -d Output
 complete -c fronde -n 'contains new (__fish_print_cmd_args_without_options)' -s t -l title -r -d Title
 complete -c fronde -n 'contains new (__fish_print_cmd_args_without_options)' -s v -l verbose -d Verbose
+complete -c fronde -n 'contains update (__fish_print_cmd_args_without_options)' -s v -l verbose -d Verbose
 complete -c fronde -n 'contains open (__fish_print_cmd_args_without_options)' -s a -l author -r -d Author
 complete -c fronde -n 'contains open (__fish_print_cmd_args_without_options)' -s l -l lang -r -d Lang
 complete -c fronde -n 'contains open (__fish_print_cmd_args_without_options)' -s t -l title -r -d Title
-complete -c fronde -n 'contains open (__fish_print_cmd_args_without_options)' -s v -l verbose -d Verbose
 complete -c fronde -n 'contains build (__fish_print_cmd_args_without_options)' -s f -l force -d Force
+complete -c fronde -n 'contains build (__fish_print_cmd_args_without_options)' -s v -l verbose -d Verbose
+complete -c fronde -n 'contains publish (__fish_print_cmd_args_without_options)' -s v -l verbose -d Verbose
 complete -c fronde -s h -l help -d 'Display help for a command and exit.'
 complete -c fronde -s V -l version -d 'Display Fronde version and exit.'

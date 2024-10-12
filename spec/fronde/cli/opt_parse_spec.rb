@@ -59,7 +59,7 @@ describe Fronde::CLI::OptParse do
       expect(config_opts).to have_key(:name)
       expect(config_opts[:name]).to eq('open')
       expect(config_opts).to have_key(:opts)
-      expect(config_opts[:opts]).to contain_exactly('-a', '-l', '-t', '-v')
+      expect(config_opts[:opts]).to contain_exactly('-a', '-l', '-t')
       expect(config_opts).not_to have_key(:alias)
     end
 
@@ -91,8 +91,7 @@ describe Fronde::CLI::OptParse do
       open_opts = [
         '    -a, --author AUTHOR       ',
         '    -l, --lang LOCALE         ',
-        '    -t, --title TITLE         ',
-        '    -v, --verbose             '
+        '    -t, --title TITLE         '
       ].join("\n")
       expect(described_class.summarize_command('open')).to eq(open_opts)
     end
@@ -105,7 +104,7 @@ describe Fronde::CLI::OptParse do
     it 'displays help for other commands' do
       {
         'new' => "Options\n#{NEW_OPTS}",
-        'update' => ''
+        'preview' => ''
       }.each do |command, help_message|
         expect(described_class.help_command_body(command)).to \
           eq help_message
