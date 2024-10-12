@@ -37,6 +37,7 @@ Gem::Specification.new do |spec|
     # Core files
     'lib/fronde/cli/commands.rb',
     'lib/fronde/cli/data/config.yml',
+    'lib/fronde/cli/data/fish_completion',
     'lib/fronde/cli/data/gitignore',
     'lib/fronde/cli/data/Rakefile',
     'lib/fronde/cli/data/zsh_completion',
