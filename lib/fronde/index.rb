@@ -96,7 +96,7 @@ module Fronde
       all_keys = all_tags
       {
         by_name: all_keys.sort,
-        by_weight: all_keys.sort_by { @index[_1].length }.reverse
+        by_weight: all_keys.sort_by { [-@index[_1].length, _1] }
       }
     end
   end
