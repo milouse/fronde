@@ -44,8 +44,8 @@ maintaining. In short, the main feature of this project is surely its
 
 *** Where does this name come from?
 
-A /fronde/ is the french word for a [[https://en.wikipedia.org/wiki/Sling_(weapon)][sling]]. This name was chosen as a
-tribute to the french newspaper « La Fronde », created by [[https://en.wikipedia.org/wiki/Marguerite_Durand][Marguerite
+A /fronde/ is the french word for a [[https://en.wikipedia.org/wiki/Sling_(weapon)][sling]]. This name was chosen as
+a tribute to the french newspaper « La Fronde », created by [[https://en.wikipedia.org/wiki/Marguerite_Durand][Marguerite
 Durand]] in France in 1897. This was the first all-women written and
 edited newspaper in the world. Marguerite Durand said about it in one of
 her editorial[fn:durand1902] that her newspaper was « comme les autres
@@ -67,13 +67,13 @@ Web.
 Fronde is built with some strong opinion about what a static website
 generator should be, and more specifically, what should it be for Org.
 
-- Org is a powerful tool that enables you to publish your writings in a
-  wide range of formats. Its markup is easy to learn and as readable and
-  as convenient as Markdown's. That's why fronde will never support any
-  other markup language.
+- Org is a powerful tool that enables you to publish your writings in
+  a wide range of formats. Its markup is easy to learn and as readable
+  and as convenient as Markdown's. That's why fronde will never support
+  any other markup language.
 - However Org HTML export should be more easily expandable. That’s why
-  fronde gives you the [[#templates_setting][templates feature]] and introduces [[#formatting_tags][new formatting tags]]
-  for the preamble and postamble sections.
+  fronde gives you the [[#templates_setting][templates feature]] and introduces [[#formatting_tags][new formatting
+  tags]] for the preamble and postamble sections.
 - Org writers should already be Emacs users, that’s why fronde will
   directly call Emacs to convert your Org files to HTML. There is no
   need to use Pandoc or org-ruby if you already have Emacs.
@@ -108,7 +108,8 @@ A mirror also exists on [[https://github.com/milouse/fronde][Github]].
 
 Fronde is a [[https://rubygems.org/][Ruby gem]] and thus you need a working Ruby environment to use
 it. Fronde requires at least ruby 2.7 to work (though this version is no
-more maintained, you should really move to ruby 3.1 as soon as possible).
+more maintained, you should really move to ruby 3.1 as soon as
+possible).
 
 You may already have Ruby installed on your computer. You can check
 inside a terminal emulator by typing: ~ruby -v~. You also need the
@@ -226,8 +227,10 @@ Now, you can run the ~fronde init~ command with some arguments:
 #+begin_noteblock
 The following arguments are allowed:
 
-- -a (--author) :: Set up the default author name (see the [[#author_setting][~author~ config key]])
-- -l (--lang) :: Set up the default lang of your website (see the [[#lang_setting][~lang~ config key]])
+- -a (--author) :: Set up the default author name
+  (see the [[#author_setting][~author~ config key]])
+- -l (--lang) :: Set up the default lang of your website
+  (see the [[#lang_setting][~lang~ config key]])
 - -t (--title) :: Set up the title of your first page
 #+end_noteblock
 
@@ -449,14 +452,15 @@ your project).
 
 The ~gemini_remote~ or ~html_remote~ option contains the destination of
 your capsule or website. This destination string define whether the
-[[https://neocities.org][Neocities]] or the default rsync backend must be used,
-and with what parameters.
+[[https://neocities.org][Neocities]] or the default rsync backend must be used, and with what
+parameters.
 
 #+begin_noteblock
-There is no default value for ~gemini_remote~ or ~html_remote~. Publication of your
-capsule will be skipped if there is no value for ~gemini_remote~. The
-same thing for your website, if there is no value for ~html_remote~, the
-publication of your website will be skipped.
+There is no default value for ~gemini_remote~ or
+~html_remote~. Publication of your capsule will be skipped if there is
+no value for ~gemini_remote~. The same thing for your website, if there
+is no value for ~html_remote~, the publication of your website will be
+skipped.
 #+end_noteblock
 
 **** Rsync backend
@@ -469,8 +473,8 @@ example ~user@domain:/var/www/mywebsite/~
 The trailing slash is mandatory.
 #+end_importantblock
 
-Fronde will directly call Rsync in a synchronous process, thus if a
-password must be entered to either unlock an SSH key, or because your
+Fronde will directly call Rsync in a synchronous process, thus if
+a password must be entered to either unlock an SSH key, or because your
 are trying to connect with a password, you will be able to manually
 enter it as usual.
 
@@ -487,10 +491,10 @@ than Neocities, you can use the following value for this setting:
   host it on a different server). This part is optional if you use the
   official Neocities server.
 
-For example, if your Website name is /example/ and you wish to publish it
-on the official Neocities server, you can just set the ~html_remote~ to
-~neocities:example~ or ~neocities:example@neocities.org~ if you want to be
-precise (but again, ~neocities.org~ is the default value for the
+For example, if your Website name is /example/ and you wish to publish
+it on the official Neocities server, you can just set the ~html_remote~
+to ~neocities:example~ or ~neocities:example@neocities.org~ if you want
+to be precise (but again, ~neocities.org~ is the default value for the
 ~server_name~, so you can skip it).
 
 To use the Neocities API, you also need to store your password. As you
@@ -602,10 +606,10 @@ following exact value:
 
 In the first case, as nothing as been given for the ~sources~ option,
 its default value will use ~.~ as its target directory, which means to
-put generated HTML files directly at the root of the ~html_public_folder~
-(which defaults to ~public_html~). But in the later case, the generated
-target will be the ~src~ folder /inside/ the ~html_public_folder~, which
-will be, by default, ~public_html/src~.
+put generated HTML files directly at the root of the
+~html_public_folder~ (which defaults to ~public_html~). But in the later
+case, the generated target will be the ~src~ folder /inside/ the
+~html_public_folder~, which will be, by default, ~public_html/src~.
 
 Thus, if you have a very simple website with only one source, you should
 avoid setting the ~sources~ options, or be very precise in what you
@@ -622,16 +626,16 @@ whatever source they come from. The main idea behind this is to add HTML
 fragments to the generated files.
 
 The ~templates~ option stores an array of /template/, each one
-documenting an HTML fragment to insert or move at some place in a
-specified generated file. Each template listed in that array is an
+documenting an HTML fragment to insert or move at some place in
+a specified generated file. Each template listed in that array is an
 object, which must use the following keys:
 
 - type :: [string] how the template should be inserted or moved in the
   HTML document. Can be either ~before~, ~after~ or ~replace~. It
   defaults to ~after~.
 - content :: [string] the HTML fragment to insert or replace. This value
-  will be evaluated before insertion and some tags will be replaced in a
-  context sensitive manner. See the [[#formatting_tags][Preamble/Postamble/Templates
+  will be evaluated before insertion and some tags will be replaced in
+  a context sensitive manner. See the [[#formatting_tags][Preamble/Postamble/Templates
   formatting tags]] section for the details.
 - selector :: [string] a CSS selector specifying where to insert the new
   fragment. For example, if this value is ~#main p:first-child~ and the
