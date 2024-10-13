@@ -5,6 +5,14 @@ require_relative '../fronde/index'
 require_relative '../fronde/templater'
 require_relative '../fronde/cli/throbber'
 
+def remove_orphan_file_maybe(file_path)
+  print I18n.t('fronde.tasks.site.remove_orphan_file')
+  action = $stdin.gets.strip.downcase
+  return unless action == 'y'
+
+  FileUtils.rm file_path
+end
+
 namespace :site do
   desc 'Build all your projects'
   task :build, [:force?] => ['var/lib/org-config.el'] do |_, args|
@@ -70,18 +78,25 @@ namespace :site do
 
   desc 'Cleanup orphaned published files'
   task :clean do
+    Fronde::Index.all_blog_index do |index|
+      project = index.project
+      all_tags = %w[index] + index.all_tags
+      Dir.glob("#{project['path']}/tags/*").each do |file_name|
+        slug = File.basename file_name, '.org'
+        next if all_tags.include?(slug)
+
+        short_file = file_name.sub(/^#{Dir.pwd}/, '.')
+        puts I18n.t('fronde.tasks.site.orphan_tag', file: short_file)
+        remove_orphan_file_maybe file_name
+      end
+    end
     pubfolder = Fronde::CONFIG.get('html_public_folder')
     Dir.glob("#{pubfolder}/**/*.html").each do |file_name|
       source = Fronde::Org::File.new(file_name)
-
       # Return if an org file has been found for this published file
       next unless source.file == file_name
 
-      print I18n.t('fronde.tasks.site.remove_orphan_file')
-      action = $stdin.gets.strip.downcase
-      next unless action == 'y'
-
-      rm file_name
+      remove_orphan_file_maybe file_name
     end
   end
 

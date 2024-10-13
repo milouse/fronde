@@ -204,6 +204,24 @@ context 'with a testing website' do
       )
     end
 
+    it 'warns about orphaned tag files' do
+      old_conf = Fronde::CONFIG.settings.merge
+      old_conf['sources'] = [
+        { 'name' => 'org', 'path' => 'src', 'target' => '.',
+          'is_blog' => true }
+      ]
+      Fronde::CONFIG.load_test(old_conf)
+      Fronde::CONFIG.write_org_lisp_config
+      FileUtils.mkdir_p 'src/tags'
+      FileUtils.touch ['src/tags/test.org', 'src/tags/index.org']
+      allow($stdin).to receive(:gets).and_return("n\n")
+      alert = 'The file ./src/tags/test.org refers to a tag, ' \
+              'which is no more in use.'
+      expect { rake.invoke_task('site:clean') }.to(
+        output(/#{alert}/).to_stdout
+      )
+    end
+
     it 'cleans orphaned files', :aggregate_failures do
       allow($stdin).to receive(:gets).and_return("y\n")
       FileUtils.mkdir_p 'public_html'

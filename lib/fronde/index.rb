@@ -8,7 +8,7 @@ module Fronde
   # Generates website indexes and atom feeds for all the org documents
   #   keywords.
   class Index
-    attr_reader :date
+    attr_reader :date, :project
 
     def initialize(project)
       @project = project

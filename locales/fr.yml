@@ -81,6 +81,9 @@ fr:
         publishing_feeds: 'Publication des flux Atom :'
         building: 'Compilation :'
         customizing: 'Décoration :'
+        orphan_tag: >-
+          Le fichier %{file} fait référence à une étiquette qui n’est plus
+          utilisée.
         remove_orphan_file: 'Le supprimer ? [y/N]: '
       org:
         downloaded: La version %{version} de Org a été téléchargée.
