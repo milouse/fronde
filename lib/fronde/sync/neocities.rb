@@ -35,7 +35,7 @@ module Fronde
 
       def local_list
         Dir.chdir(@public_folder) do
-          Dir['**/*'].map { |file| neocities_stat(file) }
+          Dir.glob('**/*').map { |file| neocities_stat(file) }
         end
       end
 

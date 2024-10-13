@@ -43,7 +43,7 @@ end
 
 def clean_testing_environment
   safe_files = %w[lib var Rakefile].freeze
-  Dir['*'].each do |file|
+  Dir.glob('*').each do |file|
     next if safe_files.include? file
 
     if File.directory? file

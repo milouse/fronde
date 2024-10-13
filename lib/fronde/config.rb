@@ -224,7 +224,7 @@ module Fronde
 end
 
 i18n_glob = File.expand_path('../../locales', __dir__)
-I18n.load_path = Dir["#{i18n_glob}/*.yml"]
+I18n.load_path = Dir.glob("#{i18n_glob}/*.yml")
 I18n.default_locale = Fronde::CONFIG.get('lang')
 
 Fronde::CONFIG.load_sources

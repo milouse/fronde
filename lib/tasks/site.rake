@@ -54,7 +54,7 @@ namespace :site do
 
     customize_html = Thread.new do
       pubfolder = Fronde::CONFIG.get('html_public_folder')
-      Dir["#{pubfolder}/**/*.html"].each do |f|
+      Dir.glob("#{pubfolder}/**/*.html").each do |f|
         Fronde::Templater.customize_output(f)
       end
     end
@@ -71,7 +71,7 @@ namespace :site do
   desc 'Cleanup orphaned published files'
   task :clean do
     pubfolder = Fronde::CONFIG.get('html_public_folder')
-    Dir["#{pubfolder}/**/*.html"].each do |file_name|
+    Dir.glob("#{pubfolder}/**/*.html").each do |file_name|
       source = Fronde::Org::File.new(file_name)
 
       # Return if an org file has been found for this published file

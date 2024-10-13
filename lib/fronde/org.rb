@@ -10,7 +10,7 @@ module Fronde
     class << self
       def current_version
         # Do not crash if Org is not yet installed (and thus return nil)
-        Dir['lib/org-*'].first&.delete_prefix('lib/org-')
+        Dir.glob('lib/org-*').first&.delete_prefix('lib/org-')
       end
 
       # Fetch and return the last published version of Org.
