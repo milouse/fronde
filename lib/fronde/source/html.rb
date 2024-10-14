@@ -26,7 +26,7 @@ module Fronde
       def fill_in_specific_config
         @config.merge!(
           'type' => 'html', 'ext' => '.html', 'mime_type' => 'text/html',
-          'folder' => CONFIG.get('html_public_folder')
+          'folder' => File.expand_path(CONFIG.get('html_public_folder'))
         )
       end
 

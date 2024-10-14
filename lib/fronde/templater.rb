@@ -24,7 +24,7 @@ module Fronde
       # the insert action
       @config['source'].unlink if @config.has_key? 'source'
       # Insert new content
-      @dom.css(@config['selector']).each do |element|
+      @dom.css(@config['selector']).map do |element|
         insert_new_node_at element, content
       end
     end
@@ -37,49 +37,35 @@ module Fronde
       end
     end
 
-    def valid?(file_name)
+    def valid?
       return false unless @config.has_key?('selector')
 
       unless @config.has_key?('content') || @config.has_key?('source')
         return false
       end
 
-      check_path(file_name)
+      check_path
     end
 
     class << self
       def customize_output(file_name)
-        source = Fronde::Org::File.new(file_name)
+        source = Fronde::Org::File.new file_name
         # Return if no org file found for this published file
-        return if source.file.end_with?(file_name)
+        return unless source.pub_file
 
-        dom = open_dom(file_name)
-        updated = apply_templates(source, dom, file_name)
-        write_dom(file_name, dom) if updated
+        apply_templates source
       end
 
-      private
-
-      def apply_templates(source, dom, file_name)
-        Fronde::CONFIG.get('templates', []).map do |config|
+      def apply_templates(source)
+        public_file = source.pub_file absolute: true
+        dom = File.open(public_file, 'r') { Nokogiri::HTML _1 }
+        changes = Fronde::CONFIG.get('templates', []).map do |config|
           template = Fronde::Templater.new(source, dom, config)
-          next if !template.valid?(file_name) || template.applied?
+          next if !template.valid? || template.applied?
 
           template.apply
-          true
-        end.any?
-      end
-
-      def open_dom(file_name)
-        File.open(file_name, 'r') do |file|
-          Nokogiri::HTML file
         end
-      end
-
-      def write_dom(file_name, dom)
-        File.open(file_name, 'w') do |file|
-          dom.write_to file
-        end
+        File.open(public_file, 'w') { dom.write_to _1 } if changes.any?
       end
     end
 
@@ -97,13 +83,11 @@ module Fronde
     end
 
     def warn_no_element(source)
-      pub_folder = Fronde::CONFIG.get('html_public_folder').sub(
-        /^#{Dir.pwd}/, '.'
-      )
+      public_file = @org_file.pub_file(absolute: true)
       warn(
         I18n.t(
           'fronde.error.templater.no_element_found',
-          source: source, file: "#{pub_folder}#{@org_file.pub_file}"
+          source: source, file: public_file.sub(/^#{Dir.pwd}/, '.')
         )
       )
       '' # Return empty string
@@ -127,15 +111,14 @@ module Fronde
       warn_no_element source
     end
 
-    def check_path(file_name)
+    def check_path
       paths = @config['path']
       return true unless paths
 
       paths = [paths] unless paths.is_a? Array
 
-      pub_folder = Fronde::CONFIG.get('html_public_folder')
       paths.any? do |template_path|
-        File.fnmatch?("#{pub_folder}#{template_path}", file_name)
+        File.fnmatch?(template_path, @org_file.pub_file)
       end
     end
   end

@@ -109,6 +109,21 @@ module Fronde
         @data[:date].strftime('%Y%m%d%H%M%S')
       end
 
+      # Returns the path to the published version of this document.
+      #
+      # By default, this method returns the relative path to the published
+      # file. If the ~absolute~ argument is true, it will return the absolute
+      # path to the published file.
+      #
+      # @param absolute [Boolean] whether to display absolute or relative
+      #   published file path (default false)
+      # @return [String] the document key
+      def pub_file(absolute: false)
+        return @data[:pub_file] unless absolute
+
+        "#{@project['folder']}#{@data[:pub_file]}"
+      end
+
       # Formats given ~string~ with values of the current Org::File.
       #
       # This method expects to find percent-tags in the given ~string~

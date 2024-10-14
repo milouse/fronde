@@ -111,7 +111,7 @@ module Fronde
     def publication_path
       return @config['publication_path'] if @config['publication_path']
 
-      publish_in = [File.expand_path(@config['folder']), @config['target']]
+      publish_in = [@config['folder'], @config['target']]
       @config['publication_path'] = publish_in.join('/').delete_suffix('/')
     end
 

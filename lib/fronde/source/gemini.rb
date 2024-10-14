@@ -20,7 +20,7 @@ module Fronde
       def fill_in_specific_config
         @config.merge!(
           'type' => 'gemini', 'ext' => '.gmi', 'mime_type' => 'text/gemini',
-          'folder' => CONFIG.get('gemini_public_folder')
+          'folder' => File.expand_path(CONFIG.get('gemini_public_folder'))
         )
       end
 

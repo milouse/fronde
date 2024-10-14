@@ -73,7 +73,7 @@ describe Fronde::Templater do
       end.to(
         output(
           'No element found with the selector h2 in ' \
-          "public_html/customize_test.html.\n"
+          "./public_html/customize_test.html.\n"
         ).to_stderr
       )
     end
