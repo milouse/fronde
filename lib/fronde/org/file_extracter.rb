@@ -20,9 +20,17 @@ module Fronde
         end
         return unless @project
 
+        warn_if_dangerous_code_block
         @data[:updated] = ::File.mtime(@file)
         @data[:pub_file] = @project.target_for @file
         @data[:url] = Fronde::CONFIG.get('domain') + @data[:pub_file]
+      end
+
+      def warn_if_dangerous_code_block
+        code_block_rx = /^#\+begin_src.+:exports (?:results|both).*$/i
+        return unless code_block_rx.match?(@data[:content])
+
+        warn I18n.t('fronde.error.org_file.dangerous_code_block', file: @file)
       end
 
       def extract_date

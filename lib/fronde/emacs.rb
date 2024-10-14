@@ -33,7 +33,6 @@ module Fronde
       @command = [default_emacs || 'emacs -Q --batch -nw']
       @command << '--eval \'(setq inhibit-message t)\'' unless @verbose
       @command += [
-        '--eval \'(setq enable-dir-local-variables nil)\'',
         '-l ./var/lib/org-config.el',
         "--eval '#{org_action}'"
       ]

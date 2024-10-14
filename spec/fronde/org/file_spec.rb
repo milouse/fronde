@@ -225,6 +225,16 @@ describe Fronde::Org::File do
       o = described_class.new('data/content.org')
       expect(o.url).to eq('http://perdu.com/data/content.html')
     end
+
+    it 'warns if it contains a code block to eval' do
+      config = { 'sources' => [{ 'path' => '..' }] }
+      Fronde::CONFIG.load_test config
+      expect { described_class.new('../DOCUMENTATION.org') }.to(
+        # rubocop:disable Layout/LineLength
+        output(%r{The file .+/DOCUMENTATION.org contains at least one code block to eval}).to_stderr
+        # rubocop:enable Layout/LineLength
+      )
+    end
   end
 
   context 'with an html file as file name' do

@@ -47,6 +47,10 @@ en:
       org_file:
         no_file_or_title: No file or title given.
         no_project: No project found for %{file}. Publication will fail.
+        dangerous_code_block: >-
+          The file %{file} contains at least one code block to eval, which will
+          be ignored for security reasons. You can still evaluate it manually
+          from inside Org in order to have its result exported.
       index:
         wrong_sort_kind: '%{kind} not in %{accepted_values}'
       templater:

@@ -53,6 +53,10 @@ fr:
       org_file:
         no_file_or_title: Aucun chemin de fichier ou titre donné.
         no_project: Aucun projet trouvé pour %{file}. Sa publication va échouer.
+        dangerous_code_block: >-
+          Le fichier %{file} contient au moins un bloc de code à évaluer qui
+          sera ignoré pour des raisons de sécûrité. Vous pouvez manuellement
+          l’évaluer dans Org pour que son résultat soit correctement exporté.
       index:
         wrong_sort_kind: '%{kind} n’est pas dans %{accepted_values}'
       templater:

@@ -145,8 +145,9 @@ INFO is a plist used as a communication channel."
       org-publish-timestamp-directory (expand-file-name "timestamps/" fronde-org-temp-dir)
       org-id-locations-file (expand-file-name "id-locations.el" fronde-org-temp-dir)
       make-backup-files nil
-      enable-local-variables :all
-      org-confirm-babel-evaluate nil
+      enable-dir-local-variables nil
+      enable-local-variables t ;; enforce default
+      org-confirm-babel-evaluate t ;; enforce default
       org-export-with-broken-links t
       org-html-doctype "html5"
       org-html-html5-fancy t
