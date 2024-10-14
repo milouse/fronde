@@ -10,8 +10,10 @@ module Fronde
       @command = nil
     end
 
-    def publish(project = 'website')
-      build_command("(org-publish \"#{project}\")")
+    def publish(project: 'website', force: false)
+      org_action = ['org-publish', %("#{project}")]
+      org_action << 't' if force
+      build_command "(#{org_action.join(' ')})"
       run_command
     end
 

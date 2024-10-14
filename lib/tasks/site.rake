@@ -38,8 +38,7 @@ namespace :site do
     all_indexes = build_index[:all_indexes]
 
     build_html = Thread.new do
-      rm_r 'var/tmp/timestamps', force: true if args[:force?]
-      Fronde::Emacs.new(verbose:).publish
+      Fronde::Emacs.new(verbose:).publish(force: args[:force?])
     end
     Fronde::CLI::Throbber.run(build_html, I18n.t('fronde.tasks.site.building'))
 
