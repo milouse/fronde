@@ -2,6 +2,24 @@
 
 require 'rake'
 
+def add_some_contents
+  FileUtils.mkdir_p 'src/news'
+  org_content = <<~ORG
+    #+title: Index file
+    #+description: Nice description
+
+    Nice content.
+  ORG
+  File.write('src/index.org', org_content)
+  file1 = <<~ORG
+    #+title: Index file
+    #+keywords: toto, titi
+
+    Lorem ipsum sic habet…
+  ORG
+  File.write('src/news/test1.org', file1)
+end
+
 def write_base_files
   config = <<~CONF
     ---
@@ -21,25 +39,12 @@ def write_base_files
   File.write('config.yml', config)
   Fronde::CONFIG.reset
   Fronde::CONFIG.write_org_lisp_config
-  FileUtils.mkdir_p 'src/news'
-  org_content = <<~ORG
-    #+title: Index file
-
-    My website
-  ORG
-  File.write('src/index.org', org_content)
-  file1 = <<~ORG
-    #+title: Index file
-    #+keywords: toto, titi
-
-    My website
-  ORG
-  File.write('src/news/test1.org', file1)
+  add_some_contents
   file2 = <<~ORG
     #+title: Index file
     #+keywords: toto
 
-    My website
+    Aliquam sed ex nulla
   ORG
   File.write('src/news/test2.org', file2)
 end
@@ -64,23 +69,26 @@ context 'with a testing website' do
     before do
       Fronde::CONFIG.reset
       Fronde::CONFIG.write_org_lisp_config
-      o = Fronde::Org::File.new(
-        'src/index.org',
-        title: 'My website',
-        content: "#+description: Nice description\n\nNice content."
-      )
-      o.write
+      add_some_contents
     end
 
-    it 'builds something' do
+    it 'builds default project', :aggregate_failures do
       rake(verbose: false).invoke_task('site:build')
       expect(File.exist?('public_html/index.html')).to be true
+      expect(File.exist?('public_html/news/test1.html')).to be true
     end
 
-    it 'builds something even in verbose mode' do
+    it 'builds verbosely default project', :aggregate_failures do
       # For coverage
       rake(verbose: true).invoke_task('site:build')
       expect(File.exist?('public_html/index.html')).to be true
+      expect(File.exist?('public_html/news/test1.html')).to be true
+    end
+
+    it 'builds a single file', :aggregate_failures do
+      rake(verbose: false).invoke_task('site:build_file[src/index.org]')
+      expect(File.exist?('public_html/index.html')).to be true
+      expect(File.exist?('public_html/news/test1.html')).to be false
     end
 
     it 'build something for gemini projects' do
@@ -139,7 +147,7 @@ context 'with a testing website' do
       o = Fronde::Org::File.new('public_gmi/index.gmi')
       data = o.to_h
       content = <<~CONTENT
-        # My website
+        # Index file
 
         Nice content.
 
@@ -171,7 +179,7 @@ context 'with a testing website' do
       expect(File.read('public_html/index.html')).to eql(old_content)
     end
 
-    it 'builds again when call with force option' do
+    it 'builds again when called with force option' do
       rake(verbose: false).invoke_task('site:build')
       old_content = File.read('public_html/index.html')
       custom_footer = {
@@ -181,6 +189,32 @@ context 'with a testing website' do
       Fronde::CONFIG.load_test(new_conf)
       Fronde::CONFIG.write_org_lisp_config
       rake(verbose: false).invoke_task('site:build[true]')
+      expect(File.read('public_html/index.html')).not_to eql(old_content)
+    end
+
+    it 'does not build again a single file with successive call' do
+      rake(verbose: false).invoke_task('site:build')
+      old_content = File.read('public_html/index.html')
+      custom_footer = {
+        'org-html' => { 'html-postamble' => '<footer>Modified!</footer>' }
+      }
+      new_conf = Fronde::CONFIG.settings.merge(custom_footer)
+      Fronde::CONFIG.load_test(new_conf)
+      Fronde::CONFIG.write_org_lisp_config
+      rake(verbose: false).invoke_task('site:build_file[src/index.org]')
+      expect(File.read('public_html/index.html')).to eql(old_content)
+    end
+
+    it 'builds again a single file when called with force option' do
+      rake(verbose: false).invoke_task('site:build')
+      old_content = File.read('public_html/index.html')
+      custom_footer = {
+        'org-html' => { 'html-postamble' => '<footer>Modified!</footer>' }
+      }
+      new_conf = Fronde::CONFIG.settings.merge(custom_footer)
+      Fronde::CONFIG.load_test(new_conf)
+      Fronde::CONFIG.write_org_lisp_config
+      rake(verbose: false).invoke_task('site:build_file[src/index.org, true]')
       expect(File.read('public_html/index.html')).not_to eql(old_content)
     end
 

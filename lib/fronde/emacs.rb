@@ -10,10 +10,22 @@ module Fronde
       @command = nil
     end
 
-    def publish(project: 'website', force: false)
-      org_action = ['org-publish', %("#{project}")]
-      org_action << 't' if force
-      build_command "(#{org_action.join(' ')})"
+    def publish(project = 'website', force: false)
+      if force
+        build_command %[(org-publish "#{project}" t)]
+      else
+        build_command %[(org-publish "#{project}")]
+      end
+      run_command
+    end
+
+    def publish_file(file_path, force: false)
+      if force
+        build_command '(org-publish-current-file t)'
+      else
+        build_command '(org-publish-current-file)'
+      end
+      @command.insert(-2, %(--visit "#{file_path}"))
       run_command
     end
 
@@ -30,12 +42,13 @@ module Fronde
 
     def build_command(org_action)
       default_emacs = Fronde::CONFIG.get('emacs')
-      @command = [default_emacs || 'emacs -Q --batch -nw']
-      @command << '--eval \'(setq inhibit-message t)\'' unless @verbose
-      @command += [
+      @command = [
+        default_emacs || 'emacs -Q --batch -nw',
+        '--eval \'(setq inhibit-message t)\'',
         '-l ./var/lib/org-config.el',
         "--eval '#{org_action}'"
       ]
+      @command.delete_at(1) if @verbose
     end
   end
 end

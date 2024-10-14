@@ -75,6 +75,15 @@ namespace :site do
     # :nocov:
   end
 
+  desc 'Build a single file'
+  task :build_file, %i[path force?] do |_, args|
+    args.with_defaults(force?: false)
+    Fronde::Emacs.new(verbose: true).publish_file(
+      args[:path], force: args[:force?]
+    )
+    Fronde::Templater.customize_output(args[:path])
+  end
+
   desc 'Cleanup orphaned published files'
   task :clean do
     Fronde::Index.all_blog_index do |index|
