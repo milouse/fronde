@@ -9,6 +9,16 @@
 #+latex_header: \defaultfontfeatures{Ligatures=TeX, Scale=MatchLowercase}
 #+latex_header: \setmonofont{InconsolataLGC}[Ligatures=TeXReset, Scale=0.75]
 
+#+begin_src emacs-lisp :exports results :wrap noteblock
+  (with-temp-buffer
+    (insert-file-contents "./lib/fronde/version.rb")
+    (goto-char (point-min))
+    (when (re-search-forward "VERSION = '\\([^']+\\)'" nil t)
+      (format
+       "This documentation assume you are using fronde version *%s*."
+       (match-string 1))))
+#+end_src
+
 * Introduction
 
 ** Summary
