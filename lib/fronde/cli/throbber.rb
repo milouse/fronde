@@ -56,10 +56,16 @@ module Fronde
         #
         # @param thread [Thread] the long-running operation to decorate
         # @param message [String] the message to display before the throbber
+        # @param verbose [Boolean] whether the decoration should be shown
+        #   or skipped
         # @return [void]
-        def run(thread, message)
-          throbber = new(thread, message)
-          throbber.run
+        def run(thread, message, verbose)
+          if verbose
+            thread.join
+          else
+            throbber = new(thread, message)
+            throbber.run
+          end
         end
       end
 

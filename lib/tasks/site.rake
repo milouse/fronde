@@ -28,33 +28,26 @@ namespace :site do
       end
       Thread.current[:all_indexes] = all_index
     end
-    if verbose
-      build_index.join
-    else
-      Fronde::CLI::Throbber.run(
-        build_index, I18n.t('fronde.tasks.site.generating_indexes')
-      )
-    end
+    Fronde::CLI::Throbber.run(
+      build_index, I18n.t('fronde.tasks.site.generating_indexes'), verbose
+    )
     all_indexes = build_index[:all_indexes]
 
     build_html = Thread.new do
       Fronde::Emacs.new(verbose:).publish(force: args[:force?])
     end
-    Fronde::CLI::Throbber.run(build_html, I18n.t('fronde.tasks.site.building'))
-
+    Fronde::CLI::Throbber.run(
+      build_html, I18n.t('fronde.tasks.site.building'), verbose
+    )
     if all_indexes.any?
-      if verbose
-        all_indexes.each(&:write_all_feeds)
-      else
-        publish_feed = Thread.new do
-          all_indexes.each do |index|
-            index.write_all_feeds(verbose: false)
-          end
+      publish_feed = Thread.new do
+        all_indexes.each do |index|
+          index.write_all_feeds(verbose: false)
         end
-        Fronde::CLI::Throbber.run(
-          publish_feed, I18n.t('fronde.tasks.site.publishing_feeds')
-        )
       end
+      Fronde::CLI::Throbber.run(
+        publish_feed, I18n.t('fronde.tasks.site.publishing_feeds'), verbose
+      )
     end
 
     next unless Fronde::CONFIG.sources.any? { |source| source.type == 'html' }
@@ -66,7 +59,7 @@ namespace :site do
       end
     end
     Fronde::CLI::Throbber.run(
-      customize_html, I18n.t('fronde.tasks.site.customizing')
+      customize_html, I18n.t('fronde.tasks.site.customizing'), verbose
     )
     # :nocov:
   rescue RuntimeError, Interrupt

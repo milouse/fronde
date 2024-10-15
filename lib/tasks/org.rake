@@ -22,14 +22,13 @@ namespace :org do
     # Weird Rake issue, still executing the task even if the file exists
     next if File.exist? 'var/tmp/org.tar.gz'
 
-    download = Thread.new { Fronde::Org.download }
-    if verbose
-      warn I18n.t('fronde.tasks.org.downloaded', version: download.value)
-    else
-      Fronde::CLI::Throbber.run(
-        download, I18n.t('fronde.tasks.org.downloading')
-      )
+    download = Thread.new do
+      version = Fronde::Org.download
+      puts I18n.t('fronde.tasks.org.downloaded', version:) if verbose
     end
+    Fronde::CLI::Throbber.run(
+      download, I18n.t('fronde.tasks.org.downloading'), verbose
+    )
   rescue RuntimeError, Interrupt
     warn I18n.t('fronde.tasks.org.no_download') if verbose
   end
@@ -38,23 +37,19 @@ namespace :org do
   multitask compile: ['var/tmp/org.tar.gz', 'lib'] do |task|
     # No need to force fetch last version as it is only interesting as
     # part of the upgrade task
-    org_version = Fronde::Org.last_version
+    version = Fronde::Org.last_version
 
-    org_dir = "lib/org-#{org_version}"
+    org_dir = "lib/org-#{version}"
     next if Dir.exist?("#{org_dir}/lisp")
 
     build = Thread.new do
-      Fronde::Org.compile(
-        task.prerequisites[0], org_version, org_dir, verbose:
-      )
+      Fronde::Org.compile(task.prerequisites[0], version, org_dir, verbose:)
       Dir.glob('lib/org-[0-9.]*').each { rm_r _1 unless _1 == org_dir }
+      puts I18n.t('fronde.tasks.org.installed', version:) if verbose
     end
-    if verbose
-      build.join
-      warn I18n.t('fronde.tasks.org.installed', version: org_version)
-    else
-      Fronde::CLI::Throbber.run(build, I18n.t('fronde.tasks.org.installing'))
-    end
+    Fronde::CLI::Throbber.run(
+      build, I18n.t('fronde.tasks.org.installing'), verbose
+    )
   rescue RuntimeError, Interrupt
     next
   end

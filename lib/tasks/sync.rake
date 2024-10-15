@@ -15,13 +15,9 @@ namespace :sync do
       publish_thread = Fronde::Sync.pull_or_push(
         :push, type, test: args[:test?], verbose: verbose
       )
-      if verbose
-        publish_thread.join
-      else
-        Fronde::CLI::Throbber.run(
-          publish_thread, format('Publishing %<fmt>s:', fmt: type)
-        )
-      end
+      Fronde::CLI::Throbber.run(
+        publish_thread, format('Publishing %<fmt>s:', fmt: type), verbose
+      )
     rescue Fronde::Sync::Error => e
       warn e
       next
@@ -36,13 +32,9 @@ namespace :sync do
       pull_thread = Fronde::Sync.pull_or_push(
         :pull, type, test: args[:test?], verbose: verbose
       )
-      if verbose
-        pull_thread.join
-      else
-        Fronde::CLI::Throbber.run(
-          pull_thread, format('Pulling %<fmt>s:', fmt: type)
-        )
-      end
+      Fronde::CLI::Throbber.run(
+        pull_thread, format('Pulling %<fmt>s:', fmt: type), verbose
+      )
     rescue Fronde::Sync::Error => e
       warn e
       next
