@@ -88,6 +88,7 @@ fr:
         publishing_feeds: 'Publication des flux Atom :'
         building: 'Compilation :'
         customizing: 'Décoration :'
+        customizing_file: 'Décoration du fichier %{file}'
         orphan_tag: >-
           Le fichier %{file} fait référence à une étiquette qui n’est plus
           utilisée.

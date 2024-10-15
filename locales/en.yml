@@ -82,6 +82,7 @@ en:
         publishing_feeds: 'Publishing Atom feeds:'
         building: 'Building:'
         customizing: 'Customizing:'
+        customizing_file: 'Customizing file %{file}'
         orphan_tag: The file %{file} refers to a tag, which is no more in use.
         remove_orphan_file: 'Remove it? [y/N]: '
       org:

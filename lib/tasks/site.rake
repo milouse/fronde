@@ -55,6 +55,10 @@ namespace :site do
     customize_html = Thread.new do
       pubfolder = Fronde::CONFIG.get('html_public_folder')
       Dir.glob("#{pubfolder}/**/*.html").each do |f|
+        if verbose
+          short_file = f.sub(/^#{Dir.pwd}/, '.')
+          puts I18n.t('fronde.tasks.site.customizing_file', file: short_file)
+        end
         Fronde::Templater.customize_output(f)
       end
     end
@@ -74,6 +78,7 @@ namespace :site do
     Fronde::Emacs.new(verbose: true).publish_file(
       args[:path], force: args[:force?]
     )
+    puts I18n.t('fronde.tasks.site.customizing_file', file: args[:path])
     Fronde::Templater.customize_output(args[:path])
   end
 
