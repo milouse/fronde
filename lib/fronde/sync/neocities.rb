@@ -52,7 +52,7 @@ module Fronde
         file_list = remote_list
         finish
         orphans = select_orphans(file_list, local_list) do |path|
-          warn "deleting #{path}" if @verbose
+          warn I18n.t('fronde.neocities.deleting', path:) if @verbose
 
           "#{@public_folder}/#{path}"
         end
@@ -98,7 +98,7 @@ module Fronde
           # the index.html file to be removed.
           next if PROTECTED_FILES.include? path
 
-          warn "deleting #{path}" if @verbose
+          warn I18n.t('fronde.neocities.deleting', path:) if @verbose
           path
         end
         request.form_data = { 'filenames[]' => orphan_paths }
@@ -146,7 +146,7 @@ module Fronde
         check = Digest::SHA1.hexdigest content
         return content if check == sha1sum
 
-        warn "SHA1 hash differ for #{uri}"
+        warn I18n.t('fronde.neocities.sha1_differ', uri:)
       end
 
       def save_file(path, content, updated_at)

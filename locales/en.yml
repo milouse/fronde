@@ -71,6 +71,9 @@ en:
         last_modification: Last modification on %C
         with_emacs: with %c, and published with %n
         with_emacs_html: with %c, and published with %N
+    neocities:
+      deleting: deleting %{path}
+      sha1_differ: SHA1 hash differ for %{uri}
     tasks:
       site:
         aborting: Aborting
