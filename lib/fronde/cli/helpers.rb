@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'uri'
-require 'net/http'
 require 'fileutils'
 
 module Fronde
