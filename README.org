@@ -7,7 +7,7 @@
 * What's fronde for?
 
 #+attr_gmi: :alt A stylized picture of a tiger
-#+attr_html: :alt A stylized picture of a tiger head :style width:150px;float:right;margin-top:-4.5em;margin-left:2em;
+#+attr_html: :alt A stylized picture of a tiger head :id tiger_head
 [[file:./tigre.png]]
 
 Fronde is an opinionated static website generator for [[https://orgmode.org][Org]]. It helps you
