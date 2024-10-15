@@ -4,6 +4,7 @@ source 'https://rubygems.org'
 gemspec
 
 group :development do
+  gem 'bundler-audit', '~> 0.9'
   gem 'org-ruby', '~> 0.9'
   gem 'rspec', '~> 3.13'
   gem 'rubocop', '~> 1.64'
