@@ -23,7 +23,7 @@ module Fronde
       private
 
       def run(cmd)
-        warn cmd.join(' ') if @verbose
+        puts cmd.join(' ') if @verbose
         # Be precise about Kernel to allow mock in rspec
         Kernel.system(*cmd)
       end

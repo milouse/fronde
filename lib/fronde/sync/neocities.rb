@@ -52,7 +52,7 @@ module Fronde
         file_list = remote_list
         finish
         orphans = select_orphans(file_list, local_list) do |path|
-          warn I18n.t('fronde.neocities.deleting', path:) if @verbose
+          puts I18n.t('fronde.neocities.deleting', path:) if @verbose
 
           "#{@public_folder}/#{path}"
         end
@@ -98,7 +98,7 @@ module Fronde
           # the index.html file to be removed.
           next if PROTECTED_FILES.include? path
 
-          warn I18n.t('fronde.neocities.deleting', path:) if @verbose
+          puts I18n.t('fronde.neocities.deleting', path:) if @verbose
           path
         end
         request.form_data = { 'filenames[]' => orphan_paths }
@@ -123,12 +123,12 @@ module Fronde
       def download_file(http, file_data, test: false)
         path = file_data['path']
         if file_data['is_directory']
-          warn "#{path}/" if @verbose
+          puts "#{path}/" if @verbose
           FileUtils.mkdir_p path unless test
           return
         end
 
-        warn path if @verbose
+        puts path if @verbose
 
         content = fetch_file_content(
           http, file_data['uri'], file_data['sha1_hash']
@@ -163,7 +163,7 @@ module Fronde
             next if file_data['is_directory']
 
             path = file_data['path']
-            warn path if @verbose
+            puts path if @verbose
             [path, File.new(path)]
           end
         end

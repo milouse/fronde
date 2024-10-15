@@ -34,8 +34,8 @@ module Fronde
     def run_command
       cmd = @command.join(' ')
       if @verbose
-        warn cmd
-        return system(cmd, exception: true)
+        puts cmd
+        return system(cmd, err: $stdout, exception: true)
       end
       system cmd, out: File::NULL, err: File::NULL, exception: true
     end

@@ -75,7 +75,7 @@ module Fronde
         cmd = cmd_opt[:name] || @command
         output << format_label(I18n.t("fronde.bin.commands.#{cmd}"))
         output << OptParse.help_command_body(cmd)
-        warn output.join
+        puts output.join
         true
       end
 

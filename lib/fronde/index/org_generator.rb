@@ -30,7 +30,7 @@ module Fronde
       FileUtils.mkdir_p "#{@project['path']}/tags"
       @index.each_key do |tag|
         write_org(tag)
-        warn I18n.t('fronde.index.index_generated', tag:) if verbose
+        puts I18n.t('fronde.index.index_generated', tag:) if verbose
       end
       write_blog_home_page(verbose)
     end
@@ -92,7 +92,7 @@ module Fronde
     def write_blog_home_page(verbose)
       orgdest = format('%<root>s/index.org', root: @project['path'])
       if verbose
-        warn I18n.t('fronde.org.generate_blog_index', name: @project['name'])
+        puts I18n.t('fronde.org.generate_blog_index', name: @project['name'])
       end
       File.write(orgdest, blog_home_page)
     end
