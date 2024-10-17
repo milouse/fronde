@@ -7,13 +7,13 @@ def template_proof(digest)
     <!DOCTYPE html>
     <html>
       <head>
-    <!-- Fronde Template: #{digest} -->
         <meta property="test" content="TEST">
     <title>My website</title>
       </head>
       <body>
         <h1>My website</h1>
       </body>
+    <!-- Fronde Template: #{digest} -->
     </html>
   RESULT
 end
@@ -51,24 +51,6 @@ describe Fronde::Templater do
       Fronde::CONFIG.reset
     end
 
-    it 'skips file on broken html' do
-      FileUtils.touch 'src/broken.org'
-      File.write 'public_html/broken.html', 'No markup at all'
-      Fronde::CONFIG.load_test(
-        'templates' => [
-          { 'selector' => 'title',
-            'content' => metatag }
-        ]
-      )
-      expect do
-        described_class.customize_output('public_html/broken.html')
-      end.to(
-        output(
-          "No head tag found in file public_html/broken.html.\n"
-        ).to_stderr
-      )
-    end
-
     it 'skips file on unknown source' do
       FileUtils.mkdir 'public_html/customize'
       test_path = './public_html/customize/test.html'
@@ -91,7 +73,7 @@ describe Fronde::Templater do
       end.to(
         output(
           'No element found with the selector h2 in ' \
-          "public_html/customize_test.html.\n"
+          "./public_html/customize_test.html.\n"
         ).to_stderr
       )
     end
@@ -108,13 +90,13 @@ describe Fronde::Templater do
         <!DOCTYPE html>
         <html>
           <head>
-        <!-- Fronde Template: e5a93c7cd8b3e75e4956a81dae18b7fe -->
             <title>My website</title>
         <meta property="test" content="TEST">
           </head>
           <body>
             <h1>My website</h1>
           </body>
+        <!-- Fronde Template: e5a93c7cd8b3e75e4956a81dae18b7fe -->
         </html>
       RESULT
       expect(File.read('public_html/customize_test.html')).to eq(local_result)
@@ -138,13 +120,13 @@ describe Fronde::Templater do
         <!DOCTYPE html>
         <html>
           <head>
-        <!-- Fronde Template: e5a93c7cd8b3e75e4956a81dae18b7fe -->
             <title>My website</title>
         <meta property="test" content="TEST">
           </head>
           <body>
             <h1>My website</h1>
           </body>
+        <!-- Fronde Template: e5a93c7cd8b3e75e4956a81dae18b7fe -->
         </html>
       RESULT
       expect(File.read('public_html/customize_test.html')).to eq(local_result)
@@ -177,13 +159,13 @@ describe Fronde::Templater do
         <!DOCTYPE html>
         <html>
           <head>
-        <!-- Fronde Template: 04d9fa11efccbebe205507cceace0b3c -->
             <title>My website</title>
         <meta property="test" content="TEST">
           </head>
           <body>
             <h1>My website</h1>
           </body>
+        <!-- Fronde Template: 04d9fa11efccbebe205507cceace0b3c -->
         </html>
       RESULT
       expect(File.read('public_html/customize_test.html')).to eq(local_result)
@@ -202,12 +184,12 @@ describe Fronde::Templater do
         <!DOCTYPE html>
         <html>
           <head>
-        <!-- Fronde Template: 1db4871b83a08057505303f8298c3060 -->
             <title>My website</title>
           </head>
           <body>
             <p>Toto tata</p>
           </body>
+        <!-- Fronde Template: 1db4871b83a08057505303f8298c3060 -->
         </html>
       RESULT
       expect(File.read('public_html/customize_test.html')).to eq(local_result)
@@ -240,13 +222,13 @@ describe Fronde::Templater do
         <!DOCTYPE html>
         <html>
           <head>
-        <!-- Fronde Template: 1db4871b83a08057505303f8298c3060 -->
             <!-- This is a test comment -->
             <title>My website</title>
           </head>
           <body>
             <p>Toto tata</p>
           </body>
+        <!-- Fronde Template: 1db4871b83a08057505303f8298c3060 -->
         </html>
       RESULT
       expect(File.read('public_html/customize_test2.html')).to eq(local_result)
@@ -301,7 +283,6 @@ describe Fronde::Templater do
         <!DOCTYPE html>
         <html>
           <head>
-        <!-- Fronde Template: 850906143b13df4a1d627f062fb667d0 -->
             <title>My website</title>
           </head>
           <body>
@@ -310,6 +291,7 @@ describe Fronde::Templater do
               <p>Lorem ipsum...</p>
             </div>
           </body>
+        <!-- Fronde Template: 850906143b13df4a1d627f062fb667d0 -->
         </html>
       HTML
       expect(File.read('public_html/customize_test.html')).to eq(result)
@@ -385,7 +367,6 @@ describe Fronde::Templater do
         <!DOCTYPE html>
         <html>
           <head>
-        <!-- Fronde Template: 850906143b13df4a1d627f062fb667d0 -->
             <title>My website</title>
           </head>
           <body>
@@ -394,6 +375,7 @@ describe Fronde::Templater do
               <p>Lorem ipsum...</p>
             </div>
           </body>
+        <!-- Fronde Template: 850906143b13df4a1d627f062fb667d0 -->
         </html>
       HTML
       expect(File.read('public_html/customize_test.html')).to eq(result)

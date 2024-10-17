@@ -109,6 +109,21 @@ module Fronde
         @data[:date].strftime('%Y%m%d%H%M%S')
       end
 
+      # Returns the path to the published version of this document.
+      #
+      # By default, this method returns the relative path to the published
+      # file. If the ~absolute~ argument is true, it will return the absolute
+      # path to the published file.
+      #
+      # @param absolute [Boolean] whether to display absolute or relative
+      #   published file path (default false)
+      # @return [String] the document key
+      def pub_file(absolute: false)
+        return @data[:pub_file] unless absolute
+
+        "#{@project['folder']}#{@data[:pub_file]}"
+      end
+
       # Formats given ~string~ with values of the current Org::File.
       #
       # This method expects to find percent-tags in the given ~string~
@@ -151,6 +166,7 @@ module Fronde
       #     org_file.format("Article written by %a the %d")
       #     => "Article written by Alice Smith the Wednesday 3rd July"
       #
+      # @param string [String] the template text to edit
       # @return [String] the given ~string~ after replacement occurs
       # rubocop:disable Layout/LineLength
       def format(string)
@@ -159,13 +175,18 @@ module Fronde
         #       %a (author), %c (creator), %C (input-file), %d (date),
         #       %e (email), %s (subtitle), %t (title), %T (timestamp),
         #       %v (html validation link)
+        localized_dates = I18n.with_locale(@data[:lang]) do
+          { short: @data[:date].l18n_short_date_string,
+            short_html: @data[:date].l18n_short_date_html,
+            long_html: @data[:date].l18n_long_date_html }
+        end
         string.gsub('%a', @data[:author])
               .gsub('%A', "<span class=\"author\">#{@data[:author]}</span>")
-              .gsub('%d', @data[:date].l18n_short_date_html)
-              .gsub('%D', @data[:date].l18n_long_date_html)
+              .gsub('%d', localized_dates[:short_html])
+              .gsub('%D', localized_dates[:long_html])
               .gsub('%F', project_data['atom_feed'] || '')
               .gsub('%h', project_data['domain'] || '')
-              .gsub('%i', @data[:date].l18n_short_date_string)
+              .gsub('%i', localized_dates[:short])
               .gsub('%I', @data[:date].xmlschema)
               .gsub('%k', @data[:keywords].join(', '))
               .gsub('%K', keywords_to_html)
@@ -191,18 +212,17 @@ module Fronde
       def write
         if ::File.directory? @file
           if @data[:title] == ''
-            raise R18n.t.fronde.error.org_file.no_file_or_title
+            raise I18n.t('fronde.error.org_file.no_file_or_title')
           end
 
           @file = ::File.join @file, "#{Slug.slug(@data[:title])}.org"
         else
-          file_dir = ::File.dirname @file
-          FileUtils.mkdir_p file_dir
+          FileUtils.mkdir_p ::File.dirname(@file)
         end
         ::File.write @file, @data[:content]
       end
 
-      def method_missing(method_name, *args, &block)
+      def method_missing(method_name, *args, &)
         reader_method = method_name.to_s.delete_suffix('=').to_sym
         if @data.has_key? reader_method
           return @data[reader_method] if reader_method == method_name
@@ -222,11 +242,13 @@ module Fronde
       end
 
       def to_h
-        fields = %w[author excerpt keywords timekey title url]
+        fields = %w[author excerpt keywords lang timekey title url]
         data = fields.to_h { |key| [key, send(key)] }
         data['published_body'] = extract_published_body
         pub_date = @data[:date]
-        data['published'] = pub_date.l18n_long_date_string(with_year: false)
+        data['published'] = I18n.with_locale(@data[:lang]) do
+          pub_date.l18n_long_date_no_year_string
+        end
         data['published_gemini_index'] = pub_date.strftime('%Y-%m-%d')
         data['published_xml'] = pub_date.xmlschema
         data['updated_xml'] = @data[:updated]&.xmlschema
@@ -244,13 +266,11 @@ module Fronde
         return source if source
 
         short_file = @file.sub(/^#{Dir.pwd}/, '.')
-        warn R18n.t.fronde.error.org_file.no_project(file: short_file)
+        warn I18n.t('fronde.error.org_file.no_project', file: short_file)
       end
 
       def find_source_for_org_file
-        Fronde::CONFIG.sources.find do |project|
-          project.source_for? @file
-        end
+        Fronde::CONFIG.sources.find { _1.source_for? @file }
       end
 
       def find_source_for_publication_file

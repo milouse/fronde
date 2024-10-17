@@ -2,7 +2,25 @@
 
 require 'rake'
 
-def write_base_files # rubocop:disable Metrics/MethodLength
+def add_some_contents
+  FileUtils.mkdir_p 'src/news'
+  org_content = <<~ORG
+    #+title: Index file
+    #+description: Nice description
+
+    Nice content.
+  ORG
+  File.write('src/index.org', org_content)
+  file1 = <<~ORG
+    #+title: Index file
+    #+keywords: toto, titi
+
+    Lorem ipsum sic habet…
+  ORG
+  File.write('src/news/test1.org', file1)
+end
+
+def write_base_files
   config = <<~CONF
     ---
     sources:
@@ -21,25 +39,12 @@ def write_base_files # rubocop:disable Metrics/MethodLength
   File.write('config.yml', config)
   Fronde::CONFIG.reset
   Fronde::CONFIG.write_org_lisp_config
-  FileUtils.mkdir_p 'src/news'
-  org_content = <<~ORG
-    #+title: Index file
-
-    My website
-  ORG
-  File.write('src/index.org', org_content)
-  file1 = <<~ORG
-    #+title: Index file
-    #+keywords: toto, titi
-
-    My website
-  ORG
-  File.write('src/news/test1.org', file1)
+  add_some_contents
   file2 = <<~ORG
     #+title: Index file
     #+keywords: toto
 
-    My website
+    Aliquam sed ex nulla
   ORG
   File.write('src/news/test2.org', file2)
 end
@@ -64,23 +69,26 @@ context 'with a testing website' do
     before do
       Fronde::CONFIG.reset
       Fronde::CONFIG.write_org_lisp_config
-      o = Fronde::Org::File.new(
-        'src/index.org',
-        title: 'My website',
-        content: "#+description: Nice description\n\nNice content."
-      )
-      o.write
+      add_some_contents
     end
 
-    it 'builds something' do
+    it 'builds default project', :aggregate_failures do
       rake(verbose: false).invoke_task('site:build')
       expect(File.exist?('public_html/index.html')).to be true
+      expect(File.exist?('public_html/news/test1.html')).to be true
     end
 
-    it 'builds something even in verbose mode' do
+    it 'builds verbosely default project', :aggregate_failures do
       # For coverage
       rake(verbose: true).invoke_task('site:build')
       expect(File.exist?('public_html/index.html')).to be true
+      expect(File.exist?('public_html/news/test1.html')).to be true
+    end
+
+    it 'builds a single file', :aggregate_failures do
+      rake(verbose: false).invoke_task('site:build_file[src/index.org]')
+      expect(File.exist?('public_html/index.html')).to be true
+      expect(File.exist?('public_html/news/test1.html')).to be false
     end
 
     it 'build something for gemini projects' do
@@ -139,7 +147,7 @@ context 'with a testing website' do
       o = Fronde::Org::File.new('public_gmi/index.gmi')
       data = o.to_h
       content = <<~CONTENT
-        # My website
+        # Index file
 
         Nice content.
 
@@ -152,7 +160,7 @@ context 'with a testing website' do
       version_rx = 'GNU/Emacs [0-9.]+ \(Org mode [0-9.]+\), ' \
                    'and published with Fronde [0-9.]+'
       page_content = data['published_body'].gsub(
-        /[FMSTW][a-z]+ \d{1,2} of [ADFJMNOS][a-z]+, \d{4} at \d{2}:\d{2}/,
+        /[FMSTW][a-z]+, [ADFJMNOS][a-z]+ \d{1,2}, \d{4} at \d{2}:\d{2}/,
         '__PUB_DATE__'
       ).gsub(/#{version_rx}/, '__VERSION__')
       expect(page_content).to eq(content)
@@ -171,7 +179,7 @@ context 'with a testing website' do
       expect(File.read('public_html/index.html')).to eql(old_content)
     end
 
-    it 'builds again when call with force option' do
+    it 'builds again when called with force option' do
       rake(verbose: false).invoke_task('site:build')
       old_content = File.read('public_html/index.html')
       custom_footer = {
@@ -181,6 +189,32 @@ context 'with a testing website' do
       Fronde::CONFIG.load_test(new_conf)
       Fronde::CONFIG.write_org_lisp_config
       rake(verbose: false).invoke_task('site:build[true]')
+      expect(File.read('public_html/index.html')).not_to eql(old_content)
+    end
+
+    it 'does not build again a single file with successive call' do
+      rake(verbose: false).invoke_task('site:build')
+      old_content = File.read('public_html/index.html')
+      custom_footer = {
+        'org-html' => { 'html-postamble' => '<footer>Modified!</footer>' }
+      }
+      new_conf = Fronde::CONFIG.settings.merge(custom_footer)
+      Fronde::CONFIG.load_test(new_conf)
+      Fronde::CONFIG.write_org_lisp_config
+      rake(verbose: false).invoke_task('site:build_file[src/index.org]')
+      expect(File.read('public_html/index.html')).to eql(old_content)
+    end
+
+    it 'builds again a single file when called with force option' do
+      rake(verbose: false).invoke_task('site:build')
+      old_content = File.read('public_html/index.html')
+      custom_footer = {
+        'org-html' => { 'html-postamble' => '<footer>Modified!</footer>' }
+      }
+      new_conf = Fronde::CONFIG.settings.merge(custom_footer)
+      Fronde::CONFIG.load_test(new_conf)
+      Fronde::CONFIG.write_org_lisp_config
+      rake(verbose: false).invoke_task('site:build_file[src/index.org, true]')
       expect(File.read('public_html/index.html')).not_to eql(old_content)
     end
 
@@ -201,6 +235,24 @@ context 'with a testing website' do
         output(
           %r{No project found for .+/orphan.html. Publication will fail.}
         ).to_stderr
+      )
+    end
+
+    it 'warns about orphaned tag files' do
+      old_conf = Fronde::CONFIG.settings.merge
+      old_conf['sources'] = [
+        { 'name' => 'org', 'path' => 'src', 'target' => '.',
+          'is_blog' => true }
+      ]
+      Fronde::CONFIG.load_test(old_conf)
+      Fronde::CONFIG.write_org_lisp_config
+      FileUtils.mkdir_p 'src/tags'
+      FileUtils.touch ['src/tags/test.org', 'src/tags/index.org']
+      allow($stdin).to receive(:gets).and_return("n\n")
+      alert = 'The file ./src/tags/test.org refers to a tag, ' \
+              'which is no more in use.'
+      expect { rake.invoke_task('site:clean') }.to(
+        output(/#{alert}/).to_stdout
       )
     end
 

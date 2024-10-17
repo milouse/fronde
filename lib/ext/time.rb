@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require_relative 'r18n'
-using R18nPatch
-
 # Monkey patch to add some helpers
 module TimePatch
   refine Time do
@@ -10,7 +7,7 @@ module TimePatch
     #
     # @return [String] the localized Time string representation
     def l18n_short_date_string
-      R18n.l to_date
+      I18n.l to_date
     end
 
     # Format the current Time as a HTML `time` tag showing a short date.
@@ -22,11 +19,17 @@ module TimePatch
 
     # Returns the current Time instance as a localized long string.
     #
-    # @param with_year [Boolean] whether or not the string must contain
-    #   the year
     # @return [String] the localized Time string representation
-    def l18n_long_date_string(with_year: true)
-      R18n.t.long_date_string(self, with_year: with_year)
+    def l18n_long_date_string
+      I18n.l self, format: :long
+    end
+
+    # Returns the current Time instance as a localized long string
+    #   without year.
+    #
+    # @return [String] the localized Time string representation
+    def l18n_long_date_no_year_string
+      I18n.l self, format: :long_no_year
     end
 
     # Format the current Time as a HTML `time` tag showing a long date.

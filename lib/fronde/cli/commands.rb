@@ -71,26 +71,26 @@ module Fronde
         @command = @argv.shift || 'basic' if @command == 'help'
         cmd_opt = OptParse.command_options(@command)
         label = cmd_opt[:label] || @command
-        output = [format_label(R18n.t.fronde.bin.usage(label))]
+        output = [format_label(I18n.t('fronde.bin.usage', label:))]
         cmd = cmd_opt[:name] || @command
-        output << format_label(R18n.t.fronde.bin.commands[cmd])
+        output << format_label(I18n.t("fronde.bin.commands.#{cmd}"))
         output << OptParse.help_command_body(cmd)
-        warn output.join
+        puts output.join
         true
       end
 
       private
 
       def format_label(label)
-        return '' if label == '' || label.is_a?(R18n::Untranslated)
+        return '' if label == '' || label.start_with?('Translation missing:')
 
-        format("%<label>s\n\n", label: label)
+        format("%<label>s\n\n", label:)
       end
 
       def file_name_from_title
-        title = @options[:title] || R18n.t.fronde.bin.options.default_title
+        title = @options[:title] || I18n.t('fronde.bin.options.default_title')
         # No title, nor a reliable file_path? Better abort
-        raise R18n.t.fronde.error.bin.no_file if title == ''
+        raise I18n.t('fronde.error.bin.no_file') if title == ''
 
         "#{Fronde::Slug.slug(title)}.org"
       end

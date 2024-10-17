@@ -35,11 +35,11 @@ module Fronde
         raise e
         # :nocov: not sure how to emulate a Ctrl+c in rspec
       rescue Interrupt => e
-        show_message Rainbow(R18n.t.fronde.bin.interrupted).red, "\n"
+        show_message Rainbow(I18n.t('fronde.bin.interrupted')).red, "\n"
         raise e
         # :nocov:
       else
-        show_message Rainbow(R18n.t.fronde.bin.done).green, "\n"
+        show_message Rainbow(I18n.t('fronde.bin.done')).green, "\n"
       end
 
       class << self
@@ -56,10 +56,16 @@ module Fronde
         #
         # @param thread [Thread] the long-running operation to decorate
         # @param message [String] the message to display before the throbber
+        # @param verbose [Boolean] whether the decoration should be shown
+        #   or skipped
         # @return [void]
-        def run(thread, message)
-          throbber = new(thread, message)
-          throbber.run
+        def run(thread, message, verbose)
+          if verbose
+            thread.join
+          else
+            throbber = new(thread, message)
+            throbber.run
+          end
         end
       end
 
@@ -93,8 +99,8 @@ module Fronde
           format(
             "%<message>s %<label>s\n%<explanation>s",
             message: @message,
-            label: Rainbow(R18n.t.fronde.error.bin.label).bold.red,
-            explanation: Rainbow(R18n.t.fronde.error.bin.explanation).bold
+            label: Rainbow(I18n.t('fronde.error.bin.label')).bold.red,
+            explanation: Rainbow(I18n.t('fronde.error.bin.explanation')).bold
           )
         )
       end

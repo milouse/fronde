@@ -13,17 +13,17 @@ module Fronde
       end
 
       def pull(test: false)
-        run command(test: test) + [@remote_path, @local_path]
+        run command(test:) + [@remote_path, @local_path]
       end
 
       def push(test: false)
-        run command(test: test) + [@local_path, @remote_path]
+        run command(test:) + [@local_path, @remote_path]
       end
 
       private
 
       def run(cmd)
-        warn cmd.join(' ') if @verbose
+        puts cmd.join(' ') if @verbose
         # Be precise about Kernel to allow mock in rspec
         Kernel.system(*cmd)
       end

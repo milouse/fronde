@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'yaml'
-require 'r18n-core'
+require 'i18n'
 require 'singleton'
 
 require_relative 'config/lisp'
@@ -141,7 +141,7 @@ module Fronde
         get('sources', default_sources).filter_map do |source_conf|
           config = Source.canonical_config source_conf.dup
           unless config['path']
-            warn R18n.t.fronde.error.source.no_path(source: config.inspect)
+            warn I18n.t('fronde.error.source.no_path', source: config.inspect)
             next
           end
           Source.new_from_config config
@@ -153,7 +153,8 @@ module Fronde
         return path unless collection[type].has_key?(path)
 
         warn(
-          R18n.t.fronde.error.source.duplicate(
+          I18n.t(
+            'fronde.error.source.duplicate',
             source: source['name'], type: type
           )
         )
@@ -182,7 +183,8 @@ module Fronde
       def warn_on_existing_inclusion(type, other, possible_matchs, sources)
         possible_matchs.each do |match|
           warn(
-            R18n.t.fronde.error.source.inclusion(
+            I18n.t(
+              'fronde.error.source.inclusion',
               source: sources[match]['title'],
               other_source: other, type: type
             )
@@ -221,8 +223,8 @@ module Fronde
   CONFIG = Config::Store.instance
 end
 
-R18n.default_places = File.expand_path('../../locales', __dir__)
-R18n::Filters.on(:named_variables)
-R18n.set Fronde::CONFIG.get('lang')
+i18n_glob = File.expand_path('../../locales', __dir__)
+I18n.load_path = Dir.glob("#{i18n_glob}/*.yml")
+I18n.default_locale = Fronde::CONFIG.get('lang')
 
 Fronde::CONFIG.load_sources

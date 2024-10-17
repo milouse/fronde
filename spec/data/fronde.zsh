@@ -12,20 +12,32 @@ __fronde_new(){
         '(-v --verbose)'{-v,--verbose}
 }
 
+(( $+functions[__fronde_update] )) ||
+__fronde_update(){
+    _arguments \
+        '(-v --verbose)'{-v,--verbose}
+}
+
 (( $+functions[__fronde_open] )) ||
 __fronde_open(){
     _arguments \
         '(-a --author)'{-a,--author}':AUTHOR:' \
         '(-l --lang)'{-l,--lang}':LOCALE:' \
         '(-t --title)'{-t,--title}':TITLE:' \
-        '(-v --verbose)'{-v,--verbose} \
         '1:file:_files -g \*.org'
 }
 
 (( $+functions[__fronde_build] )) ||
 __fronde_build(){
     _arguments \
-        '(-f --force)'{-f,--force}
+        '(-f --force)'{-f,--force} \
+        '(-v --verbose)'{-v,--verbose}
+}
+
+(( $+functions[__fronde_publish] )) ||
+__fronde_publish(){
+    _arguments \
+        '(-v --verbose)'{-v,--verbose}
 }
 
 

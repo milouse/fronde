@@ -14,4 +14,12 @@ context 'with an example project' do
       output(proof_content).to_stdout
     )
   end
+
+  it 'generates a fish completion file' do
+    proof = File.expand_path 'data/fronde.fish', __dir__
+    proof_content = File.read(proof)
+    expect { rake.invoke_task('cli:fish_complete') }.to(
+      output(proof_content).to_stdout
+    )
+  end
 end

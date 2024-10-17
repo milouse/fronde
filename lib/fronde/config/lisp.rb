@@ -6,9 +6,6 @@ require_relative '../version'
 require_relative '../org'
 require_relative 'helpers'
 
-require_relative '../../ext/r18n'
-using R18nPatch
-
 module Fronde
   module Config
     # This module contains utilitary methods to ease ~org-config.el~
@@ -33,7 +30,7 @@ module Fronde
           'work_dir' => workdir,
           'fronde_data_dir' => File.expand_path('data', __dir__),
           'org_version' => Fronde::Org.current_version,
-          'long_date_fmt' => R18n.t.full_datetime_format.to_s,
+          'long_date_fmt' => I18n.t('time.formats.long'),
           'author' => { 'email' => get('author_email', ''),
                         'name' => get('author') },
           'domain' => get('domain'),

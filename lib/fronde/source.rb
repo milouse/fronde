@@ -58,11 +58,11 @@ module Fronde
     def source_for(file_name)
       relative_file_path = file_name.delete_prefix "#{publication_path}/"
       # file_name does not begin with source path.
-      return nil if relative_file_path == file_name
+      return if relative_file_path == file_name
 
       # Looks like a file at a deeper level, but current source is not
       # recursive.
-      return nil if relative_file_path.include?('/') && !recursive?
+      return if relative_file_path.include?('/') && !recursive?
 
       # Looks like a match. But does a source file for this one actually
       # exists?
@@ -70,7 +70,7 @@ module Fronde
         /#{@config['ext']}\z/, '.org'
       )
       source_path = File.join(@config['path'], relative_source_path)
-      return nil unless File.file?(source_path)
+      return unless File.file?(source_path)
 
       source_path
     end
@@ -111,7 +111,7 @@ module Fronde
     def publication_path
       return @config['publication_path'] if @config['publication_path']
 
-      publish_in = [File.expand_path(@config['folder']), @config['target']]
+      publish_in = [@config['folder'], @config['target']]
       @config['publication_path'] = publish_in.join('/').delete_suffix('/')
     end
 

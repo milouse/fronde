@@ -10,13 +10,13 @@ module Fronde
         '-a' => { long: 'author' },
         '-f' => { long: 'force', boolean: true },
         '-h' => { long: 'help', boolean: true, method: :on_tail,
-                  help: R18n.t.fronde.bin.options.help },
+                  help: I18n.t('fronde.bin.options.help') },
         '-l' => { long: 'lang', keyword: 'LOCALE' },
         '-o' => { long: 'output', keyword: 'FORMAT', choices: %w[gemini html] },
         '-t' => { long: 'title' },
         '-v' => { long: 'verbose', boolean: true, method: :on_tail },
         '-V' => { long: 'version', boolean: true, method: :on_tail,
-                  help: R18n.t.fronde.bin.options.version }
+                  help: I18n.t('fronde.bin.options.version') }
       }.freeze
 
       # TODO: jekyll new [path] / jekyll build / jekyll clean / jekyll serve
@@ -28,13 +28,13 @@ module Fronde
       FRONDE_COMMANDS = {
         'new' => { opts: ['-a', '-l', '-o', '-t', '-v'], label: 'new <path>' },
         'init' => { alias: 'new' },
-        'update' => {},
+        'update' => { opts: ['-v'] },
         'config' => { alias: 'update' },
         'preview' => {},
-        'open' => { opts: ['-a', '-l', '-t', '-v'], label: 'open <path>' },
+        'open' => { opts: ['-a', '-l', '-t'], label: 'open <path>' },
         'edit' => { alias: 'open' },
-        'build' => { opts: ['-f'] },
-        'publish' => {},
+        'build' => { opts: ['-f', '-v'] },
+        'publish' => { opts: ['-v'] },
         'help' => {},
         'basic' => { opts: ['-h', '-V'], label: '<command>' }
       }.freeze
@@ -59,7 +59,7 @@ module Fronde
             config = [short, long]
           else
             key = opt[:keyword] || opt[:long].upcase
-            config = [short, format('%<long>s %<key>s', long: long, key: key)]
+            config = [short, format('%<long>s %<key>s', long:, key:)]
           end
           config.push opt[:choices], opt[:help]
           config.compact
@@ -86,9 +86,9 @@ module Fronde
           command_opts_doc = summarize_command(command)
           return '' if command_opts_doc == ''
 
-          body = [R18n.t.fronde.bin.options.cmd_title, command_opts_doc]
+          body = [I18n.t('fronde.bin.options.cmd_title'), command_opts_doc]
           if command == 'basic'
-            body += ['', R18n.t.fronde.bin.commands.cmd_title, list_commands]
+            body += ['', I18n.t('fronde.bin.commands.cmd_title'), list_commands]
           end
           body.join("\n")
         end
@@ -102,9 +102,9 @@ module Fronde
 
             line = ['   ', cmd.ljust(10)]
             if opt.has_key? :alias
-              line << R18n.t.fronde.bin.commands.alias(opt[:alias])
+              line << I18n.t('fronde.bin.commands.alias', alias: opt[:alias])
             else
-              line << R18n.t.fronde.bin.commands[cmd]
+              line << I18n.t("fronde.bin.commands.#{cmd}")
             end
             line.join(' ')
           end.join("\n")

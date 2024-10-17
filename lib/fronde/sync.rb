@@ -25,8 +25,8 @@ module Fronde
       method, remote_path = extract_method_and_remote type
       public_folder = Fronde::CONFIG.get("#{type}_public_folder")
       klass = Kernel.const_get("::Fronde::Sync::#{method.capitalize}")
-      syncer = klass.new(remote_path, public_folder, verbose: verbose)
-      Thread.new { syncer.send(direction, test: test) }
+      syncer = klass.new(remote_path, public_folder, verbose:)
+      Thread.new { syncer.send(direction, test:) }
     end
   end
 end

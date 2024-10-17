@@ -2,5 +2,5 @@
 
 module Fronde
   # @return [String] the version number of the current Fronde release.
-  VERSION = '0.5.0'
+  VERSION = '0.6.0'
 end

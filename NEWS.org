@@ -1,6 +1,31 @@
 #+title: News from Fronde
 #+language: en
 
+* Oct. 2024 - v0.6 release
+
+This release also continues the stability work.
+
+Here are the most interesting changes:
+
+** Features
+
+- Replace ~r18n-core~ dependency by more common ~i18n~ gem.
+- Add a new rake task to generate a [[https://fishshell.com][Fish shell]] completion file.
+- Detect orphaned keywords in the ~site:clean~ rake task, to allow you
+  to remove useless files.
+- Add a new rake task to build a single file instead of the whole
+  project.
+
+** Fixes
+
+- Fix build time regression by using a keywords cache directly exposed
+  to Org internals.
+- Correctly expose the verbose option to the right commands in the CLI
+  help messages.
+- Never automatically eval code blocks, as it clearly opens a security flaw.
+- Never use the throbber in verbose mode.
+
+
 * Jul. 2024 - v0.5 release
 
 This new release continues the stability work.

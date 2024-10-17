@@ -8,7 +8,7 @@ module Fronde
   # Generates website indexes and atom feeds for all the org documents
   #   keywords.
   class Index
-    attr_reader :date
+    attr_reader :date, :project
 
     def initialize(project)
       @project = project
@@ -31,7 +31,8 @@ module Fronde
     def sort_by(kind)
       accepted_values = %i[name weight]
       unless accepted_values.include?(kind)
-        error_msg = R18n.t.fronde.error.index.wrong_sort_kind(
+        error_msg = I18n.t(
+          'fronde.error.index.wrong_sort_kind',
           kind: kind, accepted_values: accepted_values.inspect
         )
         raise ArgumentError, error_msg
@@ -41,6 +42,10 @@ module Fronde
       end.reverse
       # Reverse in order to have most important or A near next prompt
       # and avoid to scroll to find the beginning of the list.
+    end
+
+    def emacs_keywords
+      @tags_names.map { |slug, title| "#{title}\x1f#{slug}" }.join("\x1e")
     end
 
     class << self
@@ -91,7 +96,7 @@ module Fronde
       all_keys = all_tags
       {
         by_name: all_keys.sort,
-        by_weight: all_keys.sort_by { @index[_1].length }.reverse
+        by_weight: all_keys.sort_by { [-@index[_1].length, _1] }
       }
     end
   end

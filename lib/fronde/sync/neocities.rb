@@ -35,7 +35,7 @@ module Fronde
 
       def local_list
         Dir.chdir(@public_folder) do
-          Dir['**/*'].map { |file| neocities_stat(file) }
+          Dir.glob('**/*').map { |file| neocities_stat(file) }
         end
       end
 
@@ -52,19 +52,19 @@ module Fronde
         file_list = remote_list
         finish
         orphans = select_orphans(file_list, local_list) do |path|
-          warn "deleting #{path}" if @verbose
+          puts I18n.t('fronde.neocities.deleting', path:) if @verbose
 
           "#{@public_folder}/#{path}"
         end
         File.unlink(*orphans) unless test
-        download_all file_list, test: test
+        download_all(file_list, test:)
         nil # Mute this method
       end
 
       def push(test: false)
         file_list = local_list
-        remove_remote_orphans file_list, test: test
-        upload_all file_list, test: test
+        remove_remote_orphans(file_list, test:)
+        upload_all(file_list, test:)
         finish
       end
 
@@ -84,10 +84,10 @@ module Fronde
         data
       end
 
-      def select_orphans(to_apply, current_list, &block)
+      def select_orphans(to_apply, current_list, &)
         paths_to_apply = to_apply.map { _1['path'] }
         current_paths = current_list.map { _1['path'] }
-        (current_paths - paths_to_apply).filter_map(&block)
+        (current_paths - paths_to_apply).filter_map(&)
       end
 
       def remove_remote_orphans(file_list, test: false)
@@ -98,7 +98,7 @@ module Fronde
           # the index.html file to be removed.
           next if PROTECTED_FILES.include? path
 
-          warn "deleting #{path}" if @verbose
+          puts I18n.t('fronde.neocities.deleting', path:) if @verbose
           path
         end
         request.form_data = { 'filenames[]' => orphan_paths }
@@ -114,7 +114,7 @@ module Fronde
             file_list.each do |file_data|
               path = file_data['path']
               file_data['uri'] = "https://#{publish_domain}/#{path}"
-              download_file http, file_data, test: test
+              download_file http, file_data, test:
             end
           end
         end
@@ -123,12 +123,12 @@ module Fronde
       def download_file(http, file_data, test: false)
         path = file_data['path']
         if file_data['is_directory']
-          warn "#{path}/" if @verbose
+          puts "#{path}/" if @verbose
           FileUtils.mkdir_p path unless test
           return
         end
 
-        warn path if @verbose
+        puts path if @verbose
 
         content = fetch_file_content(
           http, file_data['uri'], file_data['sha1_hash']
@@ -146,7 +146,7 @@ module Fronde
         check = Digest::SHA1.hexdigest content
         return content if check == sha1sum
 
-        warn "SHA1 hash differ for #{uri}"
+        warn I18n.t('fronde.neocities.sha1_differ', uri:)
       end
 
       def save_file(path, content, updated_at)
@@ -163,7 +163,7 @@ module Fronde
             next if file_data['is_directory']
 
             path = file_data['path']
-            warn path if @verbose
+            puts path if @verbose
             [path, File.new(path)]
           end
         end

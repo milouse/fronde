@@ -30,7 +30,7 @@ module Fronde
       FileUtils.mkdir_p "#{@project['path']}/tags"
       @index.each_key do |tag|
         write_org(tag)
-        warn R18n.t.fronde.index.index_generated(tag: tag) if verbose
+        puts I18n.t('fronde.index.index_generated', tag:) if verbose
       end
       write_blog_home_page(verbose)
     end
@@ -47,7 +47,9 @@ module Fronde
       entries.map! do |article|
         published = article['published']
         unless published == ''
-          article['published'] = R18n.t.fronde.index.published_on published
+          article['published'] = I18n.with_locale(article['lang']) do
+            I18n.t('fronde.index.published_on', date: published)
+          end
         end
         article
       end
@@ -60,7 +62,7 @@ module Fronde
         'domain' => Fronde::CONFIG.get('domain'),
         'lang' => Fronde::CONFIG.get('lang'),
         'author' => Fronde::CONFIG.get('author'),
-        'unsorted' => R18n.t.fronde.index.unsorted,
+        'unsorted' => I18n.t('fronde.index.unsorted'),
         'entries' => entries
       )
     end
@@ -73,11 +75,11 @@ module Fronde
             'weight' => @index[tag].length
           }
         end
-        { 'title' => R18n.t.fronde.index.send(title), 'tags' => all_tags }
+        { 'title' => I18n.t("fronde.index.#{title}"), 'tags' => all_tags }
       end
       Config::Helpers.render_liquid_template(
         File.read(File.expand_path('./data/all_tags.org', __dir__)),
-        'title' => R18n.t.fronde.index.all_tags,
+        'title' => I18n.t('fronde.index.all_tags'),
         'lang' => Fronde::CONFIG.get('lang'),
         'author' => Fronde::CONFIG.get('author'),
         'domain' => Fronde::CONFIG.get('domain'),
@@ -90,7 +92,7 @@ module Fronde
     def write_blog_home_page(verbose)
       orgdest = format('%<root>s/index.org', root: @project['path'])
       if verbose
-        warn R18n.t.fronde.org.generate_blog_index(name: @project['name'])
+        puts I18n.t('fronde.org.generate_blog_index', name: @project['name'])
       end
       File.write(orgdest, blog_home_page)
     end

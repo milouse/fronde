@@ -10,7 +10,7 @@ module Fronde
     class << self
       def current_version
         # Do not crash if Org is not yet installed (and thus return nil)
-        Dir['lib/org-*'].first&.delete_prefix('lib/org-')
+        Dir.glob('lib/org-*').first&.delete_prefix('lib/org-')
       end
 
       # Fetch and return the last published version of Org.
@@ -97,8 +97,8 @@ module Fronde
         FileUtils.mv "org-mode-release_#{version}", target
         # Fix a weird unknown package version
         ::File.write("#{target}/mk/version.mk", "ORGVERSION ?= #{version}")
-        system(*make_org_cmd(target, 'compile', verbose: verbose))
-        system(*make_org_cmd(target, 'autoloads', verbose: verbose))
+        system(*make_org_cmd(target, 'compile', verbose:))
+        system(*make_org_cmd(target, 'autoloads', verbose:))
       end
     end
   end

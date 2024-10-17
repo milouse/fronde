@@ -10,12 +10,9 @@ class NilTime
     ''
   end
 
-  def l18n_short_date_string
-    ''
-  end
-
-  def l18n_long_date_string(*)
-    ''
+  %i[l18n_short_date_string l18n_long_date_string
+     l18n_long_date_no_year_string].each do |name|
+    define_method(name) { '' }
   end
 
   def l18n_short_date_html

@@ -8,9 +8,9 @@ module Fronde
         def org_default_postamble
           format(
             "📅 %<date>s\n📝 %<author>s %<creator>s",
-            author: R18n.t.fronde.org.postamble.written_by,
-            creator: R18n.t.fronde.org.postamble.with_emacs,
-            date: R18n.t.fronde.org.postamble.last_modification
+            author: I18n.t('fronde.org.postamble.written_by'),
+            creator: I18n.t('fronde.org.postamble.with_emacs'),
+            date: I18n.t('fronde.org.postamble.last_modification')
           )
         end
       end
@@ -20,7 +20,7 @@ module Fronde
       def fill_in_specific_config
         @config.merge!(
           'type' => 'gemini', 'ext' => '.gmi', 'mime_type' => 'text/gemini',
-          'folder' => CONFIG.get('gemini_public_folder')
+          'folder' => File.expand_path(CONFIG.get('gemini_public_folder'))
         )
       end
 

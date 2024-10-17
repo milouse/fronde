@@ -29,7 +29,9 @@ context 'when managing Org installation' do
     allow(Fronde::Org).to receive(:download).and_return('test')
     expect do
       rake(verbose: true).invoke_task('var/tmp/org.tar.gz')
-    end.to output("Org version test has been downloaded.\n").to_stderr
+    end.to output(
+      "mkdir -p var/tmp\nOrg version test has been downloaded.\n"
+    ).to_stdout
   end
 
   it 'does not download Org if a copy is cached', :aggregate_failures do
@@ -73,7 +75,7 @@ context 'when managing Org installation' do
   it 'compiles Org successfully' do
     copy_org_tarball_to_fake_tmp
     expect { rake(verbose: true).invoke_task('org:compile') }.to(
-      output(/Org version [0-9.]+ has been locally installed./).to_stderr
+      output(/Org version [0-9.]+ has been locally installed./).to_stdout
     )
   end
 

@@ -11,6 +11,9 @@ CLOBBER.push(
   'var/lib/org-config.el', 'lib/htmlize.el'
 )
 
+HTMLIZE_TAG = 'release/1.58'
+OX_GMI_TAG = 'v0.2'
+
 namespace :org do
   directory 'var/tmp'
 
@@ -19,37 +22,34 @@ namespace :org do
     # Weird Rake issue, still executing the task even if the file exists
     next if File.exist? 'var/tmp/org.tar.gz'
 
-    download = Thread.new { Fronde::Org.download }
-    if verbose
-      warn R18n.t.fronde.tasks.org.downloaded(version: download.value)
-    else
-      Fronde::CLI::Throbber.run(download, R18n.t.fronde.tasks.org.downloading)
+    download = Thread.new do
+      version = Fronde::Org.download
+      puts I18n.t('fronde.tasks.org.downloaded', version:) if verbose
     end
+    Fronde::CLI::Throbber.run(
+      download, I18n.t('fronde.tasks.org.downloading'), verbose
+    )
   rescue RuntimeError, Interrupt
-    warn R18n.t.fronde.tasks.org.no_download if verbose
+    warn I18n.t('fronde.tasks.org.no_download') if verbose
   end
 
   desc 'Compile Org'
   multitask compile: ['var/tmp/org.tar.gz', 'lib'] do |task|
     # No need to force fetch last version as it is only interesting as
     # part of the upgrade task
-    org_version = Fronde::Org.last_version
+    version = Fronde::Org.last_version
 
-    org_dir = "lib/org-#{org_version}"
+    org_dir = "lib/org-#{version}"
     next if Dir.exist?("#{org_dir}/lisp")
 
     build = Thread.new do
-      Fronde::Org.compile(
-        task.prerequisites[0], org_version, org_dir, verbose: verbose
-      )
+      Fronde::Org.compile(task.prerequisites[0], version, org_dir, verbose:)
       Dir.glob('lib/org-[0-9.]*').each { rm_r _1 unless _1 == org_dir }
+      puts I18n.t('fronde.tasks.org.installed', version:) if verbose
     end
-    if verbose
-      build.join
-      warn R18n.t.fronde.tasks.org.installed(version: org_version)
-    else
-      Fronde::CLI::Throbber.run(build, R18n.t.fronde.tasks.org.installing)
-    end
+    Fronde::CLI::Throbber.run(
+      build, I18n.t('fronde.tasks.org.installing'), verbose
+    )
   rescue RuntimeError, Interrupt
     next
   end
@@ -58,14 +58,14 @@ namespace :org do
 
   file 'lib/htmlize.el' => 'lib' do
     htmlize = URI(
-      'https://raw.githubusercontent.com/hniksic/emacs-htmlize/master/htmlize.el'
+      "https://raw.githubusercontent.com/hniksic/emacs-htmlize/refs/tags/#{HTMLIZE_TAG}/htmlize.el"
     ).open.read
     File.write 'lib/htmlize.el', htmlize
   end
 
   file 'lib/ox-gmi.el' => 'lib' do
     ox_gmi = URI(
-      'https://git.umaneti.net/ox-gmi/plain/ox-gmi.el'
+      "https://git.umaneti.net/ox-gmi/plain/ox-gmi.el?h=#{OX_GMI_TAG}"
     ).open.read
     File.write 'lib/ox-gmi.el', ox_gmi
   end

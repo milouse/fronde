@@ -1,0 +1,20 @@
+function __fronde_main_commands
+  echo {{ comcomp }}
+end
+
+function __fronde_no_command_yet
+  set -f cmd (__fish_print_cmd_args_without_options)
+  {%- for com in commands %}
+  {% unless forloop.first %}and {% endunless %}not contains {{ com }} $cmd
+  {%- endfor %}
+end
+
+complete -c fronde -e
+complete -c fronde -f
+complete -c fronde -x -n '__fronde_no_command_yet' -a '(__fronde_main_commands)'
+complete -c fronde -n 'contains help (__fish_print_cmd_args_without_options)' -a '{{ commands | join ' ' }}'
+complete -c fronde -n 'contains new (__fish_print_cmd_args_without_options)' -F
+complete -c fronde -n 'contains open (__fish_print_cmd_args_without_options)' -F
+{%- for compopt in details %}
+complete -c fronde{% unless compopt.command == 'basic' %} -n 'contains {{ compopt.command }} (__fish_print_cmd_args_without_options)'{% endunless %} -s {{ compopt.short_no_dash }} -l {{ compopt.long_no_dash }}{% if compopt.keyword %} -r{% endif %}{% if compopt.choices %} -a '{{ compopt.choices | join ' ' }}'{% endif %} -d {% if compopt.help %}'{{ compopt.help }}'{% else %}{{ compopt.long_no_dash | capitalize }}{% endif %}
+{%- endfor %}

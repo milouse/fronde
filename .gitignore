@@ -3,6 +3,7 @@
 fronde-*.gem
 doc
 coverage
+TAGS
 _minted-DOCUMENTATION
 DOCUMENTATION.*
 !DOCUMENTATION.org
