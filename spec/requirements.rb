@@ -1,9 +1,13 @@
 # frozen_string_literal: true
 
-require 'fileutils'
-require 'simplecov'
-
 require 'liquid'
+require 'fileutils'
+
+require 'simplecov'
+if ENV.fetch('COVERAGE', 'html') == 'cobertura'
+  require 'simplecov-cobertura'
+  SimpleCov.formatter = SimpleCov::Formatter::CoberturaFormatter
+end
 
 SimpleCov.start do
   # Activate new covering precision

@@ -13,3 +13,5 @@ group :development do
   gem 'simplecov', '~> 0.22'
   gem 'yard', '~> 0.9'
 end
+
+gem 'simplecov-cobertura', '~> 2.1', group: :ci

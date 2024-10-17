@@ -12,7 +12,14 @@ rubocop:
 
 rspec:
   stage: test
+  variables:
+    COVERAGE: cobertura
   script:
     - apk add -U emacs-nox ncurses
     - rspec
-  coverage: '/\(\d+\.\d+\%\) covered./'
+  coverage: '/LOC \(\d+\.\d+\%\) covered/'
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage/coverage.xml
