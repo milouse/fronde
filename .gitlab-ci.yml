@@ -15,4 +15,4 @@ rspec:
   script:
     - apk add -U emacs-nox ncurses
     - rspec
-  coverage: '/\(\d+\.\d+\%\) covered./'
+  coverage: '/Line Coverage: \(\d+\.\d+\%\)/'
