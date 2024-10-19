@@ -27,12 +27,6 @@ the publication process.
 - Can use different themes for different sources
 - Supports tags and [[https://en.wikipedia.org/wiki/Atom_(Web_standard)][ATOM feeds]]
 
-* Announcements
-
-See the following NEWS.org file:
-
-[[./NEWS.org][Latest news]]
-
 * Quick install
 
 Fronde is a [[https://rubygems.org/][Ruby gem]]. You need a working Ruby environment to use it. We
