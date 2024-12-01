@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'shellwords'
 require_relative 'helpers'
 require_relative 'opt_parse'
 require_relative '../slug'
@@ -47,8 +48,7 @@ module Fronde
       end
 
       def fronde_open
-        editor = ENV['EDITOR'] || ENV['VISUAL'] || 'emacs'
-        cmd = [editor]
+        cmd = (ENV['EDITOR'] || ENV['VISUAL'] || 'emacs').shellsplit
         file_path = @argv.first || Dir.pwd
         unless File.file?(file_path)
           # file_path may be updated with title given in options
@@ -58,7 +58,7 @@ module Fronde
           cmd << '+6'
         end
         cmd << file_path
-        system(*cmd)
+        system(*cmd, exception: true)
       end
 
       def fronde_publish
