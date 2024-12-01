@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    fronde (0.6.1)
+    fronde (0.6.2)
       base64 (~> 0.1)
       bigdecimal (~> 3.1)
       i18n (~> 1.14)
