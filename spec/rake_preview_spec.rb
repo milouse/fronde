@@ -8,10 +8,10 @@ require 'digest/md5'
 def fetch_test_content(path)
   page_content = URI("http://localhost:5000/#{path}").open.read
   # Ensure tests always pass, whatever charset is generated
-  page_content.gsub!('charset=UTF-8', 'charset=utf-8')
-  page_content.gsub(
-    /[FMSTW][a-z]+, [ADFJMNOS][a-z]+ \d{1,2}, \d{4} at \d{2}:\d{2}/,
-    '__PUB_DATE__'
+  page_content.sub!('charset=UTF-8', 'charset=utf-8')
+  page_content.sub(
+    /(?<date>[FMSTW][a-z]+, [ADFJMNOS][a-z]+ \d{1,2}, \d{4}) at \d{2}:\d{2}/,
+    '\k<date> at __PUB_TIME__'
   )
 end
 
@@ -20,6 +20,7 @@ def preview_proof_content
   digest = Digest::MD5.hexdigest(template_config.to_s)
   proof = File.expand_path('data/index_proof.html', __dir__)
   content = File.read(proof)
+  content.sub!('__PUB_DATE__', Time.now.strftime('%A, %B %-d, %Y'))
   content.sub('__TEMPLATE_DIGEST__', digest)
 end
 
