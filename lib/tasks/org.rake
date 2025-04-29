@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'open-uri'
-
 require_relative '../fronde/config'
 require_relative '../fronde/cli/throbber'
 
@@ -57,10 +55,15 @@ namespace :org do
   directory 'lib'
 
   file 'lib/htmlize.el' => 'lib' do
-    htmlize = URI(
+    uri = URI(
       "https://raw.githubusercontent.com/hniksic/emacs-htmlize/refs/tags/#{HTMLIZE_TAG}/htmlize.el"
-    ).open.read
-    File.write 'lib/htmlize.el', htmlize
+    )
+    response = Net::HTTP.start(uri.host, uri.port, use_ssl: true) do |http|
+      request = Net::HTTP::Get.new(uri)
+      request['User-Agent'] = Fronde::USER_AGENT
+      http.request request
+    end
+    File.write 'lib/htmlize.el', response.body
   end
 
   file 'lib/ox-gmi.el' => 'lib' do

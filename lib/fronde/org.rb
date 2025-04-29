@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require 'net/http'
+require_relative 'version'
+
 module Fronde
   # Everything related to Org mode
   #
@@ -42,9 +45,15 @@ module Fronde
           '<a href=\'/cgit/emacs/org-mode.git/tag/\?h=' \
           '(?<tag>release_(?<number>[^\']+))\'>\k<tag></a>'
         )
-        versions = URI(
+        uri = URI(
           'https://git.savannah.gnu.org/cgit/emacs/org-mode.git/refs/'
-        ).open.readlines.map do |line|
+        )
+        response = Net::HTTP.start(uri.host, uri.port, use_ssl: true) do |http|
+          request = Net::HTTP::Get.new(uri)
+          request['User-Agent'] = Fronde::USER_AGENT
+          http.request request
+        end
+        versions = response.body.each_line(chomp: true).filter_map do |line|
           line.match(tag_rx) { |matchdata| matchdata[:number] }
         end
         versions.compact.first
@@ -59,8 +68,10 @@ module Fronde
         tarball = "org-mode-release_#{org_last_version}.tar.gz"
         uri = URI("https://git.savannah.gnu.org/cgit/emacs/org-mode.git/snapshot/#{tarball}")
         # Will crash on purpose if anything goes wrong
-        Net::HTTP.start(uri.host) do |http|
-          fetch_org_tarball http, Net::HTTP::Get.new(uri), destination
+        Net::HTTP.start(uri.host, uri.port, use_ssl: true) do |http|
+          request = Net::HTTP::Get.new(uri)
+          request['User-Agent'] = Fronde::USER_AGENT
+          fetch_org_tarball http, request, destination
         end
         org_last_version
       end

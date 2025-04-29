@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'json'
-require 'open-uri'
 require_relative '../version'
 require_relative '../org'
 require_relative 'helpers'
