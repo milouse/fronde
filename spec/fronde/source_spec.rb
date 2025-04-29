@@ -2,9 +2,8 @@
 
 describe Fronde::Source do
   it 'can not be instantiated directly', :aggregate_failures do
-    expect { described_class.new({}) }.to raise_error NameError
     expect { described_class.new({}) }.to \
-      raise_error(/`fill_in_specific_config'/)
+      raise_error(NameError, /[`']fill_in_specific_config'/)
   end
 
   it 'stores new settings' do

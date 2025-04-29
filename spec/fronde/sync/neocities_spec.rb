@@ -133,7 +133,7 @@ describe Fronde::Sync::Neocities do
 
     neocities = described_class.new('test@example.org', './test')
     expect { neocities.info['sitename'] }.to \
-      raise_error(RuntimeError, '{"result"=>"error"}')
+      raise_error(RuntimeError, { 'result' => 'error' }.to_s)
   end
 
   it 'connects to neocities in a block' do

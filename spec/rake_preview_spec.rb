@@ -3,6 +3,7 @@
 require 'rake'
 require 'open-uri'
 require 'net/http'
+require 'digest/md5'
 
 def fetch_test_content(path)
   page_content = URI("http://localhost:5000/#{path}").open.read
@@ -12,6 +13,14 @@ def fetch_test_content(path)
     /[FMSTW][a-z]+, [ADFJMNOS][a-z]+ \d{1,2}, \d{4} at \d{2}:\d{2}/,
     '__PUB_DATE__'
   )
+end
+
+def preview_proof_content
+  template_config = Fronde::CONFIG.get('templates', 0).first
+  digest = Digest::MD5.hexdigest(template_config.to_s)
+  proof = File.expand_path('data/index_proof.html', __dir__)
+  content = File.read(proof)
+  content.sub('__TEMPLATE_DIGEST__', digest)
 end
 
 def init_preview
@@ -87,8 +96,7 @@ context 'when trying preview mode' do
 
     it 'is viewable with preview', :aggregate_failures do
       home_page = fetch_test_content 'index.html'
-      proof = File.expand_path('data/index_proof.html', __dir__)
-      expect(home_page).to eq(File.read(proof))
+      expect(home_page).to eq(preview_proof_content)
       tigre = URI('http://localhost:5000/tigre.png')
       res = Net::HTTP.get_response(tigre)
       expect(res).to be_a(Net::HTTPOK)
@@ -98,14 +106,12 @@ context 'when trying preview mode' do
 
     it 'serves index' do
       home_page = fetch_test_content ''
-      proof = File.expand_path('data/index_proof.html', __dir__)
-      expect(home_page).to eq(File.read(proof))
+      expect(home_page).to eq(preview_proof_content)
     end
 
     it 'is viewable with routes testing' do
       test_page = fetch_test_content 'test'
-      proof = File.expand_path('data/index_proof.html', __dir__)
-      expect(test_page).to eq(File.read(proof))
+      expect(test_page).to eq(preview_proof_content)
     end
 
     it 'sends an error if a page is not found' do
@@ -132,9 +138,8 @@ context 'when trying preview mode' do
 
     it 'replaces domain occurence by localhost URIs' do
       home_page = fetch_test_content 'index.html'
-      proof = File.expand_path('data/index_proof.html', __dir__)
-      proof_content = File.read(proof).gsub('mydomain.local', 'localhost:5000')
-      expect(home_page).to eq(proof_content)
+      proof = preview_proof_content.gsub('mydomain.local', 'localhost:5000')
+      expect(home_page).to eq(proof)
     end
   end
 end
