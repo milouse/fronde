@@ -21,12 +21,12 @@ Gem::Specification.new do |spec|
         fronde build -f
 
   POSTINST
-  spec.authors  = ['Étienne Deparis']
+  spec.authors  = ['Étienne Pflieger']
   spec.email    = 'etienne@depar.is'
   spec.metadata = {
     'rubygems_mfa_required' => 'true',
     'source_code_uri' => 'https://git.umaneti.net/fronde',
-    'homepage_uri' => 'https://etienne.depar.is/fronde/',
+    'homepage_uri' => 'https://etienne.pflieger.bzh/fronde/',
     'funding_uri' => 'https://liberapay.com/milouse'
   }
   spec.files = [
@@ -91,7 +91,7 @@ Gem::Specification.new do |spec|
     'LICENSE'
   ]
   spec.executables = ['fronde']
-  spec.homepage    = 'https://git.umaneti.net/fronde/about/'
+  spec.homepage    = 'https://etienne.pflieger.bzh/fronde/'
   spec.license     = 'WTFPL'
 
   spec.required_ruby_version = '>= 3.1'

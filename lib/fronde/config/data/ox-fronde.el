@@ -97,7 +97,7 @@ INFO is a plist used as a communication channel."
           output)
     (push `(?l . ,(org-export-data (plist-get info :language) info)) output)
     (push `(?n . ,(format "Fronde %s" fronde-version)) output)
-    (push `(?N . ,(format "<a href=\"https://etienne.depar.is/fronde/\">Fronde</a> %s" fronde-version)) output)
+    (push `(?N . ,(format "<a href=\"https://etienne.pflieger.bzh/fronde/\">Fronde</a> %s" fronde-version)) output)
     (push `(?x . ,(org-export-data (plist-get info :description) info)) output)
     (push `(?X . ,(format "<p>%s</p>"
                     (org-export-data (plist-get info :description) info)))

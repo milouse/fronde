@@ -193,7 +193,7 @@ module Fronde
               .gsub('%l', @data[:lang])
               .gsub('%L', Fronde::CONFIG.get('license', '').gsub(/\s+/, ' ').strip)
               .gsub('%n', "Fronde #{Fronde::VERSION}")
-              .gsub('%N', "<a href=\"https://git.umaneti.net/fronde/about/\">Fronde</a> #{Fronde::VERSION}")
+              .gsub('%N', "<a href=\"https://git.umaneti.net/fronde\">Fronde</a> #{Fronde::VERSION}")
               .gsub('%o', project_data['theme'] || '')
               .gsub('%s', @data[:subtitle])
               .gsub('%t', @data[:title])

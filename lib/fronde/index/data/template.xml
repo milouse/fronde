@@ -9,7 +9,7 @@
   <updated>{{ upddate }}</updated>
   <author><name>{{ author }}</name></author>
   <id>urn:md5:{{ domain | md5 }}</id>
-  <generator uri="https://git.umaneti.net/fronde/about/">Fronde</generator>
+  <generator uri="https://git.umaneti.net/fronde">Fronde</generator>
 
   {%- for article in entries %}
 
