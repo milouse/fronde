@@ -21,5 +21,5 @@
         ("website" :components ("{{ all_projects | map: 'name' | join: '" "' | remove: '" "tags' }}"))))
 
 ;; Load fronde lib
-(load-file (expand-file-name "ox-gmi.el" "{{ work_dir }}/lib"))
+(load-file (expand-file-name "ox-gmi.el" "{{ fronde_data_dir }}"))
 (load-file (expand-file-name "ox-fronde.el" "{{ fronde_data_dir }}"))

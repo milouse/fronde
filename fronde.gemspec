@@ -47,6 +47,7 @@ Gem::Specification.new do |spec|
     'lib/fronde/cli/throbber.rb',
     'lib/fronde/config/data/org-config.el',
     'lib/fronde/config/data/ox-fronde.el',
+    'lib/fronde/config/data/ox-gmi.el',
     'lib/fronde/config/helpers.rb',
     'lib/fronde/config/lisp.rb',
     'lib/fronde/config.rb',

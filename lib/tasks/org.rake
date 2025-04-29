@@ -10,7 +10,6 @@ CLOBBER.push(
 )
 
 HTMLIZE_TAG = 'release/1.58'
-OX_GMI_TAG = 'v0.2'
 
 namespace :org do
   directory 'var/tmp'
@@ -66,14 +65,7 @@ namespace :org do
     File.write 'lib/htmlize.el', response.body
   end
 
-  file 'lib/ox-gmi.el' => 'lib' do
-    ox_gmi = URI(
-      "https://git.umaneti.net/ox-gmi/plain/ox-gmi.el?h=#{OX_GMI_TAG}"
-    ).open.read
-    File.write 'lib/ox-gmi.el', ox_gmi
-  end
-
-  file 'var/lib/org-config.el' => ['lib/htmlize.el', 'lib/ox-gmi.el'] do
+  file 'var/lib/org-config.el' => ['lib/htmlize.el'] do
     Fronde::CONFIG.write_org_lisp_config
   end
 
@@ -88,9 +80,9 @@ namespace :org do
 
   desc 'Install Org'
   multitask install: ['org:compile', '.gitignore'] do
-    # lib/htmlize.el and lib/ox-gmi.el cannot be generated in parallel
-    # of org:compilation, as it will leads to a weird SSL error. Thus
-    # finishing file generation "manually" here.
+    # lib/htmlize.el cannot be generated in parallel of org:compilation,
+    # as it will leads to a weird SSL error. Thus finishing file generation
+    # "manually" here.
     Rake::Task['var/lib/org-config.el'].invoke
     sources = Fronde::CONFIG.sources
     sources.each { mkdir_p _1['path'] }

@@ -91,5 +91,5 @@ with %c, and published with %N</p>
         ("website" :components ("src" "src-assets" "news" "news-assets" "other" "other-assets" "theme-my-theme"))))
 
 ;; Load fronde lib
-(load-file (expand-file-name "ox-gmi.el" "{{ test_dir }}/lib"))
+(load-file (expand-file-name "ox-gmi.el" "{{ base_dir }}/lib/fronde/config/data"))
 (load-file (expand-file-name "ox-fronde.el" "{{ base_dir }}/lib/fronde/config/data"))
