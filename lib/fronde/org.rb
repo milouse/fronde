@@ -10,6 +10,8 @@ module Fronde
   # of the Emacs package. It also serves as a namespace for the class
   # responsible for handling Org files: {Fronde::Org::File}.
   module Org
+    CGIT_BASE_URL = 'https://cgit.git.savannah.gnu.org/cgit/emacs/org-mode.git/'
+
     class << self
       def current_version
         # Do not crash if Org is not yet installed (and thus return nil)
@@ -45,9 +47,7 @@ module Fronde
           '<a href=\'/cgit/emacs/org-mode.git/tag/\?h=' \
           '(?<tag>release_(?<number>[^\']+))\'>\k<tag></a>'
         )
-        uri = URI(
-          'https://git.savannah.gnu.org/cgit/emacs/org-mode.git/refs/'
-        )
+        uri = URI(CGIT_BASE_URL)
         response = Net::HTTP.start(uri.host, uri.port, use_ssl: true) do |http|
           request = Net::HTTP::Get.new(uri)
           request['User-Agent'] = Fronde::USER_AGENT
@@ -56,7 +56,7 @@ module Fronde
         versions = response.body.each_line(chomp: true).filter_map do |line|
           line.match(tag_rx) { |matchdata| matchdata[:number] }
         end
-        versions.compact.first
+        versions.compact.max_by { Gem::Version.new _1 }
       end
 
       # Download latest org-mode tarball.
@@ -66,7 +66,7 @@ module Fronde
       def download(destination = 'var/tmp')
         org_last_version = last_version(force: false, cookie_dir: destination)
         tarball = "org-mode-release_#{org_last_version}.tar.gz"
-        uri = URI("https://git.savannah.gnu.org/cgit/emacs/org-mode.git/snapshot/#{tarball}")
+        uri = URI("#{CGIT_BASE_URL}snapshot/#{tarball}")
         # Will crash on purpose if anything goes wrong
         Net::HTTP.start(uri.host, uri.port, use_ssl: true) do |http|
           request = Net::HTTP::Get.new(uri)
