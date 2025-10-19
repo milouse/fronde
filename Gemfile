@@ -5,6 +5,7 @@ gemspec
 
 group :development do
   gem 'bundler-audit', '~> 0.9'
+  gem 'openssl', '~> 3.3.1' # Until it becomes default
   gem 'org-ruby', '~> 0.9'
   gem 'rspec', '~> 3.13'
   gem 'rubocop', '~> 1.75'
