@@ -3,7 +3,7 @@ AllCops:
   NewCops: enable
   TargetRubyVersion: 3.1
 
-require:
+plugins:
   - rubocop-performance
   - rubocop-rspec
 
@@ -46,6 +46,13 @@ Metrics/ModuleLength:
     - hash
     - heredoc
     - method_call
+
+Naming/PredicateMethod:
+  Exclude:
+    # used to reflect command status (success or not)
+    - lib/fronde/cli/commands.rb
+    # Mock methods
+    - spec/fronde/sync/neocities_spec.rb
 
 RSpec:
   Severity: warning

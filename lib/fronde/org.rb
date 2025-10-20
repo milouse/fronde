@@ -41,6 +41,14 @@ module Fronde
         org_version
       end
 
+      def http_get_client(uri)
+        Net::HTTP.start(uri.host, uri.port, use_ssl: true) do |http|
+          request = Net::HTTP::Get.new(uri)
+          request['User-Agent'] = Fronde::USER_AGENT
+          yield http, request
+        end
+      end
+
       def fetch_version_number
         # Retrieve last org version from git repository tags page.
         tag_rx = Regexp.new(
@@ -48,11 +56,7 @@ module Fronde
           '(?<tag>release_(?<number>[^\']+))\'>\k<tag></a>'
         )
         uri = URI(CGIT_BASE_URL)
-        response = Net::HTTP.start(uri.host, uri.port, use_ssl: true) do |http|
-          request = Net::HTTP::Get.new(uri)
-          request['User-Agent'] = Fronde::USER_AGENT
-          http.request request
-        end
+        response = http_get_client(uri) { |http, req| http.request req }
         versions = response.body.each_line(chomp: true).filter_map do |line|
           line.match(tag_rx) { |matchdata| matchdata[:number] }
         end
@@ -68,9 +72,7 @@ module Fronde
         tarball = "org-mode-release_#{org_last_version}.tar.gz"
         uri = URI("#{CGIT_BASE_URL}snapshot/#{tarball}")
         # Will crash on purpose if anything goes wrong
-        Net::HTTP.start(uri.host, uri.port, use_ssl: true) do |http|
-          request = Net::HTTP::Get.new(uri)
-          request['User-Agent'] = Fronde::USER_AGENT
+        http_get_client(uri) do |http, request|
           fetch_org_tarball http, request, destination
         end
         org_last_version
