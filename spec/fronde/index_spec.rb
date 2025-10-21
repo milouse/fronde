@@ -131,7 +131,7 @@ SAMPLE_ATOM = <<~ATOM
     <updated>%<date>s</updated>
     <author><name>Test</name></author>
     <id>urn:md5:75d53866bcb20465b3287cf237234464</id>
-    <generator uri="https://git.umaneti.net/fronde/about/">Fronde</generator>
+    <generator uri="https://git.umaneti.net/fronde">Fronde</generator>
 
     <entry>
       <title>My third article</title>
@@ -186,7 +186,7 @@ SAMPLE_EMPTY_ATOM = <<~ATOM
     <updated>%<date>s</updated>
     <author><name>%<author>s</name></author>
     <id>urn:md5:75d53866bcb20465b3287cf237234464</id>
-    <generator uri="https://git.umaneti.net/fronde/about/">Fronde</generator>
+    <generator uri="https://git.umaneti.net/fronde">Fronde</generator>
   </feed>
 ATOM
 

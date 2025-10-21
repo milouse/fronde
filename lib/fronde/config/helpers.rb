@@ -59,4 +59,4 @@ module Fronde
   end
 end
 
-Liquid::Template.register_filter(Fronde::Config::Filters)
+Liquid::Environment.default.register_filter(Fronde::Config::Filters)

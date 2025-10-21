@@ -61,8 +61,9 @@ end
 
 def copy_org_tarball_to_fake_tmp
   tarball = File.expand_path 'tmp/org.tar.gz', __dir__
+  org_version_cookie = File.expand_path 'tmp/last_org_version', __dir__
   FileUtils.mkdir_p 'var/tmp'
-  FileUtils.cp tarball, 'var/tmp'
+  FileUtils.cp [tarball, org_version_cookie], 'var/tmp'
 end
 
 def copy_org_lisp_files_to_fake_tmp
@@ -73,16 +74,43 @@ def copy_org_lisp_files_to_fake_tmp
   FileUtils.cp_r installed_files, 'lib/'
 end
 
+def use_custom_org_version(tmp_dir)
+  Dir.chdir(File.expand_path('../', __dir__)) do
+    org_tarball = Dir['org-mode-release_*.tar.gz'].first
+    next unless org_tarball
+
+    match = org_tarball.match(/org-mode-release_(?<version>[0-9.]+)\.tar\.gz/)
+    next unless match
+
+    FileUtils.cp org_tarball, "#{tmp_dir}/org.tar.gz"
+    org_version = match[:version]
+    File.write "#{tmp_dir}/last_org_version", org_version
+    org_version
+  end
+end
+
+def provision_custom_org_version(tmp_dir)
+  org_version = Fronde::Org.download tmp_dir
+  # Keep a copy to trigger "use_custom_org_version" next time
+  project_path = File.expand_path('../', __dir__)
+  backup = "#{project_path}/org-mode-release_#{org_version}.tar.gz"
+  FileUtils.cp "#{tmp_dir}/org.tar.gz", backup
+  org_version
+end
+
 def init_fake_org_install
   tmp_dir = File.expand_path 'tmp', __dir__
+
   # It should be sufficient to have the tarball downloaded to assume it
   # has also already compiled Org.
   return if File.exist? "#{tmp_dir}/org.tar.gz"
 
-  last_version = Fronde::Org.download tmp_dir
+  # One can provide already an Org tarball
+  org_version = use_custom_org_version tmp_dir
+  org_version ||= provision_custom_org_version tmp_dir
+
   Fronde::Org.compile(
-    "#{tmp_dir}/org.tar.gz", last_version,
-    "#{tmp_dir}/org-#{last_version}"
+    "#{tmp_dir}/org.tar.gz", org_version, "#{tmp_dir}/org-#{org_version}"
   )
 end
 

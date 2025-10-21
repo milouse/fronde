@@ -1,8 +1,8 @@
-image: ruby:3.3-alpine
+image: ruby:3.4-alpine
 
 default:
   before_script:
-    - apk add -U build-base
+    - apk add -U build-base openssl-dev
     - bundle install -j $(nproc)
 
 rubocop:
@@ -17,7 +17,7 @@ rspec:
   script:
     - apk add -U emacs-nox ncurses
     - rspec
-  coverage: '/LOC \(\d+\.\d+\%\) covered/'
+  coverage: '/Line Coverage: \d+\.\d+\%/'
   artifacts:
     reports:
       coverage_report:

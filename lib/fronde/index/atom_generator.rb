@@ -34,20 +34,15 @@ module Fronde
     # @param entries [Array] the article to list in this file
     # @return [String] the Atom feed as a String
     def atom_file(tag_name, entries)
-      domain = Fronde::CONFIG.get('domain')
       slug = Slug.slug(tag_name)
-      tagurl = "#{domain}#{@project.public_absolute_path}tags/#{slug}.html"
+      variables = atom_templating_basics.merge(
+        'title' => @tags_names[tag_name],
+        'slug' => slug,
+        'entries' => entries
+      )
       Config::Helpers.render_liquid_template(
         File.read(File.expand_path('./data/template.xml', __dir__)),
-        'title' => @tags_names[tag_name],
-        'lang' => Fronde::CONFIG.get('lang'),
-        'domain' => domain,
-        'slug' => slug,
-        'tagurl' => tagurl,
-        'upddate' => @date.xmlschema,
-        'author' => Fronde::CONFIG.get('author'),
-        'publication_format' => @project['mime_type'],
-        'entries' => entries
+        variables
       )
     end
 
@@ -56,19 +51,26 @@ module Fronde
     # @param entries [Array] the article to list in this file
     # @return [String] the Atom feed as a String
     def atom_index(entries)
-      domain = Fronde::CONFIG.get('domain')
-      Config::Helpers.render_liquid_template(
-        File.read(File.expand_path('./data/template.xml', __dir__)),
+      variables = atom_templating_basics.merge(
         'title' => @project['title'],
-        'lang' => Fronde::CONFIG.get('lang'),
-        'domain' => domain,
-        'slug' => 'index',
-        'tagurl' => domain,
-        'upddate' => @date.xmlschema,
-        'author' => Fronde::CONFIG.get('author'),
-        'publication_format' => @project['mime_type'],
+        'slug' => '__HOME_PAGE__',
         'entries' => entries
       )
+      Config::Helpers.render_liquid_template(
+        File.read(File.expand_path('./data/template.xml', __dir__)),
+        variables
+      )
+    end
+
+    def atom_templating_basics
+      {
+        'lang' => Fronde::CONFIG.get('lang'),
+        'author' => Fronde::CONFIG.get('author'),
+        'domain' => Fronde::CONFIG.get('domain'),
+        'project_path' => @project.public_absolute_path,
+        'upddate' => @date.xmlschema,
+        'publication_format' => @project['mime_type']
+      }
     end
   end
 end

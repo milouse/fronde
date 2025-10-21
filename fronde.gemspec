@@ -21,12 +21,12 @@ Gem::Specification.new do |spec|
         fronde build -f
 
   POSTINST
-  spec.authors  = ['Étienne Deparis']
+  spec.authors  = ['Étienne Pflieger']
   spec.email    = 'etienne@depar.is'
   spec.metadata = {
     'rubygems_mfa_required' => 'true',
     'source_code_uri' => 'https://git.umaneti.net/fronde',
-    'homepage_uri' => 'https://etienne.depar.is/fronde/',
+    'homepage_uri' => 'https://etienne.pflieger.bzh/fronde/',
     'funding_uri' => 'https://liberapay.com/milouse'
   }
   spec.files = [
@@ -47,6 +47,7 @@ Gem::Specification.new do |spec|
     'lib/fronde/cli/throbber.rb',
     'lib/fronde/config/data/org-config.el',
     'lib/fronde/config/data/ox-fronde.el',
+    'lib/fronde/config/data/ox-gmi.el',
     'lib/fronde/config/helpers.rb',
     'lib/fronde/config/lisp.rb',
     'lib/fronde/config.rb',
@@ -90,18 +91,18 @@ Gem::Specification.new do |spec|
     'LICENSE'
   ]
   spec.executables = ['fronde']
-  spec.homepage    = 'https://git.umaneti.net/fronde/about/'
+  spec.homepage    = 'https://etienne.pflieger.bzh/fronde/'
   spec.license     = 'WTFPL'
 
   spec.required_ruby_version = '>= 3.1'
   spec.add_dependency 'base64', '~> 0.1'
   spec.add_dependency 'bigdecimal', '~> 3.1'
   spec.add_dependency 'i18n', '~> 1.14'
-  spec.add_dependency 'liquid', '~> 5.5'
-  spec.add_dependency 'nokogiri', '~> 1.16'
+  spec.add_dependency 'liquid', '~> 5.8'
+  spec.add_dependency 'nokogiri', '~> 1.18'
   spec.add_dependency 'rainbow', '~> 3.1'
-  spec.add_dependency 'rake', '~> 13.1'
-  spec.add_dependency 'webrick', '~> 1.8'
+  spec.add_dependency 'rake', '~> 13.2'
+  spec.add_dependency 'webrick', '~> 1.9'
 
   spec.requirements << 'emacs'
 end

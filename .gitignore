@@ -4,6 +4,7 @@
 fronde-*.gem
 doc
 coverage
+Gemfile.lock
 TAGS
 _minted-DOCUMENTATION
 DOCUMENTATION.*

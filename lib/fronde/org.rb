@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require 'net/http'
+require_relative 'version'
+
 module Fronde
   # Everything related to Org mode
   #
@@ -7,6 +10,8 @@ module Fronde
   # of the Emacs package. It also serves as a namespace for the class
   # responsible for handling Org files: {Fronde::Org::File}.
   module Org
+    CGIT_BASE_URL = 'https://cgit.git.savannah.gnu.org/cgit/emacs/org-mode.git/'
+
     class << self
       def current_version
         # Do not crash if Org is not yet installed (and thus return nil)
@@ -36,18 +41,26 @@ module Fronde
         org_version
       end
 
+      def http_get_client(uri)
+        Net::HTTP.start(uri.host, uri.port, use_ssl: true) do |http|
+          request = Net::HTTP::Get.new(uri)
+          request['User-Agent'] = Fronde::USER_AGENT
+          yield http, request
+        end
+      end
+
       def fetch_version_number
         # Retrieve last org version from git repository tags page.
         tag_rx = Regexp.new(
           '<a href=\'/cgit/emacs/org-mode.git/tag/\?h=' \
           '(?<tag>release_(?<number>[^\']+))\'>\k<tag></a>'
         )
-        versions = URI(
-          'https://git.savannah.gnu.org/cgit/emacs/org-mode.git/refs/'
-        ).open.readlines.map do |line|
+        uri = URI(CGIT_BASE_URL)
+        response = http_get_client(uri) { |http, req| http.request req }
+        versions = response.body.each_line(chomp: true).filter_map do |line|
           line.match(tag_rx) { |matchdata| matchdata[:number] }
         end
-        versions.compact.first
+        versions.compact.max_by { Gem::Version.new _1 }
       end
 
       # Download latest org-mode tarball.
@@ -57,10 +70,10 @@ module Fronde
       def download(destination = 'var/tmp')
         org_last_version = last_version(force: false, cookie_dir: destination)
         tarball = "org-mode-release_#{org_last_version}.tar.gz"
-        uri = URI("https://git.savannah.gnu.org/cgit/emacs/org-mode.git/snapshot/#{tarball}")
+        uri = URI("#{CGIT_BASE_URL}snapshot/#{tarball}")
         # Will crash on purpose if anything goes wrong
-        Net::HTTP.start(uri.host) do |http|
-          fetch_org_tarball http, Net::HTTP::Get.new(uri), destination
+        http_get_client(uri) do |http, request|
+          fetch_org_tarball http, request, destination
         end
         org_last_version
       end

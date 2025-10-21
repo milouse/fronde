@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'json'
-require 'open-uri'
 require_relative '../version'
 require_relative '../org'
 require_relative 'helpers'
@@ -11,6 +10,19 @@ module Fronde
     # This module contains utilitary methods to ease ~org-config.el~
     # file generation
     module Lisp
+      class << self
+        def theme_directory(theme)
+          # User theme first to allow overwriting
+          directory = File.expand_path("themes/#{theme}")
+          return directory if Dir.exist? directory
+
+          directory = File.expand_path("data/themes/#{theme}", __dir__)
+          return directory if Dir.exist? directory
+
+          raise Errno::ENOENT, "Theme #{theme} not found"
+        end
+      end
+
       # Generate emacs lisp configuration file for Org and write it.
       #
       # This method saves the generated configuration in the file
@@ -41,19 +53,8 @@ module Fronde
 
       private
 
-      def theme_directory(theme)
-        # User theme first to allow overwriting
-        directory = File.expand_path("themes/#{theme}")
-        return directory if Dir.exist? directory
-
-        directory = File.expand_path("data/themes/#{theme}", __dir__)
-        return directory if Dir.exist? directory
-
-        raise Errno::ENOENT, "Theme #{theme} not found"
-      end
-
       def org_theme_config(theme)
-        { 'base-directory' => theme_directory(theme),
+        { 'base-directory' => Lisp.theme_directory(theme),
           # rubocop:disable Layout/LineLength
           'base-extension' => %w[css js gif jpg png svg otf ttf woff2?].join('\\\\|'),
           'publishing-directory' => "#{get('html_public_folder')}/assets/#{theme}",
