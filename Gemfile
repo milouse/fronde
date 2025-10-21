@@ -15,4 +15,4 @@ group :development do
   gem 'yard', '~> 0.9'
 end
 
-gem 'simplecov-cobertura', '~> 2.1', group: :ci
+gem 'simplecov-cobertura', '~> 3.1', group: :ci

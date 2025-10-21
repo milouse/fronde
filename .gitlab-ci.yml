@@ -17,7 +17,7 @@ rspec:
   script:
     - apk add -U emacs-nox ncurses
     - rspec
-  coverage: '/LOC \(\d+\.\d+\%\) covered/'
+  coverage: '/Line Coverage: \d+\.\d+\%/'
   artifacts:
     reports:
       coverage_report:
