@@ -10,14 +10,15 @@ CLOBBER.push(
 )
 
 HTMLIZE_TAG = 'release/1.58'
+TMP_ORG_TARBALL = 'var/tmp/org.tar.gz'
 
 namespace :org do
   directory 'var/tmp'
 
   desc 'Download last version of Org'
-  file 'var/tmp/org.tar.gz' => 'var/tmp' do
+  file TMP_ORG_TARBALL => 'var/tmp' do
     # Weird Rake issue, still executing the task even if the file exists
-    next if File.exist? 'var/tmp/org.tar.gz'
+    next if File.exist? TMP_ORG_TARBALL
 
     download = Thread.new do
       version = Fronde::Org.download
@@ -31,7 +32,7 @@ namespace :org do
   end
 
   desc 'Compile Org'
-  multitask compile: ['var/tmp/org.tar.gz', 'lib'] do |task|
+  multitask compile: [TMP_ORG_TARBALL, 'lib'] do |task|
     # No need to force fetch last version as it is only interesting as
     # part of the upgrade task
     version = Fronde::Org.last_version
@@ -100,7 +101,7 @@ namespace :org do
   desc 'Upgrade Org'
   task :upgrade do
     Rake::Task['clobber'].execute
-    if File.exist? 'var/tmp/org.tar.gz'
+    if File.exist? TMP_ORG_TARBALL
       # Cleanup cached tarball only if a new version is available.
       # Also cached the new remote org version in the same time.
       org_version = Fronde::Org.current_version
@@ -109,7 +110,7 @@ namespace :org do
       rescue RuntimeError
         last_version = org_version
       end
-      File.unlink 'var/tmp/org.tar.gz' unless org_version == last_version
+      File.unlink TMP_ORG_TARBALL unless org_version == last_version
     end
     Rake::Task['org:install'].invoke
   end
