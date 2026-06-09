@@ -10,9 +10,10 @@ CLOBBER.push(
 )
 
 HTMLIZE_TAG = 'release/1.58'
-TMP_ORG_TARBALL = 'var/tmp/org.tar.gz'
+TMP_ORG_TARBALL = 'var/tmp/org.tar'
 
 namespace :org do
+  directory 'lib'
   directory 'var/tmp'
 
   desc 'Download last version of Org'
@@ -31,17 +32,17 @@ namespace :org do
     warn I18n.t('fronde.tasks.org.no_download') if verbose
   end
 
-  desc 'Compile Org'
-  multitask compile: [TMP_ORG_TARBALL, 'lib'] do |task|
+  desc 'Extract Org tarball'
+  multitask extract: [TMP_ORG_TARBALL, 'lib'] do |task|
     # No need to force fetch last version as it is only interesting as
     # part of the upgrade task
     version = Fronde::Org.last_version
 
     org_dir = "lib/org-#{version}"
-    next if Dir.exist?("#{org_dir}/lisp")
+    next if File.exist?("#{org_dir}/org-version.el")
 
     build = Thread.new do
-      Fronde::Org.compile(task.prerequisites[0], version, org_dir, verbose:)
+      Fronde::Org.extract task.prerequisites[0], 'lib'
       # Remove old versions
       Dir.glob('lib/org-[0-9.]*').each { rm_r it unless it == org_dir }
       puts I18n.t('fronde.tasks.org.installed', version:) if verbose
@@ -52,8 +53,6 @@ namespace :org do
   rescue RuntimeError, Interrupt
     next
   end
-
-  directory 'lib'
 
   file 'lib/htmlize.el' => 'lib' do
     uri = URI(
@@ -81,7 +80,7 @@ namespace :org do
   end
 
   desc 'Install Org'
-  multitask install: ['org:compile', '.gitignore'] do
+  multitask install: ['org:extract', '.gitignore'] do
     # lib/htmlize.el cannot be generated in parallel of org:compilation,
     # as it will leads to a weird SSL error. Thus finishing file generation
     # "manually" here.
