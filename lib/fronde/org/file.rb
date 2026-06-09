@@ -270,7 +270,7 @@ module Fronde
       end
 
       def find_source_for_org_file
-        Fronde::CONFIG.sources.find { _1.source_for? @file }
+        Fronde::CONFIG.sources.find { it.source_for? @file }
       end
 
       def find_source_for_publication_file

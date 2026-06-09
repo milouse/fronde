@@ -150,18 +150,18 @@ describe Fronde::Sync::Neocities do
     generate_public_dir_content
     neocities = described_class.new('test@example.org', './test')
     file_list = neocities.local_list
-    expect(file_list.map { _1['path'] }).to \
+    expect(file_list.map { it['path'] }).to \
       eq(['index.html', 'pictures', 'pictures/cat.jpg'])
-    expect(file_list.map { _1['is_directory'] }).to \
+    expect(file_list.map { it['is_directory'] }).to \
       eq([false, true, false])
   end
 
   it 'lists remote files', :aggregate_failures do
     neocities = described_class.new('test@example.org', './test')
     file_list = neocities.remote_list
-    expect(file_list.map { _1['path'] }).to \
+    expect(file_list.map { it['path'] }).to \
       eq(['index.html', 'pictures', 'pictures/cat.jpg', 'pictures/bird.jpg'])
-    expect(file_list.map { _1['is_directory'] }).to \
+    expect(file_list.map { it['is_directory'] }).to \
       eq([false, true, false, false])
   end
 

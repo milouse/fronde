@@ -41,7 +41,8 @@ namespace :org do
 
     build = Thread.new do
       Fronde::Org.compile(task.prerequisites[0], version, org_dir, verbose:)
-      Dir.glob('lib/org-[0-9.]*').each { rm_r _1 unless _1 == org_dir }
+      # Remove old versions
+      Dir.glob('lib/org-[0-9.]*').each { rm_r it unless it == org_dir }
       puts I18n.t('fronde.tasks.org.installed', version:) if verbose
     end
     Fronde::CLI::Throbber.run(
@@ -85,9 +86,9 @@ namespace :org do
     # "manually" here.
     Rake::Task['var/lib/org-config.el'].invoke
     sources = Fronde::CONFIG.sources
-    sources.each { mkdir_p _1['path'] }
+    sources.each { mkdir_p it['path'] }
 
-    outputs = sources.map { _1['type'] }.uniq
+    outputs = sources.map { it['type'] }.uniq
     if outputs.include?('html')
       mkdir_p "#{Fronde::CONFIG.get('html_public_folder')}/assets"
     end

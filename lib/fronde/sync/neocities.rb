@@ -85,8 +85,8 @@ module Fronde
       end
 
       def select_orphans(to_apply, current_list, &)
-        paths_to_apply = to_apply.map { _1['path'] }
-        current_paths = current_list.map { _1['path'] }
+        paths_to_apply = to_apply.map { it['path'] }
+        current_paths = current_list.map { it['path'] }
         (current_paths - paths_to_apply).filter_map(&)
       end
 
