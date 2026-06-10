@@ -41,21 +41,23 @@ module Fronde
         org_version
       end
 
-      def http_get_client(uri)
+      def http_get_client(uri, &)
         Net::HTTP.start(uri.host, uri.port, use_ssl: true) do |http|
           request = Net::HTTP::Get.new(uri)
           request['User-Agent'] = Fronde::USER_AGENT
-          yield http, request
+          http.request request, &
         end
       end
 
       def fetch_version_number
         # Retrieve last org version from GNU ELPA page.
         uri = URI("#{GNU_ELPA_URL}.html")
-        response = http_get_client(uri) { |http, req| http.request req }
-        version_line = response.body.each_line(chomp: true).find do |line|
+        response = http_get_client(uri).body
+        version_line = response.each_line(chomp: true).find do |line|
           line.start_with? '<dt>Latest</dt> <dd><a href='
         end
+        return unless version_line
+
         version_match = version_line.match(/org-(?<version>[0-9.]+)\.tar/)
         return version_match[:version] if version_match
 
@@ -70,20 +72,18 @@ module Fronde
         org_last_version = last_version(force: false, cookie_dir: destination)
         uri = URI("#{GNU_ELPA_URL}-#{org_last_version}.tar")
         # Will crash on purpose if anything goes wrong
-        http_get_client(uri) do |http, request|
-          fetch_org_tarball http, request, destination
+        http_get_client(uri) do |response|
+          fetch_org_tarball response, destination
         end
         org_last_version
       end
 
-      def fetch_org_tarball(http, request, destination)
+      def fetch_org_tarball(response, destination)
         # Remove version number in dest file to allow easy rake file
         # task naming
         dest_file = ::File.expand_path('org.tar', destination)
-        http.request request do |response|
-          ::File.open(dest_file, 'w') do |io|
-            response.read_body { |chunk| io.write chunk }
-          end
+        ::File.open(dest_file, 'w') do |io|
+          response.read_body { |chunk| io.write chunk }
         end
       end
 
