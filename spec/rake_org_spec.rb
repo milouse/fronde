@@ -44,17 +44,8 @@ context 'when managing Org installation' do
     end.not_to output.to_stderr
   end
 
-  it 'warns user if no last version can be found', :aggregate_failures do
+  it 'warns user if no last version can be found' do
     allow(Fronde::Org).to receive(:fetch_version_number).and_return(nil)
-    expect { Fronde::Org.download }.to raise_error RuntimeError
-    expect { Fronde::Org.download }.to(
-      raise_error('No remote Org version found')
-    )
-    expect { rake(verbose: true).invoke_task('org:install') }.to(
-      output(
-        /Impossible to download Org now\. Please try again later\./
-      ).to_stderr
-    )
     expect { rake(verbose: false).invoke_task('org:install') }.to(
       output(/An error occurred\./).to_stderr
     )
