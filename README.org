@@ -22,8 +22,8 @@ the publication process.
 - Does not require any server-side code, nor databases, only a simple
   http server like apache, nginx, lighttpd, hiawatha…
 - Allows fine customization of generated html files
-- Allows multiple sources for your Org file and lets you organize them as
-  you wish in the destination folder
+- Allows multiple sources for your Org file and lets you organize them
+  as you wish in the destination folder
 - Can use different themes for different sources
 - Supports tags and [[https://en.wikipedia.org/wiki/Atom_(Web_standard)][ATOM feeds]]
 
@@ -62,9 +62,8 @@ Conduct]]. You can read it here:
 
 ** Translations
 
-You can fetch the yaml files directly from the [[./locales][source code tree]] and
-send your changes as a pull request (see bellow) or by email, as you
-prefer.
+You can fetch the yaml files directly from the [[./locales][source code tree]] and send
+your changes as a pull request (see bellow) or by email, as you prefer.
 
 ** Code
 
@@ -79,8 +78,8 @@ by mail to the main author.
 #+html: <a href="https://liberapay.com/milouse/donate"><img alt="Support using Liberapay" src="https://img.shields.io/badge/Liberapay-Support_me-yellow?logo=liberapay"/></a>
 #+html: <a href="https://paypal.me/milouse"><img alt="Support using Paypal" src="https://img.shields.io/badge/Paypal-Support_me-00457C?logo=paypal&labelColor=lightgray"/></a>
 
-You can help me a lot by giving me some tip, either through [[https://liberapay.com/milouse][Liberapay]] or
-[[https://paypal.me/milouse][Paypal]]. Thank you very much!
+You can help me a lot by giving me some tip, either through [[https://liberapay.com/milouse][Liberapay]]
+or [[https://paypal.me/milouse][Paypal]]. Thank you very much!
 
 
 * Going further
