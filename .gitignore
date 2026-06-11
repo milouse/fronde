@@ -6,7 +6,7 @@ doc
 coverage
 Gemfile.lock
 TAGS
-_minted-DOCUMENTATION
+_minted
 DOCUMENTATION.*
 !DOCUMENTATION.org
 !DOCUMENTATION.pdf
