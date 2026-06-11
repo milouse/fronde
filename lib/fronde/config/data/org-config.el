@@ -1,5 +1,5 @@
 ;; Add org-mode to load path
-(add-to-list 'load-path (expand-file-name "org-{{ org_version }}/lisp" "{{ work_dir }}/lib"))
+(add-to-list 'load-path (expand-file-name "org-{{ org_version }}" "{{ work_dir }}/lib"))
 ;; Load last version of htmlize.el
 (load-file (expand-file-name "htmlize.el" "{{ work_dir }}/lib"))
 

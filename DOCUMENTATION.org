@@ -844,7 +844,7 @@ would be if you directly add yourself such an html file in the
 # Compile this file with:
 # latexmk -norc -xelatex -halt-on-error -shell-escape DOCUMENTATION
 # Clean folder with:
-# rm -rf _minted-DOCUMENTATION
+# rm -rf _minted
 # latexmk -e "push @generated_exts, 'nav', 'snm', 'vrb';" -c DOCUMENTATION
 
 # Local Variables:

@@ -17,29 +17,19 @@ module Fronde
       render_heading
     end
 
-    def [](key)
-      @config[key]
-    end
+    def [](key) = @config[key]
 
     def []=(key, value)
       @config[key] = value
     end
 
-    def type
-      @config['type']
-    end
+    def type = @config['type']
 
-    def recursive?
-      !!@config['recursive']
-    end
+    def recursive? = !!@config['recursive']
 
-    def blog?
-      !!@config['is_blog']
-    end
+    def blog? = !!@config['is_blog']
 
-    def to_h
-      @config
-    end
+    def to_h = @config
 
     def source_for?(file_name)
       relative_file_path = file_name.delete_prefix "#{@config['path']}/"
@@ -76,10 +66,9 @@ module Fronde
     end
 
     def target_for(file_name)
-      target = File.expand_path file_name
-      target.delete_prefix! "#{Dir.pwd}/"
+      target = File.expand_path(file_name).delete_prefix "#{Dir.pwd}/"
       target.sub!(/\.org\z/, @config['ext'])
-      project_relative_path = @config['path'].delete_prefix("#{Dir.pwd}/")
+      project_relative_path = @config['path'].delete_prefix "#{Dir.pwd}/"
       target.delete_prefix! "#{project_relative_path}/"
       public_absolute_path + target
     end

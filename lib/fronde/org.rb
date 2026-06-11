@@ -10,7 +10,7 @@ module Fronde
   # of the Emacs package. It also serves as a namespace for the class
   # responsible for handling Org files: {Fronde::Org::File}.
   module Org
-    CGIT_BASE_URL = 'https://cgit.git.savannah.gnu.org/cgit/emacs/org-mode.git/'
+    GNU_ELPA_URL = 'https://elpa.gnu.org/packages/org'
 
     class << self
       def current_version
@@ -41,26 +41,27 @@ module Fronde
         org_version
       end
 
-      def http_get_client(uri)
+      def http_get_client(uri, &)
         Net::HTTP.start(uri.host, uri.port, use_ssl: true) do |http|
           request = Net::HTTP::Get.new(uri)
           request['User-Agent'] = Fronde::USER_AGENT
-          yield http, request
+          http.request request, &
         end
       end
 
       def fetch_version_number
-        # Retrieve last org version from git repository tags page.
-        tag_rx = Regexp.new(
-          '<a href=\'/cgit/emacs/org-mode.git/tag/\?h=' \
-          '(?<tag>release_(?<number>[^\']+))\'>\k<tag></a>'
-        )
-        uri = URI(CGIT_BASE_URL)
-        response = http_get_client(uri) { |http, req| http.request req }
-        versions = response.body.each_line(chomp: true).filter_map do |line|
-          line.match(tag_rx) { |matchdata| matchdata[:number] }
+        # Retrieve last org version from GNU ELPA page.
+        uri = URI("#{GNU_ELPA_URL}.html")
+        response = http_get_client(uri).body
+        version_line = response.each_line(chomp: true).find do |line|
+          line.start_with? '<dt>Latest</dt> <dd><a href='
         end
-        versions.compact.max_by { Gem::Version.new _1 }
+        return unless version_line
+
+        version_match = version_line.match(/org-(?<version>[0-9.]+)\.tar/)
+        return version_match[:version] if version_match
+
+        nil
       end
 
       # Download latest org-mode tarball.
@@ -69,49 +70,29 @@ module Fronde
       # @return [String] the downloaded org-mode version
       def download(destination = 'var/tmp')
         org_last_version = last_version(force: false, cookie_dir: destination)
-        tarball = "org-mode-release_#{org_last_version}.tar.gz"
-        uri = URI("#{CGIT_BASE_URL}snapshot/#{tarball}")
+        uri = URI("#{GNU_ELPA_URL}-#{org_last_version}.tar")
         # Will crash on purpose if anything goes wrong
-        http_get_client(uri) do |http, request|
-          fetch_org_tarball http, request, destination
+        http_get_client(uri) do |response|
+          fetch_org_tarball response, destination
         end
         org_last_version
       end
 
-      def fetch_org_tarball(http, request, destination)
+      def fetch_org_tarball(response, destination)
         # Remove version number in dest file to allow easy rake file
         # task naming
-        dest_file = ::File.expand_path('org.tar.gz', destination)
-        http.request request do |response|
-          ::File.open(dest_file, 'w') do |io|
-            response.read_body { |chunk| io.write chunk }
-          end
+        dest_file = ::File.expand_path('org.tar', destination)
+        ::File.open(dest_file, 'w') do |io|
+          response.read_body { |chunk| io.write chunk }
         end
       end
 
-      def make_org_cmd(org_dir, target, verbose: false)
-        make = ['make', '-C', org_dir, target]
-        return make.join(' ') if verbose
-
-        make.insert(3, '-s')
-        make << 'EMACSQ="emacs -Q --eval \'(setq inhibit-message t)\'"'
-        make.join(' ')
-      end
-
-      # Compile downloaded Org package
+      # Extract downloaded Org tarball
       #
       # @param source [String] path to the org-mode tarball to install
-      # @param version [String] version of the org package to install
       # @param target [String] path to the final install directory
-      # @param verbose [Boolean] whether the process should be verbose
-      def compile(source, version, target, verbose: false)
-        untar_cmd = ['tar', '-xzf', source]
-        system(*untar_cmd)
-        FileUtils.mv "org-mode-release_#{version}", target
-        # Fix a weird unknown package version
-        ::File.write("#{target}/mk/version.mk", "ORGVERSION ?= #{version}")
-        system(*make_org_cmd(target, 'compile', verbose:))
-        system(*make_org_cmd(target, 'autoloads', verbose:))
+      def extract(source, target)
+        system 'tar', '-C', target, '-xf', source
       end
     end
   end

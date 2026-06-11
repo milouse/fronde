@@ -10,14 +10,16 @@ CLOBBER.push(
 )
 
 HTMLIZE_TAG = 'release/1.58'
+TMP_ORG_TARBALL = 'var/tmp/org.tar'
 
 namespace :org do
+  directory 'lib'
   directory 'var/tmp'
 
   desc 'Download last version of Org'
-  file 'var/tmp/org.tar.gz' => 'var/tmp' do
+  file TMP_ORG_TARBALL => 'var/tmp' do
     # Weird Rake issue, still executing the task even if the file exists
-    next if File.exist? 'var/tmp/org.tar.gz'
+    next if File.exist? TMP_ORG_TARBALL
 
     download = Thread.new do
       version = Fronde::Org.download
@@ -30,18 +32,19 @@ namespace :org do
     warn I18n.t('fronde.tasks.org.no_download') if verbose
   end
 
-  desc 'Compile Org'
-  multitask compile: ['var/tmp/org.tar.gz', 'lib'] do |task|
+  desc 'Extract Org tarball'
+  multitask extract: [TMP_ORG_TARBALL, 'lib'] do |task|
     # No need to force fetch last version as it is only interesting as
     # part of the upgrade task
     version = Fronde::Org.last_version
 
     org_dir = "lib/org-#{version}"
-    next if Dir.exist?("#{org_dir}/lisp")
+    next if File.exist?("#{org_dir}/org-version.el")
 
     build = Thread.new do
-      Fronde::Org.compile(task.prerequisites[0], version, org_dir, verbose:)
-      Dir.glob('lib/org-[0-9.]*').each { rm_r _1 unless _1 == org_dir }
+      Fronde::Org.extract task.prerequisites[0], 'lib'
+      # Remove old versions
+      Dir.glob('lib/org-[0-9.]*').each { rm_r it unless it == org_dir }
       puts I18n.t('fronde.tasks.org.installed', version:) if verbose
     end
     Fronde::CLI::Throbber.run(
@@ -50,8 +53,6 @@ namespace :org do
   rescue RuntimeError, Interrupt
     next
   end
-
-  directory 'lib'
 
   file 'lib/htmlize.el' => 'lib' do
     uri = URI(
@@ -79,15 +80,15 @@ namespace :org do
   end
 
   desc 'Install Org'
-  multitask install: ['org:compile', '.gitignore'] do
+  multitask install: ['org:extract', '.gitignore'] do
     # lib/htmlize.el cannot be generated in parallel of org:compilation,
     # as it will leads to a weird SSL error. Thus finishing file generation
     # "manually" here.
     Rake::Task['var/lib/org-config.el'].invoke
     sources = Fronde::CONFIG.sources
-    sources.each { mkdir_p _1['path'] }
+    sources.each { mkdir_p it['path'] }
 
-    outputs = sources.map { _1['type'] }.uniq
+    outputs = sources.map { it['type'] }.uniq
     if outputs.include?('html')
       mkdir_p "#{Fronde::CONFIG.get('html_public_folder')}/assets"
     end
@@ -99,7 +100,7 @@ namespace :org do
   desc 'Upgrade Org'
   task :upgrade do
     Rake::Task['clobber'].execute
-    if File.exist? 'var/tmp/org.tar.gz'
+    if File.exist? TMP_ORG_TARBALL
       # Cleanup cached tarball only if a new version is available.
       # Also cached the new remote org version in the same time.
       org_version = Fronde::Org.current_version
@@ -108,7 +109,7 @@ namespace :org do
       rescue RuntimeError
         last_version = org_version
       end
-      File.unlink 'var/tmp/org.tar.gz' unless org_version == last_version
+      File.unlink TMP_ORG_TARBALL unless org_version == last_version
     end
     Rake::Task['org:install'].invoke
   end

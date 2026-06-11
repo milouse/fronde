@@ -58,14 +58,14 @@ module Fronde
 
       def apply_templates(source)
         public_file = source.pub_file absolute: true
-        dom = File.open(public_file, 'r') { Nokogiri::HTML _1 }
+        dom = File.open(public_file, 'r') { Nokogiri::HTML it }
         changes = Fronde::CONFIG.get('templates', []).map do |config|
           template = Fronde::Templater.new(source, dom, config)
           next if !template.valid? || template.applied?
 
           template.apply
         end
-        File.open(public_file, 'w') { dom.write_to _1 } if changes.any?
+        File.open(public_file, 'w') { dom.write_to it } if changes.any?
       end
     end
 

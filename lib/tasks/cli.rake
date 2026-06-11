@@ -28,7 +28,7 @@ namespace :cli do
     data['commands'] = all_commands.filter_map do |command, options|
       next if options[:alias] || command == 'basic'
 
-      opts = (options[:opts] || []).map { comp_opt_to_liquid(_1, command) }
+      opts = (options[:opts] || []).map { comp_opt_to_liquid(it, command) }
       { 'name' => command,
         'translation' => I18n.t("fronde.bin.commands.#{command}"),
         'options' => opts }
